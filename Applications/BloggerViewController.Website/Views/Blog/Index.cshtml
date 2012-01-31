@@ -1,7 +1,25 @@
-﻿@{
-    ViewBag.Title = "Index";
+﻿@model BloggerViewController.BlogResult
+
+@{
+    ViewBag.Title = "List of blogposts";
+    if(ViewBag.PageIndex > 1) {
+        ViewBag.Title = ViewBag.Title + " - Page " + ViewBag.PageIndex;
+    }
 }
 
 <h2>Index</h2>
 
 <p>Demo-template for the BloggerViewController-project.</p>
+
+@foreach(var entry in Model.Posts) {
+    <div>
+        <h2>@entry.Title</h2>
+        <span>@entry.Updated</span>
+        <div>@Html.Raw(entry.Text)</div>
+        <div>
+            @foreach (var tag in entry.Categories) {
+                <span><a href="#@tag">@tag</a></span>
+            }
+        </div>
+    </div>
+}

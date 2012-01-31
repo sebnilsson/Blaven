@@ -64,7 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlogPost.cs" />
-    <Compile Include="BlogPostPreview.cs" />
+    <Compile Include="BlogResult.cs" />
     <Compile Include="BlogService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
