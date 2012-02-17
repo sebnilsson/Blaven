@@ -55,6 +55,7 @@
     <Reference Include="Google.GData.Blogger, Version=1.9.0.0, Culture=neutral, PublicKeyToken=6f8943d33947d761, processorArchitecture=MSIL" />
     <Reference Include="Google.GData.Client, Version=1.9.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -63,8 +64,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlogConfiguration.cs" />
+    <Compile Include="BlogPagingHelper.cs" />
+    <Compile Include="BlogPostDetail.cs" />
     <Compile Include="BlogPost.cs" />
-    <Compile Include="BlogResult.cs" />
+    <Compile Include="BlogPostPagingHelper.cs" />
+    <Compile Include="BlogData.cs" />
     <Compile Include="BlogService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

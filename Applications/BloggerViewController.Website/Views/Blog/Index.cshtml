@@ -1,8 +1,8 @@
-﻿@model BloggerViewController.BlogResult
+﻿@model BloggerViewController.Website.Models.BlogListViewModel
 
 @{
     ViewBag.Title = "List of blogposts";
-    if(ViewBag.PageIndex > 1) {
+    if(Model.PageIndex > 1) {
         ViewBag.Title = ViewBag.Title + " - Page " + ViewBag.PageIndex;
     }
 }
@@ -11,7 +11,7 @@
 
 <p>Demo-template for the BloggerViewController-project.</p>
 
-@foreach(var entry in Model.Posts) {
+@foreach(var entry in Model.Data.Posts) {
     <div>
         <h2>@entry.Title</h2>
         <span>@entry.Updated</span>
@@ -23,3 +23,13 @@
         </div>
     </div>
 }
+
+@*@section Navigation {
+    @if(Model.HasPreviousItems) {
+        <a href="#previousPage">Previous Page</a>    
+    }
+
+    @if(Model.HasNextItems) {
+        <a href="#nextPage">Next Page</a>    
+    }
+}*@

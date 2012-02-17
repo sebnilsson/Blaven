@@ -17,26 +17,57 @@ namespace BloggerViewController {
             _password = password;
         }
 
-        public BlogResult GetBlog(DateTime? minPublicationDate = null, bool includePosts = true) {
+        public BlogData GetBlogData() {
+            return GetBlogDataMultiple(null, null);
+        }
+
+        public BlogData GetBlogData(int pageSize, int pageIndex) {
+            return GetBlogDataMultiple(pageSize, pageIndex);
+        }
+
+        public BlogData GetBlogData(string entryId) {
+            return GetBlogDataSingle(entryId);
+        }
+
+        private BlogData GetBlogDataSingle(string entryId) {
+            // TODO: Get correct URI
+            var queryUri = new Uri(string.Format("https://www.blogger.com/feeds/{0}/posts/default?entryId={1}", _blogId, entryId));
+            return GetBlogDataFromService(1, 0, queryUri);
+        }
+
+        private BlogData GetBlogDataMultiple(int? pageSize, int? pageIndex) {
+            var queryUri = new Uri(string.Format("https://www.blogger.com/feeds/{0}/posts/default", _blogId));
+            return GetBlogDataFromService(pageSize, pageIndex, queryUri);
+        }
+
+        private BloggerService GetBloggerService() {
             var service = new BloggerService("BloggerViewController");
             service.Credentials = new GDataCredentials(_username, _password);
-            
+
             // For proper authentication for Google Apps users
             SetAuthForGoogleAppsUsers(service);
 
-            var query = new BloggerQuery();
-            query.Uri = new Uri(string.Format("https://www.blogger.com/feeds/{0}/posts/default", _blogId));
-            if(!includePosts) {
-                query.NumberToRetrieve = 0;
+            return service;
+        }
+
+        private BlogData GetBlogDataFromService(int? pageSize, int? pageIndex, Uri queryUri) {
+            var service = GetBloggerService();
+
+            var query = new BloggerQuery {
+                Uri = queryUri,
+            };
+            if(pageSize.HasValue && pageIndex.HasValue) {
+                int startIndex = pageSize.Value * pageIndex.Value;
+
+                query.NumberToRetrieve = pageSize.Value;
+                query.StartIndex = startIndex;
             }
-            
-            if(minPublicationDate.HasValue) {
-                query.MinPublication = minPublicationDate.Value;
-            }
-            
+
             var feed = service.Query(query);
 
-            var blogResult = new BlogResult {
+            bool hasNextItems = !string.IsNullOrWhiteSpace(feed.NextChunk);
+
+            var blogResult = new BlogData(hasNextItems, pageSize, pageIndex) {
                 Categories = (feed.Categories != null)
                     ? feed.Categories.Select(cat => cat.Term) : Enumerable.Empty<string>(),
                 Description = feed.Subtitle.Text,
@@ -44,11 +75,41 @@ namespace BloggerViewController {
                 Updated = feed.Updated,
             };
 
-            if(includePosts) {
-                blogResult.Posts = GetBlogPosts(service, query, feed);
+            if(pageSize.GetValueOrDefault(0) > 0) {
+                blogResult.Posts = GetBlogPostDetails(service, query, feed);
             }
 
             return blogResult;
+        }
+
+        private IEnumerable<BlogPostDetail> GetBlogPostDetails(Service service, BloggerQuery query, AtomFeed feed) {
+            foreach(var entry in feed.Entries) {
+                yield return new BlogPostDetail(entry);
+            }
+
+            var next = feed.NextChunk;
+            while(!string.IsNullOrWhiteSpace(next)) {
+                query.Uri = new Uri(next);
+                feed = service.Query(query);
+                foreach(var entry in feed.Entries) {
+                    yield return new BlogPostDetail(entry);
+                }
+
+                next = feed.NextChunk;
+            }
+        }
+
+        public IEnumerable<BlogPost> GetAllPosts() {
+            var service = GetBloggerService();
+
+            var query = new BloggerQuery {
+                Uri = new Uri(string.Format("https://www.blogger.com/feeds/{0}/posts/default", _blogId)),
+            };
+            query.ExtraParameters = "?fields=entry(id,title,published,uri)";
+
+            var feed = service.Query(query);
+
+            return GetBlogPosts(service, query, feed);
         }
 
         private IEnumerable<BlogPost> GetBlogPosts(Service service, BloggerQuery query, AtomFeed feed) {

@@ -49,3 +49,6 @@ _ReSharper*/
 # Custom
 *.private
 readme.html
+
+# Project-specific
+AppSettings.config
