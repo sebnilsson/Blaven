@@ -1,9 +1,9 @@
 ﻿@model BloggerViewController.Website.Models.BlogListViewModel
 
 @{
-    ViewBag.Title = "List of blogposts";
+    ViewBag.Title = string.Empty;
     if(Model.PageIndex > 1) {
-        ViewBag.Title = ViewBag.Title + " - Page " + ViewBag.PageIndex;
+        ViewBag.Title = ViewBag.Title + "Page " + ViewBag.PageIndex;
     }
 }
 
@@ -11,11 +11,11 @@
 
 <p>Demo-template for the BloggerViewController-project.</p>
 
-@foreach(var entry in Model.Data.Posts) {
+@foreach(var entry in Model.Selection.Posts) {
     <div>
         <h2>@entry.Title</h2>
         <span>@entry.Updated</span>
-        <div>@Html.Raw(entry.Text)</div>
+        <div>@Html.Raw(entry.Content)</div>
         <div>
             @foreach (var tag in entry.Categories) {
                 <span><a href="#@tag">@tag</a></span>

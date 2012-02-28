@@ -2,24 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Google.GData.Client;
-
 namespace BloggerViewController {
     public class BlogPost {
-        public BlogPost() {
-
+        public BlogPost(IEnumerable<string> categories = null) {
+            this.Categories = categories ?? Enumerable.Empty<string>();
         }
 
-        internal BlogPost(AtomEntry entry) {
-            ID = entry.Id.Uri.Content;
-            Published = entry.Published;
-            Title = entry.Title.Text;
-            Uri = entry.Id.Uri.Content;
-        }
-
+        public IEnumerable<string> Categories { get; set; }
+        public string Content { get; set; }
+        public string EditUri { get; set; }
         public string ID { get; set; }
         public DateTime Published { get; set; }
         public string Title { get; set; }
+        public DateTime Updated { get; set; }
         public string Uri { get; set; }
     }
 }

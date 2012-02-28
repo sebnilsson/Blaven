@@ -37,7 +37,7 @@ namespace BloggerViewController {
             string value = GetConfigValue("BloggerViewController.PageSize", false);
             int result = 0;
             if(!int.TryParse(value, out result)) {
-                result = 10;
+                result = 5;
             }
 
             return result;
@@ -45,6 +45,21 @@ namespace BloggerViewController {
         public static int PageSize {
             get {
                 return _pageSize.Value;
+            }
+        }
+
+        private static Lazy<int> _cacheTime = new Lazy<int>(() => {
+            string value = GetConfigValue("BloggerViewController.CacheTime", false);
+            int result = 0;
+            if(!int.TryParse(value, out result)) {
+                result = 5;
+            }
+
+            return result;
+        });
+        public static int CacheTime {
+            get {
+                return _cacheTime.Value;
             }
         }
 

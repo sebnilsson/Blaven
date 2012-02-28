@@ -64,13 +64,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlogConfiguration.cs" />
-    <Compile Include="BlogPagingHelper.cs" />
-    <Compile Include="BlogPostDetail.cs" />
-    <Compile Include="BlogPost.cs" />
-    <Compile Include="BlogPostPagingHelper.cs" />
     <Compile Include="BlogData.cs" />
+    <Compile Include="BloggerHelper.cs" />
+    <Compile Include="BlogConfiguration.cs" />
+    <Compile Include="BlogLinkHelper.cs" />
+    <Compile Include="BlogPost.cs" />
+    <Compile Include="BlogInfo.cs" />
+    <Compile Include="BlogSelection.cs" />
     <Compile Include="BlogService.cs" />
+    <Compile Include="IBlogStore.cs" />
+    <Compile Include="MemoryBlogStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

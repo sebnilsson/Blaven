@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 
 namespace BloggerViewController.Website.Models {
     public class BlogSingleViewModel {
-        public BlogData Data { get; set; }
-        public BlogPostDetail Post { get { return Data.Posts.FirstOrDefault(); } }
+        public BlogInfo Info { get; set; }
+        public BlogPost Post { get; set; }
     }
 }
