@@ -32,15 +32,17 @@ namespace BloggerViewController {
                 query.ModifiedSince = ifModifiedSince.Value;
             }
 
-            var feed = service.Query(query);
+            BloggerFeed feed = null;
+            try {
+                feed = service.Query(query);
+            }
+            catch(GDataNotModifiedException) {
+                return null;
+            }
 
             using(var stream = new System.IO.MemoryStream()) {
                 feed.SaveToXml(stream);
                 stream.Position = 0;
-
-                /*using(var reader = new System.IO.StreamReader(stream)) {
-                    string content = reader.ReadToEnd();
-                }*/
 
                 var document = XDocument.Load(stream);
                 return document;
@@ -54,16 +56,7 @@ namespace BloggerViewController {
             var blogEntries = feed.Elements(ns + "entry").Where(entry => !string.IsNullOrWhiteSpace(entry.Value));
 
             var posts = from entry in blogEntries
-                               select new BlogPost {
-                                   ID = ParseId(entry.Element(ns + "id").Value),
-                                   Categories = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
-                                   Content = entry.Element(ns + "content").Value,
-                                   EditUri = entry.Elements(ns + "link").First(el => el.Attribute("rel").Value == "edit").Attribute("href").Value,
-                                   Published = ParseDate(entry.Element(ns + "published").Value),
-                                   Title = entry.Element(ns + "title").Value,
-                                   Updated = ParseDate(entry.Element(ns + "updated").Value),
-                                   Uri = entry.Elements(ns + "link").First(el => el.Attribute("rel").Value == "self").Attribute("href").Value,
-                               };
+                        select ParseEntry(ns, entry);
 
             var categories = new Dictionary<string, int>();
             foreach(var post in posts) {
@@ -75,6 +68,8 @@ namespace BloggerViewController {
                 }
             }
 
+            var friendlyPermaLinks = posts.Select(post => post.FriendlyPermaLink);
+
             var postDates = new Dictionary<DateTime, int>();
             foreach(var post in posts) {
                 DateTime key = new DateTime(post.Published.Year, post.Published.Month, 1);
@@ -83,8 +78,8 @@ namespace BloggerViewController {
                 }
                 postDates[key] = (postDates[key] + 1);
             }
-
-            var blogInfo = new BlogInfo(categories, postDates) {
+                        
+            var blogInfo = new BlogInfo(categories, friendlyPermaLinks, postDates) {
                 Subtitle = feed.Element(ns + "subtitle").Value,
                 Title = feed.Element(ns + "title").Value,
                 Updated = ParseDate(feed.Element(ns + "updated").Value),
@@ -94,44 +89,20 @@ namespace BloggerViewController {
             return blogData;
         }
 
-        /*public BlogSelection GetBlogSection(XDocument document, BlogInfo blogInfo, int pageIndex, int? pageSize) {
-            return GetBlogSection(document, blogInfo.AllPosts, pageIndex, pageSize);
+        private static BlogPost ParseEntry(XNamespace ns, XElement entry) {
+            var alternateLink = entry.Elements(ns + "link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
+
+            var post = new BlogPost {
+                ID = ParseId(entry.Element(ns + "id").Value),
+                Categories = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
+                Content = entry.Element(ns + "content").Value,
+                FriendlyPermaLink = GetRelativeUrl(alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value),
+                Published = ParseDate(entry.Element(ns + "published").Value),
+                Title = entry.Element(ns + "title").Value,
+                Updated = ParseDate(entry.Element(ns + "updated").Value),
+            };
+            return post;
         }
-
-        public BlogSelection GetBlogSection(XDocument document, IEnumerable<BlogPost> allPosts, int pageIndex, int? pageSize) {
-            int take = pageSize.GetValueOrDefault(BlogConfiguration.PageSize);
-            int skip = (pageIndex * take);
-            var blogEntries = document.Root.Elements("entry").Where(entry => !string.IsNullOrWhiteSpace(entry.Value)).Skip(skip).Take(take);
-
-            var blogPosts = ParseBlogPostDetails(blogEntries);
-
-            return new BlogSelection(allPosts, blogPosts, pageIndex, pageSize);
-        }*/
-
-        /*public BlogPostDetail GetBlogPost(XDocument document, IEnumerable<BlogPost> allPosts, string blogId) {
-            var blogEntries = document.Root.Elements("entry").Where(entry => entry.Value.EndsWith(blogId));
-
-            var blogPosts = ParseBlogPostDetails(blogEntries);
-
-            return blogPosts.FirstOrDefault();
-        }
-
-        private IEnumerable<BlogPostDetail> ParseBlogPostDetails(IEnumerable<XElement> elements) {
-            var blogPosts = from entry in elements
-                            select new BlogPostDetail {
-                                ID = ParseId(entry.Element("id").Value),
-                                Categories = entry.Elements("category").Select(cat => cat.Attribute("term").Value),
-                                Published = ParseDate(entry.Element("published").Value),
-                                Title = entry.Element("title").Value,
-                                Uri = entry.Elements("link").First(el => el.Attribute("rel").Value == "self").Attribute("href").Value,
-
-                                Content = entry.Element("content").Value,
-                                EditUri = entry.Elements("link").First(el => el.Attribute("rel").Value == "edit").Attribute("href").Value,
-                                Updated = ParseDate(entry.Element("updated").Value),
-                            };
-
-            return blogPosts;
-        }*/
 
         private BloggerService GetBloggerService() {
             var service = new BloggerService("BloggerViewController");
@@ -167,6 +138,18 @@ namespace BloggerViewController {
 
             var dateTime = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
             return dateTime;
+        }
+
+        internal static string GetRelativeUrl(string fullUrl) {
+            if(string.IsNullOrWhiteSpace(fullUrl) || !Uri.IsWellFormedUriString(fullUrl, UriKind.RelativeOrAbsolute)) {
+                return string.Empty;
+            }
+            var uri = new Uri(fullUrl);
+
+            var relative = uri.LocalPath;
+            var index = relative.LastIndexOf(".html");
+            relative = relative.Substring(0, index);
+            return relative;
         }
     }
 }

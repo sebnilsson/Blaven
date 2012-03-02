@@ -63,6 +63,22 @@ namespace BloggerViewController {
             }
         }
 
+        private static Lazy<IBlogStore> _blogStore = new Lazy<IBlogStore>(() => {
+            string value = GetConfigValue("BloggerViewController.BlogStore", false);
+            switch(value.ToLowerInvariant()) {
+                case "disk":
+                    return new DiskBlogStore();
+                default:
+                    return new MemoryBlogStore();
+            }
+        });
+
+        public static IBlogStore BlogStore {
+            get {
+                return _blogStore.Value;
+            }
+        }
+
         private static string GetConfigValue(string configKey, bool throwException = true) {
             string value = ConfigurationManager.AppSettings[configKey];
             if(throwException && string.IsNullOrWhiteSpace(value)) {

@@ -7,7 +7,7 @@ namespace BloggerViewController {
         BlogInfo GetBlogInfo();
         BlogSelection GetBlogSelection(int pageIndex, int? pageSize);
         BlogPost GetBlogPost(string link);
-        BlogPost GetBlogPostById(string blogId);
         DateTime? LastUpdate { get; }
+        bool HasAnyData { get;  }
     }
 }

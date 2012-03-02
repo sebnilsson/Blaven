@@ -37,17 +37,15 @@ namespace BloggerViewController {
             var post = _store.GetBlogPost(blogId);
             return post;
         }
-
+        
         private void EnsureStoreIsUpdated() {
             // Check if cache is updated
-            bool isCacheUpToDate = (_store.LastUpdate.HasValue && _store.LastUpdate.Value.AddMinutes(BlogConfiguration.CacheTime) > DateTime.Now);
-            if(isCacheUpToDate) {
+            var storeCache = new BlogStoreCacheHandler(_bloggerHelper, _store, BlogConfiguration.CacheTime);
+            if(storeCache.IsCacheUpToDate) {
                 return;
             }
 
-            // If not, updated with BloggerHelper and call IBlogStore.Update
-            var bloggerDocument = _bloggerHelper.GetBloggerDocument(_store.LastUpdate);
-            _store.Update(bloggerDocument);
+            storeCache.UpdateStore();
         }
     }
 }
