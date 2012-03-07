@@ -1,85 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Configuration;
+﻿using System.Configuration;
 
 namespace BloggerViewController {
-    public static class BlogConfiguration {
-        private static Lazy<string> _blogId = new Lazy<string>(() => {
-            return GetConfigValue("BloggerViewController.BlogId");
-        });
-        public static string BlogId {
+    public class BlogConfiguration {
+        private string _blogKey;
+        public BlogConfiguration(string blogKey) {
+            _blogKey = blogKey;
+        }
+
+        private string _blogId;
+        public string BlogId {
             get {
-                return _blogId.Value;
+                if(string.IsNullOrWhiteSpace(_blogId)) {
+                    _blogId = GetConfigValue("BloggerViewController.BlogId", _blogKey);
+                }
+                return _blogId;
             }
         }
 
-        private static Lazy<string> _username = new Lazy<string>(() => {
-            return GetConfigValue("BloggerViewController.Username");
-        });
-        public static string Username {
+        private string _username;
+        public string Username {
             get {
-                return _username.Value;
+                if(string.IsNullOrWhiteSpace(_username)) {
+                    _username = GetConfigValue("BloggerViewController.Username", _blogKey);
+                }
+                return _username;
             }
         }
 
-        private static Lazy<string> _password = new Lazy<string>(() => {
-            return GetConfigValue("BloggerViewController.Password");
-        });
-        public static string Password {
+        private string _password;
+        public string Password {
             get {
-                return _password.Value;
+                if(string.IsNullOrWhiteSpace(_password)) {
+                    _password = GetConfigValue("BloggerViewController.Password", _blogKey);
+                }
+                return _password;
             }
         }
 
-        private static Lazy<int> _pageSize = new Lazy<int>(() => {
-            string value = GetConfigValue("BloggerViewController.PageSize", false);
-            int result = 0;
-            if(!int.TryParse(value, out result)) {
-                result = 5;
+        internal static string GetConfigValue(string configKey, string blogKey = null, bool throwException = true) {
+            if(!string.IsNullOrWhiteSpace(blogKey)) {
+                configKey = string.Format("{0}.{1}", blogKey, configKey);
             }
 
-            return result;
-        });
-        public static int PageSize {
-            get {
-                return _pageSize.Value;
-            }
-        }
-
-        private static Lazy<int> _cacheTime = new Lazy<int>(() => {
-            string value = GetConfigValue("BloggerViewController.CacheTime", false);
-            int result = 0;
-            if(!int.TryParse(value, out result)) {
-                result = 5;
-            }
-
-            return result;
-        });
-        public static int CacheTime {
-            get {
-                return _cacheTime.Value;
-            }
-        }
-
-        private static Lazy<IBlogStore> _blogStore = new Lazy<IBlogStore>(() => {
-            string value = GetConfigValue("BloggerViewController.BlogStore", false);
-            switch(value.ToLowerInvariant()) {
-                case "disk":
-                    return new DiskBlogStore();
-                default:
-                    return new MemoryBlogStore();
-            }
-        });
-
-        public static IBlogStore BlogStore {
-            get {
-                return _blogStore.Value;
-            }
-        }
-
-        private static string GetConfigValue(string configKey, bool throwException = true) {
             string value = ConfigurationManager.AppSettings[configKey];
             if(throwException && string.IsNullOrWhiteSpace(value)) {
                 throw new ConfigurationErrorsException(string.Format("Could not find configuration-value for key '{0}'.", configKey));

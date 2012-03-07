@@ -8,23 +8,19 @@ using Google.GData.Client;
 
 namespace BloggerViewController {
     internal class BloggerHelper {
-        private string _blogId;
-        private string _username;
-        private string _password;
+        private BlogConfiguration _configuration;
 
         public static string BloggerPostsUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
 
-        public BloggerHelper(string blogId, string username, string password) {
-            _blogId = blogId;
-            _username = username;
-            _password = password;
+        public BloggerHelper(BlogConfiguration configuration) {
+            _configuration = configuration;
         }
 
         public XDocument GetBloggerDocument(DateTime? ifModifiedSince = null) {
             var service = GetBloggerService();
 
             var query = new BloggerQuery {
-                Uri = new Uri(string.Format(BloggerPostsUriFormat, _blogId)),
+                Uri = new Uri(string.Format(BloggerPostsUriFormat, _configuration.BlogId)),
                 NumberToRetrieve = int.MaxValue,
             };
 
@@ -106,7 +102,7 @@ namespace BloggerViewController {
 
         private BloggerService GetBloggerService() {
             var service = new BloggerService("BloggerViewController");
-            service.Credentials = new GDataCredentials(_username, _password);
+            service.Credentials = new GDataCredentials(_configuration.Username, _configuration.Password);
 
             // For proper authentication for Google Apps users
             SetAuthForGoogleAppsUsers(service);

@@ -8,6 +8,6 @@ namespace BloggerViewController {
         BlogSelection GetBlogSelection(int pageIndex, int? pageSize);
         BlogPost GetBlogPost(string link);
         DateTime? LastUpdate { get; }
-        bool HasAnyData { get;  }
+        bool HasData { get; }
     }
 }

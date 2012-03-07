@@ -2,19 +2,15 @@
 
 namespace BloggerViewController {
     public class BlogService {
-        private string _blogId;
-        private string _password;
-        private string _username;
+        private BlogConfiguration _configuration;
         private BloggerHelper _bloggerHelper;
         private IBlogStore _store;
 
-        public BlogService(string blogId = null, string username = null, string password = null, IBlogStore store = null) {
-            _blogId = blogId ?? BlogConfiguration.BlogId;
-            _username = username ?? BlogConfiguration.Username;
-            _password = password ?? BlogConfiguration.Password;
-            _store = store ?? new MemoryBlogStore();
+        public BlogService(BlogConfiguration configuration = null, IBlogStore store = null) {
+            _configuration = configuration ?? BlogConfigurationHelper.DefaultConfiguration;
+            _store = store ?? BlogConfigurationHelper.BlogStore;
 
-            _bloggerHelper = new BloggerHelper(_blogId, _username, _password);
+            _bloggerHelper = new BloggerHelper(_configuration);
         }
 
         public BlogInfo GetInfo() {
@@ -37,15 +33,14 @@ namespace BloggerViewController {
             var post = _store.GetBlogPost(blogId);
             return post;
         }
-        
-        private void EnsureStoreIsUpdated() {
-            // Check if cache is updated
-            var storeCache = new BlogStoreCacheHandler(_bloggerHelper, _store, BlogConfiguration.CacheTime);
-            if(storeCache.IsCacheUpToDate) {
-                return;
-            }
 
-            storeCache.UpdateStore();
+        public void InitStore() {
+            BlogStoreCacheHandler.EnsureStoreIsUpdated(_bloggerHelper, _store, BlogConfigurationHelper.CacheTime, false);
+        }
+        
+        internal void EnsureStoreIsUpdated() {
+            // Check if cache is updated
+            BlogStoreCacheHandler.EnsureStoreIsUpdated(_bloggerHelper, _store, BlogConfigurationHelper.CacheTime);
         }
     }
 }

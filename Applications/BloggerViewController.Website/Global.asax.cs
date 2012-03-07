@@ -30,6 +30,9 @@ namespace BloggerViewController.Website {
 
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
+
+            var service = new BlogService();
+            service.InitStore();
         }
     }
 }

@@ -1,53 +1,59 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace BloggerViewController {
     internal class BlogStoreCacheHandler {
-        private int _cacheTime;
-        private IBlogStore _store;
-        private BloggerHelper _bloggerHelper;
-
-        public BlogStoreCacheHandler(BloggerHelper bloggerHelper, IBlogStore store, int? cacheTime = null) {
-            _bloggerHelper = bloggerHelper;
-            _cacheTime = cacheTime.GetValueOrDefault(BlogConfiguration.CacheTime);
-            _store = store;
+        private static bool GetIsCacheUpToDate(IBlogStore store, int cacheTime) {
+            return (store.LastUpdate.HasValue && store.LastUpdate.Value.AddMinutes(cacheTime) > DateTime.Now);
         }
 
-        public bool IsCacheUpToDate {
-            get {
-                return (_store.LastUpdate.HasValue && _store.LastUpdate.Value.AddMinutes(_cacheTime) > DateTime.Now);
+        private static bool _isUpdating = false;
+
+        private static readonly object _updateLock = new object();
+
+        public static void EnsureStoreIsUpdated(BloggerHelper bloggerHelper, IBlogStore store, int? cacheTime = null, bool alwaysThrowOnError = true) {
+            var cacheTimeHours = cacheTime.GetValueOrDefault(BlogConfigurationHelper.CacheTime);
+
+            if(_isUpdating) {
+                return;
             }
-        }
 
-        public void UpdateStore() {
-            var bloggerDocument = _bloggerHelper.GetBloggerDocument(_store.LastUpdate);
-            _store.Update(bloggerDocument);
+            lock(_updateLock) {
+                if(_isUpdating || GetIsCacheUpToDate(store, cacheTimeHours)) {
+                    return;
+                }
 
-            //// If not, updated with BloggerHelper and call IBlogStore.Update
-            //try {
-            //    _isBloggerDocumentUpdating = true;
-            //    lock(_updateLock) {
-            //        // If the store has any data then perform update async
-            //        if(_store.HasAnyData) {
-            //            var callback = new System.Threading.WaitCallback((obj) => {
-            //                var bloggerDocument = _bloggerHelper.GetBloggerDocument(_store.LastUpdate);
-            //                _store.Update(bloggerDocument);
-            //                _isBloggerDocumentUpdating = false;
-            //            });
-            //            System.Threading.ThreadPool.QueueUserWorkItem(callback, null);
-            //        } else {
-            //            var bloggerDocument = _bloggerHelper.GetBloggerDocument(_store.LastUpdate);
-            //            _store.Update(bloggerDocument);
-            //            _isBloggerDocumentUpdating = false;
-            //        }
-            //    }
-            //}
-            //catch(Exception) {
-            //    _isBloggerDocumentUpdating = false;
-            //    // Silent fail
-            //}
+                _isUpdating = true;
+
+                Action<object> action = (obj) => {
+                    try {
+                        var blogStore = obj as IBlogStore;
+
+                        var bloggerDocument = bloggerHelper.GetBloggerDocument(blogStore.LastUpdate);
+                        blogStore.Update(bloggerDocument);
+                    }
+                    catch(Exception) {
+                        if(alwaysThrowOnError) {
+                            throw;
+                        }
+
+                        // If the fetch fails, but there is data in store, don't throw exception
+                        if(!store.HasData) {
+                            throw;
+                        }
+                    }
+                    finally {
+                        _isUpdating = false;
+                    }
+                };
+
+                if(!store.HasData) {
+                    action(store);
+                } else {
+                    var callback = new System.Threading.WaitCallback(action);
+                    System.Threading.ThreadPool.QueueUserWorkItem(callback, store);
+                }
+
+            }
         }
     }
 }

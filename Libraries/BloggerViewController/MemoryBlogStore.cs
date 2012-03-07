@@ -9,9 +9,7 @@ namespace BloggerViewController {
 
         private static BlogData BlogData {
             get {
-                lock(_lock) {
-                    return _blogData;
-                }
+                return _blogData;
             }
         }
 
@@ -24,11 +22,8 @@ namespace BloggerViewController {
                 }
 
                 var newBlogData = BloggerHelper.ParseBlogData(bloggerDocument);
-                
-                _blogData = _blogData ?? new BlogData();
-                _blogData.Posts = _blogData.Posts.Union(newBlogData.Posts);
-                _blogData.Info = newBlogData.Info;
-                
+
+                _blogData = newBlogData;
             }
         }
 
@@ -37,7 +32,7 @@ namespace BloggerViewController {
         }
 
         public BlogSelection GetBlogSelection(int pageIndex, int? pageSize) {
-            int take = pageSize.GetValueOrDefault(BlogConfiguration.PageSize);
+            int take = pageSize.GetValueOrDefault(BlogConfigurationHelper.PageSize);
             int skip = (pageIndex * take);
 
             var selectionPosts = BlogData.Posts.Skip(skip).Take(take);
@@ -58,8 +53,10 @@ namespace BloggerViewController {
             }
         }
 
-        public bool HasAnyData {
-            get { return BlogData.Info.Updated == DateTime.MinValue || string.IsNullOrWhiteSpace(BlogData.Info.Title); }
+        public bool HasData {
+            get {
+                return BlogData != null && !string.IsNullOrWhiteSpace(BlogData.Info.Title);
+            }
         }
     }
 }
