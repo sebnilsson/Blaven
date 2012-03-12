@@ -8,19 +8,21 @@ using Google.GData.Client;
 
 namespace BloggerViewController {
     internal class BloggerHelper {
-        private BlogConfiguration _configuration;
+        private Dictionary<string, BlogConfiguration> _configurations;
 
         public static string BloggerPostsUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
 
-        public BloggerHelper(BlogConfiguration configuration) {
-            _configuration = configuration;
+        public BloggerHelper(IEnumerable<BlogConfiguration> configurations) {
+            _configurations = configurations.ToDictionary(conf => conf.BlogKey, conf => conf);
         }
 
-        public XDocument GetBloggerDocument(DateTime? ifModifiedSince = null) {
-            var service = GetBloggerService();
+        public XDocument GetBloggerDocument(string blogKey = null, DateTime? ifModifiedSince = null) {
+            var configuration = _configurations[blogKey];
+
+            var service = GetBloggerService(configuration.Username, configuration.Password);
 
             var query = new BloggerQuery {
-                Uri = new Uri(string.Format(BloggerPostsUriFormat, _configuration.BlogId)),
+                Uri = new Uri(string.Format(BloggerPostsUriFormat, configuration.BlogId)),
                 NumberToRetrieve = int.MaxValue,
             };
 
@@ -45,7 +47,7 @@ namespace BloggerViewController {
             }
         }
 
-        public static BlogData ParseBlogData(XDocument document) {
+        public static BlogData ParseBlogData(XDocument document, string blogKey) {
             var feed = document.Root;
             var ns = document.Root.Name.Namespace;
 
@@ -76,6 +78,7 @@ namespace BloggerViewController {
             }
                         
             var blogInfo = new BlogInfo(categories, friendlyPermaLinks, postDates) {
+                BlogKey = blogKey,
                 Subtitle = feed.Element(ns + "subtitle").Value,
                 Title = feed.Element(ns + "title").Value,
                 Updated = ParseDate(feed.Element(ns + "updated").Value),
@@ -100,9 +103,9 @@ namespace BloggerViewController {
             return post;
         }
 
-        private BloggerService GetBloggerService() {
+        private BloggerService GetBloggerService(string username, string password) {
             var service = new BloggerService("BloggerViewController");
-            service.Credentials = new GDataCredentials(_configuration.Username, _configuration.Password);
+            service.Credentials = new GDataCredentials(username, password);
 
             // For proper authentication for Google Apps users
             SetAuthForGoogleAppsUsers(service);

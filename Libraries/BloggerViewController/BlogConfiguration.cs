@@ -1,29 +1,21 @@
-﻿using System.Configuration;
-
-namespace BloggerViewController {
+﻿namespace BloggerViewController {
     public class BlogConfiguration {
         private string _blogKey;
         public BlogConfiguration(string blogKey) {
-            _blogKey = blogKey;
+            _blogKey = blogKey ?? string.Empty;
+        }
+
+        public string BlogKey {
+            get { return _blogKey; }
         }
 
         private string _blogId;
         public string BlogId {
             get {
                 if(string.IsNullOrWhiteSpace(_blogId)) {
-                    _blogId = GetConfigValue("BloggerViewController.BlogId", _blogKey);
+                    _blogId = ConfigurationService.GetConfigValue("BloggerViewController.BlogId", _blogKey);
                 }
                 return _blogId;
-            }
-        }
-
-        private string _username;
-        public string Username {
-            get {
-                if(string.IsNullOrWhiteSpace(_username)) {
-                    _username = GetConfigValue("BloggerViewController.Username", _blogKey);
-                }
-                return _username;
             }
         }
 
@@ -31,22 +23,20 @@ namespace BloggerViewController {
         public string Password {
             get {
                 if(string.IsNullOrWhiteSpace(_password)) {
-                    _password = GetConfigValue("BloggerViewController.Password", _blogKey);
+                    _password = ConfigurationService.GetConfigValue("BloggerViewController.Password", _blogKey);
                 }
                 return _password;
             }
         }
 
-        internal static string GetConfigValue(string configKey, string blogKey = null, bool throwException = true) {
-            if(!string.IsNullOrWhiteSpace(blogKey)) {
-                configKey = string.Format("{0}.{1}", blogKey, configKey);
+        private string _username;
+        public string Username {
+            get {
+                if(string.IsNullOrWhiteSpace(_username)) {
+                    _username = ConfigurationService.GetConfigValue("BloggerViewController.Username", _blogKey);
+                }
+                return _username;
             }
-
-            string value = ConfigurationManager.AppSettings[configKey];
-            if(throwException && string.IsNullOrWhiteSpace(value)) {
-                throw new ConfigurationErrorsException(string.Format("Could not find configuration-value for key '{0}'.", configKey));
-            }
-            return value;
         }
     }
 }

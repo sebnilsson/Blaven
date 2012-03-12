@@ -13,11 +13,13 @@ namespace BloggerViewController {
         }
 
         [DataMember]
+        public string BlogKey { get; set; }
+        [DataMember]
         public Dictionary<string, int> Categories { get; set; }
         [DataMember]
-        public Dictionary<DateTime, int> PostDates { get; set; }
-        [DataMember]
         public IEnumerable<string> FriendlyPermaLinks { get; set; }
+        [DataMember]
+        public Dictionary<DateTime, int> PostDates { get; set; }
         [DataMember]
         public string Subtitle { get; set; }
         [DataMember]

@@ -65,19 +65,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlogConfigurationHelper.cs" />
+    <Compile Include="ConfigurationService.cs" />
     <Compile Include="BlogData.cs" />
-    <Compile Include="BloggerHelper.cs" />
+    <Compile Include="Data\BloggerHelper.cs" />
     <Compile Include="BlogConfiguration.cs" />
-    <Compile Include="BlogStoreCacheHandler.cs" />
-    <Compile Include="BlogLinkHelper.cs" />
     <Compile Include="BlogPost.cs" />
     <Compile Include="BlogInfo.cs" />
     <Compile Include="BlogSelection.cs" />
     <Compile Include="BlogService.cs" />
-    <Compile Include="DiskBlogStore.cs" />
-    <Compile Include="IBlogStore.cs" />
-    <Compile Include="MemoryBlogStore.cs" />
+    <Compile Include="Data\BlogStoreBase.cs" />
+    <Compile Include="Data\IBlogStore.cs" />
+    <Compile Include="Data\MemoryBlogStore.cs" />
+    <Compile Include="Data\RavenDbBlogStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationHelper.cs" />
   </ItemGroup>
