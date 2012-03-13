@@ -1,0 +1,14 @@
+﻿@model BloggerViewController.BlogPost
+
+<div>
+    <h2>
+        <a href="@Url.Content(Model.FriendlyPermaLink)">@Model.Title</a>
+    </h2>
+    <span>@Model.Updated</span>
+    <div>@Html.Raw(Model.Content)</div>
+    <div>
+        @foreach(var label in Model.Labels) {
+            <span><a href="#@Url.Action("Label", new { label = label })">@label</a></span>
+        }
+    </div>
+</div>

@@ -1,6 +1,7 @@
 ﻿@model BloggerViewController.Website.Models.BlogSingleViewModel
 
 @{
-    
+    var post = Model.Post;
 }
 
+@Html.Partial("BlogPost", post)

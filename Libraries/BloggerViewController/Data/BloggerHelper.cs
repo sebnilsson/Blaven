@@ -58,7 +58,7 @@ namespace BloggerViewController {
 
             var categories = new Dictionary<string, int>();
             foreach(var post in posts) {
-                foreach(var category in post.Categories) {
+                foreach(var category in post.Labels) {
                     if(!categories.ContainsKey(category)) {
                         categories.Add(category, 0);
                     }
@@ -93,7 +93,7 @@ namespace BloggerViewController {
 
             var post = new BlogPost {
                 ID = ParseId(entry.Element(ns + "id").Value),
-                Categories = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
+                Labels = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value,
                 FriendlyPermaLink = GetRelativeUrl(alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value),
                 Published = ParseDate(entry.Element(ns + "published").Value),

@@ -1,0 +1,10 @@
+﻿@model BloggerViewController.BlogInfo
+
+<div id="archive-nav">
+    @foreach(var date in Model.PostDates.Keys) {      
+    <span>
+        @Html.ActionLink(string.Format("{0} ({1})", date.ToString("yyyy-MM"), Model.PostDates[date]),
+            "archive", "blog", new { year = date.Year, month = date.Month.ToString("00") }, null)
+    </span>
+    }
+</div>

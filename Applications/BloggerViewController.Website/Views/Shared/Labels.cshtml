@@ -1,0 +1,10 @@
+﻿@model BloggerViewController.BlogInfo
+
+<div id="labels-nav">
+    @foreach(var label in Model.Labels.Keys) {
+    <span>
+        @Html.ActionLink(string.Format("{0} ({1})", label, Model.Labels[label]),
+            "label", "blog", new { labelName = label.ToLowerInvariant() }, null)
+    </span>
+    }
+</div>

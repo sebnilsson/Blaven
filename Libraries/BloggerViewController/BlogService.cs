@@ -29,19 +29,25 @@ namespace BloggerViewController {
             return info;
         }
 
-        public BlogSelection GetSelection(int pageIndex, int? pageSize = null, string blogKey = null) {
+        public BlogSelection GetSelection(int pageIndex, int? pageSize = null, string blogKey = null, Func<BlogPost, bool> predicate = null) {
+            if(pageIndex < 0) {
+                throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
+            }
+
             blogKey = blogKey ?? string.Empty;
             EnsureBlogIsUpdated(blogKey);
 
-            var selection = _store.GetBlogSelection(pageIndex, pageSize, blogKey);
+            var actualPageSize = pageSize.GetValueOrDefault(ConfigurationService.PageSize);
+
+            var selection = _store.GetBlogSelection(pageIndex, actualPageSize, blogKey, predicate);
             return selection;
         }
 
-        public BlogPost GetPost(string blogId, string blogKey = null) {
+        public BlogPost GetPost(string permaLink, string blogKey = null) {
             blogKey = blogKey ?? string.Empty;
             EnsureBlogIsUpdated(blogKey);
 
-            var post = _store.GetBlogPost(blogId, blogKey);
+            var post = _store.GetBlogPost(permaLink, blogKey);
             return post;
         }
 

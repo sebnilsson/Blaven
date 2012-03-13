@@ -25,14 +25,15 @@ namespace BloggerViewController.Data {
             return data.Posts.FirstOrDefault(post => post.FriendlyPermaLink == permaLink);
         }
 
-        public BlogSelection GetBlogSelection(int pageIndex, int? pageSize, string blogKey) {
-            int take = pageSize.GetValueOrDefault(ConfigurationService.PageSize);
-            int skip = (pageIndex * take);
-
+        public BlogSelection GetBlogSelection(int pageIndex, int pageSize, string blogKey, Func<BlogPost, bool> predicate = null) {
             var data = GetBlogData(blogKey);
 
-            var selectionPosts = data.Posts.Skip(skip).Take(take);
-            return new BlogSelection(data.Posts, selectionPosts, pageIndex, pageSize);
+            var selectedPosts = data.Posts;
+            if(predicate != null) {
+                selectedPosts = selectedPosts.Where(predicate);
+            }
+
+            return new BlogSelection(selectedPosts, pageIndex, pageSize);
         }
 
         public bool GetIsBlogUpdated(string blogKey) {

@@ -18,11 +18,48 @@ namespace BloggerViewController.Website {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
+                "Post",
+                "{year}/{month}/{title}",
+                new { controller = "Blog", action = "Post", },
+                new { year = @"\d+", month = @"\d+", }
+            );
+
+            routes.MapRoute(
+                "Archive",
+                "{year}/{month}",
+                new { controller = "Blog", action = "Archive", },
+                new { year = @"\d+", month = @"\d+", }
+            );
+
+            routes.MapRoute(
+                "Label",
+                "label/{labelName}",
+                new { controller = "Blog", action = "Label", labelName = string.Empty, }
+            );
+
+            routes.MapRoute(
+                "Services", // Route name
+                "services/{action}/{id}", // URL with parameters
+                new { controller = "Services", action = "Index", id = UrlParameter.Optional } // Parameter defaults
+            );
+            
+            routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
                 new { controller = "Blog", action = "Index", id = UrlParameter.Optional } // Parameter defaults
             );
 
+            routes.MapRoute(
+                "Index",
+                "",
+                new { controller = "Blog", action = "Index", id = UrlParameter.Optional }
+            );
+
+            //routes.MapRoute(
+            //    "Default", // Route name
+            //    "{controller}/{action}/{id}", // URL with parameters
+            //    new { controller = "Blog", action = "Index", id = UrlParameter.Optional } // Parameter defaults
+            //);
         }
 
         protected void Application_Start() {
