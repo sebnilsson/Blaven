@@ -90,10 +90,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BloggerSettingsService.cs" />
     <Compile Include="ConfigurationService.cs" />
     <Compile Include="BlogData.cs" />
     <Compile Include="Data\BloggerHelper.cs" />
-    <Compile Include="BlogConfiguration.cs" />
+    <Compile Include="BloggerSetting.cs" />
     <Compile Include="BlogPost.cs" />
     <Compile Include="BlogInfo.cs" />
     <Compile Include="BlogSelection.cs" />

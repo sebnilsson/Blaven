@@ -6,18 +6,21 @@ using BloggerViewController.Data;
 
 namespace BloggerViewController {
     public class BlogService {
-        private IEnumerable<BlogConfiguration> _configurations;
+        private IEnumerable<BloggerSetting> _settings;
         private IBlogStore _store;
         private BloggerHelper _bloggerHelper;
 
-        public BlogService(IBlogStore store, IEnumerable<BlogConfiguration> configurations = null) {
+        public BlogService(IBlogStore store, params BloggerSetting[] settings) {
             if(store == null) {
                 throw new ArgumentNullException("store");
             }
 
-            _configurations = (configurations != null && configurations.Any())
-                ? configurations : new[] { ConfigurationService.DefaultConfiguration }.AsEnumerable();
-            _bloggerHelper = new BloggerHelper(_configurations);
+            if(settings == null) {
+                throw new ArgumentNullException("settings");
+            }
+
+            _settings = settings.AsEnumerable();
+            _bloggerHelper = new BloggerHelper(_settings);
             _store = store;
         }
 

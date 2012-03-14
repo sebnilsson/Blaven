@@ -18,8 +18,7 @@ namespace BloggerViewController.Website.Controllers {
         }
 
         internal BlogService GetBlogService() {
-            var service = new BlogService(new BloggerViewController.Data.MemoryBlogStore());
-            return service;
+            return MvcApplication.GetBlogService();
         }
     }
 }

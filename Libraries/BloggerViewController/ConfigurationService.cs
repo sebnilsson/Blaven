@@ -4,19 +4,29 @@ using System.Linq;
 
 namespace BloggerViewController {
     public static class ConfigurationService {
-        public static BlogConfiguration DefaultConfiguration { get { return GetConfiguration(string.Empty); } }
+        /*public static BlogConfiguration DefaultConfiguration { get { return GetConfiguration(string.Empty); } }
         public static BlogConfiguration GetConfiguration(string blogKey) {
             return new BlogConfiguration(blogKey);
-        }
+        }*/
 
-        private static IEnumerable<string> _blogList;
-        public static IEnumerable<string> BlogList {
+        /*private static IEnumerable<BloggerSetting> _bloggerSettings;
+        public static IEnumerable<BloggerSetting> BloggerSettings {
             get {
-                if(_blogList == null) {
-                    string value = GetConfigValue("BloggerViewController.BlogList", throwException: false);
-                    _blogList = value.Split(new[] { ';' }, System.StringSplitOptions.RemoveEmptyEntries).AsEnumerable();
+                if(_bloggerSettings == null) {
+                    
                 }
-                return _blogList;
+                return _bloggerSettings;
+            }
+        }*/
+
+        private static string _bloggerSettingsPath;
+        public static string BloggerSettingsPath {
+            get {
+                if(_bloggerSettingsPath == null) {
+                    string value = GetConfigValue("BloggerViewController.BloggerSettingsPath", throwException: false);
+                    _bloggerSettingsPath = (!string.IsNullOrWhiteSpace(value)) ? value : "~/BloggerSettings.json";
+                }
+                return _bloggerSettingsPath;
             }
         }
         

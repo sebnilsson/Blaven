@@ -53,5 +53,5 @@ readme.html
 # Project-specific
 App.config
 AppSettings.config
-BloggerViewControllerStore.txt
+BloggerSettings.json
 packages/

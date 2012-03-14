@@ -8,21 +8,21 @@ using Google.GData.Client;
 
 namespace BloggerViewController {
     internal class BloggerHelper {
-        private Dictionary<string, BlogConfiguration> _configurations;
+        private Dictionary<string, BloggerSetting> _settings;
 
         public static string BloggerPostsUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
 
-        public BloggerHelper(IEnumerable<BlogConfiguration> configurations) {
-            _configurations = configurations.ToDictionary(conf => conf.BlogKey, conf => conf);
+        public BloggerHelper(IEnumerable<BloggerSetting> settings) {
+            _settings = settings.ToDictionary(setting => setting.BlogKey, setting => setting);
         }
 
         public XDocument GetBloggerDocument(string blogKey = null, DateTime? ifModifiedSince = null) {
-            var configuration = _configurations[blogKey];
+            var setting = _settings[blogKey];
 
-            var service = GetBloggerService(configuration.Username, configuration.Password);
+            var service = GetBloggerService(setting.Username, setting.Password);
 
             var query = new BloggerQuery {
-                Uri = new Uri(string.Format(BloggerPostsUriFormat, configuration.BlogId)),
+                Uri = new Uri(string.Format(BloggerPostsUriFormat, setting.BlogId)),
                 NumberToRetrieve = int.MaxValue,
             };
 

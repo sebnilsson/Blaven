@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 
@@ -68,8 +65,17 @@ namespace BloggerViewController.Website {
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
 
-            var service = new BlogService(new BloggerViewController.Data.MemoryBlogStore());            
+            var service = GetBlogService();         
             service.UpdateBlog();
+        }
+
+        internal static BlogService GetBlogService() {
+            string bloggerSettingsFilePath = HttpContext.Current.Server.MapPath(ConfigurationService.BloggerSettingsPath);
+            var bloggerSettingsService = new BloggerSettingsService(bloggerSettingsFilePath);
+            var defaultSetting = bloggerSettingsService.DefaultSetting;
+
+            var service = new BlogService(new BloggerViewController.Data.MemoryBlogStore(), defaultSetting);
+            return service;
         }
     }
 }
