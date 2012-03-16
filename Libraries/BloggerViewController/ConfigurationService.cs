@@ -73,11 +73,7 @@ namespace BloggerViewController {
             }
         }
 
-        internal static string GetConfigValue(string configKey, string blogKey = null, bool throwException = true) {
-            if(!string.IsNullOrWhiteSpace(blogKey)) {
-                configKey = string.Format("{0}.{1}", blogKey, configKey);
-            }
-
+        internal static string GetConfigValue(string configKey, bool throwException = true) {
             string value = ConfigurationManager.AppSettings[configKey];
             if(throwException && string.IsNullOrWhiteSpace(value)) {
                 throw new ConfigurationErrorsException(string.Format("Could not find configuration-value for key '{0}'.", configKey));

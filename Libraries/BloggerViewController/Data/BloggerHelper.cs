@@ -8,16 +8,10 @@ using Google.GData.Client;
 
 namespace BloggerViewController {
     internal class BloggerHelper {
-        private Dictionary<string, BloggerSetting> _settings;
 
         public static string BloggerPostsUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
 
-        public BloggerHelper(IEnumerable<BloggerSetting> settings) {
-            _settings = settings.ToDictionary(setting => setting.BlogKey, setting => setting);
-        }
-
-        public XDocument GetBloggerDocument(string blogKey = null, DateTime? ifModifiedSince = null) {
-            var setting = _settings[blogKey];
+        public XDocument GetBloggerDocument(BloggerSetting setting, DateTime? ifModifiedSince = null) {
 
             var service = GetBloggerService(setting.Username, setting.Password);
 
@@ -42,8 +36,7 @@ namespace BloggerViewController {
                 feed.SaveToXml(stream);
                 stream.Position = 0;
 
-                var document = XDocument.Load(stream);
-                return document;
+                return XDocument.Load(stream);
             }
         }
 
@@ -54,6 +47,7 @@ namespace BloggerViewController {
             var blogEntries = feed.Elements(ns + "entry").Where(entry => !string.IsNullOrWhiteSpace(entry.Value));
 
             var posts = from entry in blogEntries
+                        where entry.Element(ns + "title") != null
                         select ParseEntry(ns, entry);
 
             var categories = new Dictionary<string, int>();
@@ -65,9 +59,7 @@ namespace BloggerViewController {
                     categories[category] = (categories[category] + 1);
                 }
             }
-
-            var friendlyPermaLinks = posts.Select(post => post.FriendlyPermaLink);
-
+            
             var postDates = new Dictionary<DateTime, int>();
             foreach(var post in posts) {
                 DateTime key = new DateTime(post.Published.Year, post.Published.Month, 1);
@@ -77,30 +69,31 @@ namespace BloggerViewController {
                 postDates[key] = (postDates[key] + 1);
             }
                         
-            var blogInfo = new BlogInfo(categories, friendlyPermaLinks, postDates) {
+            var blogInfo = new BlogInfo(categories, postDates) {
                 BlogKey = blogKey,
                 Subtitle = feed.Element(ns + "subtitle").Value,
                 Title = feed.Element(ns + "title").Value,
                 Updated = ParseDate(feed.Element(ns + "updated").Value),
             };
 
-            var blogData = new BlogData(blogInfo, posts);
-            return blogData;
+            return new BlogData(blogInfo, posts);
         }
 
         private static BlogPost ParseEntry(XNamespace ns, XElement entry) {
             var alternateLink = entry.Elements(ns + "link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
+            
+            string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
-            var post = new BlogPost {
+            return new BlogPost {
                 ID = ParseId(entry.Element(ns + "id").Value),
                 Labels = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value,
-                FriendlyPermaLink = GetRelativeUrl(alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value),
+                PermaLinkAbsolute = permaLinkFull,
+                PermaLinkRelative = GetRelativeUrl(permaLinkFull),
                 Published = ParseDate(entry.Element(ns + "published").Value),
                 Title = entry.Element(ns + "title").Value,
                 Updated = ParseDate(entry.Element(ns + "updated").Value),
             };
-            return post;
         }
 
         private BloggerService GetBloggerService(string username, string password) {
@@ -135,8 +128,7 @@ namespace BloggerViewController {
             var date = DateTime.Parse(split[0]);
             var time = DateTime.Parse(timeString);
 
-            var dateTime = new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
-            return dateTime;
+            return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
         }
 
         internal static string GetRelativeUrl(string fullUrl) {
@@ -147,8 +139,11 @@ namespace BloggerViewController {
 
             var relative = uri.LocalPath;
             var index = relative.LastIndexOf(".html");
-            relative = relative.Substring(0, index);
-            return relative;
+            if(index < 0) {
+                index = relative.LastIndexOf(".asp");
+            }
+
+            return relative.Substring(0, index);
         }
     }
 }

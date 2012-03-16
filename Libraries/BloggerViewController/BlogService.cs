@@ -20,12 +20,12 @@ namespace BloggerViewController {
             }
 
             _settings = settings.AsEnumerable();
-            _bloggerHelper = new BloggerHelper(_settings);
+            _bloggerHelper = new BloggerHelper();
             _store = store;
         }
 
         public BlogInfo GetInfo(string blogKey = null) {
-            blogKey = blogKey ?? string.Empty;
+            blogKey = blogKey ?? GetFirstBlogKey();
             EnsureBlogIsUpdated(blogKey);
 
             var info = _store.GetBlogInfo(blogKey);
@@ -37,28 +37,46 @@ namespace BloggerViewController {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            blogKey = blogKey ?? string.Empty;
-            EnsureBlogIsUpdated(blogKey);
+            var keys = GetBlogKeys(blogKey);
+
+            foreach(var key in keys) {
+                EnsureBlogIsUpdated(key);
+            }
 
             var actualPageSize = pageSize.GetValueOrDefault(ConfigurationService.PageSize);
 
-            var selection = _store.GetBlogSelection(pageIndex, actualPageSize, blogKey, predicate);
+            var selection = _store.GetBlogSelection(pageIndex, actualPageSize, keys, predicate);
             return selection;
         }
 
         public BlogPost GetPost(string permaLink, string blogKey = null) {
-            blogKey = blogKey ?? string.Empty;
+            blogKey = blogKey ?? GetFirstBlogKey();
             EnsureBlogIsUpdated(blogKey);
 
             var post = _store.GetBlogPost(permaLink, blogKey);
             return post;
         }
 
-        public void UpdateBlog(string blogKey = null) {
-            blogKey = blogKey ?? string.Empty;
+        public void UpdateBlogs(string blogKey = null) {
+            var keys = GetBlogKeys(blogKey);
 
-            var bloggerDocument = _bloggerHelper.GetBloggerDocument(blogKey);
-            _store.Update(bloggerDocument, blogKey);
+            foreach(var key in keys) {
+                var setting = _settings.First(s => s.BlogKey == key);
+                var bloggerDocument = _bloggerHelper.GetBloggerDocument(setting);
+                _store.Update(bloggerDocument, key);
+            }
+        }
+
+        private string GetFirstBlogKey() {
+            return BloggerSettingsService.Settings.FirstOrDefault().BlogKey;
+        }
+
+        private IEnumerable<string> GetBlogKeys(string blogKey) {
+            if(string.IsNullOrWhiteSpace(blogKey)) {
+                return BloggerSettingsService.Settings.Select(setting => setting.BlogKey);
+            }
+
+            return new[] { BloggerSettingsService.Settings.FirstOrDefault().BlogKey };
         }
 
         private static Dictionary<string, object> _locks = new Dictionary<string, object>();
@@ -85,7 +103,7 @@ namespace BloggerViewController {
                     return;
                 }
                 
-                UpdateBlog(blogKey);
+                UpdateBlogs(blogKey);
             }
         }
     }

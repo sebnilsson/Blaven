@@ -1,29 +1,49 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace BloggerViewController {
-    public class BloggerSettingsService {
-        private string _filePath;
+    public static class BloggerSettingsService {
+        private static string _filePath;
+        private static bool _isInitialized = false;
 
-        public BloggerSettingsService(string fullFilePath) {
+        public static void Init(string fullFilePath) {
+            if(!File.Exists(fullFilePath)) {
+                throw new FileNotFoundException(string.Format("The Blogger-settings file couldn't be found at '{0}'.", fullFilePath), fullFilePath);
+            }
+
             _filePath = fullFilePath;
+            _isInitialized = true;
         }
 
-        public BloggerSetting DefaultSetting {
+        private static IEnumerable<BloggerSetting> _settings;
+        public static IEnumerable<BloggerSetting> Settings {
             get {
-                return GetSettings().FirstOrDefault();
+                if(_settings == null) {
+                    CheckIsInitialized();
+
+                    string fileContent = File.ReadAllText(_filePath);
+                    _settings = SerializationHelper.GetDeserializedObject<IEnumerable<BloggerSetting>>(fileContent, Enumerable.Empty<BloggerSetting>());
+                    
+                    foreach(var setting in _settings) {
+                        setting.Password = ConfigurationService.GetConfigValue(setting.PasswordKey);
+                        setting.Username = ConfigurationService.GetConfigValue(setting.UsernameKey);
+                    }
+
+                    if(_settings == null || !_settings.Any()) {
+                        throw new System.Configuration.ConfigurationErrorsException(
+                            string.Format("No BloggerSettings were defined in file at '[0}'.", _filePath));
+                    }
+                }
+                return _settings;
             }
         }
 
-        public IEnumerable<BloggerSetting> GetSettings() {
-            if(!File.Exists(_filePath)) {
-                throw new FileNotFoundException(string.Format("The Blogger-settings file couldn't be found at '{0}'.", _filePath), _filePath);
+        private static void CheckIsInitialized() {
+            if(!_isInitialized) {
+                throw new ApplicationException("BloggerSettingService has not been initialized. Please call the method 'Init' before using class.");
             }
-
-            string fileContent = File.ReadAllText(_filePath);
-            var deserialized = SerializationHelper.GetDeserializedObject<IEnumerable<BloggerSetting>>(fileContent, Enumerable.Empty<BloggerSetting>());
-            return deserialized;
         }
     }
 }

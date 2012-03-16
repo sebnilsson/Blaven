@@ -20,18 +20,24 @@ namespace BloggerViewController.Data {
             return _blogData[blogKey].Info;
         }
 
-        public BlogPost GetBlogPost(string permaLink, string blogKey) {
+        public BlogPost GetBlogPost(string permaLinkRelative, string blogKey) {
             var data = GetBlogData(blogKey);
-            return data.Posts.FirstOrDefault(post => post.FriendlyPermaLink == permaLink);
+            return data.Posts.FirstOrDefault(post => post.PermaLinkRelative == permaLinkRelative);
         }
 
-        public BlogSelection GetBlogSelection(int pageIndex, int pageSize, string blogKey, Func<BlogPost, bool> predicate = null) {
-            var data = GetBlogData(blogKey);
+        public BlogSelection GetBlogSelection(int pageIndex, int pageSize, IEnumerable<string> blogKeys, Func<BlogPost, bool> predicate = null) {
+            var blogDatas = _blogData.Values.Where(data => blogKeys.Contains(data.Info.BlogKey));
 
-            var selectedPosts = data.Posts;
+            var selectedPosts = Enumerable.Empty<BlogPost>();
+            foreach(var data in blogDatas) {
+                selectedPosts = selectedPosts.Union(data.Posts);
+            }
+
             if(predicate != null) {
                 selectedPosts = selectedPosts.Where(predicate);
             }
+
+            selectedPosts = selectedPosts.OrderByDescending(post => post.Published);
 
             return new BlogSelection(selectedPosts, pageIndex, pageSize);
         }
