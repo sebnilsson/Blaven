@@ -58,8 +58,12 @@
     <Reference Include="AsyncCtpLibrary">
       <HintPath>..\..\packages\RavenDB-Client.1.0.701\lib\net40\AsyncCtpLibrary.dll</HintPath>
     </Reference>
-    <Reference Include="Google.GData.Blogger, Version=1.9.0.0, Culture=neutral, PublicKeyToken=6f8943d33947d761, processorArchitecture=MSIL" />
-    <Reference Include="Google.GData.Client, Version=1.9.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL" />
+    <Reference Include="Google.GData.Blogger, Version=1.9.0.0, Culture=neutral, PublicKeyToken=6f8943d33947d761, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Google.GData.Blogger.1.9.0.0\lib\Google.GData.Blogger.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.GData.Client, Version=1.9.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\Google.GData.Client.1.9.0.0\lib\Google.GData.Client.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.4.0.8\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -104,10 +108,6 @@
     <Compile Include="Data\RavenDbBlogStore.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializationHelper.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Libraries\GData\Google.GData.Blogger.dll" />
-    <Content Include="Libraries\GData\Google.GData.Client.dll" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">

@@ -68,10 +68,11 @@ namespace BloggerViewController {
                 }
                 postDates[key] = (postDates[key] + 1);
             }
-                        
+            
+            XElement subtitle = feed.Element(ns + "subtitle");
             var blogInfo = new BlogInfo(categories, postDates) {
                 BlogKey = blogKey,
-                Subtitle = feed.Element(ns + "subtitle").Value,
+                Subtitle = (subtitle != null) ? subtitle.Value : string.Empty,
                 Title = feed.Element(ns + "title").Value,
                 Updated = ParseDate(feed.Element(ns + "updated").Value),
             };
