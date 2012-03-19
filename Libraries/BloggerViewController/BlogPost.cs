@@ -4,8 +4,9 @@ using System.Linq;
 
 namespace BloggerViewController {
     public class BlogPost {
-        public BlogPost(IEnumerable<string> labels = null) {
-            this.Labels = labels ?? Enumerable.Empty<string>();
+        public BlogPost() {
+            this.Author = new BlogAuthor();
+            this.Labels = Enumerable.Empty<string>();
         }
 
         public string Content { get; set; }
@@ -23,5 +24,7 @@ namespace BloggerViewController {
         public string PermaLinkAbsolute { get; set; }
 
         public string PermaLinkRelative { get; set; }
+
+        public BlogAuthor Author { get; set; }
     }
 }

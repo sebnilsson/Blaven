@@ -94,6 +94,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlogAuthor.cs" />
     <Compile Include="BloggerSettingsService.cs" />
     <Compile Include="ConfigurationService.cs" />
     <Compile Include="BlogData.cs" />

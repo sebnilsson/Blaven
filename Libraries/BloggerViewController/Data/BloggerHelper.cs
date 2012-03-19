@@ -48,6 +48,7 @@ namespace BloggerViewController {
 
             var posts = from entry in blogEntries
                         where entry.Element(ns + "title") != null
+                        && entry.Elements(ns + "link").Any(el => el.Attribute("rel").Value == "alternate")
                         select ParseEntry(ns, entry);
 
             var categories = new Dictionary<string, int>();
@@ -85,7 +86,7 @@ namespace BloggerViewController {
             
             string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
-            return new BlogPost {
+            var post = new BlogPost {
                 ID = ParseId(entry.Element(ns + "id").Value),
                 Labels = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value,
@@ -95,6 +96,16 @@ namespace BloggerViewController {
                 Title = entry.Element(ns + "title").Value,
                 Updated = ParseDate(entry.Element(ns + "updated").Value),
             };
+
+            var authorNode = entry.Element(ns + "author");
+            if(authorNode != null) {
+                post.Author.Name = authorNode.Element(ns + "name").Value;
+
+                var gdNs = XNamespace.Get("http://schemas.google.com/g/2005");
+                post.Author.ImageUrl = authorNode.Element(gdNs + "image").Attribute("src").Value;
+            }
+
+            return post;
         }
 
         private BloggerService GetBloggerService(string username, string password) {
