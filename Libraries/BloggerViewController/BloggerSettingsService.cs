@@ -4,10 +4,17 @@ using System.IO;
 using System.Linq;
 
 namespace BloggerViewController {
+    /// <summary>
+    /// A static service-class to handle the application's Blogger-settings.
+    /// </summary>
     public static class BloggerSettingsService {
         private static string _filePath;
         private static bool _isInitialized = false;
 
+        /// <summary>
+        /// Initializes the BloggerSettingsService-class.
+        /// </summary>
+        /// <param name="fullFilePath">The full path to the Blogger-settings-file.</param>
         public static void Init(string fullFilePath) {
             if(!File.Exists(fullFilePath)) {
                 throw new FileNotFoundException(string.Format("The Blogger-settings file couldn't be found at '{0}'.", fullFilePath), fullFilePath);
@@ -18,13 +25,16 @@ namespace BloggerViewController {
         }
 
         private static IEnumerable<BloggerSetting> _settings;
+        /// <summary>
+        /// Gets a list of Blogger-settings configured in the Blogger-settings-file.
+        /// </summary>
         public static IEnumerable<BloggerSetting> Settings {
             get {
                 if(_settings == null) {
                     CheckIsInitialized();
 
                     string fileContent = File.ReadAllText(_filePath);
-                    _settings = SerializationHelper.GetDeserializedObject<IEnumerable<BloggerSetting>>(fileContent, Enumerable.Empty<BloggerSetting>());
+                    _settings = JsonSerializationHelper.GetDeserializedObject<IEnumerable<BloggerSetting>>(fileContent, Enumerable.Empty<BloggerSetting>());
                     
                     foreach(var setting in _settings) {
                         setting.Password = ConfigurationService.GetConfigValue(setting.PasswordKey);

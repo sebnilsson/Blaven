@@ -3,23 +3,14 @@ using System.Configuration;
 using System.Linq;
 
 namespace BloggerViewController {
+    /// <summary>
+    /// A static service-class to handle the application's settings.
+    /// </summary>
     public static class ConfigurationService {
-        /*public static BlogConfiguration DefaultConfiguration { get { return GetConfiguration(string.Empty); } }
-        public static BlogConfiguration GetConfiguration(string blogKey) {
-            return new BlogConfiguration(blogKey);
-        }*/
-
-        /*private static IEnumerable<BloggerSetting> _bloggerSettings;
-        public static IEnumerable<BloggerSetting> BloggerSettings {
-            get {
-                if(_bloggerSettings == null) {
-                    
-                }
-                return _bloggerSettings;
-            }
-        }*/
-
         private static string _bloggerSettingsPath;
+        /// <summary>
+        /// Gets the Blogger-settings file-path. Looks at the config-key "BloggerViewController.BloggerSettingsPath". Defaults to "~/BloggerSettings.json".
+        /// </summary>
         public static string BloggerSettingsPath {
             get {
                 if(_bloggerSettingsPath == null) {
@@ -29,8 +20,11 @@ namespace BloggerViewController {
                 return _bloggerSettingsPath;
             }
         }
-        
+
         private static int? _cacheTime;
+        /// <summary>
+        /// Gets the default cache-time. Looks at the config-key "BloggerViewController.CacheTime". Defaults to 5.
+        /// </summary>
         public static int CacheTime {
             get {
                 if(!_cacheTime.HasValue) {
@@ -46,6 +40,9 @@ namespace BloggerViewController {
         }
 
         private static int? _pageSize;
+        /// <summary>
+        /// Gets the default page-size. Looks at the config-key "BloggerViewController.PageSize". Defaults to 5.
+        /// </summary>
         public static int PageSize {
             get {
                 if(!_pageSize.HasValue) {
@@ -61,6 +58,10 @@ namespace BloggerViewController {
         }
 
         private static bool? _useBackgroundService;
+        /// <summary>
+        /// Gets if the application should use a background-service to update its blog-data.
+        /// Looks at the config-key "BloggerViewController.UseBackgroundService". Defaults to false.
+        /// </summary>
         public static bool UseBackgroundService {
             get {
                 if(!_useBackgroundService.HasValue) {

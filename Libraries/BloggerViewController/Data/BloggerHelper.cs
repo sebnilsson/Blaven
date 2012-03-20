@@ -51,13 +51,13 @@ namespace BloggerViewController {
                         && entry.Elements(ns + "link").Any(el => el.Attribute("rel").Value == "alternate")
                         select ParseEntry(ns, entry);
 
-            var categories = new Dictionary<string, int>();
+            var labels = new Dictionary<string, int>();
             foreach(var post in posts) {
-                foreach(var category in post.Labels) {
-                    if(!categories.ContainsKey(category)) {
-                        categories.Add(category, 0);
+                foreach(var label in post.Labels) {
+                    if(!labels.ContainsKey(label)) {
+                        labels.Add(label, 0);
                     }
-                    categories[category] = (categories[category] + 1);
+                    labels[label] = (labels[label] + 1);
                 }
             }
             
@@ -71,14 +71,16 @@ namespace BloggerViewController {
             }
             
             XElement subtitle = feed.Element(ns + "subtitle");
-            var blogInfo = new BlogInfo(categories, postDates) {
+            var blogInfo = new BlogInfo {
                 BlogKey = blogKey,
+                Labels = labels,
+                PostDates = postDates,
                 Subtitle = (subtitle != null) ? subtitle.Value : string.Empty,
                 Title = feed.Element(ns + "title").Value,
                 Updated = ParseDate(feed.Element(ns + "updated").Value),
             };
 
-            return new BlogData(blogInfo, posts);
+            return new BlogData { Info = blogInfo, Posts = posts };
         }
 
         private static BlogPost ParseEntry(XNamespace ns, XElement entry) {

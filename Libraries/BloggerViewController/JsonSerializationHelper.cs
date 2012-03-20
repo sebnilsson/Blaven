@@ -4,7 +4,17 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 
 namespace BloggerViewController {
-    public static class SerializationHelper {
+    /// <summary>
+    /// A static helper-class to help serialize and deserialze to JSON.
+    /// </summary>
+    public static class JsonSerializationHelper {
+        /// <summary>
+        /// Gets a deserialized object from a serialized string.
+        /// </summary>
+        /// <typeparam name="TDeserialized">The type of the deserialized object.</typeparam>
+        /// <param name="serializedData">The string containing the serialized data.</param>
+        /// <param name="defaultValue">The default value to return if the deserialized object was null.</param>
+        /// <returns>Returns a deserialized object the give type.</returns>
         public static TDeserialized GetDeserializedObject<TDeserialized>(string serializedData,
             TDeserialized defaultValue = default(TDeserialized)) where TDeserialized : class {
             if(string.IsNullOrWhiteSpace(serializedData)) {
@@ -18,12 +28,24 @@ namespace BloggerViewController {
             }
         }
 
+        /// <summary>
+        /// Gets a serialized string from an object.
+        /// </summary>
+        /// <typeparam name="TSerialized">The type of the object to serialize.</typeparam>
+        /// <param name="deserializedData">The object to serialize.</param>
+        /// <returns>Returns a serialized string of an object.</returns>
         public static string GetSerializedString<TSerialized>(TSerialized deserializedData)
             where TSerialized : class {
             var type = deserializedData.GetType();
             return GetSerializedString(deserializedData, type);
         }
 
+        /// <summary>
+        /// Gets a serialized string from an object.
+        /// </summary>
+        /// <param name="deserializedData">The object to serialize.</param>
+        /// <param name="objectType">The type of the object to serialize.</param>
+        /// <returns>Returns a serialized string of an object.</returns>
         public static string GetSerializedString(object deserializedData, Type objectType = null) {
             if(deserializedData == null) {
                 return null;

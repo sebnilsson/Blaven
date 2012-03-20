@@ -3,13 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace BloggerViewController {
+    /// <summary>
+    /// A selection of blog-posts, with pagination-information.
+    /// </summary>
     public class BlogSelection {
-        public const int DefaultPageSize = 5;
-
-        public BlogSelection(IEnumerable<BlogPost> selectedPosts, int pageIndex, int? pageSize = DefaultPageSize) {
+        /// <summary>
+        /// Creates an instance of a selection of blog-posts with pagination-information.
+        /// </summary>
+        /// <param name="selectedPosts">The blog-posts to paginate over.</param>
+        /// <param name="pageIndex">The current page-index of pagination.</param>
+        /// <param name="pageSize">Optional parameter for page-size. Defaults to value in configuration.</param>
+        public BlogSelection(IEnumerable<BlogPost> selectedPosts, int pageIndex, int? pageSize = null) {
             if(selectedPosts == null) {
                 throw new ArgumentNullException("selectedPosts");
             }
+            pageSize = pageSize.GetValueOrDefault(ConfigurationService.PageSize);
             if(pageSize < 1) {
                 throw new ArgumentOutOfRangeException("pageSize", "The argument has to be a positive number above 0.");
             }
@@ -34,10 +42,29 @@ namespace BloggerViewController {
             HasPreviousItems = (selectedPosts.FirstOrDefault().ID != pagedPosts.FirstOrDefault().ID);
         }
 
+        /// <summary>
+        /// Gets if the selection has more items next in the pagination.
+        /// </summary>
         public bool HasNextItems { get; private set; }
+
+        /// <summary>
+        /// Gets if the selection has more items previous in the pagination.
+        /// </summary>
         public bool HasPreviousItems { get; private set; }
+
+        /// <summary>
+        /// Gets the current page-index of the pagination.
+        /// </summary>
         public int PageIndex { get; private set; }
+
+        /// <summary>
+        /// Gets the page-size of the pagination.
+        /// </summary>
         public int PageSize { get; private set; }
+
+        /// <summary>
+        /// Gets the current posts in the pagination.
+        /// </summary>
         public IEnumerable<BlogPost> Posts { get; private set; }
     }
 }

@@ -5,11 +5,19 @@ using System.Linq;
 using BloggerViewController.Data;
 
 namespace BloggerViewController {
+    /// <summary>
+    /// A service-class for accessing blog-related features.
+    /// </summary>
     public class BlogService {
         private IEnumerable<BloggerSetting> _settings;
         private IBlogStore _store;
         private BloggerHelper _bloggerHelper;
 
+        /// <summary>
+        /// Creates an instance of a service-class for accessing blog-related features.
+        /// </summary>
+        /// <param name="store">The store to use for storing blog-data.</param>
+        /// <param name="settings">The Blogger-settings to use in the service.</param>
         public BlogService(IBlogStore store, params BloggerSetting[] settings) {
             if(store == null) {
                 throw new ArgumentNullException("store");
@@ -24,6 +32,11 @@ namespace BloggerViewController {
             _store = store;
         }
 
+        /// <summary>
+        /// Gets the BlogInfo for the specified blogKey. If no parameters defaults to first blog in settings.
+        /// </summary>
+        /// <param name="blogKey">The key of the blog to get info for. Defaults to first blog in settings.</param>
+        /// <returns>Returns information about a blog.</returns>
         public BlogInfo GetInfo(string blogKey = null) {
             blogKey = blogKey ?? GetFirstBlogKey();
             EnsureBlogIsUpdated(blogKey);
@@ -32,6 +45,14 @@ namespace BloggerViewController {
             return info;
         }
 
+        /// <summary>
+        /// Gets a selection of blog-posts, with pagination-info.
+        /// </summary>
+        /// <param name="pageIndex">The current page-index of the pagination. Must have a value of 0 or higher.</param>
+        /// <param name="pageSize">Optional page-size of the pagination. Defaults to value in configuration.</param>
+        /// <param name="blogKey">Optional key of the blog to get the selection from. Defaults to use all blogs' blog-posts.</param>
+        /// <param name="predicate">Optional predicate for filtering the blog-posts in selection.</param>
+        /// <returns>Returns a blog-selection with pagination-info.</returns>
         public BlogSelection GetSelection(int pageIndex, int? pageSize = null, string blogKey = null, Func<BlogPost, bool> predicate = null) {
             if(pageIndex < 0) {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
@@ -49,6 +70,12 @@ namespace BloggerViewController {
             return selection;
         }
 
+        /// <summary>
+        /// Gets a blog-post from given perma-link and blog-key.
+        /// </summary>
+        /// <param name="permaLink">The perma-link of the blog-post to get.</param>
+        /// <param name="blogKey">Optional key for the blog to get the blog-post from.</param>
+        /// <returns>Returns a blog-post.</returns>
         public BlogPost GetPost(string permaLink, string blogKey = null) {
             blogKey = blogKey ?? GetFirstBlogKey();
             EnsureBlogIsUpdated(blogKey);
@@ -57,6 +84,10 @@ namespace BloggerViewController {
             return post;
         }
 
+        /// <summary>
+        /// Updates the given blog.
+        /// </summary>
+        /// <param name="blogKey">Optional key for the blog to update. Defaults to update all blogs, if no value given.</param>
         public void UpdateBlogs(string blogKey = null) {
             var keys = GetBlogKeys(blogKey);
 
