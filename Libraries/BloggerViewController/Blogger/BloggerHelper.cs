@@ -6,7 +6,7 @@ using System.Xml.Linq;
 using Google.GData.Blogger;
 using Google.GData.Client;
 
-namespace BloggerViewController {
+namespace BloggerViewController.Blogger {
     internal class BloggerHelper {
 
         public static string BloggerPostsUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";

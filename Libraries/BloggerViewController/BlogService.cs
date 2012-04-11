@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BloggerViewController.Blogger;
 using BloggerViewController.Data;
 
 namespace BloggerViewController {
@@ -12,6 +13,8 @@ namespace BloggerViewController {
         private IEnumerable<BloggerSetting> _settings;
         private IBlogStore _store;
         private BloggerHelper _bloggerHelper;
+
+        public const string DefaultBlogKey = "_";
 
         /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features.
@@ -25,6 +28,8 @@ namespace BloggerViewController {
 
             if(settings == null) {
                 throw new ArgumentNullException("settings");
+            } else if(!settings.Any()) {
+                throw new ArgumentOutOfRangeException("settings", "The provided array of settings cannot be empty.");
             }
 
             _settings = settings.AsEnumerable();
@@ -107,7 +112,8 @@ namespace BloggerViewController {
                 return BloggerSettingsService.Settings.Select(setting => setting.BlogKey);
             }
 
-            return new[] { BloggerSettingsService.Settings.FirstOrDefault().BlogKey };
+            return new[] { (BloggerSettingsService.Settings.FirstOrDefault(setting => setting.BlogKey == blogKey)
+                ?? BloggerSettingsService.Settings.FirstOrDefault()).BlogKey };
         }
 
         private static Dictionary<string, object> _locks = new Dictionary<string, object>();

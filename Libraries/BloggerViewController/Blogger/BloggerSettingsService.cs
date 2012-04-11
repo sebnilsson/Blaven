@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace BloggerViewController {
+namespace BloggerViewController.Blogger {
     /// <summary>
     /// A static service-class to handle the application's Blogger-settings.
     /// </summary>
@@ -37,6 +37,13 @@ namespace BloggerViewController {
                     _settings = JsonSerializationHelper.GetDeserializedObject<IEnumerable<BloggerSetting>>(fileContent, Enumerable.Empty<BloggerSetting>());
                     
                     foreach(var setting in _settings) {
+                        if(_settings.Count() == 1 && string.IsNullOrWhiteSpace(setting.BlogKey)) {
+                            setting.BlogKey = BlogService.DefaultBlogKey;
+                        }
+
+                        if(string.IsNullOrWhiteSpace(setting.BlogKey)) {
+                            throw new System.Configuration.ConfigurationErrorsException("Blogger-settings cannot have a blank blog-key.");
+                        }
                         setting.Password = ConfigurationService.GetConfigValue(setting.PasswordKey);
                         setting.Username = ConfigurationService.GetConfigValue(setting.UsernameKey);
                     }

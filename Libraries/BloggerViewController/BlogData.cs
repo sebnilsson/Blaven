@@ -7,6 +7,7 @@ namespace BloggerViewController {
         /// An object holding all the information about a blog from a parsed XML-document from BLogger.
         /// </summary>
         public BlogData() {
+            this.Info = new BlogInfo();
             this.Posts = Enumerable.Empty<BlogPost>();
         }
         

@@ -55,9 +55,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AsyncCtpLibrary">
-      <HintPath>..\..\packages\RavenDB-Client.1.0.701\lib\net40\AsyncCtpLibrary.dll</HintPath>
-    </Reference>
     <Reference Include="Google.GData.Blogger, Version=1.9.0.0, Culture=neutral, PublicKeyToken=6f8943d33947d761, processorArchitecture=MSIL">
       <HintPath>..\..\..\packages\Google.GData.Blogger.1.9.0.0\lib\Google.GData.Blogger.dll</HintPath>
     </Reference>
@@ -70,17 +67,20 @@
     <Reference Include="NLog">
       <HintPath>..\..\packages\NLog.2.0.0.2000\lib\net40\NLog.dll</HintPath>
     </Reference>
-    <Reference Include="Raven.Abstractions">
-      <HintPath>..\..\packages\RavenDB-Client.1.0.701\lib\net40\Raven.Abstractions.dll</HintPath>
+    <Reference Include="Raven.Abstractions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\RavenDB-Client.1.0.888\lib\net40\Raven.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Raven.Client.Debug">
-      <HintPath>..\..\packages\RavenDB-Client.1.0.701\lib\net40\Raven.Client.Debug.dll</HintPath>
+    <Reference Include="Raven.Client.Debug, Version=1.0.0.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\RavenDB-Client.1.0.888\lib\net40\Raven.Client.Debug.dll</HintPath>
     </Reference>
-    <Reference Include="Raven.Client.Lightweight">
-      <HintPath>..\..\packages\RavenDB-Client.1.0.701\lib\net40\Raven.Client.Lightweight.dll</HintPath>
+    <Reference Include="Raven.Client.Lightweight, Version=1.0.0.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\RavenDB-Client.1.0.888\lib\net40\Raven.Client.Lightweight.dll</HintPath>
     </Reference>
-    <Reference Include="Raven.Client.MvcIntegration">
-      <HintPath>..\..\packages\RavenDB-Client.1.0.701\lib\net40\Raven.Client.MvcIntegration.dll</HintPath>
+    <Reference Include="Raven.Client.Lightweight.FSharp">
+      <HintPath>..\..\..\packages\RavenDB-Client.1.0.888\lib\net40\Raven.Client.Lightweight.FSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Raven.Client.MvcIntegration, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\packages\RavenDB-Client.1.0.888\lib\net40\Raven.Client.MvcIntegration.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -95,15 +95,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlogAuthor.cs" />
-    <Compile Include="BloggerSettingsService.cs" />
+    <Compile Include="Blogger\BloggerSettingsService.cs" />
     <Compile Include="ConfigurationService.cs" />
     <Compile Include="BlogData.cs" />
-    <Compile Include="Data\BloggerHelper.cs" />
-    <Compile Include="BloggerSetting.cs" />
+    <Compile Include="Blogger\BloggerHelper.cs" />
+    <Compile Include="Blogger\BloggerSetting.cs" />
     <Compile Include="BlogPost.cs" />
     <Compile Include="BlogInfo.cs" />
     <Compile Include="BlogSelection.cs" />
     <Compile Include="BlogService.cs" />
+    <Compile Include="Data\BlogStoreUpdate.cs" />
     <Compile Include="Data\IBlogStore.cs" />
     <Compile Include="Data\MemoryBlogStore.cs" />
     <Compile Include="Data\RavenDbBlogStore.cs" />

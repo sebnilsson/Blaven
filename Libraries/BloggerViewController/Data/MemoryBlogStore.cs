@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
+
+using BloggerViewController.Blogger;
 
 namespace BloggerViewController.Data {
     /// <summary>
@@ -14,8 +15,9 @@ namespace BloggerViewController.Data {
         private static BlogData GetBlogData(string blogKey) {
             BlogData data;
             if(!_blogData.TryGetValue(blogKey, out data)) {
-                return null;
+                throw new ArgumentOutOfRangeException("blogKey", string.Format("No blog-data available for blog-key '{0}'.", blogKey));
             }
+
             return data;
         }
 
@@ -48,7 +50,8 @@ namespace BloggerViewController.Data {
         /// <param name="predicate">Optional predicate to filter blog-posts.</param>
         /// <returns>Returns a blog-selection with pagination-info.</returns>
         public BlogSelection GetBlogSelection(int pageIndex, int pageSize, IEnumerable<string> blogKeys, Func<BlogPost, bool> predicate = null) {
-            var blogDatas = _blogData.Values.Where(data => blogKeys.Contains(data.Info.BlogKey));
+            var blogDatas = blogKeys.Select(key => GetBlogData(key));
+            //_blogData.Values.Where(data => blogKeys.Contains(data.Info.BlogKey));
 
             var selectedPosts = Enumerable.Empty<BlogPost>();
             foreach(var data in blogDatas) {
@@ -83,7 +86,7 @@ namespace BloggerViewController.Data {
         /// </summary>
         /// <param name="bloggerDocument">The Blogger XML-document.</param>
         /// <param name="blogKey">The key of the blog to update.</param>
-        public void Update(XDocument bloggerDocument, string blogKey) {
+        public void Update(System.Xml.Linq.XDocument bloggerDocument, string blogKey) {
             _blogUpdates[blogKey] = DateTime.Now;
 
             if(bloggerDocument == null) {
