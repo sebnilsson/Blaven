@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BloggerViewController.Blogger;
+using BloggerViewController.Configuration;
 using Raven.Client;
 using Raven.Client.Document;
 
@@ -14,7 +14,7 @@ namespace BloggerViewController.Data {
         private IDocumentStore _documentStore;
 
         public RavenDbBlogStore(IDocumentStore documentStore = null) {
-            _documentStore = documentStore ?? new DocumentStore { Url = ConfigurationService.RavenDbStoreUrlKey };
+            _documentStore = documentStore ?? new DocumentStore { Url = AppSettingsService.RavenDbStoreUrlKey };
             _documentStore.Initialize();
         }
 
@@ -86,7 +86,7 @@ namespace BloggerViewController.Data {
                     return false;
                 }
 
-                return storeUpdate.Updated.AddMinutes(ConfigurationService.CacheTime) > DateTime.Now;
+                return storeUpdate.Updated.AddMinutes(AppSettingsService.CacheTime) > DateTime.Now;
             }
         }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BloggerViewController.Blogger;
+using BloggerViewController.Configuration;
 
 namespace BloggerViewController.Data {
     /// <summary>
@@ -78,7 +78,7 @@ namespace BloggerViewController.Data {
             }
 
             var updated = _blogUpdates[blogKey];
-            return updated.AddMinutes(ConfigurationService.CacheTime) > DateTime.Now;
+            return updated.AddMinutes(AppSettingsService.CacheTime) > DateTime.Now;
         }
 
         /// <summary>

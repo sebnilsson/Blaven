@@ -95,11 +95,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlogAuthor.cs" />
-    <Compile Include="Blogger\BloggerSettingsService.cs" />
-    <Compile Include="ConfigurationService.cs" />
+    <Compile Include="Configuration\BloggerSettingsService.cs" />
+    <Compile Include="Configuration\AppSettingsService.cs" />
     <Compile Include="BlogData.cs" />
-    <Compile Include="Blogger\BloggerHelper.cs" />
-    <Compile Include="Blogger\BloggerSetting.cs" />
+    <Compile Include="BloggerHelper.cs" />
+    <Compile Include="Configuration\BloggerSetting.cs" />
     <Compile Include="BlogPost.cs" />
     <Compile Include="BlogInfo.cs" />
     <Compile Include="BlogSelection.cs" />

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace BloggerViewController.Blogger {
+namespace BloggerViewController.Configuration {
     /// <summary>
     /// Represents a Blogger-setting.
     /// </summary>

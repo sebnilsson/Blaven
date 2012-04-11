@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
+using BloggerViewController.Configuration;
 using Google.GData.Blogger;
 using Google.GData.Client;
 
-namespace BloggerViewController.Blogger {
+namespace BloggerViewController {
     internal class BloggerHelper {
 
         public static string BloggerPostsUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";

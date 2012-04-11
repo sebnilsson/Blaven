@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BloggerViewController.Configuration;
+
 namespace BloggerViewController {
     /// <summary>
     /// A selection of blog-posts, with pagination-information.
@@ -17,7 +19,7 @@ namespace BloggerViewController {
             if(selectedPosts == null) {
                 throw new ArgumentNullException("selectedPosts");
             }
-            pageSize = pageSize.GetValueOrDefault(ConfigurationService.PageSize);
+            pageSize = pageSize.GetValueOrDefault(AppSettingsService.PageSize);
             if(pageSize < 1) {
                 throw new ArgumentOutOfRangeException("pageSize", "The argument has to be a positive number above 0.");
             }

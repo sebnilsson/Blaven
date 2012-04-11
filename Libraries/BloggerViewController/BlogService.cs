@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BloggerViewController.Blogger;
+using BloggerViewController.Configuration;
 using BloggerViewController.Data;
 
 namespace BloggerViewController {
@@ -69,7 +69,7 @@ namespace BloggerViewController {
                 EnsureBlogIsUpdated(key);
             }
 
-            var actualPageSize = pageSize.GetValueOrDefault(ConfigurationService.PageSize);
+            var actualPageSize = pageSize.GetValueOrDefault(AppSettingsService.PageSize);
 
             var selection = _store.GetBlogSelection(pageIndex, actualPageSize, keys, predicate);
             return selection;
@@ -126,7 +126,7 @@ namespace BloggerViewController {
         }
 
         private void EnsureBlogIsUpdated(string blogKey) {
-            if(ConfigurationService.UseBackgroundService) {
+            if(AppSettingsService.UseBackgroundService) {
                 return;                
             }
 

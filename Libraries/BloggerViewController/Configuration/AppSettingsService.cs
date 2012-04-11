@@ -2,11 +2,11 @@
 using System.Configuration;
 using System.Linq;
 
-namespace BloggerViewController {
+namespace BloggerViewController.Configuration {
     /// <summary>
     /// A static service-class to handle the application's settings.
     /// </summary>
-    public static class ConfigurationService {
+    public static class AppSettingsService {
         private static string _bloggerSettingsPath;
         /// <summary>
         /// Gets the Blogger-settings file-path. Looks at the config-key "BloggerViewController.BloggerSettingsPath". Defaults to "~/BloggerSettings.json".
