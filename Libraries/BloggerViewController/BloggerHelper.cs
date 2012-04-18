@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
@@ -9,15 +8,18 @@ using Google.GData.Client;
 
 namespace BloggerViewController {
     internal class BloggerHelper {
+        private string _bloggerUri;
+        public BloggerHelper(string bloggerUri = null) {
+            _bloggerUri = bloggerUri;
+        }
 
-        public static string BloggerPostsUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
+        public const string BloggerPostsUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
 
         public XDocument GetBloggerDocument(BloggerSetting setting, DateTime? ifModifiedSince = null) {
-
-            var service = GetBloggerService(setting.Username, setting.Password);
+            string uri = _bloggerUri ?? string.Format(BloggerPostsUriFormat, setting.BlogId);
 
             var query = new BloggerQuery {
-                Uri = new Uri(string.Format(BloggerPostsUriFormat, setting.BlogId)),
+                Uri = new Uri(uri),
                 NumberToRetrieve = int.MaxValue,
             };
 
@@ -25,6 +27,12 @@ namespace BloggerViewController {
                 query.ModifiedSince = ifModifiedSince.Value;
             }
 
+            return GetBloggerDocument(setting, query);
+        }
+
+        public XDocument GetBloggerDocument(BloggerSetting setting, BloggerQuery query) {
+            var service = GetBloggerService(setting.Username, setting.Password);
+            
             BloggerFeed feed = null;
             try {
                 feed = service.Query(query);
@@ -41,7 +49,7 @@ namespace BloggerViewController {
             }
         }
 
-        public static BlogData ParseBlogData(XDocument document, string blogKey) {
+        public static BlogData ParseBlogData(string blogKey, XDocument document) {
             var feed = document.Root;
             var ns = document.Root.Name.Namespace;
 
@@ -50,46 +58,25 @@ namespace BloggerViewController {
             var posts = from entry in blogEntries
                         where entry.Element(ns + "title") != null
                         && entry.Elements(ns + "link").Any(el => el.Attribute("rel").Value == "alternate")
-                        select ParseEntry(ns, entry);
-
-            var labels = new Dictionary<string, int>();
-            foreach(var post in posts) {
-                foreach(var label in post.Labels) {
-                    if(!labels.ContainsKey(label)) {
-                        labels.Add(label, 0);
-                    }
-                    labels[label] = (labels[label] + 1);
-                }
-            }
-            
-            var postDates = new Dictionary<DateTime, int>();
-            foreach(var post in posts) {
-                DateTime key = new DateTime(post.Published.Year, post.Published.Month, 1);
-                if(!postDates.ContainsKey(key)) {
-                    postDates.Add(key, 0);
-                }
-                postDates[key] = (postDates[key] + 1);
-            }
+                        select ParseEntry(blogKey, ns, entry);
             
             XElement subtitle = feed.Element(ns + "subtitle");
             var blogInfo = new BlogInfo {
-                BlogKey = blogKey,
-                Labels = labels,
-                PostDates = postDates,
+                BlogKey = blogKey,                 
                 Subtitle = (subtitle != null) ? subtitle.Value : string.Empty,
                 Title = feed.Element(ns + "title").Value,
                 Updated = ParseDate(feed.Element(ns + "updated").Value),
             };
 
-            return new BlogData { Info = blogInfo, Posts = posts };
+            return new BlogData { Info = blogInfo, Posts = posts, };
         }
 
-        private static BlogPost ParseEntry(XNamespace ns, XElement entry) {
+        private static BlogPost ParseEntry(string blogKey, XNamespace ns, XElement entry) {
             var alternateLink = entry.Elements(ns + "link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
             
             string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
-            var post = new BlogPost {
+            var post = new BlogPost(blogKey) {
                 ID = ParseId(entry.Element(ns + "id").Value),
                 Labels = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value,

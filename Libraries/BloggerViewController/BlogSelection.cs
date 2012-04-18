@@ -29,9 +29,9 @@ namespace BloggerViewController {
 
             PageIndex = pageIndex;
             PageSize = pageSize.Value;
-            
-            int take = PageSize;
-            int skip = (PageIndex * take);
+
+            int skip = BlogSelection.GetSkip(PageIndex, PageSize);
+            int take = BlogSelection.GetTake(PageSize);
 
             var pagedPosts = selectedPosts.Skip(skip).Take(take);                        
             Posts = pagedPosts;
@@ -42,6 +42,14 @@ namespace BloggerViewController {
 
             HasNextItems = (selectedPosts.LastOrDefault().ID != pagedPosts.LastOrDefault().ID);
             HasPreviousItems = (selectedPosts.FirstOrDefault().ID != pagedPosts.FirstOrDefault().ID);
+        }
+
+        public static int GetSkip(int pageIndex, int pageSize) {
+            return (pageIndex * pageSize);
+        }
+
+        public static int GetTake(int pageSize) {
+            return pageSize;
         }
 
         /// <summary>

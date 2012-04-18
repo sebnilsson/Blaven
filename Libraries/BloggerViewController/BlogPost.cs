@@ -7,7 +7,9 @@ namespace BloggerViewController {
     /// Represents a blog-post on a blog.
     /// </summary>
     public class BlogPost {
-        public BlogPost() {
+        public BlogPost(string blogKey) {
+            this.BlogKey = blogKey;
+
             this.Author = new BlogAuthor();
             this.Labels = Enumerable.Empty<string>();
         }
@@ -56,5 +58,10 @@ namespace BloggerViewController {
         /// The author-information of the blog-post.
         /// </summary>
         public BlogAuthor Author { get; set; }
+
+        /// <summary>
+        /// The blog key the post belongs to..
+        /// </summary>
+        public string BlogKey { get; set; }
     }
 }

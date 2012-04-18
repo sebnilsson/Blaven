@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace BloggerViewController {
-    public class BlogData {
+    internal class BlogData {
         /// <summary>
-        /// An object holding all the information about a blog from a parsed XML-document from BLogger.
+        /// An object holding all the information about a blog from a parsed XML-document from Blogger.
         /// </summary>
         public BlogData() {
             this.Info = new BlogInfo();

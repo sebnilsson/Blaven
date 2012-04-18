@@ -21,7 +21,7 @@ namespace BloggerViewController.Test {
             var blogStore = new MemoryBlogStore();
             var settings = new[] { new BloggerSetting() };
 
-            var blogService = new BlogService(blogStore, settings);
+            //var blogService = new BlogService(blogStore, settings);
         }
     }
 }

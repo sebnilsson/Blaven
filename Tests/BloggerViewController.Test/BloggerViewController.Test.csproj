@@ -45,6 +45,11 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BloggerXmlResources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>BloggerXmlResources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BlogServiceTest.cs" />
   </ItemGroup>
@@ -53,6 +58,19 @@
       <Project>{30FB0DDF-B9A6-4D40-A1D8-979A5DF398EA}</Project>
       <Name>BloggerViewController</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BloggerXmlResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>BloggerXmlResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="BloggerXml\bloggerindraft.blogspot.xml" />
+    <Content Include="BloggerXml\buzz.blogger.xml" />
+    <Content Include="BloggerXml\knownissues.blogspot.xml" />
+    <Content Include="BloggerXml\status.blogger.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
