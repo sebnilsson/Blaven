@@ -78,7 +78,7 @@ namespace BloggerViewController {
 
             var post = new BlogPost(blogKey) {
                 ID = ParseId(entry.Element(ns + "id").Value),
-                Labels = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
+                Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value,
                 PermaLinkAbsolute = permaLinkFull,
                 PermaLinkRelative = GetRelativeUrl(permaLinkFull),

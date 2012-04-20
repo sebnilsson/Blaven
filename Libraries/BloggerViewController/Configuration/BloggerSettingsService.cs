@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Json;
 
 namespace BloggerViewController.Configuration {
     public static class BloggerSettingsService {
@@ -13,7 +12,7 @@ namespace BloggerViewController.Configuration {
             }
 
             string fileContent = File.ReadAllText(bloggerSettingsFilePath);
-            var settings = JsonSerializationHelper.GetDeserializedObject<IEnumerable<BloggerSetting>>(fileContent, Enumerable.Empty<BloggerSetting>());
+            var settings = GetDeserializedObject<IEnumerable<BloggerSetting>>(fileContent, Enumerable.Empty<BloggerSetting>());
 
             foreach(var setting in settings) {
                 if(string.IsNullOrWhiteSpace(setting.BlogKey)) {
@@ -29,6 +28,19 @@ namespace BloggerViewController.Configuration {
             }
 
             return settings;
+        }
+
+        private static TDeserialized GetDeserializedObject<TDeserialized>(string serializedData,
+            TDeserialized defaultValue = default(TDeserialized)) where TDeserialized : class {
+            if(string.IsNullOrWhiteSpace(serializedData)) {
+                return defaultValue;
+            }
+
+            var serializer = new DataContractJsonSerializer(typeof(TDeserialized));
+            using(var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(serializedData))) {
+                var deserialized = serializer.ReadObject(stream) as TDeserialized;
+                return deserialized ?? defaultValue;
+            }
         }
     }
 }

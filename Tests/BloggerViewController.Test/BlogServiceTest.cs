@@ -18,7 +18,6 @@ namespace BloggerViewController.Test {
 
         [TestMethod]
         public void TestMethod1() {
-            var blogStore = new MemoryBlogStore();
             var settings = new[] { new BloggerSetting() };
 
             //var blogService = new BlogService(blogStore, settings);

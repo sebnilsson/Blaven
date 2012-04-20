@@ -5,14 +5,14 @@ using System.Linq;
 using Raven.Client.Indexes;
 
 namespace BloggerViewController.Data.Indexes {
-    public class PostDatesByBlogKey : AbstractIndexCreationTask<BlogPost, PostDatesByBlogKey.ReduceResult> {
+    public class ArchiveCountByBlogKey : AbstractIndexCreationTask<BlogPost, ArchiveCountByBlogKey.ReduceResult> {
         public class ReduceResult {
             internal string BlogKey { get; set; }
             public DateTime Date { get; set; }
             public int Count { get; set; }
         }
 
-        public PostDatesByBlogKey() {
+        public ArchiveCountByBlogKey() {
             Map = posts => from post in posts
                            let date = new DateTime(post.Published.Year, post.Published.Month, 1)
                            select new {
@@ -22,13 +22,15 @@ namespace BloggerViewController.Data.Indexes {
                            };
 
             Reduce = results => from result in results
-                                group result by new { Date = result.Date, BlogKey = result.BlogKey, }
-                                    into g
-                                    select new {
-                                        BlogKey = g.Key.BlogKey,
-                                        Date = g.Key.Date,
-                                        Count = g.Sum(x => x.Count),
-                                    };
+                                group result by new {
+                                    Date = result.Date,
+                                    BlogKey = result.BlogKey,
+                                } into g
+                                select new {
+                                    BlogKey = g.Key.BlogKey,
+                                    Date = g.Key.Date,
+                                    Count = g.Sum(x => x.Count),
+                                };
         }
     }
 }

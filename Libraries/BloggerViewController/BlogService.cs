@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BloggerViewController.Configuration;
+
 namespace BloggerViewController {
     /// <summary>
     /// A service-class for accessing blog-related features.
@@ -24,78 +26,165 @@ namespace BloggerViewController {
         /// </summary>
         public BlogServiceConfig Config { get; private set; }
 
-        private Dictionary<string, BlogServiceBlog> _blogCache = new Dictionary<string, BlogServiceBlog>();
+        public Dictionary<DateTime, int> GetArchiveCount(params string[] blogKeys) {
+            blogKeys = GetAllKeys(blogKeys);
 
-        /// <summary>
-        /// Gets a blog from a given blog-key.
-        /// </summary>
-        /// <param name="blogKey">The key of the blog desired.</param>
-        /// <returns>Returns another service-object specific to the blog.</returns>
-        public BlogServiceBlog GetBlog(string blogKey) {
-            if(!_blogCache.ContainsKey(blogKey)) {
-                var bloggerSetting = this.Config.BloggerSettings.FirstOrDefault(setting => setting.BlogKey == blogKey);
-                if(bloggerSetting == null) {
-                    throw new IndexOutOfRangeException(string.Format("No blog found in settings with key '{0}'.", blogKey));
-                }
+            EnsureBlogIsUpdated(blogKeys);
 
-                _blogCache[blogKey] = new BlogServiceBlog(bloggerSetting, this.Config);
+            return this.Config.BlogStore.GetBlogArchiveCount(blogKeys);
+        }
+
+        public BlogSelection GetArchiveSelection(DateTime date, int pageIndex, params string[] blogKeys) {
+            if(pageIndex < 0) {
+                throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            return _blogCache[blogKey];
+            blogKeys = GetAllKeys(blogKeys);
+
+            EnsureBlogIsUpdated(blogKeys);
+
+            return this.Config.BlogStore.GetBlogArchiveSelection(date, pageIndex, this.Config.PageSize, blogKeys);
+        }
+        
+        /// <summary>
+        /// Gets the BlogInfo for a blog.
+        /// </summary>
+        /// <param name="blogKey">The key of the blog desired. Defaults to first blog in the collection of Blogger-settings.</param>
+        /// <returns>Returns information about a blog.</returns>
+        public BlogInfo GetInfo(string blogKey = null) {
+            blogKey = GetBlogKeyOrDefault(blogKey);
+
+            EnsureBlogIsUpdated(blogKey);
+
+            return this.Config.BlogStore.GetBlogInfo(blogKey);
         }
 
         /// <summary>
-        /// Gets the first blog in the Blogger-settings.
+        /// Gets a blog-post from given perma-link and blog-key.
         /// </summary>
-        /// <returns>Returns another service-object specific to the blog.</returns>
-        public BlogServiceBlog GetDefaultBlog() {
-            var firstBlogKey = this.Config.BloggerSettings.FirstOrDefault().BlogKey;
-            return GetBlog(firstBlogKey);
+        /// <param name="permaLink">The perma-link of the blog-post to get.</param>
+        /// <param name="blogKey">The key of the blog desired. Defaults to first blog in the collection of Blogger-settings.</param>
+        /// <returns>Returns a blog-post.</returns>
+        public BlogPost GetPost(string permaLink, string blogKey = null) {
+            blogKey = GetBlogKeyOrDefault(blogKey);
+
+            EnsureBlogIsUpdated(blogKey);
+
+            return this.Config.BlogStore.GetBlogPost(permaLink, blogKey);
         }
 
-        public BlogSelection GetAllBlogsSelection(int pageIndex, string labelFilter = null, DateTime? dateTimeFilter = null) {
-            return this.Config.BlogStore.GetBlogSelection(pageIndex, this.Config.PageSize, labelFilter, dateTimeFilter);
+        /// <summary>
+        /// Gets a selection of blog-posts, with pagination-info.
+        /// </summary>
+        /// <param name="pageIndex">The current page-index of the pagination. Must have a value of 0 or higher.</param>
+        /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
+        /// <returns>Returns a blog-selection with pagination-info.</returns>
+        public BlogSelection GetSelection(int pageIndex, params string[] blogKeys) {
+            if(pageIndex < 0) {
+                throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
+            }
+
+            blogKeys = GetAllKeys(blogKeys);
+
+            EnsureBlogIsUpdated(blogKeys);
+
+            return this.Config.BlogStore.GetBlogSelection(pageIndex, this.Config.PageSize, blogKeys);
         }
 
-        public Dictionary<string, int> GetAllBlogsLabels() {
-            var allBlogLabels = new Dictionary<string, int>();
+        public BlogSelection GetTagsSelection(string tagName, int pageIndex, params string[] blogKeys) {
+            if(pageIndex < 0) {
+                throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
+            }
 
-            this.Config.BloggerSettings.Select(setting => GetBlog(setting.BlogKey)).ToList().ForEach(service => {
-                var labels = service.GetLabels();
+            blogKeys = GetAllKeys(blogKeys);
 
-                foreach(var label in labels) {
-                    if(!allBlogLabels.ContainsKey(label.Key)) {
-                        allBlogLabels[label.Key] = 0;
+            EnsureBlogIsUpdated(blogKeys);
+
+            return this.Config.BlogStore.GetBlogTagsSelection(tagName, pageIndex, this.Config.PageSize, blogKeys);
+        }
+
+        /// <summary>
+        /// Gets the blog-tags count.
+        /// </summary>
+        /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
+        /// <returns>Returns a dictionary of tags and their count.</returns>
+        public Dictionary<string, int> GetTagsCount(params string[] blogKeys) {
+            blogKeys = GetAllKeys(blogKeys);
+
+            EnsureBlogIsUpdated(blogKeys);
+
+            return this.Config.BlogStore.GetBlogTagsCount(blogKeys);
+        }
+
+        /// <summary>
+        /// Updates blogs.
+        /// </summary>
+        /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
+        public void Update(params string[] blogKeys) {
+            blogKeys = GetAllKeys(blogKeys);
+
+            // TODO: Change to commented code when Blogger API-bug is fixed:
+            // http://code.google.com/p/gdata-issues/issues/detail?id=2555
+            //var lastUpdate = _config.BlogStore.GetBlogLastUpdate(_setting.BlogKey);
+            //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastUpdate);
+
+            foreach(var blogKey in blogKeys) {
+                var bloggerSetting = this.Config.BloggerSettings.First(setting => setting.BlogKey == blogKey);
+
+                var bloggerDocument = this.Config.BloggerHelper.GetBloggerDocument(bloggerSetting);
+
+                this.Config.BlogStore.Update(blogKey, bloggerDocument);
+            }
+        }
+
+        private static readonly object _lockStoreLock = new object();
+        private static Dictionary<string, object> _lockStore = new Dictionary<string, object>();
+        private static object GetLock(string key) {
+            if(!_lockStore.ContainsKey(key)) {
+                lock(_lockStoreLock) {
+                    if(!_lockStore.ContainsKey(key)) {
+                        _lockStore[key] = new object();
+                    }
+                }
+            }
+            return _lockStore[key];
+        }
+        private void EnsureBlogIsUpdated(params string[] blogKeys) {
+            // If the app uses background-service then don't handle update
+            if(AppSettingsService.UseBackgroundService) {
+                return;
+            }
+
+            foreach(var blogKey in blogKeys) {
+                if(this.Config.BlogStore.GetIsBlogUpdated(blogKey)) {
+                    return;
+                }
+
+                var lockObject = GetLock(blogKey);
+                lock(lockObject) {
+                    if(this.Config.BlogStore.GetIsBlogUpdated(blogKey)) {
+                        return;
                     }
 
-                    allBlogLabels[label.Key] = (allBlogLabels[label.Key] + label.Value);
+                    Update(blogKey);
                 }
-            });
-
-            return allBlogLabels.OrderBy(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            }
         }
 
-        public Dictionary<DateTime, int> GetAllBlogsPostDates() {
-            var allBlogPostDates = new Dictionary<DateTime, int>();
+        private string GetBlogKeyOrDefault(string blogKey) {
+            if(!string.IsNullOrWhiteSpace(blogKey)) {
+                return blogKey;
+            }
 
-            this.Config.BloggerSettings.Select(setting => GetBlog(setting.BlogKey)).ToList().ForEach(serivce => {
-                var postDates = serivce.GetPostDates();
-
-                foreach(var postDate in postDates) {
-                    if(!allBlogPostDates.ContainsKey(postDate.Key)) {
-                        allBlogPostDates[postDate.Key] = 0;
-                    }
-
-                    allBlogPostDates[postDate.Key] = (allBlogPostDates[postDate.Key] + postDate.Value);
-                }
-            });
-
-            return allBlogPostDates.OrderByDescending(kvp => kvp.Key).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            return this.Config.BloggerSettings.First().BlogKey;
         }
 
-        public void UpdateAllBlogs() {
-            this.Config.BloggerSettings.Select(setting => GetBlog(setting.BlogKey)).ToList()
-                .ForEach(service => service.Update());
+        private string[] GetAllKeys(string[] blogKeys) {
+            if(blogKeys.Any()) {
+                return blogKeys;
+            }
+
+            return this.Config.BloggerSettings.Select(setting => setting.BlogKey).ToArray();
         }
     }
 }

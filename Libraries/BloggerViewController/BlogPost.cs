@@ -11,7 +11,7 @@ namespace BloggerViewController {
             this.BlogKey = blogKey;
 
             this.Author = new BlogAuthor();
-            this.Labels = Enumerable.Empty<string>();
+            this.Tags = Enumerable.Empty<string>();
         }
 
         /// <summary>
@@ -25,9 +25,9 @@ namespace BloggerViewController {
         public string ID { get; set; }
 
         /// <summary>
-        /// The labels/tags that are set on the blog-post.
+        /// The tags that are set on the blog-post.
         /// </summary>
-        public IEnumerable<string> Labels { get; set; }
+        public IEnumerable<string> Tags { get; set; }
 
         /// <summary>
         /// The date and time that the blog-post was posted.
