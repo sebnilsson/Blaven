@@ -26,28 +26,6 @@ namespace BloggerViewController {
         /// <summary>
         /// Creates a new instance of BloggerSettingsConfig.
         /// </summary>
-        /// <param name="bloggerSettingsFilePath">The full path to the Blogger-settings file.</param>
-        /// <param name="documentStorePath">The path for the DocumentStore.</param>
-        /// <param name="bloggerHelperUri">The BloggerHelper to use. Defaults to new default instance.</param>
-        public BlogServiceConfig(string bloggerSettingsFilePath, string documentStorePath, string bloggerHelperUri = null)
-            : this(BloggerSettingsService.ParseFile(bloggerSettingsFilePath), new DocumentStore { Url = documentStorePath }, bloggerHelperUri) {
-
-        }
-
-        /// <summary>
-        /// Creates a new instance of BloggerSettingsConfig.
-        /// </summary>
-        /// <param name="settings">The Blogger-settings to use.</param>
-        /// <param name="documentStorePath">The path for the DocumentStore.</param>
-        /// <param name="bloggerHelperUri">The BloggerHelper to use. Defaults to new default instance.</param>
-        public BlogServiceConfig(IEnumerable<BloggerSetting> settings, string documentStorePath, string bloggerHelperUri = null)
-            : this(settings, new DocumentStore { Url = documentStorePath }, bloggerHelperUri) {
-
-        }
-
-        /// <summary>
-        /// Creates a new instance of BloggerSettingsConfig.
-        /// </summary>
         /// <param name="settings">The Blogger-settings to use.</param>
         /// <param name="documentStore">The IDocument to use. Defaults to a DocumentStore using the default store-URL in the AppSettings.</param>
         /// <param name="bloggerHelperUri">The BloggerHelper to use. Defaults to new default instance.</param>
