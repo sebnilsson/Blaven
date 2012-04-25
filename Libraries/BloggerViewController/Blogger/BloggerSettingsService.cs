@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Json;
 
-namespace BloggerViewController.Configuration {
+namespace BloggerViewController.Blogger {
     public static class BloggerSettingsService {
         public static IEnumerable<BloggerSetting> ParseFile(string bloggerSettingsFilePath) {
             if(!File.Exists(bloggerSettingsFilePath)) {

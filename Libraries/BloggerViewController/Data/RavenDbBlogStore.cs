@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using BloggerViewController.Blogger;
 using BloggerViewController.Data.Indexes;
 using Raven.Client;
 using Raven.Client.Document;

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-using BloggerViewController.Configuration;
+using BloggerViewController.Blogger;
 using Raven.Client;
 using Raven.Client.Embedded;
 using Raven.Client.Indexes;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BloggerViewController.Configuration;
+using BloggerViewController.Blogger;
 
 namespace BloggerViewController {
     /// <summary>

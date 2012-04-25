@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BloggerViewController.Configuration;
-
 namespace BloggerViewController {
     /// <summary>
     /// A selection of blog-posts, with pagination-information.

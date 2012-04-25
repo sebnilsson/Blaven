@@ -93,15 +93,15 @@
   <ItemGroup>
     <Compile Include="BlogAuthor.cs" />
     <Compile Include="BlogServiceConfig.cs" />
-    <Compile Include="Configuration\AppSettingsService.cs" />
+    <Compile Include="AppSettingsService.cs" />
     <Compile Include="BlogData.cs" />
-    <Compile Include="BloggerHelper.cs" />
-    <Compile Include="Configuration\BloggerSetting.cs" />
+    <Compile Include="Blogger\BloggerHelper.cs" />
+    <Compile Include="Blogger\BloggerSetting.cs" />
     <Compile Include="BlogPost.cs" />
     <Compile Include="BlogInfo.cs" />
     <Compile Include="BlogSelection.cs" />
     <Compile Include="BlogService.cs" />
-    <Compile Include="Configuration\BloggerSettingsService.cs" />
+    <Compile Include="Blogger\BloggerSettingsService.cs" />
     <Compile Include="Data\BlogStoreUpdate.cs" />
     <Compile Include="Data\Indexes\ArchiveCountByBlogKey.cs" />
     <Compile Include="Data\Indexes\BlogPostsOrderedByCreated.cs" />

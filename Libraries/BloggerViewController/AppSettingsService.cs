@@ -2,7 +2,7 @@
 using System.Configuration;
 using System.Linq;
 
-namespace BloggerViewController.Configuration {
+namespace BloggerViewController {
     /// <summary>
     /// A static service-class to handle the application's settings.
     /// </summary>
