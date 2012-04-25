@@ -33,5 +33,10 @@ namespace BloggerViewController.Configuration {
         /// The username for the account on Blogger.
         /// </summary>
         public string Username { get; set; }
+
+        /// <summary>
+        /// The URI to the Blogger-document. Will be resolved to correct URI from BlogId, if left empty.
+        /// </summary>
+        public string BloggerUri { get; set; }
     }
 }

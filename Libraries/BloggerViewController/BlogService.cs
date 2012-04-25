@@ -12,6 +12,15 @@ namespace BloggerViewController {
         /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features.
         /// </summary>
+        /// <param name="settings">The Blogger-settings to use.</param>
+        public BlogService(IEnumerable<BloggerSetting> settings)
+            : this(new BlogServiceConfig(settings)) {
+
+        }
+
+        /// <summary>
+        /// Creates an instance of a service-class for accessing blog-related features.
+        /// </summary>
         /// <param name="config">The Blogger-settings to use in the service.</param>
         public BlogService(BlogServiceConfig config) {
             if(config == null) {
@@ -19,6 +28,8 @@ namespace BloggerViewController {
             }
 
             this.Config = config;
+
+            EnsureBlogsUpdated(this.Config.BloggerSettings.Select(setting => setting.BlogKey).ToArray());
         }
 
         /// <summary>
@@ -29,8 +40,6 @@ namespace BloggerViewController {
         public Dictionary<DateTime, int> GetArchiveCount(params string[] blogKeys) {
             blogKeys = GetAllKeys(blogKeys);
 
-            EnsureBlogIsUpdated(blogKeys);
-
             return this.Config.BlogStore.GetBlogArchiveCount(blogKeys);
         }
 
@@ -40,8 +49,6 @@ namespace BloggerViewController {
             }
 
             blogKeys = GetAllKeys(blogKeys);
-
-            EnsureBlogIsUpdated(blogKeys);
 
             return this.Config.BlogStore.GetBlogArchiveSelection(date, pageIndex, this.Config.PageSize, blogKeys);
         }
@@ -54,8 +61,6 @@ namespace BloggerViewController {
         public BlogInfo GetInfo(string blogKey = null) {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
-            EnsureBlogIsUpdated(blogKey);
-
             return this.Config.BlogStore.GetBlogInfo(blogKey);
         }
 
@@ -67,8 +72,6 @@ namespace BloggerViewController {
         /// <returns>Returns a blog-post.</returns>
         public BlogPost GetPost(string permaLink, string blogKey = null) {
             blogKey = GetBlogKeyOrDefault(blogKey);
-
-            EnsureBlogIsUpdated(blogKey);
 
             return this.Config.BlogStore.GetBlogPost(permaLink, blogKey);
         }
@@ -86,21 +89,7 @@ namespace BloggerViewController {
 
             blogKeys = GetAllKeys(blogKeys);
 
-            EnsureBlogIsUpdated(blogKeys);
-
             return this.Config.BlogStore.GetBlogSelection(pageIndex, this.Config.PageSize, blogKeys);
-        }
-
-        public BlogSelection GetTagsSelection(string tagName, int pageIndex, params string[] blogKeys) {
-            if(pageIndex < 0) {
-                throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
-            }
-
-            blogKeys = GetAllKeys(blogKeys);
-
-            EnsureBlogIsUpdated(blogKeys);
-
-            return this.Config.BlogStore.GetBlogTagsSelection(tagName, pageIndex, this.Config.PageSize, blogKeys);
         }
 
         /// <summary>
@@ -111,29 +100,62 @@ namespace BloggerViewController {
         public Dictionary<string, int> GetTagsCount(params string[] blogKeys) {
             blogKeys = GetAllKeys(blogKeys);
 
-            EnsureBlogIsUpdated(blogKeys);
-
             return this.Config.BlogStore.GetBlogTagsCount(blogKeys);
+        }
+
+        public BlogSelection GetTagsSelection(string tagName, int pageIndex, params string[] blogKeys) {
+            if(pageIndex < 0) {
+                throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
+            }
+
+            blogKeys = GetAllKeys(blogKeys);
+
+            return this.Config.BlogStore.GetBlogTagsSelection(tagName, pageIndex, this.Config.PageSize, blogKeys);
+        }
+
+        public BlogSelection SearchPosts(string searchTerms, int pageIndex, params string[] blogKeys) {
+            if(pageIndex < 0) {
+                throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
+            }
+            
+            blogKeys = GetAllKeys(blogKeys);
+
+            return this.Config.BlogStore.SearchPosts(searchTerms ?? string.Empty, pageIndex, this.Config.PageSize, blogKeys);
+        }
+
+        public void Update(params string[] blogKeys) {
+            Update(false, blogKeys);
         }
 
         /// <summary>
         /// Updates blogs.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
-        public void Update(params string[] blogKeys) {
+        public void Update(bool skipCache, params string[] blogKeys) {
             blogKeys = GetAllKeys(blogKeys);
-
-            // TODO: Change to commented code when Blogger API-bug is fixed:
-            // http://code.google.com/p/gdata-issues/issues/detail?id=2555
-            //var lastUpdate = _config.BlogStore.GetBlogLastUpdate(_setting.BlogKey);
-            //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastUpdate);
+            
+            bool hasDatabaseAnyDocuments = (this.Config.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments > 0);
 
             foreach(var blogKey in blogKeys) {
+                // TODO: Change to commented code when Blogger API-bug is fixed:
+                // http://code.google.com/p/gdata-issues/issues/detail?id=2555
+                //var lastUpdate = _config.BlogStore.GetBlogLastUpdate(blogKey);
+                //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastUpdate);
+
                 var bloggerSetting = this.Config.BloggerSettings.First(setting => setting.BlogKey == blogKey);
 
                 var bloggerDocument = this.Config.BloggerHelper.GetBloggerDocument(bloggerSetting);
 
                 this.Config.BlogStore.Update(blogKey, bloggerDocument);
+            }
+
+            // Wait for indexing - if first ever update
+            if(hasDatabaseAnyDocuments) {
+                return;
+            }
+
+            while(this.Config.DocumentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0) {
+                System.Threading.Thread.Sleep(100);
             }
         }
 
@@ -149,20 +171,20 @@ namespace BloggerViewController {
             }
             return _lockStore[key];
         }
-        private void EnsureBlogIsUpdated(params string[] blogKeys) {
+        private void EnsureBlogsUpdated(params string[] blogKeys) {
             // If the app uses background-service then don't handle update
             if(AppSettingsService.UseBackgroundService) {
                 return;
             }
 
             foreach(var blogKey in blogKeys) {
-                if(this.Config.BlogStore.GetIsBlogUpdated(blogKey)) {
+                if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
                     return;
                 }
 
                 var lockObject = GetLock(blogKey);
                 lock(lockObject) {
-                    if(this.Config.BlogStore.GetIsBlogUpdated(blogKey)) {
+                    if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
                         return;
                     }
 

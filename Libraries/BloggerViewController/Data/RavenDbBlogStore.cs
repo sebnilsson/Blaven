@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using BloggerViewController.Configuration;
 using BloggerViewController.Data.Indexes;
 using Raven.Client;
 using Raven.Client.Document;
@@ -15,7 +14,6 @@ namespace BloggerViewController.Data {
     internal class RavenDbBlogStore {
         public RavenDbBlogStore(IDocumentStore documentStore) {
             DocumentStore = documentStore;
-            DocumentStore.Initialize();
         }
         
         public IDocumentStore DocumentStore { get; private set; }
@@ -61,13 +59,13 @@ namespace BloggerViewController.Data {
             }
         }
 
-        public bool GetIsBlogUpdated(string blogKey) {
+        public bool GetIsBlogUpdated(string blogKey, int cacheTimeMinutes) {
             var lastUpdate = GetBlogLastUpdate(blogKey);
             if(!lastUpdate.HasValue) {
                 return false;
             }
 
-            return lastUpdate.Value.AddMinutes(AppSettingsService.CacheTime) > DateTime.Now;
+            return lastUpdate.Value.AddMinutes(cacheTimeMinutes) > DateTime.Now;
         }
 
         public DateTime? GetBlogLastUpdate(string blogKey) {
@@ -127,6 +125,18 @@ namespace BloggerViewController.Data {
                     .Where(x => x.BlogKey.In(blogKeys)
                         && x.Tags.Any(tag => tag.Equals(tagName, StringComparison.InvariantCultureIgnoreCase)))
                         .OrderByDescending(x => x.Published);
+
+                return new BlogSelection(posts, pageIndex, pageSize);
+            }
+        }
+
+        public BlogSelection SearchPosts(string searchTerms, int pageIndex, int pageSize, string[] blogKeys) {
+            if(blogKeys == null) {
+                throw new ArgumentNullException("blogKeys");
+            }
+
+            using(var session = DocumentStore.OpenSession()) {
+                var posts = session.Advanced.LuceneQuery<BlogPost, SearchBlogPosts>().Search("Content", searchTerms);
 
                 return new BlogSelection(posts, pageIndex, pageSize);
             }

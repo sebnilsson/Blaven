@@ -8,18 +8,13 @@ using Google.GData.Client;
 
 namespace BloggerViewController {
     internal class BloggerHelper {
-        private string _bloggerUri;
-        public BloggerHelper(string bloggerUri = null) {
-            _bloggerUri = bloggerUri;
-        }
-
-        public const string BloggerPostsUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
+        public const string BloggerFeedUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
 
         public XDocument GetBloggerDocument(BloggerSetting setting, DateTime? ifModifiedSince = null) {
-            string uri = _bloggerUri ?? string.Format(BloggerPostsUriFormat, setting.BlogId);
-
-            var query = new BloggerQuery {
-                Uri = new Uri(uri),
+            string uri = (!string.IsNullOrWhiteSpace(setting.BloggerUri)) ? setting.BloggerUri
+                : string.Format(BloggerFeedUriFormat, setting.BlogId);
+                        
+            var query = new BloggerQuery(uri) {
                 NumberToRetrieve = int.MaxValue,
             };
 
@@ -31,7 +26,7 @@ namespace BloggerViewController {
         }
 
         public XDocument GetBloggerDocument(BloggerSetting setting, BloggerQuery query) {
-            var service = GetBloggerService(setting.Username, setting.Password);
+            var service = GetBloggerService(setting.Username, setting.Password, query.Uri.IsFile);
             
             BloggerFeed feed = null;
             try {
@@ -98,12 +93,18 @@ namespace BloggerViewController {
             return post;
         }
 
-        private BloggerService GetBloggerService(string username, string password) {
+        private BloggerService GetBloggerService(string username, string password, bool isFile = false) {
             var service = new BloggerService("BloggerViewController");
-            service.Credentials = new GDataCredentials(username, password);
+            if(!string.IsNullOrWhiteSpace(username)) {
+                service.Credentials = new GDataCredentials(username, password);
 
-            // For proper authentication for Google Apps users
-            SetAuthForGoogleAppsUsers(service);
+                // For proper authentication for Google Apps users
+                SetAuthForGoogleAppsUsers(service);
+            }
+
+            if(isFile) {
+                service.RequestFactory = new BloggerViewController.Data.LocalGDataRequestFactory();   
+            }
 
             return service;
         }
