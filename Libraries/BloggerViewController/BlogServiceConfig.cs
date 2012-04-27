@@ -67,7 +67,7 @@ namespace BloggerViewController {
         public IDocumentStore DocumentStore {
             get {
                 if(_documentStore == null) {
-                    _documentStore = new DocumentStore { Url = AppSettingsService.RavenDbStoreUrlKey };
+                    _documentStore = new DocumentStore { Url = AppSettingsService.RavenDbStoreUrl };
                     _documentStore.Initialize();
                 }
                 return _documentStore;

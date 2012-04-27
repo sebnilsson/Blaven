@@ -57,19 +57,19 @@ namespace BloggerViewController {
             }
         }
 
-        private static string _ravenDbStoreUrlKey;
+        private static string _ravenDbStoreUrl;
         /// <summary>
         /// Gets the URL to the RavenDB store from a configuration-key.
         /// Looks at the config-key "BloggerViewController.RavenDbStoreUrlKey" to find correct config-key to get the value from.
         /// </summary>
-        public static string RavenDbStoreUrlKey {
+        public static string RavenDbStoreUrl {
             get {
-                if(_ravenDbStoreUrlKey == null) {
+                if(_ravenDbStoreUrl == null) {
                     string key = GetConfigValue("BloggerViewController.RavenDbStoreUrlKey");
                     string value = GetConfigValue(key);
-                    _ravenDbStoreUrlKey = value ?? string.Empty;
+                    _ravenDbStoreUrl = value ?? string.Empty;
                 }
-                return _ravenDbStoreUrlKey;
+                return _ravenDbStoreUrl;
             }
         }
 
