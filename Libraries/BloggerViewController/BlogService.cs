@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using BloggerViewController.Blogger;
 
@@ -159,39 +160,61 @@ namespace BloggerViewController {
             }
         }
 
-        private static readonly object _lockStoreLock = new object();
-        private static Dictionary<string, object> _lockStore = new Dictionary<string, object>();
-        private static object GetLock(string key) {
-            if(!_lockStore.ContainsKey(key)) {
-                lock(_lockStoreLock) {
-                    if(!_lockStore.ContainsKey(key)) {
-                        _lockStore[key] = new object();
-                    }
-                }
-            }
-            return _lockStore[key];
-        }
         private void EnsureBlogsUpdated(params string[] blogKeys) {
             // If the app uses background-service then don't handle update
             if(AppSettingsService.UseBackgroundService) {
                 return;
             }
 
-            foreach(var blogKey in blogKeys) {
-                if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
+            Parallel.ForEach(blogKeys, (blogKey) => {
+                if(GetIsBlogUpdating(blogKey)) {
                     return;
                 }
 
-                var lockObject = GetLock(blogKey);
+                if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
+                    return;
+                }
+                
+                var lockObject = GetUpdatedLock(blogKey);
                 lock(lockObject) {
                     if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
                         return;
                     }
 
-                    Update(blogKey);
+                    try {
+                        _updatingLockStore[blogKey] = true;
+                        Update(blogKey);
+                    }
+                    catch(Exception) {
+                        throw;
+                    }
+                    finally {
+                        _updatingLockStore[blogKey] = false;
+                    }
+                }
+            });
+        }
+        
+        private static bool GetIsBlogUpdating(string blogKey) {
+            if(!_updatingLockStore.ContainsKey(blogKey)) {
+                return false;
+            }
+            return _updatingLockStore[blogKey];
+        }
+        private static Dictionary<string, bool> _updatingLockStore = new Dictionary<string, bool>();
+
+        private static object GetUpdatedLock(string key) {
+            if(!_updatedLockStore.ContainsKey(key)) {
+                lock(_updatedLockStoreLock) {
+                    if(!_updatedLockStore.ContainsKey(key)) {
+                        _updatedLockStore[key] = new object();
+                    }
                 }
             }
+            return _updatedLockStore[key];
         }
+        private static readonly object _updatedLockStoreLock = new object();
+        private static Dictionary<string, object> _updatedLockStore = new Dictionary<string, object>();
 
         private string GetBlogKeyOrDefault(string blogKey) {
             if(!string.IsNullOrWhiteSpace(blogKey)) {
