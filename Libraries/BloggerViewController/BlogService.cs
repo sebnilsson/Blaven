@@ -124,34 +124,38 @@ namespace BloggerViewController {
             return this.Config.BlogStore.SearchPosts(searchTerms ?? string.Empty, pageIndex, this.Config.PageSize, blogKeys);
         }
 
-        public void Update(params string[] blogKeys) {
-            Update(false, blogKeys);
-        }
+        private static bool _hasDocumentStoreAnyDocuments = false;
 
         /// <summary>
         /// Updates blogs.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
-        public void Update(bool skipCache, params string[] blogKeys) {
+        public void Update(params string[] blogKeys) {
             blogKeys = GetAllKeys(blogKeys);
-            
-            bool hasDatabaseAnyDocuments = (this.Config.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments > 0);
 
-            foreach(var blogKey in blogKeys) {
-                // TODO: Change to commented code when Blogger API-bug is fixed:
-                // http://code.google.com/p/gdata-issues/issues/detail?id=2555
-                //var lastUpdate = _config.BlogStore.GetBlogLastUpdate(blogKey);
-                //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastUpdate);
+            _hasDocumentStoreAnyDocuments = _hasDocumentStoreAnyDocuments || (this.Config.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments > 0);
 
-                var bloggerSetting = this.Config.BloggerSettings.First(setting => setting.BlogKey == blogKey);
+            Parallel.ForEach(blogKeys, (blogKey) => {
+                if(GetIsBlogUpdating(blogKey)) {
+                    return;
+                }
 
-                var bloggerDocument = this.Config.BloggerHelper.GetBloggerDocument(bloggerSetting);
+                if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
+                    return;
+                }
 
-                this.Config.BlogStore.Update(blogKey, bloggerDocument);
-            }
+                var lockObject = GetUpdatedLock(blogKey);
+                lock(lockObject) {
+                    if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
+                        return;
+                    }
+
+                    PerformUpdate(blogKey);
+                }
+            });
 
             // Wait for indexing - if first ever update
-            if(hasDatabaseAnyDocuments) {
+            if(_hasDocumentStoreAnyDocuments) {
                 return;
             }
 
@@ -166,33 +170,30 @@ namespace BloggerViewController {
                 return;
             }
 
-            Parallel.ForEach(blogKeys, (blogKey) => {
-                if(GetIsBlogUpdating(blogKey)) {
-                    return;
-                }
+            Update(blogKeys);
+        }
+        
+        private void PerformUpdate(string blogKey) {
+            try {
+                _updatingLockStore[blogKey] = true;
 
-                if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
-                    return;
-                }
-                
-                var lockObject = GetUpdatedLock(blogKey);
-                lock(lockObject) {
-                    if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
-                        return;
-                    }
+                // TODO: Change to commented code when Blogger API-bug is fixed:
+                // http://code.google.com/p/gdata-issues/issues/detail?id=2555
+                //var lastUpdate = _config.BlogStore.GetBlogLastUpdate(key);
+                //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastUpdate);
 
-                    try {
-                        _updatingLockStore[blogKey] = true;
-                        Update(blogKey);
-                    }
-                    catch(Exception) {
-                        throw;
-                    }
-                    finally {
-                        _updatingLockStore[blogKey] = false;
-                    }
-                }
-            });
+                var bloggerSetting = this.Config.BloggerSettings.First(setting => setting.BlogKey == blogKey);
+
+                var bloggerDocument = this.Config.BloggerHelper.GetBloggerDocument(bloggerSetting);
+
+                this.Config.BlogStore.Update(blogKey, bloggerDocument);
+            }
+            catch(Exception) {
+                throw;
+            }
+            finally {
+                _updatingLockStore[blogKey] = false;
+            }
         }
         
         private static bool GetIsBlogUpdating(string blogKey) {
