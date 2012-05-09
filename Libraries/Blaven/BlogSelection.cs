@@ -10,11 +10,11 @@ namespace Blaven {
         /// <summary>
         /// Creates an instance of a selection of blog-posts with pagination-information.
         /// </summary>
-        /// <param name="selectedPosts">The blog-posts to paginate over.</param>
+        /// <param name="blogPosts">The blog-posts to paginate over.</param>
         /// <param name="pageIndex">The current page-index of pagination.</param>
         /// <param name="pageSize">Optional parameter for page-size. Defaults to value in configuration.</param>
-        public BlogSelection(IEnumerable<BlogPost> selectedPosts, int pageIndex, int? pageSize = null) {
-            if(selectedPosts == null) {
+        public BlogSelection(IEnumerable<BlogPost> blogPosts, int pageIndex, int? pageSize = null) {
+            if(blogPosts == null) {
                 throw new ArgumentNullException("selectedPosts");
             }
             pageSize = pageSize.GetValueOrDefault(AppSettingsService.PageSize);
@@ -27,19 +27,20 @@ namespace Blaven {
 
             PageIndex = pageIndex;
             PageSize = pageSize.Value;
+            TotalPostsCount = blogPosts.Count();
 
             int skip = BlogSelection.GetSkip(PageIndex, PageSize);
             int take = BlogSelection.GetTake(PageSize);
 
-            var pagedPosts = selectedPosts.Skip(skip).Take(take);                        
+            var pagedPosts = blogPosts.Skip(skip).Take(take);                        
             Posts = pagedPosts;
 
-            if(!selectedPosts.Any() || !pagedPosts.Any()) {
+            if(!blogPosts.Any() || !pagedPosts.Any()) {
                 return;
             }
 
-            HasNextItems = (selectedPosts.LastOrDefault().ID != pagedPosts.LastOrDefault().ID);
-            HasPreviousItems = (selectedPosts.FirstOrDefault().ID != pagedPosts.FirstOrDefault().ID);
+            HasNextItems = (blogPosts.LastOrDefault().ID != pagedPosts.LastOrDefault().ID);
+            HasPreviousItems = (blogPosts.FirstOrDefault().ID != pagedPosts.FirstOrDefault().ID);
         }
 
         public static int GetSkip(int pageIndex, int pageSize) {
@@ -74,5 +75,10 @@ namespace Blaven {
         /// Gets the current posts in the pagination.
         /// </summary>
         public IEnumerable<BlogPost> Posts { get; private set; }
+
+        /// <summary>
+        /// Gets the total count of posts, which are paginated over in the object.
+        /// </summary>
+        public int TotalPostsCount { get; set; }
     }
 }
