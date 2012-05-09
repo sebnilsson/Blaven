@@ -7,6 +7,8 @@ using System.Threading;
 namespace Blaven.BackgroundPoller {
     class Program {
         static void Main(string[] args) {
+            Console.WriteLine("Main functionality starting");
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
@@ -28,10 +30,16 @@ namespace Blaven.BackgroundPoller {
             
             stopwatch.Stop();
 
-            int elapsed = (int)stopwatch.ElapsedMilliseconds;
-            int timeOut = Math.Max(0, timeout * 60 * 1000 - elapsed);
+            Console.WriteLine("Main functionality done");
 
-            Thread.Sleep(timeOut);
+            int elapsed = (int)stopwatch.ElapsedMilliseconds;
+            int timeoutMs = Math.Max(0, timeout * 60 * 1000 - elapsed);
+
+            Console.WriteLine("Sleep of {0} minutes starting", timeout);
+            
+            Thread.Sleep(timeoutMs);
+            
+            Console.WriteLine("Sleep done");
         }
     }
 }
