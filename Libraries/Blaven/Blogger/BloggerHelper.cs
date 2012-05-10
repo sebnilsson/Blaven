@@ -62,7 +62,7 @@ namespace Blaven.Blogger {
                 Subtitle = (subtitle != null) ? subtitle.Value : string.Empty,
                 Title = feed.Element(ns + "title").Value,
                 Updated = ParseDate(feed.Element(ns + "updated").Value),
-                Url = (altLink != null) ? altLink.Value : string.Empty,
+                Url = (altLink != null) ? ((altLink.Attribute("href") != null) ? altLink.Attribute("href").Value : string.Empty) : string.Empty,
             };
 
             return new BlogData { Info = blogInfo, Posts = posts, };

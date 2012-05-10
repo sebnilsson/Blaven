@@ -157,6 +157,7 @@ namespace Blaven.Data {
                 blogInfo.Subtitle = parsedData.Info.Subtitle;
                 blogInfo.Title = parsedData.Info.Title;
                 blogInfo.Updated = parsedData.Info.Updated;
+                blogInfo.Url = parsedData.Info.Url;
 
                 session.SaveChanges();
             }
