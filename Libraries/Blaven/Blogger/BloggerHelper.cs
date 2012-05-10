@@ -55,7 +55,7 @@ namespace Blaven.Blogger {
                         select ParseEntry(blogKey, ns, entry);
             
             var subtitle = feed.Element(ns + "subtitle");
-            var altLink = feed.Elements("link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
+            var altLink = feed.Elements(ns + "link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
 
             var blogInfo = new BlogInfo {
                 BlogKey = blogKey,                 
