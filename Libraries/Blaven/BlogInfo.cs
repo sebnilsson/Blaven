@@ -29,5 +29,10 @@ namespace Blaven {
         /// The date of last update of the blog.
         /// </summary>
         public DateTime Updated { get; set; }
+
+        /// <summary>
+        /// The URL to the blog.
+        /// </summary>
+        public string Url { get; set; }
     }
 }
