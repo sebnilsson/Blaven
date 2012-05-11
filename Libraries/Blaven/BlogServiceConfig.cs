@@ -67,7 +67,10 @@ namespace Blaven {
         public IDocumentStore DocumentStore {
             get {
                 if(_documentStore == null) {
-                    _documentStore = new DocumentStore { Url = AppSettingsService.RavenDbStoreUrl };
+                    _documentStore = new DocumentStore {
+                        ApiKey = AppSettingsService.RavenDbStoreApiKey,
+                        Url = AppSettingsService.RavenDbStoreUrl,
+                    };
                     _documentStore.Initialize();
                 }
                 return _documentStore;

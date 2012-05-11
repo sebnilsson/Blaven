@@ -2,6 +2,10 @@
 using System.Configuration;
 using System.Linq;
 
+using Raven.Abstractions.Data;
+using Raven.Client.Document;
+using System;
+
 namespace Blaven {
     /// <summary>
     /// A static service-class to handle the application's settings.
@@ -57,19 +61,41 @@ namespace Blaven {
             }
         }
 
+        private static Lazy<ConnectionStringParser<RavenConnectionStringOptions>> _connectionStringParser =
+            new Lazy<ConnectionStringParser<RavenConnectionStringOptions>>(() => {
+                string key = GetConfigValue("Blaven.RavenDbStoreUrlKey");
+                string value = GetConfigValue(key);
+
+                var parser = ConnectionStringParser<RavenConnectionStringOptions>.FromConnectionString(value);
+                parser.Parse();
+                return parser;
+        });
+
         private static string _ravenDbStoreUrl;
         /// <summary>
-        /// Gets the URL to the RavenDB store from a configuration-key.
+        /// Gets the URL to the RavenDB store.
         /// Looks at the config-key "Blaven.RavenDbStoreUrlKey" to find correct config-key to get the value from.
         /// </summary>
         public static string RavenDbStoreUrl {
             get {
                 if(_ravenDbStoreUrl == null) {
-                    string key = GetConfigValue("Blaven.RavenDbStoreUrlKey");
-                    string value = GetConfigValue(key);
-                    _ravenDbStoreUrl = value ?? string.Empty;
+                    _ravenDbStoreUrl = _connectionStringParser.Value.ConnectionStringOptions.Url;
                 }
                 return _ravenDbStoreUrl;
+            }
+        }
+
+        private static string _ravenDbStoreApiKey;
+        /// <summary>
+        /// Gets the API-key used for the RavenDB store.
+        /// Looks at the config-key "Blaven.RavenDbStoreUrlKey" to find correct config-key to get the value from.
+        /// </summary>
+        public static string RavenDbStoreApiKey {
+            get {
+                if(_ravenDbStoreApiKey == null) {
+                    _ravenDbStoreApiKey = _connectionStringParser.Value.ConnectionStringOptions.ApiKey;
+                }
+                return _ravenDbStoreApiKey;
             }
         }
 
