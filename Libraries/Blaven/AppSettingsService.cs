@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Configuration;
-using System.Linq;
 
 using Raven.Abstractions.Data;
-using Raven.Client.Document;
-using System;
 
 namespace Blaven {
     /// <summary>
@@ -79,7 +76,7 @@ namespace Blaven {
         public static string RavenDbStoreUrl {
             get {
                 if(_ravenDbStoreUrl == null) {
-                    _ravenDbStoreUrl = _connectionStringParser.Value.ConnectionStringOptions.Url;
+                    _ravenDbStoreUrl = _connectionStringParser.Value.ConnectionStringOptions.Url ?? string.Empty;
                 }
                 return _ravenDbStoreUrl;
             }
@@ -93,7 +90,7 @@ namespace Blaven {
         public static string RavenDbStoreApiKey {
             get {
                 if(_ravenDbStoreApiKey == null) {
-                    _ravenDbStoreApiKey = _connectionStringParser.Value.ConnectionStringOptions.ApiKey;
+                    _ravenDbStoreApiKey = _connectionStringParser.Value.ConnectionStringOptions.ApiKey ?? string.Empty;
                 }
                 return _ravenDbStoreApiKey;
             }
