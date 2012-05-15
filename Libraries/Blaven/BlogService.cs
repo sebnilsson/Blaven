@@ -126,11 +126,21 @@ namespace Blaven {
 
         private static bool _hasDocumentStoreAnyDocuments = false;
 
+        
         /// <summary>
         /// Updates blogs.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
         public void Update(params string[] blogKeys) {
+            Update(false, blogKeys);
+        }
+
+        /// <summary>
+        /// Updates blogs.
+        /// </summary>
+        /// <param name="forceUpdate">Sets if the blog should be forced to update, ignoring if Blog is up to date.</param>
+        /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs.</param>
+        public void Update(bool forceUpdate = false, params string[] blogKeys) {
             blogKeys = GetAllKeys(blogKeys);
 
             _hasDocumentStoreAnyDocuments = _hasDocumentStoreAnyDocuments || (this.Config.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments > 0);
