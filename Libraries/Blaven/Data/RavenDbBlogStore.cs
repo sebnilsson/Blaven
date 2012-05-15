@@ -162,12 +162,12 @@ namespace Blaven.Data {
                 session.SaveChanges();
             }
 
-            var storeBlogPosts = Enumerable.Empty<BlogPost>();
+            var blogPostOverviews = Enumerable.Empty<BlogPost>();
             using(var session = DocumentStore.OpenSession()) {
-                storeBlogPosts = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
+                blogPostOverviews = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
             }
 
-            UpdateBlogPosts(blogKey, storeBlogPosts, parsedData.Posts);
+            UpdateBlogPosts(blogKey, blogPostOverviews, parsedData.Posts);
 
             using(var session = DocumentStore.OpenSession()) {
                 string storeUpdateUrl = GetKey<BlogStoreUpdate>(blogKey);
@@ -182,8 +182,8 @@ namespace Blaven.Data {
             }
         }
 
-        private void UpdateBlogPosts(string blogKey, IEnumerable<BlogPost> storeBlogPosts, IEnumerable<BlogPost> newParsedPosts) {
-            var newPosts = newParsedPosts.Where(parsed => !storeBlogPosts.Any(post => post.ID == parsed.ID));
+        private void UpdateBlogPosts(string blogKey, IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
+            var newPosts = newParsedPosts.Where(parsed => !blogPostOverviews.Any(post => post.ID == parsed.ID));
             foreach(var newPost in newPosts) {
                 string postKey = GetKey<BlogPost>(newPost.ID);
                 using(var session = DocumentStore.OpenSession()) {
@@ -192,11 +192,12 @@ namespace Blaven.Data {
                 }
             }
 
-            var updatedPosts = newParsedPosts.Where(parsed => storeBlogPosts.Any(post => post.ID == parsed.ID && post.Updated != parsed.Updated));
+            var updatedPosts = newParsedPosts.Where(parsed => blogPostOverviews.Any(post => post.ID == parsed.ID && post.Updated != parsed.Updated));
             foreach(var updatedPost in updatedPosts) {
                 string postKey = GetKey<BlogPost>(updatedPost.ID);
                 using(var session = DocumentStore.OpenSession()) {
                     var blogPost = session.Load<BlogPost>(postKey);
+
                     blogPost.Author = updatedPost.Author;
                     blogPost.Content = updatedPost.Content;
                     blogPost.Tags = updatedPost.Tags;
@@ -204,7 +205,17 @@ namespace Blaven.Data {
                     blogPost.Updated = updatedPost.Updated;
                     
                     session.Store(blogPost, postKey);
-                    
+                    session.SaveChanges();
+                }
+            }
+
+            var deletedPosts = blogPostOverviews.Where(overview => !newParsedPosts.Any(parsed => parsed.ID == overview.ID));
+            foreach(var deletedPost in deletedPosts) {
+                string postKey = GetKey<BlogPost>(deletedPost.ID);
+                using(var session = DocumentStore.OpenSession()) {
+                    var blogPost = session.Load<BlogPost>(postKey);
+                    session.Delete<BlogPost>(blogPost);
+
                     session.SaveChanges();
                 }
             }
