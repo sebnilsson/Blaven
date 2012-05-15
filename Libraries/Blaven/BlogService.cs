@@ -156,7 +156,7 @@ namespace Blaven {
 
                 var lockObject = GetUpdatedLock(blogKey);
                 lock(lockObject) {
-                    if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
+                    if(!forceUpdate && this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
                         return;
                     }
 

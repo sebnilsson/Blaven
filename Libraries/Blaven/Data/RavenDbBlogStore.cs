@@ -203,6 +203,8 @@ namespace Blaven.Data {
                     blogPost.Title = updatedPost.Title;
                     blogPost.Updated = updatedPost.Updated;
                     
+                    session.Store(blogPost, postKey);
+                    
                     session.SaveChanges();
                 }
             }
