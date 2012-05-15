@@ -150,7 +150,7 @@ namespace Blaven {
                     return;
                 }
 
-                if(this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
+                if(!forceUpdate && this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
                     return;
                 }
 
