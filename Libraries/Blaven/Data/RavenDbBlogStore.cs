@@ -146,6 +146,19 @@ namespace Blaven.Data {
         public void Update(string blogKey, System.Xml.Linq.XDocument bloggerDocument) {
             var parsedData = BloggerHelper.ParseBlogData(blogKey, bloggerDocument);
 
+            UpdateBlogInfo(blogKey, parsedData);
+
+            var blogPosts = Enumerable.Empty<BlogPost>();
+            using(var session = DocumentStore.OpenSession()) {
+                blogPosts = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
+            }
+
+            UpdateBlogPosts(blogKey, blogPosts, parsedData.Posts);
+
+            UpdateBlogStoreUpdate(blogKey);
+        }
+
+        private void UpdateBlogInfo(string blogKey, BlogData parsedData) {
             using(var session = DocumentStore.OpenSession()) {
                 string blogInfoUrl = GetKey<BlogInfo>(blogKey);
                 var blogInfo = session.Load<BlogInfo>(blogInfoUrl);
@@ -158,25 +171,6 @@ namespace Blaven.Data {
                 blogInfo.Title = parsedData.Info.Title;
                 blogInfo.Updated = parsedData.Info.Updated;
                 blogInfo.Url = parsedData.Info.Url;
-
-                session.SaveChanges();
-            }
-
-            var blogPostOverviews = Enumerable.Empty<BlogPost>();
-            using(var session = DocumentStore.OpenSession()) {
-                blogPostOverviews = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
-            }
-
-            UpdateBlogPosts(blogKey, blogPostOverviews, parsedData.Posts);
-
-            using(var session = DocumentStore.OpenSession()) {
-                string storeUpdateUrl = GetKey<BlogStoreUpdate>(blogKey);
-                var storeUpdate = session.Load<BlogStoreUpdate>(storeUpdateUrl);
-                if(storeUpdate == null) {
-                    storeUpdate = new BlogStoreUpdate { BlogKey = blogKey };
-                    session.Store(storeUpdate, storeUpdateUrl);
-                }
-                storeUpdate.Updated = DateTime.Now;
 
                 session.SaveChanges();
             }
@@ -218,6 +212,20 @@ namespace Blaven.Data {
 
                     session.SaveChanges();
                 }
+            }
+        }
+
+        private void UpdateBlogStoreUpdate(string blogKey) {
+            using(var session = DocumentStore.OpenSession()) {
+                string storeUpdateUrl = GetKey<BlogStoreUpdate>(blogKey);
+                var storeUpdate = session.Load<BlogStoreUpdate>(storeUpdateUrl);
+                if(storeUpdate == null) {
+                    storeUpdate = new BlogStoreUpdate { BlogKey = blogKey };
+                    session.Store(storeUpdate, storeUpdateUrl);
+                }
+                storeUpdate.Updated = DateTime.Now;
+
+                session.SaveChanges();
             }
         }
 
