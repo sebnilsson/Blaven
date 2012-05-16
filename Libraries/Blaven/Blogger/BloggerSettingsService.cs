@@ -24,7 +24,7 @@ namespace Blaven.Blogger {
 
             if(settings == null || !settings.Any()) {
                 throw new System.Configuration.ConfigurationErrorsException(
-                    string.Format("No Blogger-settings were defined in file at '[0}'.", bloggerSettingsFilePath));
+                    string.Format("No Blogger-settings were defined in file at '{0}'.", bloggerSettingsFilePath));
             }
 
             return settings;
