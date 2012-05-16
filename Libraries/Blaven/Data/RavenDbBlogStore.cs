@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.Blogger;
 using Blaven.Data.Indexes;
@@ -178,16 +179,16 @@ namespace Blaven.Data {
 
         private void UpdateBlogPosts(string blogKey, IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
             var newPosts = newParsedPosts.Where(parsed => !blogPostOverviews.Any(post => post.ID == parsed.ID));
-            foreach(var newPost in newPosts) {
+            Parallel.ForEach(newPosts, newPost => {
                 string postKey = GetKey<BlogPost>(newPost.ID);
                 using(var session = DocumentStore.OpenSession()) {
                     session.Store(newPost, postKey);
                     session.SaveChanges();
                 }
-            }
+            });
 
             var updatedPosts = newParsedPosts.Where(parsed => blogPostOverviews.Any(post => post.ID == parsed.ID && post.Updated != parsed.Updated));
-            foreach(var updatedPost in updatedPosts) {
+            Parallel.ForEach(updatedPosts, updatedPost => {
                 string postKey = GetKey<BlogPost>(updatedPost.ID);
                 using(var session = DocumentStore.OpenSession()) {
                     var blogPost = session.Load<BlogPost>(postKey);
@@ -197,14 +198,14 @@ namespace Blaven.Data {
                     blogPost.Tags = updatedPost.Tags;
                     blogPost.Title = updatedPost.Title;
                     blogPost.Updated = updatedPost.Updated;
-                    
+
                     session.Store(blogPost, postKey);
                     session.SaveChanges();
                 }
-            }
+            });
 
             var deletedPosts = blogPostOverviews.Where(overview => !newParsedPosts.Any(parsed => parsed.ID == overview.ID));
-            foreach(var deletedPost in deletedPosts) {
+            Parallel.ForEach(deletedPosts, deletedPost => {
                 string postKey = GetKey<BlogPost>(deletedPost.ID);
                 using(var session = DocumentStore.OpenSession()) {
                     var blogPost = session.Load<BlogPost>(postKey);
@@ -212,7 +213,7 @@ namespace Blaven.Data {
 
                     session.SaveChanges();
                 }
-            }
+            });
         }
 
         private void UpdateBlogStoreUpdate(string blogKey) {
