@@ -2,7 +2,7 @@
 
 using Raven.Client.Indexes;
 
-namespace Blaven.Data.Indexes {
+namespace Blaven.RavenDb.Indexes {
     public class BlogPostsOrderedByCreated : AbstractIndexCreationTask<BlogPost, BlogPost> {
         public BlogPostsOrderedByCreated() {
             Map = posts => from post in posts

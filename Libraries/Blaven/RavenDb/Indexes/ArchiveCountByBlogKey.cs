@@ -1,36 +1,36 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using Raven.Client.Indexes;
 
-namespace Blaven.Data.Indexes {
-    public class TagsCountByBlogKey : AbstractIndexCreationTask<BlogPost, TagsCountByBlogKey.ReduceResult> {
+namespace Blaven.RavenDb.Indexes {
+    public class ArchiveCountByBlogKey : AbstractIndexCreationTask<BlogPost, ArchiveCountByBlogKey.ReduceResult> {
         public class ReduceResult {
-            public string BlogKey { get; set; }
-            public string Tag { get; set; }
+            internal string BlogKey { get; set; }
+            public DateTime Date { get; set; }
             public int Count { get; set; }
         }
 
-        public TagsCountByBlogKey() {
+        public ArchiveCountByBlogKey() {
             Map = posts => from post in posts
-                           from tag in post.Tags
+                           let date = new DateTime(post.Published.Year, post.Published.Month, 1)
                            select new {
                                BlogKey = post.BlogKey,
-                               Tag = tag,
+                               Date = date,
                                Count = 1,
                            };
 
             Reduce = results => from result in results
                                 group result by new {
-                                    result.BlogKey,
-                                    result.Tag
+                                    Date = result.Date,
+                                    BlogKey = result.BlogKey,
                                 } into g
                                 select new {
                                     BlogKey = g.Key.BlogKey,
-                                    Tag = g.Key.Tag,
+                                    Date = g.Key.Date,
                                     Count = g.Sum(x => x.Count),
                                 };
-            
         }
     }
 }

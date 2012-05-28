@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.Blogger;
-using Blaven.Data;
+using Blaven.RavenDb;
 using Raven.Client;
 using Raven.Client.Document;
 
@@ -31,7 +31,6 @@ namespace Blaven {
             }
 
             this.BloggerSettings = settings;
-            this.BloggerHelper = new BloggerHelper();
             this.CacheTime = AppSettingsService.CacheTime;
             this.PageSize = AppSettingsService.PageSize;
         }
@@ -60,9 +59,7 @@ namespace Blaven {
         /// Gets or sets the page-size used in the BlogServiceConfig. Defaults to AppSettings default.
         /// </summary>
         public int PageSize { get; set; }
-
-        internal BloggerHelper BloggerHelper { get; private set; }
-
+        
         private IDocumentStore _documentStore;
         public IDocumentStore DocumentStore {
             get {

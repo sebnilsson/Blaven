@@ -1,7 +1,7 @@
 ﻿using System;
 using Google.GData.Client;
 
-namespace Blaven.Data {
+namespace Blaven.Blogger {
     internal class LocalGDataRequestFactory : IGDataRequestFactory {
         #region IGDataRequestFactory Members
 

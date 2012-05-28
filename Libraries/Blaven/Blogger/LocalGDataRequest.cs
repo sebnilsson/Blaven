@@ -3,7 +3,7 @@ using System.IO;
 
 using Google.GData.Client;
 
-namespace Blaven.Data {
+namespace Blaven.Blogger {
     internal class LocalGDataRequest : IGDataRequest {
         private string _filePath;
 

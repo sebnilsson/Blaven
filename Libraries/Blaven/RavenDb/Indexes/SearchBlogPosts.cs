@@ -2,7 +2,7 @@
 
 using Raven.Client.Indexes;
 
-namespace Blaven.Data.Indexes {
+namespace Blaven.RavenDb.Indexes {
     public class SearchBlogPosts : AbstractMultiMapIndexCreationTask<SearchBlogPosts.Result> {
         public class Result {
             public object[] Content { get; set; }

@@ -194,7 +194,7 @@ namespace Blaven {
 
                 var bloggerSetting = this.Config.BloggerSettings.First(setting => setting.BlogKey == blogKey);
 
-                var bloggerDocument = this.Config.BloggerHelper.GetBloggerDocument(bloggerSetting);
+                var bloggerDocument = BloggerHelper.GetBloggerDocument(bloggerSetting);
 
                 this.Config.BlogStore.Update(blogKey, bloggerDocument);
             }

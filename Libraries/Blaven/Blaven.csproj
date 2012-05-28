@@ -92,6 +92,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlogAuthor.cs" />
+    <Compile Include="Blogger\BloggerParser.cs" />
     <Compile Include="BlogServiceConfig.cs" />
     <Compile Include="AppSettingsService.cs" />
     <Compile Include="BlogData.cs" />
@@ -102,15 +103,15 @@
     <Compile Include="BlogSelection.cs" />
     <Compile Include="BlogService.cs" />
     <Compile Include="Blogger\BloggerSettingsService.cs" />
-    <Compile Include="Data\BlogStoreUpdate.cs" />
-    <Compile Include="Data\Indexes\ArchiveCountByBlogKey.cs" />
-    <Compile Include="Data\Indexes\BlogPostsOrderedByCreated.cs" />
-    <Compile Include="Data\Indexes\BlogPostsOverviewByKey.cs" />
-    <Compile Include="Data\Indexes\SearchBlogPosts.cs" />
-    <Compile Include="Data\LocalGDataRequest.cs" />
-    <Compile Include="Data\RavenDbBlogStore.cs" />
-    <Compile Include="Data\Indexes\TagsCountByBlogKey.cs" />
-    <Compile Include="Data\LocalGDataRequestFactory.cs" />
+    <Compile Include="RavenDb\BlogStoreUpdate.cs" />
+    <Compile Include="RavenDb\Indexes\ArchiveCountByBlogKey.cs" />
+    <Compile Include="RavenDb\Indexes\BlogPostsOrderedByCreated.cs" />
+    <Compile Include="RavenDb\Indexes\BlogPostsOverviewByKey.cs" />
+    <Compile Include="RavenDb\Indexes\SearchBlogPosts.cs" />
+    <Compile Include="Blogger\LocalGDataRequest.cs" />
+    <Compile Include="RavenDb\RavenDbBlogStore.cs" />
+    <Compile Include="RavenDb\Indexes\TagsCountByBlogKey.cs" />
+    <Compile Include="Blogger\LocalGDataRequestFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.Blogger;
-using Blaven.Data.Indexes;
+using Blaven.RavenDb.Indexes;
 using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Linq;
 
-namespace Blaven.Data {
+namespace Blaven.RavenDb {
     /// <summary>
     /// A store for blog-data that stores the data in a RavenDB-store. Implements IBlogStore.
     /// </summary>
@@ -145,7 +145,7 @@ namespace Blaven.Data {
         }
 
         public void Update(string blogKey, System.Xml.Linq.XDocument bloggerDocument) {
-            var parsedData = BloggerHelper.ParseBlogData(blogKey, bloggerDocument);
+            var parsedData = BloggerParser.ParseBlogData(blogKey, bloggerDocument);
 
             UpdateBlogInfo(blogKey, parsedData);
 

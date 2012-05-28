@@ -3,7 +3,7 @@ using System.Linq;
 
 using Raven.Client.Indexes;
 
-namespace Blaven.Data.Indexes {
+namespace Blaven.RavenDb.Indexes {
     public class BlogPostsOverviewByKey : AbstractIndexCreationTask<BlogPost, BlogPostsOverviewByKey.ReduceResult> {
         public class ReduceResult {
             public string BlogKey { get; set; }
