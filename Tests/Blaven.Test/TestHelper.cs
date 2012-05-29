@@ -26,7 +26,7 @@ namespace Blaven.Test {
         }
 
         public static string GetProjectPath(params string[] relativeFilePaths) {
-            string[] paths = new[] { ProjectDirectory }.Concat(relativeFilePaths).ToArray();
+            string[] paths = new[] { "Integration", ProjectDirectory }.Concat(relativeFilePaths).ToArray();
             return Path.Combine(paths);
         }
 
@@ -43,7 +43,7 @@ namespace Blaven.Test {
             documentStore.Initialize();
 
             IndexCreation.CreateIndexes(
-                typeof(Blaven.Data.Indexes.BlogPostsOrderedByCreated).Assembly, documentStore);            
+                typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, documentStore);            
 
             return documentStore;
         }

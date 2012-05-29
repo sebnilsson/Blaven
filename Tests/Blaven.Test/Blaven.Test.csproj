@@ -100,22 +100,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BlogServiceTest.cs" />
+    <Compile Include="Integration\BlogServiceTest.cs" />
     <Compile Include="TestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="XmlFiles\bloggerindraft.xml">
+    <Content Include="Integration\XmlFiles\buzz.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="XmlFiles\buzz.xml">
+    <Content Include="Integration\XmlFiles\buzz_simple.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="XmlFiles\buzz_added.xml">
+    <Content Include="Integration\XmlFiles\buzz_simple_added.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Integration\XmlFiles\buzz_simple_removed.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
