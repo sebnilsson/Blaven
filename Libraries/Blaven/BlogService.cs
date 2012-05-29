@@ -30,7 +30,7 @@ namespace Blaven {
 
             this.Config = config;
 
-            EnsureBlogsUpdated(this.Config.BloggerSettings.Select(setting => setting.BlogKey).ToArray());
+            EnsureBlogsRefreshed(this.Config.BloggerSettings.Select(setting => setting.BlogKey).ToArray());
         }
 
         /// <summary>
@@ -128,43 +128,51 @@ namespace Blaven {
 
         
         /// <summary>
-        /// Updates blogs.
+        /// Refreshes blogs.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
-        public void Update(params string[] blogKeys) {
-            Update(false, blogKeys);
+        public void Refresh(params string[] blogKeys) {
+            Refresh(false, blogKeys);
         }
 
         /// <summary>
-        /// Updates blogs.
+        /// Refreshes blogs.
         /// </summary>
-        /// <param name="forceUpdate">Sets if the blog should be forced to update, ignoring if Blog is up to date.</param>
+        /// <param name="forceRefresh">Sets if the blog should be forced to refresh, ignoring if Blog is up to date.</param>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs.</param>
-        public void Update(bool forceUpdate = false, params string[] blogKeys) {
+        public void Refresh(bool forceRefresh = false, params string[] blogKeys) {
             blogKeys = GetAllKeys(blogKeys);
 
             _hasDocumentStoreAnyDocuments = _hasDocumentStoreAnyDocuments || (this.Config.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments > 0);
 
-            Parallel.ForEach(blogKeys, (blogKey) => {
-                if(GetIsBlogUpdating(blogKey)) {
+            Action<string> refreshFunc = (blogKey) => {
+                if(BlogService.GetIsBlogRefreshing(blogKey)) {
                     return;
                 }
 
-                if(!forceUpdate && this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
+                if(!forceRefresh && this.Config.BlogStore.GetIsBlogRefreshed(blogKey, this.Config.CacheTime)) {
                     return;
                 }
 
-                var lockObject = GetUpdatedLock(blogKey);
+                var lockObject = BlogService.GetRefreshedLock(blogKey);
                 lock(lockObject) {
-                    if(!forceUpdate && this.Config.BlogStore.GetIsBlogUpdated(blogKey, this.Config.CacheTime)) {
+                    if(!forceRefresh && this.Config.BlogStore.GetIsBlogRefreshed(blogKey, this.Config.CacheTime)) {
                         return;
                     }
 
-                    PerformUpdate(blogKey);
+                    this.PerformRefresh(blogKey);
                 }
-            });
+            };
 
-            // Wait for indexing - if first ever update
+            if(!_hasDocumentStoreAnyDocuments || this.Config.RefreshMode == BlogRefreshMode.Synchronously) {
+                Parallel.ForEach(blogKeys, refreshFunc);
+            } else {
+                Task.Factory.StartNew(() => {
+                    Parallel.ForEach(blogKeys, refreshFunc);
+                });
+            }
+            
+            // Wait for indexing - if first ever refresh
             if(_hasDocumentStoreAnyDocuments) {
                 return;
             }
@@ -174,58 +182,58 @@ namespace Blaven {
             }
         }
 
-        private void EnsureBlogsUpdated(params string[] blogKeys) {
-            // If the app uses background-service then don't handle update
-            if(AppSettingsService.UseBackgroundService) {
+        private void EnsureBlogsRefreshed(params string[] blogKeys) {
+            // If the app uses background-service then don't handle refresh
+            if(AppSettingsService.RefreshMode == BlogRefreshMode.BackgroundService) {
                 return;
             }
 
-            Update(blogKeys);
+            Refresh(blogKeys);
         }
         
-        private void PerformUpdate(string blogKey) {
+        private void PerformRefresh(string blogKey) {
             try {
-                _updatingLockStore[blogKey] = true;
+                _refreshingLockStore[blogKey] = true;
 
                 // TODO: Change to commented code when Blogger API-bug is fixed:
                 // http://code.google.com/p/gdata-issues/issues/detail?id=2555
-                //var lastUpdate = _config.BlogStore.GetBlogLastUpdate(key);
-                //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastUpdate);
+                //var lastRefresh = _config.BlogStore.GetBlogLastRefresh(key);
+                //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastRefresh);
 
                 var bloggerSetting = this.Config.BloggerSettings.First(setting => setting.BlogKey == blogKey);
 
                 var bloggerDocument = BloggerHelper.GetBloggerDocument(bloggerSetting);
 
-                this.Config.BlogStore.Update(blogKey, bloggerDocument);
+                this.Config.BlogStore.Refresh(blogKey, bloggerDocument);
             }
             catch(Exception) {
                 throw;
             }
             finally {
-                _updatingLockStore[blogKey] = false;
+                _refreshingLockStore[blogKey] = false;
             }
         }
         
-        private static bool GetIsBlogUpdating(string blogKey) {
-            if(!_updatingLockStore.ContainsKey(blogKey)) {
+        private static bool GetIsBlogRefreshing(string blogKey) {
+            if(!_refreshingLockStore.ContainsKey(blogKey)) {
                 return false;
             }
-            return _updatingLockStore[blogKey];
+            return _refreshingLockStore[blogKey];
         }
-        private static Dictionary<string, bool> _updatingLockStore = new Dictionary<string, bool>();
+        private static Dictionary<string, bool> _refreshingLockStore = new Dictionary<string, bool>();
 
-        private static object GetUpdatedLock(string key) {
-            if(!_updatedLockStore.ContainsKey(key)) {
-                lock(_updatedLockStoreLock) {
-                    if(!_updatedLockStore.ContainsKey(key)) {
-                        _updatedLockStore[key] = new object();
+        private static object GetRefreshedLock(string key) {
+            if(!_refreshedLockStore.ContainsKey(key)) {
+                lock(_refreshedLockStoreLock) {
+                    if(!_refreshedLockStore.ContainsKey(key)) {
+                        _refreshedLockStore[key] = new object();
                     }
                 }
             }
-            return _updatedLockStore[key];
+            return _refreshedLockStore[key];
         }
-        private static readonly object _updatedLockStoreLock = new object();
-        private static Dictionary<string, object> _updatedLockStore = new Dictionary<string, object>();
+        private static readonly object _refreshedLockStoreLock = new object();
+        private static Dictionary<string, object> _refreshedLockStore = new Dictionary<string, object>();
 
         private string GetBlogKeyOrDefault(string blogKey) {
             if(!string.IsNullOrWhiteSpace(blogKey)) {

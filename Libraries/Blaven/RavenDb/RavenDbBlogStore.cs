@@ -61,23 +61,23 @@ namespace Blaven.RavenDb {
             }
         }
 
-        public bool GetIsBlogUpdated(string blogKey, int cacheTimeMinutes) {
-            var lastUpdate = GetBlogLastUpdate(blogKey);
-            if(!lastUpdate.HasValue) {
+        public bool GetIsBlogRefreshed(string blogKey, int cacheTimeMinutes) {
+            var lastRefresh = GetBlogLastRefresh(blogKey);
+            if(!lastRefresh.HasValue) {
                 return false;
             }
 
-            return lastUpdate.Value.AddMinutes(cacheTimeMinutes) > DateTime.Now;
+            return lastRefresh.Value.AddMinutes(cacheTimeMinutes) > DateTime.Now;
         }
 
-        public DateTime? GetBlogLastUpdate(string blogKey) {
+        public DateTime? GetBlogLastRefresh(string blogKey) {
             using(var session = DocumentStore.OpenSession()) {
-                var storeUpdate = session.Load<BlogStoreUpdate>(GetKey<BlogStoreUpdate>(blogKey));
-                if(storeUpdate == null) {
+                var storeRefresh = session.Load<StoreRefresh>(GetKey<StoreRefresh>(blogKey));
+                if(storeRefresh == null) {
                     return null;
                 }
 
-                return storeUpdate.Updated;
+                return storeRefresh.Updated;
             }
         }
 
@@ -144,22 +144,27 @@ namespace Blaven.RavenDb {
             }
         }
 
-        public void Update(string blogKey, System.Xml.Linq.XDocument bloggerDocument) {
+        public void Refresh(string blogKey, System.Xml.Linq.XDocument bloggerDocument) {
             var parsedData = BloggerParser.ParseBlogData(blogKey, bloggerDocument);
 
-            UpdateBlogInfo(blogKey, parsedData);
+            Parallel.Invoke(
+            () => {
+                RefreshBlogInfo(blogKey, parsedData);
+            },
+            () => {
+                var blogPosts = Enumerable.Empty<BlogPost>();
+                using(var session = DocumentStore.OpenSession()) {
+                    blogPosts = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
+                }
 
-            var blogPosts = Enumerable.Empty<BlogPost>();
-            using(var session = DocumentStore.OpenSession()) {
-                blogPosts = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
-            }
-
-            UpdateBlogPosts(blogKey, blogPosts, parsedData.Posts);
-
-            UpdateBlogStoreUpdate(blogKey);
+                RefreshBlogPosts(blogKey, blogPosts, parsedData.Posts);
+            },
+            () => {
+                UpdateStoreRefresh(blogKey);
+            });
         }
 
-        private void UpdateBlogInfo(string blogKey, BlogData parsedData) {
+        private void RefreshBlogInfo(string blogKey, BlogData parsedData) {
             using(var session = DocumentStore.OpenSession()) {
                 string blogInfoUrl = GetKey<BlogInfo>(blogKey);
                 var blogInfo = session.Load<BlogInfo>(blogInfoUrl);
@@ -177,16 +182,33 @@ namespace Blaven.RavenDb {
             }
         }
 
-        private void UpdateBlogPosts(string blogKey, IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
-            var newPosts = newParsedPosts.Where(parsed => !blogPostOverviews.Any(post => post.ID == parsed.ID));
-            Parallel.ForEach(newPosts, newPost => {
-                string postKey = GetKey<BlogPost>(newPost.ID);
+        private void RefreshBlogPosts(string blogKey, IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
+            Parallel.Invoke(
+            () => {
+                RefreshNewBlogPosts(blogPostOverviews, newParsedPosts);
+            },
+            () => {
+                RefreshUpdatedBlogPosts(blogPostOverviews, newParsedPosts);
+            },
+            () => {
+                RefreshDeletedPosts(blogPostOverviews, newParsedPosts);
+            });
+        }
+
+        private void RefreshDeletedPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
+            var deletedPosts = blogPostOverviews.Where(overview => !newParsedPosts.Any(parsed => parsed.ID == overview.ID));
+            Parallel.ForEach(deletedPosts, deletedPost => {
+                string postKey = GetKey<BlogPost>(deletedPost.ID);
                 using(var session = DocumentStore.OpenSession()) {
-                    session.Store(newPost, postKey);
+                    var blogPost = session.Load<BlogPost>(postKey);
+                    session.Delete<BlogPost>(blogPost);
+
                     session.SaveChanges();
                 }
             });
+        }
 
+        private void RefreshUpdatedBlogPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
             var updatedPosts = newParsedPosts.Where(parsed => blogPostOverviews.Any(post => post.ID == parsed.ID && post.Updated != parsed.Updated));
             Parallel.ForEach(updatedPosts, updatedPost => {
                 string postKey = GetKey<BlogPost>(updatedPost.ID);
@@ -203,25 +225,25 @@ namespace Blaven.RavenDb {
                     session.SaveChanges();
                 }
             });
+        }
 
-            var deletedPosts = blogPostOverviews.Where(overview => !newParsedPosts.Any(parsed => parsed.ID == overview.ID));
-            Parallel.ForEach(deletedPosts, deletedPost => {
-                string postKey = GetKey<BlogPost>(deletedPost.ID);
+        private void RefreshNewBlogPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
+            var newPosts = newParsedPosts.Where(parsed => !blogPostOverviews.Any(post => post.ID == parsed.ID));
+            Parallel.ForEach(newPosts, newPost => {
+                string postKey = GetKey<BlogPost>(newPost.ID);
                 using(var session = DocumentStore.OpenSession()) {
-                    var blogPost = session.Load<BlogPost>(postKey);
-                    session.Delete<BlogPost>(blogPost);
-
+                    session.Store(newPost, postKey);
                     session.SaveChanges();
                 }
             });
         }
 
-        private void UpdateBlogStoreUpdate(string blogKey) {
+        private void UpdateStoreRefresh(string blogKey) {
             using(var session = DocumentStore.OpenSession()) {
-                string storeUpdateUrl = GetKey<BlogStoreUpdate>(blogKey);
-                var storeUpdate = session.Load<BlogStoreUpdate>(storeUpdateUrl);
+                string storeUpdateUrl = GetKey<StoreRefresh>(blogKey);
+                var storeUpdate = session.Load<StoreRefresh>(storeUpdateUrl);
                 if(storeUpdate == null) {
-                    storeUpdate = new BlogStoreUpdate { BlogKey = blogKey };
+                    storeUpdate = new StoreRefresh { BlogKey = blogKey };
                     session.Store(storeUpdate, storeUpdateUrl);
                 }
                 storeUpdate.Updated = DateTime.Now;

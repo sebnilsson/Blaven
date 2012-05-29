@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Blaven.RavenDb {
-    internal class BlogStoreUpdate {
+    internal class StoreRefresh {
         public string BlogKey { get; set; }
         public DateTime Updated { get; set; }
     }

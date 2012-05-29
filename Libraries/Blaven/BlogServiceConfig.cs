@@ -33,6 +33,7 @@ namespace Blaven {
             this.BloggerSettings = settings;
             this.CacheTime = AppSettingsService.CacheTime;
             this.PageSize = AppSettingsService.PageSize;
+            this.RefreshMode = AppSettingsService.RefreshMode;
         }
 
         /// <summary>
@@ -76,5 +77,10 @@ namespace Blaven {
                 _documentStore = value;
             }
         }
+        
+        /// <summary>
+        /// Gets or sets which mode should be used for refreshing data from blogs.
+        /// </summary>
+        public BlogRefreshMode RefreshMode { get; set; }
     }
 }

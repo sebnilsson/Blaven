@@ -8,52 +8,49 @@ namespace Blaven {
     /// A static service-class to handle the application's settings.
     /// </summary>
     public static class AppSettingsService {
-        private static string _bloggerSettingsPath;
+        private static Lazy<string> _bloggerSettingsPath = new Lazy<string>(() => {
+            string value = GetConfigValue("Blaven.BloggerSettingsPath", throwException: false);
+            return (!string.IsNullOrWhiteSpace(value)) ? value : "~/BloggerSettings.json";
+        });
         /// <summary>
-        /// Gets the Blogger-settings file-path. Looks at the config-key "Blaven.BloggerSettingsPath". Defaults to "~/BloggerSettings.json".
+        /// Gets the Blogger-settings file-path. Uses config-key "Blaven.BloggerSettingsPath". Defaults to "~/BloggerSettings.json".
         /// </summary>
         public static string BloggerSettingsPath {
             get {
-                if(_bloggerSettingsPath == null) {
-                    string value = GetConfigValue("Blaven.BloggerSettingsPath", throwException: false);
-                    _bloggerSettingsPath = (!string.IsNullOrWhiteSpace(value)) ? value : "~/BloggerSettings.json";
-                }
-                return _bloggerSettingsPath;
+                return _bloggerSettingsPath.Value;
             }
         }
 
-        private static int? _cacheTime;
+        private static Lazy<int> _cacheTime = new Lazy<int>(() => {
+            string value = GetConfigValue("Blaven.CacheTime", throwException: false);
+            int result = 0;
+            if(!int.TryParse(value, out result)) {
+                result = 5;
+            }
+            return result;
+        });
         /// <summary>
-        /// Gets the default cache-time. Looks at the config-key "Blaven.CacheTime". Defaults to 5.
+        /// Gets the default cache-time. Uses config-key "Blaven.CacheTime". Defaults to 5.
         /// </summary>
         public static int CacheTime {
             get {
-                if(!_cacheTime.HasValue) {
-                    string value = GetConfigValue("Blaven.CacheTime", throwException: false);
-                    int result = 0;
-                    if(!int.TryParse(value, out result)) {
-                        result = 5;
-                    }
-                    _cacheTime = result;
-                }
                 return _cacheTime.Value;
             }
         }
 
-        private static int? _pageSize;
+        private static Lazy<int> _pageSize = new Lazy<int>(() => {
+            string value = GetConfigValue("Blaven.PageSize", throwException: false);
+            int result = 0;
+            if(!int.TryParse(value, out result)) {
+                result = 5;
+            }
+            return result;
+        });
         /// <summary>
-        /// Gets the default page-size. Looks at the config-key "Blaven.PageSize". Defaults to 5.
+        /// Gets the default page-size. Uses "Blaven.PageSize". Defaults to 5.
         /// </summary>
         public static int PageSize {
             get {
-                if(!_pageSize.HasValue) {
-                    string value = GetConfigValue("Blaven.PageSize", throwException: false);
-                    int result = 0;
-                    if(!int.TryParse(value, out result)) {
-                        result = 5;
-                    }
-                    _pageSize = result;
-                }
                 return _pageSize.Value;
             }
         }
@@ -71,7 +68,7 @@ namespace Blaven {
         private static string _ravenDbStoreUrl;
         /// <summary>
         /// Gets the URL to the RavenDB store.
-        /// Looks at the config-key "Blaven.RavenDbStoreUrlKey" to find correct config-key to get the value from.
+        /// Uses config-key "Blaven.RavenDbStoreUrlKey".
         /// </summary>
         public static string RavenDbStoreUrl {
             get {
@@ -85,7 +82,7 @@ namespace Blaven {
         private static string _ravenDbStoreApiKey;
         /// <summary>
         /// Gets the API-key used for the RavenDB store.
-        /// Looks at the config-key "Blaven.RavenDbStoreUrlKey" to find correct config-key to get the value from.
+        /// Uses config-key "Blaven.RavenDbStoreUrlKey".
         /// </summary>
         public static string RavenDbStoreApiKey {
             get {
@@ -96,20 +93,32 @@ namespace Blaven {
             }
         }
 
-        private static bool? _useBackgroundService;
-        /// <summary>
-        /// Gets if the application should use a background-service to update its blog-data.
-        /// Looks at the config-key "Blaven.UseBackgroundService". Defaults to false.
-        /// </summary>
-        public static bool UseBackgroundService {
-            get {
-                if(!_useBackgroundService.HasValue) {
-                    string configValue = GetConfigValue("Blaven.UseBackgroundService", throwException: false);
-                    bool result;
-                    bool.TryParse(configValue, out result);
-                    _useBackgroundService = result;
+        private static Lazy<BlogRefreshMode> _refreshMode = new Lazy<BlogRefreshMode>(() => {
+            string configValue = GetConfigValue("Blaven.RefreshMode", throwException: false);
+            
+            var result = BlogRefreshMode.Asynchronously;
+            if(!Enum.TryParse<BlogRefreshMode>(configValue, out result)) {
+                switch(configValue.ToLowerInvariant()) {
+                    case "background":
+                        result = BlogRefreshMode.BackgroundService;
+                        break;
+                    case "sync":
+                        result = BlogRefreshMode.Synchronously;
+                        break;
+                    default:
+                        result = BlogRefreshMode.Asynchronously;
+                        break;
                 }
-                return _useBackgroundService.Value;
+            }
+            return result;
+        });
+        /// <summary>
+        /// Gets which mode should be used for refreshing data from blogs. Defaults to BlogRefreshMode.Asynchronously.
+        /// Uses config-key "Blaven.RefreshMode". Short-hand config-values supported: "background", "sync" and "async".
+        /// </summary>
+        public static BlogRefreshMode RefreshMode {
+            get {
+                return _refreshMode.Value;
             }
         }
 
@@ -118,7 +127,7 @@ namespace Blaven {
             if(throwException && string.IsNullOrWhiteSpace(value)) {
                 throw new ConfigurationErrorsException(string.Format("Could not find configuration-value for key '{0}'.", configKey));
             }
-            return value;
+            return value ?? string.Empty;
         }
     }
 }
