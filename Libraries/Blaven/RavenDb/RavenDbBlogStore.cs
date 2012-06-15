@@ -151,21 +151,11 @@ namespace Blaven.RavenDb {
         }
 
         public void Refresh(string blogKey, BlogData parsedBlogData) {
-            Parallel.Invoke(
-            () => {
-                RefreshBlogInfo(blogKey, parsedBlogData);
-            },
-            () => {
-                //var blogPosts = Enumerable.Empty<BlogPost>();
-                //using(var session = DocumentStore.OpenSession()) {
-                //    blogPosts = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
-                //}
+            RefreshBlogInfo(blogKey, parsedBlogData);
 
-                RefreshBlogPosts(blogKey, parsedBlogData.Posts);
-            },
-            () => {
-                UpdateStoreRefresh(blogKey);
-            });
+            RefreshBlogPosts(blogKey, parsedBlogData.Posts);
+
+            UpdateStoreRefresh(blogKey);
         }
 
         private void RefreshBlogInfo(string blogKey, BlogData parsedData) {
@@ -187,16 +177,25 @@ namespace Blaven.RavenDb {
         }
 
         private void RefreshBlogPosts(string blogKey,  IEnumerable<BlogPost> parsedPosts) {
+            var parsedPostsList = parsedPosts.ToList();
+
             using(var session = DocumentStore.OpenSession()) {
                 var parsedPostsIds = parsedPosts.Select(x => x.ID).ToList();
                 var storePosts = session.Load<BlogPost>(parsedPostsIds);
 
+                var idsAndStorePosts = new SortedDictionary<string, BlogPost>();
                 int i = 0;
                 foreach(var storePost in storePosts) {
                     var id = parsedPostsIds[i];
-                    var parsedPost = parsedPosts.First(x => x.ID == id);
+                    idsAndStorePosts.Add(id, storePost);
+                    i++;
+                }
 
-                    var post = storePost;
+                Parallel.ForEach(idsAndStorePosts, idAndStorePost => {
+                    var index = parsedPostsIds.IndexOf(idAndStorePost.Key);
+                    var parsedPost = parsedPostsList[index];
+
+                    var post = idAndStorePost.Value;
                     if(post == null) {
                         post = parsedPost;
                     } else {
@@ -212,12 +211,12 @@ namespace Blaven.RavenDb {
 
                     session.Store(post, post.ID);
                     i++;
-                }
-                
+                });
+
                 var removedPosts = session.Query<BlogPost>().Where(x => !x.ID.In(parsedPostsIds));
-                foreach(var removedPost in removedPosts) {
-                    session.Delete(removedPost);                    
-                }
+                Parallel.ForEach(removedPosts, removedPost => {
+                    session.Delete(removedPost);
+                });
 
                 session.SaveChanges();
             }

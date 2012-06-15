@@ -164,6 +164,7 @@ namespace Blaven {
                 }
             };
 
+            // First update is always done synchronously
             if(!_hasDocumentStoreAnyDocuments || this.Config.RefreshMode == BlogRefreshMode.Synchronously) {
                 Parallel.ForEach(blogKeys, refreshFunc);
             } else {
