@@ -34,8 +34,8 @@ namespace Blaven.Blogger {
 
             string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
-            var post = new BlogPost(blogKey) {
-                ID = ParseId(entry.Element(ns + "id").Value),
+            string id = ParseId(entry.Element(ns + "id").Value);
+            var post = new BlogPost(blogKey, id) {
                 Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value,
                 PermaLinkAbsolute = permaLinkFull,

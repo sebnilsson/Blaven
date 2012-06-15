@@ -147,17 +147,22 @@ namespace Blaven.RavenDb {
         public void Refresh(string blogKey, System.Xml.Linq.XDocument bloggerDocument) {
             var parsedData = BloggerParser.ParseBlogData(blogKey, bloggerDocument);
 
+            Refresh(blogKey, parsedData);
+        }
+
+        internal void Refresh(string blogKey, BlogData blogData) {
             Parallel.Invoke(
             () => {
-                RefreshBlogInfo(blogKey, parsedData);
+                RefreshBlogInfo(blogKey, blogData);
             },
             () => {
                 var blogPosts = Enumerable.Empty<BlogPost>();
                 using(var session = DocumentStore.OpenSession()) {
                     blogPosts = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
+                    System.Diagnostics.Debug.WriteLine("Total BlogPosts: " + session.Query<BlogPost>().Count());
                 }
 
-                RefreshBlogPosts(blogKey, blogPosts, parsedData.Posts);
+                RefreshBlogPosts(blogKey, blogPosts, blogData.Posts);
             },
             () => {
                 UpdateStoreRefresh(blogKey);
@@ -185,17 +190,17 @@ namespace Blaven.RavenDb {
         private void RefreshBlogPosts(string blogKey, IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
             Parallel.Invoke(
             () => {
-                RefreshNewBlogPosts(blogPostOverviews, newParsedPosts);
+                AddNewBlogPosts(blogPostOverviews, newParsedPosts);
             },
             () => {
-                RefreshUpdatedBlogPosts(blogPostOverviews, newParsedPosts);
+                UpdateUpdatedBlogPosts(blogPostOverviews, newParsedPosts);
             },
             () => {
-                RefreshDeletedPosts(blogPostOverviews, newParsedPosts);
+                DeleteDeletedPosts(blogPostOverviews, newParsedPosts);
             });
         }
 
-        private void RefreshDeletedPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
+        private void DeleteDeletedPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
             var deletedPosts = blogPostOverviews.Where(overview => !newParsedPosts.Any(parsed => parsed.ID == overview.ID));
             Parallel.ForEach(deletedPosts, deletedPost => {
                 string postKey = GetKey<BlogPost>(deletedPost.ID);
@@ -208,7 +213,7 @@ namespace Blaven.RavenDb {
             });
         }
 
-        private void RefreshUpdatedBlogPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
+        private void UpdateUpdatedBlogPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
             var updatedPosts = newParsedPosts.Where(parsed => blogPostOverviews.Any(post => post.ID == parsed.ID && post.Updated != parsed.Updated));
             Parallel.ForEach(updatedPosts, updatedPost => {
                 string postKey = GetKey<BlogPost>(updatedPost.ID);
@@ -227,7 +232,7 @@ namespace Blaven.RavenDb {
             });
         }
 
-        private void RefreshNewBlogPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
+        private void AddNewBlogPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
             var newPosts = newParsedPosts.Where(parsed => !blogPostOverviews.Any(post => post.ID == parsed.ID));
             Parallel.ForEach(newPosts, newPost => {
                 string postKey = GetKey<BlogPost>(newPost.ID);

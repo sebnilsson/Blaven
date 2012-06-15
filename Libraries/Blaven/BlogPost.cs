@@ -7,8 +7,9 @@ namespace Blaven {
     /// Represents a blog-post on a blog.
     /// </summary>
     public class BlogPost {
-        public BlogPost(string blogKey) {
+        public BlogPost(string blogKey, string id) {
             this.BlogKey = blogKey;
+            this.ID = id;
 
             this.Author = new BlogAuthor();
             this.Tags = Enumerable.Empty<string>();
