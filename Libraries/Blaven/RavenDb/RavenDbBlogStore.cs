@@ -150,19 +150,18 @@ namespace Blaven.RavenDb {
             Refresh(blogKey, parsedData);
         }
 
-        internal void Refresh(string blogKey, BlogData blogData) {
+        public void Refresh(string blogKey, BlogData parsedBlogData) {
             Parallel.Invoke(
             () => {
-                RefreshBlogInfo(blogKey, blogData);
+                RefreshBlogInfo(blogKey, parsedBlogData);
             },
             () => {
-                var blogPosts = Enumerable.Empty<BlogPost>();
-                using(var session = DocumentStore.OpenSession()) {
-                    blogPosts = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
-                    System.Diagnostics.Debug.WriteLine("Total BlogPosts: " + session.Query<BlogPost>().Count());
-                }
+                //var blogPosts = Enumerable.Empty<BlogPost>();
+                //using(var session = DocumentStore.OpenSession()) {
+                //    blogPosts = session.Query<BlogPost>().Where(post => post.BlogKey == blogKey).ToList();
+                //}
 
-                RefreshBlogPosts(blogKey, blogPosts, blogData.Posts);
+                RefreshBlogPosts(blogKey, parsedBlogData.Posts);
             },
             () => {
                 UpdateStoreRefresh(blogKey);
@@ -187,62 +186,43 @@ namespace Blaven.RavenDb {
             }
         }
 
-        private void RefreshBlogPosts(string blogKey, IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
-            Parallel.Invoke(
-            () => {
-                AddNewBlogPosts(blogPostOverviews, newParsedPosts);
-            },
-            () => {
-                UpdateUpdatedBlogPosts(blogPostOverviews, newParsedPosts);
-            },
-            () => {
-                DeleteDeletedPosts(blogPostOverviews, newParsedPosts);
-            });
-        }
+        private void RefreshBlogPosts(string blogKey,  IEnumerable<BlogPost> parsedPosts) {
+            using(var session = DocumentStore.OpenSession()) {
+                var parsedPostsIds = parsedPosts.Select(x => x.ID).ToList();
+                var storePosts = session.Load<BlogPost>(parsedPostsIds);
 
-        private void DeleteDeletedPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
-            var deletedPosts = blogPostOverviews.Where(overview => !newParsedPosts.Any(parsed => parsed.ID == overview.ID));
-            Parallel.ForEach(deletedPosts, deletedPost => {
-                string postKey = GetKey<BlogPost>(deletedPost.ID);
-                using(var session = DocumentStore.OpenSession()) {
-                    var blogPost = session.Load<BlogPost>(postKey);
-                    session.Delete<BlogPost>(blogPost);
+                int i = 0;
+                foreach(var storePost in storePosts) {
+                    var id = parsedPostsIds[i];
+                    var parsedPost = parsedPosts.First(x => x.ID == id);
 
-                    session.SaveChanges();
+                    var post = storePost;
+                    if(post == null) {
+                        post = parsedPost;
+                    } else {
+                        post.Author = parsedPost.Author;
+                        post.Content = parsedPost.Content;
+                        post.PermaLinkAbsolute = parsedPost.PermaLinkAbsolute;
+                        post.PermaLinkRelative = parsedPost.PermaLinkRelative;
+                        post.Published = parsedPost.Published;
+                        post.Tags = parsedPost.Tags;
+                        post.Title = parsedPost.Title;
+                        post.Updated = parsedPost.Updated;
+                    }
+
+                    session.Store(post, post.ID);
+                    i++;
                 }
-            });
-        }
-
-        private void UpdateUpdatedBlogPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
-            var updatedPosts = newParsedPosts.Where(parsed => blogPostOverviews.Any(post => post.ID == parsed.ID && post.Updated != parsed.Updated));
-            Parallel.ForEach(updatedPosts, updatedPost => {
-                string postKey = GetKey<BlogPost>(updatedPost.ID);
-                using(var session = DocumentStore.OpenSession()) {
-                    var blogPost = session.Load<BlogPost>(postKey);
-
-                    blogPost.Author = updatedPost.Author;
-                    blogPost.Content = updatedPost.Content;
-                    blogPost.Tags = updatedPost.Tags;
-                    blogPost.Title = updatedPost.Title;
-                    blogPost.Updated = updatedPost.Updated;
-
-                    session.Store(blogPost, postKey);
-                    session.SaveChanges();
+                
+                var removedPosts = session.Query<BlogPost>().Where(x => !x.ID.In(parsedPostsIds));
+                foreach(var removedPost in removedPosts) {
+                    session.Delete(removedPost);                    
                 }
-            });
-        }
 
-        private void AddNewBlogPosts(IEnumerable<BlogPost> blogPostOverviews, IEnumerable<BlogPost> newParsedPosts) {
-            var newPosts = newParsedPosts.Where(parsed => !blogPostOverviews.Any(post => post.ID == parsed.ID));
-            Parallel.ForEach(newPosts, newPost => {
-                string postKey = GetKey<BlogPost>(newPost.ID);
-                using(var session = DocumentStore.OpenSession()) {
-                    session.Store(newPost, postKey);
-                    session.SaveChanges();
-                }
-            });
+                session.SaveChanges();
+            }
         }
-
+        
         private void UpdateStoreRefresh(string blogKey) {
             using(var session = DocumentStore.OpenSession()) {
                 string storeUpdateUrl = GetKey<StoreRefresh>(blogKey);
@@ -257,7 +237,7 @@ namespace Blaven.RavenDb {
             }
         }
 
-        private static string GetKey<T>(params string[] keys) {
+        public static string GetKey<T>(params string[] keys) {
             if(keys == null || !keys.Any()) {
                 throw new ArgumentOutOfRangeException("keys", "The provided keys cannot be null or empty.");
             }

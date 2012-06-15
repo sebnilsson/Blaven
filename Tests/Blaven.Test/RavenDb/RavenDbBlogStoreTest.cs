@@ -1,9 +1,7 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+
 using Blaven.Test;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Blaven.RavenDb.Test {
     [TestClass]
@@ -19,8 +17,8 @@ namespace Blaven.RavenDb.Test {
                     Title = "TEST_TITLE",
                 },
                 Posts = new[] {
-                    new BlogPost(blogKey, "1"),
-                    new BlogPost(blogKey, "2"),
+                    new BlogPost(blogKey, RavenDbBlogStore.GetKey<BlogPost>("1")),
+                    new BlogPost(blogKey, RavenDbBlogStore.GetKey<BlogPost>("2")),
                 }
             };
 
@@ -43,24 +41,26 @@ namespace Blaven.RavenDb.Test {
                     Title = "TEST_TITLE",
                 },
                 Posts = new [] {
-                    new BlogPost(blogKey, "1"),
-                    new BlogPost(blogKey, "2"),
+                    new BlogPost(blogKey, RavenDbBlogStore.GetKey<BlogPost>("1")),
+                    new BlogPost(blogKey, RavenDbBlogStore.GetKey<BlogPost>("2")),
                 }
             };
 
             blogStore.Refresh(blogKey, blogData);
 
+            TestHelper.WaitForIndexes(documentStore);
+
             blogData.Posts = blogData.Posts.Concat(new[] {
-                new BlogPost(blogKey, "3"),
-                new BlogPost(blogKey, "4"),
+                new BlogPost(blogKey, RavenDbBlogStore.GetKey<BlogPost>("3")),
+                new BlogPost(blogKey, RavenDbBlogStore.GetKey<BlogPost>("4")),
             });
 
             blogStore.Refresh(blogKey, blogData);
             
             TestHelper.WaitForIndexes(documentStore);
 
-            int totalPosts = blogStore.GetBlogSelection(0, 5, blogKey).TotalPostsCount;
-            Assert.AreEqual<int>(4, totalPosts);
+            var selection = blogStore.GetBlogSelection(0, 5, blogKey);
+            Assert.AreEqual<int>(4, selection.TotalPostsCount);
         }
 
         [TestMethod]
@@ -93,9 +93,9 @@ namespace Blaven.RavenDb.Test {
             blogStore.Refresh(blogKey, blogData);
 
             TestHelper.WaitForIndexes(documentStore);
-
-            int totalPosts = blogStore.GetBlogSelection(0, 5, blogKey).TotalPostsCount;
-            Assert.AreEqual<int>(2, totalPosts);
+            
+            var selection = blogStore.GetBlogSelection(0, 5, blogKey);
+            Assert.AreEqual<int>(2, selection.TotalPostsCount);
         }
     }
 }
