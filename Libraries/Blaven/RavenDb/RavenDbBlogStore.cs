@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 using Blaven.Blogger;
 using Blaven.RavenDb.Indexes;
+using Raven.Abstractions.Commands;
 using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Linq;
@@ -183,40 +184,35 @@ namespace Blaven.RavenDb {
                 var parsedPostsIds = parsedPosts.Select(x => x.ID).ToList();
                 var storePosts = session.Load<BlogPost>(parsedPostsIds);
 
-                var idsAndStorePosts = new SortedDictionary<string, BlogPost>();
-                int i = 0;
-                foreach(var storePost in storePosts) {
-                    var id = parsedPostsIds[i];
-                    idsAndStorePosts.Add(id, storePost);
-                    i++;
-                }
+                var idsAndStorePosts = parsedPostsIds.Zip(storePosts, (id, post) => new { ID = id, Post = post });
 
+                var storedPostsIds = new List<string>(parsedPostsIds.Count);
                 Parallel.ForEach(idsAndStorePosts, idAndStorePost => {
-                    var index = parsedPostsIds.IndexOf(idAndStorePost.Key);
+                    var index = parsedPostsIds.IndexOf(idAndStorePost.ID);
                     var parsedPost = parsedPostsList[index];
 
-                    var post = idAndStorePost.Value;
-                    if(post == null) {
-                        post = parsedPost;
+                    var storePost = idAndStorePost.Post;
+                    if(storePost == null) {
+                        storePost = parsedPost;
                     } else {
-                        post.Author = parsedPost.Author;
-                        post.Content = parsedPost.Content;
-                        post.PermaLinkAbsolute = parsedPost.PermaLinkAbsolute;
-                        post.PermaLinkRelative = parsedPost.PermaLinkRelative;
-                        post.Published = parsedPost.Published;
-                        post.Tags = parsedPost.Tags;
-                        post.Title = parsedPost.Title;
-                        post.Updated = parsedPost.Updated;
+                        storePost.Author = parsedPost.Author;
+                        storePost.Content = parsedPost.Content;
+                        storePost.PermaLinkAbsolute = parsedPost.PermaLinkAbsolute;
+                        storePost.PermaLinkRelative = parsedPost.PermaLinkRelative;
+                        storePost.Published = parsedPost.Published;
+                        storePost.Tags = parsedPost.Tags;
+                        storePost.Title = parsedPost.Title;
+                        storePost.Updated = parsedPost.Updated;
                     }
-
-                    session.Store(post, post.ID);
-                    i++;
+                    
+                    session.Store(storePost, storePost.ID);
+                    storedPostsIds.Add(storePost.ID);
                 });
 
-                var removedPosts = session.Query<BlogPost>().Where(x => !x.ID.In(parsedPostsIds));
-                Parallel.ForEach(removedPosts, removedPost => {
-                    session.Delete(removedPost);
-                });
+                var removedPosts = session.Query<BlogPost>().Where(x => !parsedPostsIds.Contains(x.ID));
+                foreach(var removedPost in removedPosts) {
+                    session.Advanced.Defer(new DeleteCommandData() { Key = removedPost.ID });
+                }
 
                 session.SaveChanges();
             }
