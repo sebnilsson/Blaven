@@ -186,7 +186,6 @@ namespace Blaven.RavenDb {
 
                 var idsAndStorePosts = parsedPostsIds.Zip(storePosts, (id, post) => new { ID = id, Post = post });
 
-                var storedPostsIds = new List<string>(parsedPostsIds.Count);
                 Parallel.ForEach(idsAndStorePosts, idAndStorePost => {
                     var index = parsedPostsIds.IndexOf(idAndStorePost.ID);
                     var parsedPost = parsedPostsList[index];
@@ -206,7 +205,6 @@ namespace Blaven.RavenDb {
                     }
                     
                     session.Store(storePost, storePost.ID);
-                    storedPostsIds.Add(storePost.ID);
                 });
 
                 var removedPosts = session.Query<BlogPost>().Where(x => !parsedPostsIds.Contains(x.ID));
