@@ -207,7 +207,7 @@ namespace Blaven.RavenDb {
                     session.Store(storePost, storePost.ID);
                 });
 
-                var removedPosts = session.Query<BlogPost>().Where(x => !parsedPostsIds.Contains(x.ID));
+                var removedPosts = session.Query<BlogPost>().Where(x => !x.ID.In(parsedPostsIds));
                 foreach(var removedPost in removedPosts) {
                     session.Advanced.Defer(new DeleteCommandData() { Key = removedPost.ID });
                 }
