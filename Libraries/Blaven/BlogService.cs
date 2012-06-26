@@ -189,6 +189,15 @@ namespace Blaven {
             }
         }
 
+        /// <summary>
+        /// Waits for the indexes in DocumentStore used in Service to process StaleIndexes.
+        /// </summary>
+        public void WaitForIndexes() {
+            while(this.Config.DocumentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0) {
+                System.Threading.Thread.Sleep(100);
+            }
+        }
+
         private void EnsureBlogsRefreshed(params string[] blogKeys) {
             // If the app uses background-service then don't handle refresh
             if(AppSettingsService.RefreshMode == BlogRefreshMode.BackgroundService) {
