@@ -17,30 +17,32 @@ namespace Blaven {
             if(blogPosts == null) {
                 throw new ArgumentNullException("selectedPosts");
             }
+            if(pageIndex < 0) {
+                throw new ArgumentOutOfRangeException("pageIndex", "The argument has to be a positive number of 0 or higher.");
+            }
             pageSize = pageSize.GetValueOrDefault(AppSettingsService.PageSize);
             if(pageSize < 1) {
                 throw new ArgumentOutOfRangeException("pageSize", "The argument has to be a positive number above 0.");
             }
-            if(pageIndex < 0) {
-                throw new ArgumentOutOfRangeException("pageIndex", "The argument has to be a positive number of 0 or higher.");
-            }
 
-            PageIndex = pageIndex;
-            PageSize = pageSize.Value;
-            TotalPostsCount = blogPosts.Count();
+            this.PageIndex = pageIndex;
+            this.PageSize = pageSize.Value;
+
+            this.TotalPostCount = blogPosts.Count();
+            this.PageCount = this.TotalPostCount / this.PageSize;
 
             int skip = BlogSelection.GetSkip(PageIndex, PageSize);
             int take = BlogSelection.GetTake(PageSize);
 
-            var pagedPosts = blogPosts.Skip(skip).Take(take);                        
-            Posts = pagedPosts;
+            var pagedPosts = blogPosts.Skip(skip).Take(take);
+            this.Posts = pagedPosts;
 
             if(!blogPosts.Any() || !pagedPosts.Any()) {
                 return;
             }
 
-            HasNextItems = (blogPosts.LastOrDefault().ID != pagedPosts.LastOrDefault().ID);
-            HasPreviousItems = (blogPosts.FirstOrDefault().ID != pagedPosts.FirstOrDefault().ID);
+            this.HasNextItems = (blogPosts.LastOrDefault().ID != pagedPosts.LastOrDefault().ID);
+            this.HasPreviousItems = (blogPosts.FirstOrDefault().ID != pagedPosts.FirstOrDefault().ID);
         }
 
         public static int GetSkip(int pageIndex, int pageSize) {
@@ -77,8 +79,13 @@ namespace Blaven {
         public IEnumerable<BlogPost> Posts { get; private set; }
 
         /// <summary>
+        /// Gets the count of pages. Based on TotalPostCount and PageSize.
+        /// </summary>
+        public int PageCount { get; set; }
+
+        /// <summary>
         /// Gets the total count of posts, which are paginated over in the object.
         /// </summary>
-        public int TotalPostsCount { get; set; }
+        public int TotalPostCount { get; set; }
     }
 }

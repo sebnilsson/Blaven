@@ -17,7 +17,7 @@ namespace Blaven.RavenDb.Test {
             blogStore.Refresh(_blogKey, blogData);
             DocumentStoreTestHelper.WaitForIndexes(documentStore);
 
-            int totalPosts = blogStore.GetBlogSelection(0, 5, _blogKey).TotalPostsCount;
+            int totalPosts = blogStore.GetBlogSelection(0, 5, _blogKey).TotalPostCount;
             Assert.AreEqual<int>(2, totalPosts, "The stored posts were not added to store.");
         }
 
@@ -36,7 +36,7 @@ namespace Blaven.RavenDb.Test {
             DocumentStoreTestHelper.WaitForIndexes(documentStore);
 
             var selection = blogStore.GetBlogSelection(0, 5, _blogKey);
-            Assert.AreEqual<int>(4, selection.TotalPostsCount, "The added post was not added to store.");
+            Assert.AreEqual<int>(4, selection.TotalPostCount, "The added post was not added to store.");
         }
 
         [TestMethod]
@@ -54,7 +54,7 @@ namespace Blaven.RavenDb.Test {
             DocumentStoreTestHelper.WaitForIndexes(documentStore);
 
             var selection = blogStore.GetBlogSelection(0, 5, _blogKey);
-            Assert.AreEqual<int>(2, selection.TotalPostsCount, "The removed posts was not removed from store.");
+            Assert.AreEqual<int>(2, selection.TotalPostCount, "The removed posts was not removed from store.");
         }
         
         [TestMethod]
@@ -65,7 +65,7 @@ namespace Blaven.RavenDb.Test {
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, postsCount);
             
             var selection = blogStore.GetBlogSelection(0, 5);
-            Assert.AreEqual<int>(postsCount, selection.TotalPostsCount, "The total amount of posts did not match the posts in the store.");
+            Assert.AreEqual<int>(postsCount, selection.TotalPostCount, "The total amount of posts did not match the posts in the store.");
         }
     }
 }
