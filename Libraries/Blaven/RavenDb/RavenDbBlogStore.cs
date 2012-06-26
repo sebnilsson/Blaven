@@ -73,7 +73,7 @@ namespace Blaven.RavenDb {
 
         public DateTime? GetBlogLastRefresh(string blogKey) {
             using(var session = DocumentStore.OpenSession()) {
-                var storeRefresh = session.Load<StoreRefresh>(GetKey<StoreRefresh>(blogKey));
+                var storeRefresh = session.Load<StoreBlogRefresh>(GetKey<StoreBlogRefresh>(blogKey));
                 if(storeRefresh == null) {
                     return null;
                 }
@@ -218,10 +218,10 @@ namespace Blaven.RavenDb {
         
         private void UpdateStoreRefresh(string blogKey) {
             using(var session = DocumentStore.OpenSession()) {
-                string storeUpdateUrl = GetKey<StoreRefresh>(blogKey);
-                var storeUpdate = session.Load<StoreRefresh>(storeUpdateUrl);
+                string storeUpdateUrl = GetKey<StoreBlogRefresh>(blogKey);
+                var storeUpdate = session.Load<StoreBlogRefresh>(storeUpdateUrl);
                 if(storeUpdate == null) {
-                    storeUpdate = new StoreRefresh { BlogKey = blogKey };
+                    storeUpdate = new StoreBlogRefresh { BlogKey = blogKey };
                     session.Store(storeUpdate, storeUpdateUrl);
                 }
                 storeUpdate.Updated = DateTime.Now;

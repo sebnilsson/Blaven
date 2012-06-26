@@ -13,7 +13,7 @@ namespace Blaven.Test.Integration {
 
         [ClassInitialize()]
         public static void ClassInitialize(TestContext context) {
-            BaseDocumentStore = TestHelper.GetEmbeddableDocumentStore("BlogServiceTest");
+            BaseDocumentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore("BlogServiceTest");
         }
 
         [ClassCleanup()]
