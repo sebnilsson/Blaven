@@ -13,7 +13,7 @@ namespace Blaven.Test {
         public static IEnumerable<BlogPost> GetBlogPosts(string blogKey, int start, int count) {
             var numbers = Enumerable.Range(start, count);
             foreach(var number in numbers) {
-                yield return new BlogPost(blogKey, RavenDbBlogStore.GetKey<BlogPost>(Convert.ToString(number)));
+                yield return new BlogPost(blogKey, number); //RavenDbBlogStore.GetKey<BlogPost>(Convert.ToString(number)));
             }
         }
     }

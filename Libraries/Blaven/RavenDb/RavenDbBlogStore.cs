@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+//using System.Transactions;
 
 using Blaven.Blogger;
 using Blaven.RavenDb.Indexes;
@@ -90,7 +91,7 @@ namespace Blaven.RavenDb {
         }
 
         public BlogSelection GetBlogSelection(int pageIndex, int pageSize, params string[] blogKeys) {
-            if(blogKeys == null) {
+            if(blogKeys == null || !blogKeys.Any()) {
                 throw new ArgumentNullException("blogKeys");
             }
 
@@ -181,18 +182,17 @@ namespace Blaven.RavenDb {
             var parsedPostsList = parsedPosts.ToList();
 
             using(var session = DocumentStore.OpenSession()) {
-                var parsedPostsIds = parsedPosts.Select(x => x.ID).ToList();
+                var parsedPostsIds = parsedPosts.Select(x => x.Id).ToList();
                 var storePosts = session.Load<BlogPost>(parsedPostsIds);
 
-                var idsAndStorePosts = parsedPostsIds.Zip(storePosts, (id, post) => new { ID = id, Post = post });
+                for(int i = 0; i < storePosts.Count(); i++) {
+                    var parsedPost = parsedPostsList[i];
 
-                Parallel.ForEach(idsAndStorePosts, idAndStorePost => {
-                    var index = parsedPostsIds.IndexOf(idAndStorePost.ID);
-                    var parsedPost = parsedPostsList[index];
-
-                    var storePost = idAndStorePost.Post;
+                    var storePost = storePosts[i];
                     if(storePost == null) {
                         storePost = parsedPost;
+
+                        session.Store(storePost);
                     } else {
                         storePost.Author = parsedPost.Author;
                         storePost.Content = parsedPost.Content;
@@ -203,13 +203,14 @@ namespace Blaven.RavenDb {
                         storePost.Title = parsedPost.Title;
                         storePost.Updated = parsedPost.Updated;
                     }
-                    
-                    session.Store(storePost, storePost.ID);
-                });
 
-                var removedPosts = session.Query<BlogPost>().Where(x => !x.ID.In(parsedPostsIds));
+                    storePosts[i] = storePost;
+                }
+                
+                var storePostsIds = session.Query<BlogPost>().Where(x => x.BlogKey == blogKey).Select(x => x.Id).Take(int.MaxValue).ToList();
+                var removedPosts = storePostsIds.Where(postId => !parsedPostsIds.Contains(postId));
                 foreach(var removedPost in removedPosts) {
-                    session.Advanced.Defer(new DeleteCommandData() { Key = removedPost.ID });
+                    session.Advanced.Defer(new DeleteCommandData() { Key = removedPost });
                 }
 
                 session.SaveChanges();

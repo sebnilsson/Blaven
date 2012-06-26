@@ -41,8 +41,8 @@ namespace Blaven {
                 return;
             }
 
-            this.HasNextItems = (blogPosts.LastOrDefault().ID != pagedPosts.LastOrDefault().ID);
-            this.HasPreviousItems = (blogPosts.FirstOrDefault().ID != pagedPosts.FirstOrDefault().ID);
+            this.HasNextItems = (blogPosts.LastOrDefault().Id != pagedPosts.LastOrDefault().Id);
+            this.HasPreviousItems = (blogPosts.FirstOrDefault().Id != pagedPosts.FirstOrDefault().Id);
         }
 
         public static int GetSkip(int pageIndex, int pageSize) {

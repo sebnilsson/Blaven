@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.Blogger;
+using Blaven.RavenDb;
 
 namespace Blaven {
     /// <summary>
@@ -143,7 +144,12 @@ namespace Blaven {
         public void Refresh(bool forceRefresh = false, params string[] blogKeys) {
             blogKeys = GetAllKeys(blogKeys);
 
-            _hasDocumentStoreAnyDocuments = _hasDocumentStoreAnyDocuments || (this.Config.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments > 0);
+            if(!_hasDocumentStoreAnyDocuments) {
+                using(var session = this.Config.DocumentStore.OpenSession()) {
+                    _hasDocumentStoreAnyDocuments = session.Query<StoreBlogRefresh>().Any();
+                }
+            }
+            //_hasDocumentStoreAnyDocuments = _hasDocumentStoreAnyDocuments || (this.Config.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments > 0);
 
             Action<string> refreshFunc = (blogKey) => {
                 if(BlogService.GetIsBlogRefreshing(blogKey)) {

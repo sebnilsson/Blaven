@@ -15,7 +15,7 @@ namespace Blaven.RavenDb.Indexes {
             Map = posts => from post in posts
                            select new {
                                BlogKey = post.BlogKey,
-                               ID = post.ID,
+                               ID = post.Id,
                                Updated = post.Updated,
                            };
         }

@@ -34,7 +34,7 @@ namespace Blaven.Blogger {
 
             string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
-            string id = ParseId(entry.Element(ns + "id").Value);
+            long id = ParseId(entry.Element(ns + "id").Value);
             var post = new BlogPost(blogKey, id) {
                 Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value,
@@ -56,11 +56,12 @@ namespace Blaven.Blogger {
             return post;
         }
 
-        internal static string ParseId(string val) {
+        internal static long ParseId(string val) {
             string findValue = ".post-";
             int index = val.IndexOf(findValue) + findValue.Length;
 
-            return val.Substring(index);
+            string text = val.Substring(index);
+            return long.Parse(text);
         }
 
         internal static DateTime ParseDate(string val) {

@@ -2,6 +2,7 @@
 
 using Blaven.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 
 namespace Blaven.RavenDb.Test {
     [TestClass]
@@ -63,8 +64,12 @@ namespace Blaven.RavenDb.Test {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore("GetBlogSelection_WhenContaining33Entries_ShouldContainTotal33Entries");
             var blogStore = new RavenDbBlogStore(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, postsCount);
-            
-            var selection = blogStore.GetBlogSelection(0, 5);
+
+            blogStore.Refresh(_blogKey, blogData);
+            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+
+            var selection = blogStore.GetBlogSelection(0, 5, _blogKey);
+
             Assert.AreEqual<int>(postsCount, selection.TotalPostCount, "The total amount of posts did not match the posts in the store.");
         }
     }
