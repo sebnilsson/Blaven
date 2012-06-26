@@ -153,82 +153,82 @@ namespace Blaven.RavenDb {
         }
 
         public void Refresh(string blogKey, BlogData parsedBlogData) {
-            RefreshBlogInfo(blogKey, parsedBlogData);
-
-            RefreshBlogPosts(blogKey, parsedBlogData.Posts);
-
-            UpdateStoreRefresh(blogKey);
-        }
-
-        private void RefreshBlogInfo(string blogKey, BlogData parsedData) {
             using(var session = DocumentStore.OpenSession()) {
-                string blogInfoUrl = GetKey<BlogInfo>(blogKey);
-                var blogInfo = session.Load<BlogInfo>(blogInfoUrl);
-                if(blogInfo == null) {
-                    blogInfo = new BlogInfo { BlogKey = blogKey };
-                    session.Store(blogInfo, blogInfoUrl);
-                }
+                //using(var transaction = new TransactionScope()) {
+                RefreshBlogInfo(session, blogKey, parsedBlogData);
 
-                blogInfo.Subtitle = parsedData.Info.Subtitle;
-                blogInfo.Title = parsedData.Info.Title;
-                blogInfo.Updated = parsedData.Info.Updated;
-                blogInfo.Url = parsedData.Info.Url;
+                RefreshBlogPosts(session, blogKey, parsedBlogData.Posts);
 
-                session.SaveChanges();
+                UpdateStoreRefresh(session, blogKey);
+
+                //    transaction.Complete();
+                //}
             }
         }
 
-        private void RefreshBlogPosts(string blogKey,  IEnumerable<BlogPost> parsedPosts) {
+        private void RefreshBlogInfo(IDocumentSession session, string blogKey, BlogData parsedData) {
+            string blogInfoUrl = GetKey<BlogInfo>(blogKey);
+            var blogInfo = session.Load<BlogInfo>(blogInfoUrl);
+            if(blogInfo == null) {
+                blogInfo = new BlogInfo { BlogKey = blogKey };
+                session.Store(blogInfo, blogInfoUrl);
+            }
+
+            blogInfo.Subtitle = parsedData.Info.Subtitle;
+            blogInfo.Title = parsedData.Info.Title;
+            blogInfo.Updated = parsedData.Info.Updated;
+            blogInfo.Url = parsedData.Info.Url;
+
+            session.SaveChanges();
+        }
+
+        private void RefreshBlogPosts(IDocumentSession session, string blogKey, IEnumerable<BlogPost> parsedPosts) {
             var parsedPostsList = parsedPosts.ToList();
 
-            using(var session = DocumentStore.OpenSession()) {
-                var parsedPostsIds = parsedPosts.Select(x => x.Id).ToList();
-                var storePosts = session.Load<BlogPost>(parsedPostsIds);
+            var parsedPostsIds = parsedPosts.Select(x => x.Id).ToList();
+            var storePosts = session.Load<BlogPost>(parsedPostsIds);
 
-                for(int i = 0; i < storePosts.Count(); i++) {
-                    var parsedPost = parsedPostsList[i];
+            for(int i = 0; i < storePosts.Count(); i++) {
+                var parsedPost = parsedPostsList[i];
 
-                    var storePost = storePosts[i];
-                    if(storePost == null) {
-                        storePost = parsedPost;
+                var storePost = storePosts[i];
+                if(storePost == null) {
+                    storePost = parsedPost;
 
-                        session.Store(storePost);
-                    } else {
-                        storePost.Author = parsedPost.Author;
-                        storePost.Content = parsedPost.Content;
-                        storePost.PermaLinkAbsolute = parsedPost.PermaLinkAbsolute;
-                        storePost.PermaLinkRelative = parsedPost.PermaLinkRelative;
-                        storePost.Published = parsedPost.Published;
-                        storePost.Tags = parsedPost.Tags;
-                        storePost.Title = parsedPost.Title;
-                        storePost.Updated = parsedPost.Updated;
-                    }
-
-                    storePosts[i] = storePost;
+                    session.Store(storePost);
+                } else {
+                    storePost.Author = parsedPost.Author;
+                    storePost.Content = parsedPost.Content;
+                    storePost.PermaLinkAbsolute = parsedPost.PermaLinkAbsolute;
+                    storePost.PermaLinkRelative = parsedPost.PermaLinkRelative;
+                    storePost.Published = parsedPost.Published;
+                    storePost.Tags = parsedPost.Tags;
+                    storePost.Title = parsedPost.Title;
+                    storePost.Updated = parsedPost.Updated;
                 }
+
+                storePosts[i] = storePost;
+            }
                 
-                var storePostsIds = session.Query<BlogPost>().Where(x => x.BlogKey == blogKey).Select(x => x.Id).Take(int.MaxValue).ToList();
-                var removedPosts = storePostsIds.Where(postId => !parsedPostsIds.Contains(postId));
-                foreach(var removedPost in removedPosts) {
-                    session.Advanced.Defer(new DeleteCommandData() { Key = removedPost });
-                }
-
-                session.SaveChanges();
+            var storePostsIds = session.Query<BlogPost>().Where(x => x.BlogKey == blogKey).Select(x => x.Id).Take(int.MaxValue).ToList();
+            var removedPosts = storePostsIds.Where(postId => !parsedPostsIds.Contains(postId));
+            foreach(var removedPost in removedPosts) {
+                session.Advanced.Defer(new DeleteCommandData() { Key = removedPost });
             }
+
+            session.SaveChanges();
         }
-        
-        private void UpdateStoreRefresh(string blogKey) {
-            using(var session = DocumentStore.OpenSession()) {
-                string storeUpdateUrl = GetKey<StoreBlogRefresh>(blogKey);
-                var storeUpdate = session.Load<StoreBlogRefresh>(storeUpdateUrl);
-                if(storeUpdate == null) {
-                    storeUpdate = new StoreBlogRefresh { BlogKey = blogKey };
-                    session.Store(storeUpdate, storeUpdateUrl);
-                }
-                storeUpdate.Updated = DateTime.Now;
 
-                session.SaveChanges();
+        private void UpdateStoreRefresh(IDocumentSession session, string blogKey) {
+            string storeUpdateUrl = GetKey<StoreBlogRefresh>(blogKey);
+            var storeUpdate = session.Load<StoreBlogRefresh>(storeUpdateUrl);
+            if(storeUpdate == null) {
+                storeUpdate = new StoreBlogRefresh { BlogKey = blogKey };
+                session.Store(storeUpdate, storeUpdateUrl);
             }
+            storeUpdate.Updated = DateTime.Now;
+
+            session.SaveChanges();
         }
 
         public static string GetKey<T>(params string[] keys) {
