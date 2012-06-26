@@ -19,7 +19,7 @@ namespace Blaven.RavenDb.Test {
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, BlogPostsTestHelper.GetBlogPosts(_blogKey, 2));
 
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             var selection = blogStore.GetBlogSelection(DefaultPageIndex, DefaultPageSize, _blogKey);
             int totalPosts = selection.TotalPostCount;
@@ -34,12 +34,12 @@ namespace Blaven.RavenDb.Test {
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, BlogPostsTestHelper.GetBlogPosts(_blogKey, 2));
 
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             blogData.Posts = blogData.Posts.Concat(BlogPostsTestHelper.GetBlogPosts(_blogKey, 3, 2));
 
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             var selection = blogStore.GetBlogSelection(DefaultPageIndex, DefaultPageSize, _blogKey);
 
@@ -53,12 +53,12 @@ namespace Blaven.RavenDb.Test {
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, BlogPostsTestHelper.GetBlogPosts(_blogKey, 4));
 
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             blogData.Posts = BlogPostsTestHelper.GetBlogPosts(_blogKey, 2);
 
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             var selection = blogStore.GetBlogSelection(DefaultPageIndex, DefaultPageSize, _blogKey);
 
@@ -73,7 +73,7 @@ namespace Blaven.RavenDb.Test {
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, postsCount);
 
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             var selection = blogStore.GetBlogSelection(0, 5, _blogKey);
 
@@ -89,9 +89,9 @@ namespace Blaven.RavenDb.Test {
             blogData.Info.Title = "ORIGINAL_TITLE";
             blogData.Info.Updated = DateTime.MinValue;
             blogData.Info.Url = "ORIGINAL_URL";
-            
+
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             string updatedSubtitle = "UPDATED_SUBTITLE";
             string updatedTitle = "UPDATED_TITLE";
@@ -104,7 +104,7 @@ namespace Blaven.RavenDb.Test {
             blogData.Info.Url = updatedUrl;
 
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             var info = blogStore.GetBlogInfo(_blogKey);
 
@@ -131,9 +131,9 @@ namespace Blaven.RavenDb.Test {
             post.Tags = new [] { "TAG_1", "TAG_2" };
             post.Title = "ORIGINAL_TITLE";
             post.Updated = DateTime.MinValue.AddYears(1);
-            
+
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             string updatedAuthorImageUrl = "UPDATED_AUTHOR_IMAGE_URL";
             string updatedAuthorName = "UPDATED_AUTHOR_NAME";
@@ -156,7 +156,7 @@ namespace Blaven.RavenDb.Test {
             post.Updated = updatedUpdated;
 
             blogStore.Refresh(_blogKey, blogData);
-            DocumentStoreTestHelper.WaitForIndexes(documentStore);
+            blogStore.WaitForIndexes();
 
             var selection = blogStore.GetBlogSelection(DefaultPageIndex, DefaultPageSize, _blogKey);
             var selectedPost = selection.Posts.First(x => x.Id == post.Id);

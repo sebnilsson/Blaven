@@ -144,13 +144,13 @@ namespace Blaven.RavenDb {
             }
         }
 
-        public void Refresh(string blogKey, System.Xml.Linq.XDocument bloggerDocument) {
+        public void Refresh(string blogKey, System.Xml.Linq.XDocument bloggerDocument, bool waitForIndexes = false) {
             var parsedData = BloggerParser.ParseBlogData(blogKey, bloggerDocument);
 
-            Refresh(blogKey, parsedData);
+            Refresh(blogKey, parsedData, waitForIndexes);
         }
 
-        public void Refresh(string blogKey, BlogData parsedBlogData) {
+        public void Refresh(string blogKey, BlogData parsedBlogData, bool waitForIndexes = false) {
             using(var session = DocumentStore.OpenSession()) {
                 RefreshBlogInfo(session, blogKey, parsedBlogData);
 
@@ -159,6 +159,16 @@ namespace Blaven.RavenDb {
                 UpdateStoreRefresh(session, blogKey);
 
                 session.SaveChanges();
+            }
+
+            if(waitForIndexes) {
+                WaitForIndexes();
+            }
+        }
+
+        public void WaitForIndexes() {
+            while(DocumentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0) {
+                System.Threading.Thread.Sleep(100);
             }
         }
 
