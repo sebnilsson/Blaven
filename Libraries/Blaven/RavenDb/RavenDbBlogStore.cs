@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-//using System.Transactions;
 
 using Blaven.Blogger;
 using Blaven.RavenDb.Indexes;
@@ -154,15 +152,13 @@ namespace Blaven.RavenDb {
 
         public void Refresh(string blogKey, BlogData parsedBlogData) {
             using(var session = DocumentStore.OpenSession()) {
-                //using(var transaction = new TransactionScope()) {
                 RefreshBlogInfo(session, blogKey, parsedBlogData);
 
                 RefreshBlogPosts(session, blogKey, parsedBlogData.Posts);
 
                 UpdateStoreRefresh(session, blogKey);
 
-                //    transaction.Complete();
-                //}
+                session.SaveChanges();
             }
         }
 
@@ -178,8 +174,6 @@ namespace Blaven.RavenDb {
             blogInfo.Title = parsedData.Info.Title;
             blogInfo.Updated = parsedData.Info.Updated;
             blogInfo.Url = parsedData.Info.Url;
-
-            session.SaveChanges();
         }
 
         private void RefreshBlogPosts(IDocumentSession session, string blogKey, IEnumerable<BlogPost> parsedPosts) {
@@ -215,8 +209,6 @@ namespace Blaven.RavenDb {
             foreach(var removedPost in removedPosts) {
                 session.Advanced.Defer(new DeleteCommandData() { Key = removedPost });
             }
-
-            session.SaveChanges();
         }
 
         private void UpdateStoreRefresh(IDocumentSession session, string blogKey) {
@@ -227,8 +219,6 @@ namespace Blaven.RavenDb {
                 session.Store(storeUpdate, storeUpdateUrl);
             }
             storeUpdate.Updated = DateTime.Now;
-
-            session.SaveChanges();
         }
 
         public static string GetKey<T>(params string[] keys) {
