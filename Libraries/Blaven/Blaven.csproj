@@ -107,6 +107,7 @@
     <Compile Include="BlogService.cs" />
     <Compile Include="Blogger\BloggerSettingsService.cs" />
     <Compile Include="BlogRefreshMode.cs" />
+    <Compile Include="BlogServiceLockHelper.cs" />
     <Compile Include="RavenDb\StoreBlogRefresh.cs" />
     <Compile Include="RavenDb\Indexes\ArchiveCountByBlogKey.cs" />
     <Compile Include="RavenDb\Indexes\BlogPostsOrderedByCreated.cs" />

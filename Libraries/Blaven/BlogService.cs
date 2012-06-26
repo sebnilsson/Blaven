@@ -10,7 +10,7 @@ namespace Blaven {
     /// <summary>
     /// A service-class for accessing blog-related features.
     /// </summary>
-    public class BlogService {
+    public class BlogService : IDisposable {
         /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features.
         /// </summary>
@@ -124,17 +124,16 @@ namespace Blaven {
 
             return this.Config.BlogStore.SearchPosts(searchTerms ?? string.Empty, pageIndex, this.Config.PageSize, blogKeys);
         }
-
-        private static bool _hasDocumentStoreAnyDocuments = false;
-
         
         /// <summary>
         /// Refreshes blogs.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
         public void Refresh(params string[] blogKeys) {
-            Refresh(false, blogKeys);
+            Refresh(forceRefresh: false, blogKeys: blogKeys);
         }
+
+        private static bool _hasDocumentStoreAnyDocuments = false;
 
         /// <summary>
         /// Refreshes blogs.
@@ -149,10 +148,9 @@ namespace Blaven {
                     _hasDocumentStoreAnyDocuments = session.Query<StoreBlogRefresh>().Any();
                 }
             }
-            //_hasDocumentStoreAnyDocuments = _hasDocumentStoreAnyDocuments || (this.Config.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments > 0);
 
             Action<string> refreshFunc = (blogKey) => {
-                if(BlogService.GetIsBlogRefreshing(blogKey)) {
+                if(BlogServiceLockHelper.GetIsBlogRefreshing(blogKey)) {
                     return;
                 }
 
@@ -160,7 +158,7 @@ namespace Blaven {
                     return;
                 }
 
-                var lockObject = BlogService.GetRefreshedLock(blogKey);
+                var lockObject = BlogServiceLockHelper.GetRefreshedLock(blogKey);
                 lock(lockObject) {
                     if(!forceRefresh && this.Config.BlogStore.GetIsBlogRefreshed(blogKey, this.Config.CacheTime)) {
                         return;
@@ -184,9 +182,7 @@ namespace Blaven {
                 return;
             }
 
-            while(this.Config.DocumentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0) {
-                System.Threading.Thread.Sleep(100);
-            }
+            WaitForIndexes();
         }
 
         /// <summary>
@@ -209,7 +205,7 @@ namespace Blaven {
         
         private void PerformRefresh(string blogKey) {
             try {
-                _refreshingLockStore[blogKey] = true;
+                BlogServiceLockHelper.SetIsBlogRefreshing(blogKey);
 
                 // TODO: Change to commented code when Blogger API-bug is fixed:
                 // http://code.google.com/p/gdata-issues/issues/detail?id=2555
@@ -226,30 +222,9 @@ namespace Blaven {
                 throw;
             }
             finally {
-                _refreshingLockStore[blogKey] = false;
+                BlogServiceLockHelper.SetIsBlogRefreshing(blogKey, setLocked: false);
             }
         }
-        
-        private static bool GetIsBlogRefreshing(string blogKey) {
-            if(!_refreshingLockStore.ContainsKey(blogKey)) {
-                return false;
-            }
-            return _refreshingLockStore[blogKey];
-        }
-        private static Dictionary<string, bool> _refreshingLockStore = new Dictionary<string, bool>();
-
-        private static object GetRefreshedLock(string key) {
-            if(!_refreshedLockStore.ContainsKey(key)) {
-                lock(_refreshedLockStoreLock) {
-                    if(!_refreshedLockStore.ContainsKey(key)) {
-                        _refreshedLockStore[key] = new object();
-                    }
-                }
-            }
-            return _refreshedLockStore[key];
-        }
-        private static readonly object _refreshedLockStoreLock = new object();
-        private static Dictionary<string, object> _refreshedLockStore = new Dictionary<string, object>();
 
         private string GetBlogKeyOrDefault(string blogKey) {
             if(!string.IsNullOrWhiteSpace(blogKey)) {
@@ -266,5 +241,15 @@ namespace Blaven {
 
             return this.Config.BloggerSettings.Select(setting => setting.BlogKey).ToArray();
         }
+
+        #region IDisposable Members
+
+        public void Dispose() {
+            if(this.Config.DocumentStore != null && !this.Config.DocumentStore.WasDisposed) {
+                this.Config.DocumentStore.Dispose();
+            }
+        }
+
+        #endregion
     }
 }
