@@ -70,7 +70,7 @@ namespace Blaven.Blogger {
             var date = DateTime.Parse(split[0]);
             var time = DateTime.Parse(timeString);
 
-            return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second);
+            return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, DateTimeKind.Utc);
         }
 
         internal static string GetRelativeUrl(string fullUrl) {

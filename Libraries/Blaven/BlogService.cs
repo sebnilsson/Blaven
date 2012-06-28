@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.Blogger;
-using Blaven.RavenDb;
 
 namespace Blaven {
     /// <summary>
     /// A service-class for accessing blog-related features.
     /// </summary>
     public class BlogService : IDisposable {
+        private BlogServiceRefresher _refresher;
+
         /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features.
         /// </summary>
@@ -31,7 +32,9 @@ namespace Blaven {
 
             this.Config = config;
 
-            EnsureBlogsRefreshed(this.Config.BloggerSettings.Select(setting => setting.BlogKey).ToArray());
+            _refresher = new BlogServiceRefresher(config);
+
+            EnsureBlogsRefreshed(GetKeysOrAll());
         }
 
         /// <summary>
@@ -40,7 +43,7 @@ namespace Blaven {
         public BlogServiceConfig Config { get; private set; }
 
         public Dictionary<DateTime, int> GetArchiveCount(params string[] blogKeys) {
-            blogKeys = GetAllKeys(blogKeys);
+            blogKeys = GetKeysOrAll(blogKeys);
 
             return this.Config.BlogStore.GetBlogArchiveCount(blogKeys);
         }
@@ -50,7 +53,7 @@ namespace Blaven {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            blogKeys = GetAllKeys(blogKeys);
+            blogKeys = GetKeysOrAll(blogKeys);
 
             return this.Config.BlogStore.GetBlogArchiveSelection(date, pageIndex, this.Config.PageSize, blogKeys);
         }
@@ -89,7 +92,7 @@ namespace Blaven {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            blogKeys = GetAllKeys(blogKeys);
+            blogKeys = GetKeysOrAll(blogKeys);
 
             return this.Config.BlogStore.GetBlogSelection(pageIndex, this.Config.PageSize, blogKeys);
         }
@@ -100,7 +103,7 @@ namespace Blaven {
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
         /// <returns>Returns a dictionary of tags and their count.</returns>
         public Dictionary<string, int> GetTagsCount(params string[] blogKeys) {
-            blogKeys = GetAllKeys(blogKeys);
+            blogKeys = GetKeysOrAll(blogKeys);
 
             return this.Config.BlogStore.GetBlogTagsCount(blogKeys);
         }
@@ -110,7 +113,7 @@ namespace Blaven {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            blogKeys = GetAllKeys(blogKeys);
+            blogKeys = GetKeysOrAll(blogKeys);
 
             return this.Config.BlogStore.GetBlogTagsSelection(tagName, pageIndex, this.Config.PageSize, blogKeys);
         }
@@ -120,7 +123,7 @@ namespace Blaven {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
             
-            blogKeys = GetAllKeys(blogKeys);
+            blogKeys = GetKeysOrAll(blogKeys);
 
             return this.Config.BlogStore.SearchPosts(searchTerms ?? string.Empty, pageIndex, this.Config.PageSize, blogKeys);
         }
@@ -133,56 +136,18 @@ namespace Blaven {
             Refresh(forceRefresh: false, blogKeys: blogKeys);
         }
 
-        private static bool _hasDocumentStoreAnyDocuments = false;
-
         /// <summary>
         /// Refreshes blogs.
         /// </summary>
         /// <param name="forceRefresh">Sets if the blog should be forced to refresh, ignoring if Blog is up to date.</param>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs.</param>
         public void Refresh(bool forceRefresh = false, params string[] blogKeys) {
-            blogKeys = GetAllKeys(blogKeys);
+            blogKeys = GetKeysOrAll(blogKeys);
 
-            if(!_hasDocumentStoreAnyDocuments) {
-                using(var session = this.Config.DocumentStore.OpenSession()) {
-                    _hasDocumentStoreAnyDocuments = session.Query<StoreBlogRefresh>().Any();
-                }
-            }
-
-            Action<string> refreshFunc = (blogKey) => {
-                if(BlogServiceLockHelper.GetIsBlogRefreshing(blogKey)) {
-                    return;
-                }
-
-                if(!forceRefresh && this.Config.BlogStore.GetIsBlogRefreshed(blogKey, this.Config.CacheTime)) {
-                    return;
-                }
-
-                var lockObject = BlogServiceLockHelper.GetRefreshedLock(blogKey);
-                lock(lockObject) {
-                    if(!forceRefresh && this.Config.BlogStore.GetIsBlogRefreshed(blogKey, this.Config.CacheTime)) {
-                        return;
-                    }
-
-                    this.PerformRefresh(blogKey);
-                }
-            };
-
-            // First update is always done synchronously
-            if(!_hasDocumentStoreAnyDocuments || this.Config.RefreshMode == BlogRefreshMode.Synchronously) {
-                Parallel.ForEach(blogKeys, refreshFunc);
-            } else {
-                Task.Factory.StartNew(() => {
-                    Parallel.ForEach(blogKeys, refreshFunc);
-                });
-            }
-            
-            // Wait for indexing - if first ever refresh
-            if(_hasDocumentStoreAnyDocuments) {
-                return;
-            }
-
-            this.Config.BlogStore.WaitForIndexes();
+            Parallel.ForEach(blogKeys, blogKey => {
+                _refresher.Refresh(blogKey, forceRefresh);
+            });
+            //_refresher.Refresh(forceRefresh, blogKeys);
         }
         
         private void EnsureBlogsRefreshed(params string[] blogKeys) {
@@ -193,29 +158,6 @@ namespace Blaven {
 
             Refresh(blogKeys);
         }
-        
-        private void PerformRefresh(string blogKey) {
-            try {
-                BlogServiceLockHelper.SetIsBlogRefreshing(blogKey);
-
-                // TODO: Change to commented code when Blogger API-bug is fixed:
-                // http://code.google.com/p/gdata-issues/issues/detail?id=2555
-                //var lastRefresh = _config.BlogStore.GetBlogLastRefresh(key);
-                //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastRefresh);
-
-                var bloggerSetting = this.Config.BloggerSettings.First(setting => setting.BlogKey == blogKey);
-
-                var bloggerDocument = BloggerHelper.GetBloggerDocument(bloggerSetting);
-
-                this.Config.BlogStore.Refresh(blogKey, bloggerDocument);
-            }
-            catch(Exception) {
-                throw;
-            }
-            finally {
-                BlogServiceLockHelper.SetIsBlogRefreshing(blogKey, setLocked: false);
-            }
-        }
 
         private string GetBlogKeyOrDefault(string blogKey) {
             if(!string.IsNullOrWhiteSpace(blogKey)) {
@@ -225,7 +167,9 @@ namespace Blaven {
             return this.Config.BloggerSettings.First().BlogKey;
         }
 
-        private string[] GetAllKeys(string[] blogKeys) {
+        internal string[] GetKeysOrAll(string[] blogKeys = null) {
+            blogKeys = blogKeys ?? Enumerable.Empty<string>().ToArray();
+
             if(blogKeys.Any()) {
                 return blogKeys;
             }
