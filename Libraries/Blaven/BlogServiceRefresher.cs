@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Blaven.Blogger;
+using Blaven.RavenDb;
 
 namespace Blaven {
     public class BlogServiceRefresher {
@@ -13,53 +15,56 @@ namespace Blaven {
             _config = config;
         }
 
-        private static ConcurrentDictionary<string, bool> _blogKeysUpdating = new ConcurrentDictionary<string, bool>();
+        private static ConcurrentDictionary<string, bool> _blogKeyIsUpdating = new ConcurrentDictionary<string, bool>();
+        private static ConcurrentDictionary<string, bool> _blogKeyHasAnyData = new ConcurrentDictionary<string, bool>();
 
-        public void Refresh(string blogKey, bool forceRefresh = false) {
-            if(!_blogKeysUpdating.ContainsKey(blogKey)) {
-                _blogKeysUpdating[blogKey] = true;
+        public bool Refresh(string blogKey, bool forceRefresh = false) {
+            if(!_blogKeyIsUpdating.ContainsKey(blogKey)) {
+                _blogKeyIsUpdating[blogKey] = false;
             }
 
-            if (_blogKeysUpdating[blogKey]) {
-                return;
+            if (_blogKeyIsUpdating[blogKey]) {
+                WaitForAnyData(blogKey);
+
+                return false;
             }
 
-            _blogKeysUpdating[blogKey] = true;
-
-            //var hasData = _blogKeysUpdating[blogKey];
-            //if (!hasData) {
-            //    using(var session = _config.DocumentStore.OpenSession()) {
-            //        hasData = session.Query<StoreBlogRefresh>().Any(x => x.BlogKey == blogKey);
-            //    }
-            //    _blogKeysUpdating[blogKey] = hasData;
-            //}
-
+            _blogKeyIsUpdating[blogKey] = true;
+            
             try {
                 if(_config.RefreshMode == BlogRefreshMode.Synchronously) {
                     PerformRefresh(blogKey);
+
+                    _blogKeyHasAnyData[blogKey] = true;
                 } else {
-                    Task.Factory.StartNew(() => {
+                    var task = new Task(() => {
                         PerformRefresh(blogKey);
                     });
+                    task.ContinueWith(_ => {
+                        _blogKeyHasAnyData[blogKey] = true;
+                    });
+                    task.Start();
+
+                    WaitForAnyData(blogKey);
                 }
             }
             finally {
-                _blogKeysUpdating[blogKey] = false;
+                _blogKeyIsUpdating[blogKey] = false;
             }
 
-            // Wait for indexing - if first ever refresh
-            //if(!_hasDocumentStoreAnyData) {
-            //    _config.BlogStore.WaitForIndexes();
-            //}
-
-            
+            return true;
         }
 
-        //private void WaitForFirstData() {
-        //    while(!_hasDocumentStoreAnyData) {
-        //        Thread.Sleep(100);
-        //    }
-        //}
+        private void WaitForAnyData(string blogKey) {
+            bool value = false;
+            while(!_blogKeyHasAnyData.TryGetValue(blogKey, out value) || !value) {
+                Thread.Sleep(250);
+
+                using(var session = _config.DocumentStore.OpenSession()) {
+                    _blogKeyHasAnyData[blogKey] = session.Query<StoreBlogRefresh>().Any(x => x.BlogKey == blogKey);
+                }
+            }
+        }
         
         private void PerformRefresh(string blogKey) {
             try {

@@ -32,8 +32,10 @@ namespace Blaven.Test.Integration {
 
             var resultsList = new ConcurrentDictionary<string, int>();
 
-            Parallel.For(0, 5, (i) => {
-                var blogService = BlogServiceTestHelper.GetBlogService(blogStore, "TEST_" + i, "buzz");
+            Parallel.For(0, 3, (i) => {
+                string blogKey = "buzz";
+                var blogService = BlogServiceTestHelper.GetBlogService(blogStore, blogKey, "buzz");
+                var info = blogService.GetInfo(blogKey);
             });
             
             //Assert.AreEqual<int>(1, trueCount);
