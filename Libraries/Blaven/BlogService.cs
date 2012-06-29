@@ -139,7 +139,7 @@ namespace Blaven {
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
         public IEnumerable<string> Refresh(params string[] blogKeys) {
-            return Refresh(blogKeys: blogKeys);
+            return Refresh(forceRefresh: false, async: true, blogKeys: blogKeys);
         }
 
         /// <summary>
