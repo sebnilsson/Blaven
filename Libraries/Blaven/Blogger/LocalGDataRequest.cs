@@ -5,6 +5,8 @@ using Google.GData.Client;
 
 namespace Blaven.Blogger {
     internal class LocalGDataRequest : IGDataRequest {
+        private static object streamLock = new object();
+
         private string _filePath;
 
         public LocalGDataRequest(string filePath) {
@@ -20,13 +22,27 @@ namespace Blaven.Blogger {
         }
 
         public System.IO.Stream GetRequestStream() {
-            var stream = File.Open(_filePath, FileMode.Open);
-            return stream;
+            var memoryStream = new MemoryStream();
+            lock(streamLock) {
+                using(var fileStream = File.Open(_filePath, FileMode.Open)) {
+                    fileStream.CopyTo(memoryStream);
+                }
+            }
+
+            memoryStream.Position = 0;
+            return memoryStream;
         }
 
         public System.IO.Stream GetResponseStream() {
-            var stream = File.Open(_filePath, FileMode.Open);
-            return stream;
+            var memoryStream = new MemoryStream();
+            lock(streamLock) {
+                using(var fileStream = File.Open(_filePath, FileMode.Open)) {
+                    fileStream.CopyTo(memoryStream);
+                }
+            }
+
+            memoryStream.Position = 0;
+            return memoryStream;
         }
 
         public DateTime IfModifiedSince { get; set; }

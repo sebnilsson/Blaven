@@ -132,6 +132,12 @@ namespace Blaven.RavenDb {
             }
         }
 
+        public bool GetHasBlogAnyData(string blogKey) {
+            using(var session = DocumentStore.OpenSession()) {
+                return session.Query<StoreBlogRefresh>().Any(x => x.BlogKey == blogKey);
+            }
+        }
+
         public BlogSelection SearchPosts(string searchTerms, int pageIndex, int pageSize, string[] blogKeys) {
             if(blogKeys == null) {
                 throw new ArgumentNullException("blogKeys");

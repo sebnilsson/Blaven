@@ -34,7 +34,7 @@ namespace Blaven.Blogger {
             catch(GDataNotModifiedException) {
                 return null;
             }
-
+            
             using(var stream = new System.IO.MemoryStream()) {
                 feed.SaveToXml(stream);
                 stream.Position = 0;

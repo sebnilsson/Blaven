@@ -2,11 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Blaven.Blogger;
-using Blaven.RavenDb;
+using System.Threading;
 
 namespace Blaven {
     internal class BlogServiceRefresher {
@@ -18,83 +17,59 @@ namespace Blaven {
 
         private static ConcurrentDictionary<string, bool> _blogKeyHasRan = new ConcurrentDictionary<string, bool>();
         private static ConcurrentDictionary<string, bool> _blogKeyIsUpdating = new ConcurrentDictionary<string, bool>();
-        
-        public IEnumerable<string> RefreshBlogs(IEnumerable<string> blogKeys, bool async, bool forceRefresh = false) {
-            var results = new ConcurrentBag<string>();
+
+        public IEnumerable<Tuple<string, bool>> RefreshBlogs(IEnumerable<string> blogKeys, bool forceRefresh = false) {
+            var results = new ConcurrentBag<Tuple<string, bool>>();
 
             Parallel.ForEach(blogKeys, blogKey => {
-                string updated = RefreshBlog(blogKey, async, forceRefresh);
+                var updated = RefreshBlog(blogKey, forceRefresh);
 
-                if(!string.IsNullOrWhiteSpace(updated)) {
+                if(updated != null) {
                     results.Add(updated);
                 }
             });
 
+            var waitTasks = from updatedBlog in results.Where(x => x.Item2)
+                            select Task.Factory.StartNew(() => {
+                                while(!_config.BlogStore.GetHasBlogAnyData(updatedBlog.Item1)) {
+                                    Thread.Sleep(100);
+                                }
+                            });
+
+            Task.WaitAll(waitTasks.ToArray());
+
             return results.AsEnumerable();
         }
 
-        private string RefreshBlog(string blogKey, bool async, bool forceRefresh = false) {
+        private Tuple<string, bool> RefreshBlog(string blogKey, bool async, bool forceRefresh = false) {
             if(!_blogKeyIsUpdating.ContainsKey(blogKey)) {
                 _blogKeyIsUpdating[blogKey] = false;
             }
 
             if(!forceRefresh && _blogKeyIsUpdating[blogKey]) {
-                //WaitForAnyData(blogKey);
-
-                return null;
+                return new Tuple<string,bool>(blogKey, false);
             }
 
             _blogKeyIsUpdating[blogKey] = true;
 
             bool isBlogRefreshed = _config.BlogStore.GetIsBlogRefreshed(blogKey, _config.CacheTime);
             if(isBlogRefreshed) {
-                return null;
+                return new Tuple<string, bool>(blogKey, false);
             }
 
             var updateTask = new Task(() => {
                 PerformRefresh(blogKey);
-
-                //_blogKeyHasAnyData[blogKey] = true;
             });
             
             try {
                 updateTask.Start();
-                if(!async) {
-                    updateTask.Wait();
-                }
-
-                //WaitForAnyData(blogKey);
             }
             finally {
                 _blogKeyIsUpdating[blogKey] = false;
             }
 
-            return blogKey;
+            return new Tuple<string, bool>(blogKey, true);
         }
-
-        //private void WaitForAnyData(string blogKey) {
-        //    if(_blogKeyHasRan.ContainsKey(blogKey) && _blogKeyHasRan[blogKey]) {
-        //        return;
-        //    }
-
-        //    var task = new Task(() => {
-        //        bool value = false;
-        //        while(!_blogKeyHasRan.TryGetValue(blogKey, out value) || !value) {
-        //            Thread.Sleep(200);
-
-        //            using(var session = _config.DocumentStore.OpenSession()) {
-        //                _blogKeyHasRan[blogKey] = session.Query<StoreBlogRefresh>().Any(x => x.BlogKey == blogKey);
-        //            }
-        //        }
-        //    });
-
-        //    task.Start();
-        //    bool success = task.Wait(30 * 1000);
-
-        //    if(!success) {
-        //        throw new TimeoutException();
-        //    }
-        //}
         
         private void PerformRefresh(string blogKey) {
             try {

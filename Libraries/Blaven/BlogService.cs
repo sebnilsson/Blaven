@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 using Blaven.Blogger;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Blaven {
     /// <summary>
@@ -42,11 +43,11 @@ namespace Blaven {
         /// </summary>
         public BlogServiceConfig Config { get; private set; }
 
-        public void Init() {
-            var blogKeys = GetKeysOrAll();
+        //public void Init() {
+        //    var blogKeys = GetKeysOrAll();
 
-            Refresh(forceRefresh: false, async: false, blogKeys: blogKeys);
-        }
+        //    Refresh( blogKeys);
+        //}
 
         public Dictionary<DateTime, int> GetArchiveCount(params string[] blogKeys) {
             blogKeys = GetKeysOrAll(blogKeys);
@@ -138,8 +139,8 @@ namespace Blaven {
         /// Refreshes blogs.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
-        public IEnumerable<string> Refresh(params string[] blogKeys) {
-            return Refresh(forceRefresh: false, async: true, blogKeys: blogKeys);
+        public IEnumerable<Tuple<string, bool>> Refresh(params string[] blogKeys) {
+            return Refresh(forceRefresh: false, blogKeys: blogKeys);
         }
 
         /// <summary>
@@ -147,10 +148,12 @@ namespace Blaven {
         /// </summary>
         /// <param name="forceRefresh">Sets if the blog should be forced to refresh, ignoring if Blog is up to date.</param>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs.</param>
-        public IEnumerable<string> Refresh(bool forceRefresh = false, bool async = true, params string[] blogKeys) {
+        public IEnumerable<Tuple<string, bool>> Refresh(bool forceRefresh = false, params string[] blogKeys) {
             blogKeys = GetKeysOrAll(blogKeys);
 
-            return _refresher.RefreshBlogs(blogKeys, async, forceRefresh: forceRefresh);
+            var updatedBlogs = _refresher.RefreshBlogs(blogKeys, forceRefresh: forceRefresh);
+
+            return updatedBlogs;
         }
         
         private void EnsureBlogsRefreshed(params string[] blogKeys) {
@@ -159,7 +162,7 @@ namespace Blaven {
                 return;
             }
 
-            Refresh(blogKeys);
+            Refresh(forceRefresh: false, blogKeys: blogKeys);
         }
 
         private string GetBlogKeyOrDefault(string blogKey) {
