@@ -9,7 +9,7 @@ namespace Blaven.Blogger {
             string localPath = uriTarget.LocalPath;
             int queryStringIndex = localPath.LastIndexOf('?');
 
-            string cleanLocalPath = localPath.Substring(0, queryStringIndex);
+            string cleanLocalPath = (queryStringIndex >= 0) ? localPath.Substring(0, queryStringIndex) : localPath;
             return new LocalGDataRequest(cleanLocalPath);
         }
 
