@@ -30,9 +30,9 @@ namespace Blaven {
                 throw new ArgumentNullException("config");
             }
 
-            this.Config = config;
-
             _refresher = new BlogServiceRefresher(config);
+
+            this.Config = config;
 
             EnsureBlogsRefreshed(GetKeysOrAll());
         }
@@ -41,6 +41,12 @@ namespace Blaven {
         /// Gets the configuration being used by the service.
         /// </summary>
         public BlogServiceConfig Config { get; private set; }
+
+        public void Init() {
+            var blogKeys = GetKeysOrAll();
+
+            Refresh(forceRefresh: false, async: false, blogKeys: blogKeys);
+        }
 
         public Dictionary<DateTime, int> GetArchiveCount(params string[] blogKeys) {
             blogKeys = GetKeysOrAll(blogKeys);
@@ -132,8 +138,8 @@ namespace Blaven {
         /// Refreshes blogs.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
-        public void Refresh(params string[] blogKeys) {
-            Refresh(forceRefresh: false, blogKeys: blogKeys);
+        public IEnumerable<string> Refresh(params string[] blogKeys) {
+            return Refresh(blogKeys: blogKeys);
         }
 
         /// <summary>
@@ -141,18 +147,15 @@ namespace Blaven {
         /// </summary>
         /// <param name="forceRefresh">Sets if the blog should be forced to refresh, ignoring if Blog is up to date.</param>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs.</param>
-        public void Refresh(bool forceRefresh = false, params string[] blogKeys) {
+        public IEnumerable<string> Refresh(bool forceRefresh = false, bool async = true, params string[] blogKeys) {
             blogKeys = GetKeysOrAll(blogKeys);
 
-            Parallel.ForEach(blogKeys, blogKey => {
-                _refresher.Refresh(blogKey, forceRefresh);
-            });
-            //_refresher.Refresh(forceRefresh, blogKeys);
+            return _refresher.RefreshBlogs(blogKeys, async, forceRefresh: forceRefresh);
         }
         
         private void EnsureBlogsRefreshed(params string[] blogKeys) {
             // If the app uses background-service then don't handle refresh
-            if(AppSettingsService.RefreshMode == BlogRefreshMode.BackgroundService) {
+            if(!this.Config.EnsureBlogsRefreshed) {
                 return;
             }
 

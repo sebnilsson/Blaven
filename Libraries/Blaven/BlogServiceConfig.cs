@@ -31,9 +31,11 @@ namespace Blaven {
             }
 
             this.BloggerSettings = settings;
+
             this.CacheTime = AppSettingsService.CacheTime;
+            this.EnsureBlogsRefreshed = AppSettingsService.EnsureBlogsRefreshed;
             this.PageSize = AppSettingsService.PageSize;
-            this.RefreshMode = AppSettingsService.RefreshMode;
+            this.RefreshAsync = AppSettingsService.RefreshAsync;
         }
 
         /// <summary>
@@ -55,6 +57,11 @@ namespace Blaven {
         }
 
         public int CacheTime { get; set; }
+
+        /// <summary>
+        /// Gets or sets if the BlogService should automatically ensure that blogs are refresh upon instantiation. Defaults to AppSettings default.
+        /// </summary>
+        public bool EnsureBlogsRefreshed { get; set; }
 
         /// <summary>
         /// Gets or sets the page-size used in the BlogServiceConfig. Defaults to AppSettings default.
@@ -81,6 +88,6 @@ namespace Blaven {
         /// <summary>
         /// Gets or sets which mode should be used for refreshing data from blogs.
         /// </summary>
-        public BlogRefreshMode RefreshMode { get; set; }
+        public bool RefreshAsync { get; set; }
     }
 }

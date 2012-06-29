@@ -18,8 +18,8 @@ namespace Blaven.Blogger {
                 if(string.IsNullOrWhiteSpace(setting.BlogKey)) {
                     throw new System.Configuration.ConfigurationErrorsException("Blogger-settings cannot have a blank blog-key.");
                 }
-                setting.Password = AppSettingsService.GetConfigValue(setting.PasswordKey);
-                setting.Username = AppSettingsService.GetConfigValue(setting.UsernameKey);
+                setting.Password = AppSettingsService.GetConfigValue(setting.PasswordKey, throwException: true);
+                setting.Username = AppSettingsService.GetConfigValue(setting.UsernameKey, throwException: true);
             }
 
             if(settings == null || !settings.Any()) {

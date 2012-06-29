@@ -9,7 +9,7 @@ namespace Blaven {
     /// </summary>
     public static class AppSettingsService {
         private static Lazy<string> _bloggerSettingsPath = new Lazy<string>(() => {
-            string value = GetConfigValue("Blaven.BloggerSettingsPath", throwException: false);
+            string value = GetConfigValue("Blaven.BloggerSettingsPath");
             return (!string.IsNullOrWhiteSpace(value)) ? value : "~/BloggerSettings.json";
         });
         /// <summary>
@@ -22,7 +22,7 @@ namespace Blaven {
         }
 
         private static Lazy<int> _cacheTime = new Lazy<int>(() => {
-            string value = GetConfigValue("Blaven.CacheTime", throwException: false);
+            string value = GetConfigValue("Blaven.CacheTime");
             int result = 0;
             if(!int.TryParse(value, out result)) {
                 result = 5;
@@ -39,7 +39,7 @@ namespace Blaven {
         }
 
         private static Lazy<int> _pageSize = new Lazy<int>(() => {
-            string value = GetConfigValue("Blaven.PageSize", throwException: false);
+            string value = GetConfigValue("Blaven.PageSize");
             int result = 0;
             if(!int.TryParse(value, out result)) {
                 result = 5;
@@ -57,7 +57,7 @@ namespace Blaven {
 
         private static Lazy<ConnectionStringParser<RavenConnectionStringOptions>> _connectionStringParser =
             new Lazy<ConnectionStringParser<RavenConnectionStringOptions>>(() => {
-                string key = GetConfigValue("Blaven.RavenDbStoreUrlKey");
+                string key = GetConfigValue("Blaven.RavenDbStoreUrlKey", throwException: true);
                 string value = GetConfigValue(key);
 
                 var parser = ConnectionStringParser<RavenConnectionStringOptions>.FromConnectionString(value);
@@ -93,36 +93,47 @@ namespace Blaven {
             }
         }
 
-        private static Lazy<BlogRefreshMode> _refreshMode = new Lazy<BlogRefreshMode>(() => {
-            string configValue = GetConfigValue("Blaven.RefreshMode", throwException: false);
-            
-            var result = BlogRefreshMode.Asynchronously;
-            if(!Enum.TryParse<BlogRefreshMode>(configValue, out result)) {
-                switch(configValue.ToLowerInvariant()) {
-                    case "background":
-                        result = BlogRefreshMode.BackgroundService;
-                        break;
-                    case "sync":
-                        result = BlogRefreshMode.Synchronously;
-                        break;
-                    default:
-                        result = BlogRefreshMode.Asynchronously;
-                        break;
-                }
+        private static Lazy<bool> _refreshAsync = new Lazy<bool>(() => {
+            string configValue = GetConfigValue("Blaven.RefreshAsync");
+
+            bool result = true;
+            if(!bool.TryParse(configValue, out result)) {
+                result = true;
             }
+
             return result;
         });
         /// <summary>
-        /// Gets which mode should be used for refreshing data from blogs. Defaults to BlogRefreshMode.Asynchronously.
-        /// Uses config-key "Blaven.RefreshMode". Short-hand config-values supported: "background", "sync" and "async".
+        /// Gets if the refresh of blogs should by done async. Defaults to true.
+        /// Uses config-key "Blaven.RefreshAsync".
         /// </summary>
-        public static BlogRefreshMode RefreshMode {
+        public static bool RefreshAsync {
             get {
-                return _refreshMode.Value;
+                return _refreshAsync.Value;
             }
         }
 
-        internal static string GetConfigValue(string configKey, bool throwException = true) {
+        private static Lazy<bool> _ensureBlogsRefreshed = new Lazy<bool>(() => {
+            string configValue = GetConfigValue("Blaven.EnsureBlogsRefreshed");
+
+            bool result = true;
+            if(!bool.TryParse(configValue, out result)) {
+                result = true;
+            }
+
+            return result;
+        });
+        /// <summary>
+        /// Gets or sets if the BlogService should automatically ensure that blogs are refresh upon instantiation. Defaults to true.
+        /// Uses config-key "Blaven.EnsureBlogsRefreshed".
+        /// </summary>
+        public static bool EnsureBlogsRefreshed {
+            get {
+                return _ensureBlogsRefreshed.Value;
+            }
+        }
+
+        internal static string GetConfigValue(string configKey, bool throwException = false) {
             string value = ConfigurationManager.AppSettings[configKey];
             if(throwException && string.IsNullOrWhiteSpace(value)) {
                 throw new ConfigurationErrorsException(string.Format("Could not find configuration-value for key '{0}'.", configKey));
