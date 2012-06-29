@@ -41,7 +41,7 @@ namespace Blaven.Test.Integration {
 
             var blogStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore("ctor_WithEnsureBlogIsRefreshedFollowingRefresh_ShouldNotPerformRefresh");
 
-            var resultsList = new ConcurrentBag<Tuple<string, bool>>();
+            var resultsList = new ConcurrentBag<Tuple<string, BlogServiceRefresherResult>>();
 
             Parallel.For(0, userCount, (i) => {
                 var blogService = GetRefreshTestBlogService(blogStore, refreshAsync: true, ensureBlogsRefreshed: true);
@@ -53,7 +53,7 @@ namespace Blaven.Test.Integration {
                 }
             });
 
-            var unupdatedBlogsCount = resultsList.Where(x => !x.Item2).Count();
+            var unupdatedBlogsCount = resultsList.Where(x => x.Item2 != BlogServiceRefresherResult.WasUpdated).Count();
 
             int expectedUnupdatedBlogs = (userCount) * blogCount;
 
@@ -86,7 +86,7 @@ namespace Blaven.Test.Integration {
 
             var blogStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore("ctor_WithoutEnsureBlogIsRefreshedFollowingRefresh_ShouldPerformRefreshJustOnceOnEveryBlog");
 
-            var resultsList = new ConcurrentBag<Tuple<string, bool>>();
+            var resultsList = new ConcurrentBag<Tuple<string, BlogServiceRefresherResult>>();
 
             Parallel.For(0, userCount, (i) => {
                 var blogService = GetRefreshTestBlogService(blogStore, refreshAsync: true, ensureBlogsRefreshed: false);
@@ -98,7 +98,7 @@ namespace Blaven.Test.Integration {
                 }
             });
 
-            var unupdatedBlogsCount = resultsList.Where(x => !x.Item2).Count();
+            var unupdatedBlogsCount = resultsList.Where(x => x.Item2 != BlogServiceRefresherResult.WasUpdated).Count();
 
             int expectedUnupdatedBlogs = (userCount - 1) * blogCount;
 

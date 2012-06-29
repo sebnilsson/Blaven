@@ -18,8 +18,8 @@ namespace Blaven {
         private static ConcurrentDictionary<string, bool> _blogKeyHasRan = new ConcurrentDictionary<string, bool>();
         private static ConcurrentDictionary<string, bool> _blogKeyIsUpdating = new ConcurrentDictionary<string, bool>();
 
-        public IEnumerable<Tuple<string, bool>> RefreshBlogs(IEnumerable<string> blogKeys, bool forceRefresh = false) {
-            var results = new ConcurrentBag<Tuple<string, bool>>();
+        public IEnumerable<Tuple<string, BlogServiceRefresherResult>> RefreshBlogs(IEnumerable<string> blogKeys, bool forceRefresh = false) {
+            var results = new ConcurrentBag<Tuple<string, BlogServiceRefresherResult>>();
 
             Parallel.ForEach(blogKeys, blogKey => {
                 var updated = RefreshBlog(blogKey, forceRefresh);
@@ -29,7 +29,8 @@ namespace Blaven {
                 }
             });
 
-            var waitTasks = from updatedBlog in results.Where(x => x.Item2)
+            var waitTasks = from updatedBlog in results.Where(x => x.Item2 == BlogServiceRefresherResult.IsUpdating
+                || x.Item2 == BlogServiceRefresherResult.WasUpdated)
                             select Task.Factory.StartNew(() => {
                                 while(!_config.BlogStore.GetHasBlogAnyData(updatedBlog.Item1)) {
                                     Thread.Sleep(100);
@@ -41,34 +42,41 @@ namespace Blaven {
             return results.AsEnumerable();
         }
 
-        private Tuple<string, bool> RefreshBlog(string blogKey, bool async, bool forceRefresh = false) {
-            if(!_blogKeyIsUpdating.ContainsKey(blogKey)) {
-                _blogKeyIsUpdating[blogKey] = false;
+        private static object _refreshLock = new object();
+        private Tuple<string, BlogServiceRefresherResult> RefreshBlog(string blogKey, bool async, bool forceRefresh = false) {
+            lock(_refreshLock) {
+                if(!_blogKeyIsUpdating.ContainsKey(blogKey)) {
+                    _blogKeyIsUpdating[blogKey] = false;
+                }
+
+                if(!forceRefresh && _blogKeyIsUpdating[blogKey]) {
+                    return new Tuple<string, BlogServiceRefresherResult>(blogKey, BlogServiceRefresherResult.IsUpdating);
+                }
+
+                _blogKeyIsUpdating[blogKey] = true;
+
+                bool isBlogRefreshed = _config.BlogStore.GetIsBlogRefreshed(blogKey, _config.CacheTime);
+                if(isBlogRefreshed) {
+                    return new Tuple<string, BlogServiceRefresherResult>(blogKey, BlogServiceRefresherResult.IsRefreshed);
+                }
             }
-
-            if(!forceRefresh && _blogKeyIsUpdating[blogKey]) {
-                return new Tuple<string,bool>(blogKey, false);
-            }
-
-            _blogKeyIsUpdating[blogKey] = true;
-
-            bool isBlogRefreshed = _config.BlogStore.GetIsBlogRefreshed(blogKey, _config.CacheTime);
-            if(isBlogRefreshed) {
-                return new Tuple<string, bool>(blogKey, false);
-            }
-
-            var updateTask = new Task(() => {
-                PerformRefresh(blogKey);
-            });
             
             try {
-                updateTask.Start();
+                var updateTask = Task.Factory.StartNew(() => {
+                    PerformRefresh(blogKey);
+                }).ContinueWith((t) => {
+                    _blogKeyHasRan[blogKey] = true;
+                });
+
+                if(!_blogKeyHasRan.ContainsKey(blogKey) || !_blogKeyHasRan[blogKey]) {
+                    updateTask.Wait();
+                }
             }
             finally {
                 _blogKeyIsUpdating[blogKey] = false;
             }
 
-            return new Tuple<string, bool>(blogKey, true);
+            return new Tuple<string, BlogServiceRefresherResult>(blogKey, BlogServiceRefresherResult.WasUpdated);
         }
         
         private void PerformRefresh(string blogKey) {

@@ -139,7 +139,7 @@ namespace Blaven {
         /// Refreshes blogs.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
-        public IEnumerable<Tuple<string, bool>> Refresh(params string[] blogKeys) {
+        public IEnumerable<Tuple<string, BlogServiceRefresherResult>> Refresh(params string[] blogKeys) {
             return Refresh(forceRefresh: false, blogKeys: blogKeys);
         }
 
@@ -148,7 +148,7 @@ namespace Blaven {
         /// </summary>
         /// <param name="forceRefresh">Sets if the blog should be forced to refresh, ignoring if Blog is up to date.</param>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs.</param>
-        public IEnumerable<Tuple<string, bool>> Refresh(bool forceRefresh = false, params string[] blogKeys) {
+        public IEnumerable<Tuple<string, BlogServiceRefresherResult>> Refresh(bool forceRefresh = false, params string[] blogKeys) {
             blogKeys = GetKeysOrAll(blogKeys);
 
             var updatedBlogs = _refresher.RefreshBlogs(blogKeys, forceRefresh: forceRefresh);

@@ -62,7 +62,6 @@ namespace Blaven.Test {
         public static BlogServiceConfig GetConfig(IEnumerable<BloggerSetting> settings, IDocumentStore documentStore, bool refreshAsync = true, bool ensureBlogsRefreshed = true) {
             var config = new BlogServiceConfig(settings) {
                 EnsureBlogsRefreshed = ensureBlogsRefreshed,
-                CacheTime = 0,
                 DocumentStore = documentStore,
                 RefreshAsync = refreshAsync,
             };

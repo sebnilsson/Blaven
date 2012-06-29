@@ -5,7 +5,7 @@ using Google.GData.Client;
 
 namespace Blaven.Blogger {
     internal class LocalGDataRequest : IGDataRequest {
-        private static object streamLock = new object();
+        private static object _streamLock = new object();
 
         private string _filePath;
 
@@ -23,7 +23,7 @@ namespace Blaven.Blogger {
 
         public System.IO.Stream GetRequestStream() {
             var memoryStream = new MemoryStream();
-            lock(streamLock) {
+            lock(_streamLock) {
                 using(var fileStream = File.Open(_filePath, FileMode.Open)) {
                     fileStream.CopyTo(memoryStream);
                 }
@@ -35,7 +35,7 @@ namespace Blaven.Blogger {
 
         public System.IO.Stream GetResponseStream() {
             var memoryStream = new MemoryStream();
-            lock(streamLock) {
+            lock(_streamLock) {
                 using(var fileStream = File.Open(_filePath, FileMode.Open)) {
                     fileStream.CopyTo(memoryStream);
                 }
