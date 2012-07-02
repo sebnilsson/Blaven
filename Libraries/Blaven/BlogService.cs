@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.Blogger;
-using System.Threading.Tasks;
-using System.Threading;
 
 namespace Blaven {
     /// <summary>

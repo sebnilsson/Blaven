@@ -112,11 +112,12 @@
   <ItemGroup>
     <Compile Include="BlogDataTestHelper.cs" />
     <Compile Include="BlogPostsTestHelper.cs" />
-    <Compile Include="BlogServiceTest.cs" />
+    <Compile Include="BlogServiceParallelTest.cs" />
     <Compile Include="BlogServiceTestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RavenDb\RavenDbBlogStoreTest.cs" />
     <Compile Include="DocumentStoreTestHelper.cs" />
+    <Compile Include="XmlFilesTestHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
