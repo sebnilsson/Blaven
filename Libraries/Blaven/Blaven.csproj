@@ -95,8 +95,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlavenBlogException.cs" />
+    <Compile Include="BlavenException.cs" />
     <Compile Include="BlogAuthor.cs" />
     <Compile Include="Blogger\BloggerParser.cs" />
+    <Compile Include="Blogger\BloggerParsingException.cs" />
+    <Compile Include="Blogger\BloggerServiceException.cs" />
     <Compile Include="BlogServiceConfig.cs" />
     <Compile Include="AppSettingsService.cs" />
     <Compile Include="BlogData.cs" />

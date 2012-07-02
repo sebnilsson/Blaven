@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Xml.Linq;
 
 using Google.GData.Blogger;
@@ -31,8 +30,8 @@ namespace Blaven.Blogger {
             try {
                 feed = service.Query(query);
             }
-            catch(GDataNotModifiedException) {
-                return null;
+            catch(Exception ex) {
+                throw new BloggerServiceException(setting, ex);
             }
             
             using(var stream = new System.IO.MemoryStream()) {

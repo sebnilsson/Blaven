@@ -42,6 +42,7 @@ namespace Blaven {
 
             this.CacheTime = AppSettingsService.CacheTime;
             this.EnsureBlogsRefreshed = AppSettingsService.EnsureBlogsRefreshed;
+            this.IgnoreBloggerServiceFailure = AppSettingsService.IgnoreBloggerServiceFailure;
             this.PageSize = AppSettingsService.PageSize;
             this.RefreshAsync = AppSettingsService.RefreshAsync;
         }
@@ -70,6 +71,11 @@ namespace Blaven {
         /// Gets or sets if the BlogService should automatically ensure that blogs are refresh upon instantiation. Defaults to AppSettings default.
         /// </summary>
         public bool EnsureBlogsRefreshed { get; set; }
+
+        /// <summary>
+        /// Gets or sets if the BlogService should ignore a failed call to the Blogger-service. Defaults to AppSettings default.
+        /// </summary>
+        public bool IgnoreBloggerServiceFailure { get; set; }
 
         /// <summary>
         /// Gets or sets the page-size used in the BlogServiceConfig. Defaults to AppSettings default.

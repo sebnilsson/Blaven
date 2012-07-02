@@ -4,9 +4,18 @@ using System.Xml.Linq;
 
 namespace Blaven.Blogger {
     internal static class BloggerParser {
-        public static BlogData ParseBlogData(string blogKey, XDocument document) {
-            var feed = document.Root;
-            var ns = document.Root.Name.Namespace;
+        public static BlogData ParseBlogData(string blogKey, XDocument bloggerDocument) {
+            try {
+                return ParseBlogDataImpl(blogKey, bloggerDocument);
+            }
+            catch(Exception ex) {
+                throw new BloggerParsingException(blogKey, bloggerDocument, ex);
+            }
+        }
+
+        private static BlogData ParseBlogDataImpl(string blogKey, XDocument bloggerDocument) {
+            var feed = bloggerDocument.Root;
+            var ns = bloggerDocument.Root.Name.Namespace;
 
             var blogEntries = feed.Elements(ns + "entry").Where(entry => !string.IsNullOrWhiteSpace(entry.Value));
 

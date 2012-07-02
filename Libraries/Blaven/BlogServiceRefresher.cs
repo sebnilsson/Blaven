@@ -78,25 +78,24 @@ namespace Blaven {
 
             return new Tuple<string, BlogServiceRefresherResult>(blogKey, BlogServiceRefresherResult.WasUpdated);
         }
-        
+
         private void PerformRefresh(string blogKey) {
+            // TODO: Change to commented code when Blogger API-bug is fixed:
+            // http://code.google.com/p/gdata-issues/issues/detail?id=2555
+            //var lastRefresh = _config.BlogStore.GetBlogLastRefresh(key);
+            //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastRefresh);
+
+            var bloggerSetting = _config.BloggerSettings.First(x => x.BlogKey == blogKey);
+
             try {
-                // TODO: Change to commented code when Blogger API-bug is fixed:
-                // http://code.google.com/p/gdata-issues/issues/detail?id=2555
-                //var lastRefresh = _config.BlogStore.GetBlogLastRefresh(key);
-                //var bloggerDocument = _config.BloggerHelper.GetBloggerDocument(_setting, lastRefresh);
-
-                var bloggerSetting = _config.BloggerSettings.First(x => x.BlogKey == blogKey);
-
                 var bloggerDocument = BloggerHelper.GetBloggerDocument(bloggerSetting);
 
                 _config.BlogStore.Refresh(blogKey, bloggerDocument);
             }
-            catch(Exception) {
-                throw;
-            }
-            finally {
-
+            catch(BloggerServiceException) {
+                if(!_config.IgnoreBloggerServiceFailure) {
+                    throw;
+                }
             }
         }
     }
