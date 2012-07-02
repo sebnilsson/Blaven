@@ -45,6 +45,7 @@ namespace Blaven {
             this.IgnoreBloggerServiceFailure = AppSettingsService.IgnoreBloggerServiceFailure;
             this.PageSize = AppSettingsService.PageSize;
             this.RefreshAsync = AppSettingsService.RefreshAsync;
+            this.ReformatBloggerParagraphs = AppSettingsService.ReformatBloggerParagraphs;
         }
 
         /// <summary>
@@ -103,5 +104,7 @@ namespace Blaven {
         /// Gets or sets which mode should be used for refreshing data from blogs.
         /// </summary>
         public bool RefreshAsync { get; set; }
+
+        public bool ReformatBloggerParagraphs { get; set; }
     }
 }

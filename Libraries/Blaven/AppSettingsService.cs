@@ -162,6 +162,26 @@ namespace Blaven {
             }
         }
 
+        private static Lazy<bool> _reformatBloggerParagraphs = new Lazy<bool>(() => {
+            string configValue = GetConfigValue("Blaven.ReformatBloggerParagraphs");
+
+            bool result = true;
+            if(!bool.TryParse(configValue, out result)) {
+                result = true;
+            }
+
+            return result;
+        });
+
+        /// <summary>
+        /// Gets if blog-posts from Blogger should be reformatted with correct paragraphs. Defaults to true.
+        /// </summary>
+        public static bool ReformatBloggerParagraphs {
+            get {
+                return _reformatBloggerParagraphs.Value;
+            }
+        }
+
         internal static string GetConfigValue(string configKey, bool throwException = false) {
             string value = ConfigurationManager.AppSettings[configKey];
             if(throwException && string.IsNullOrWhiteSpace(value)) {

@@ -100,7 +100,9 @@ namespace Blaven {
             try {
                 var bloggerDocument = BloggerHelper.GetBloggerDocument(bloggerSetting);
 
-                _config.BlogStore.Refresh(blogKey, bloggerDocument);
+                var parsedData = BloggerParser.ParseBlogData(blogKey, bloggerDocument, _config.ReformatBloggerParagraphs);
+
+                _config.BlogStore.Refresh(blogKey, parsedData);
             }
             catch(BloggerServiceException) {
                 if(!_config.IgnoreBloggerServiceFailure) {

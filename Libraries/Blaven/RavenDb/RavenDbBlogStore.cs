@@ -150,12 +150,6 @@ namespace Blaven.RavenDb {
             }
         }
 
-        public void Refresh(string blogKey, System.Xml.Linq.XDocument bloggerDocument, bool waitForIndexes = false) {
-            var parsedData = BloggerParser.ParseBlogData(blogKey, bloggerDocument);
-
-            Refresh(blogKey, parsedData, waitForIndexes);
-        }
-
         public void Refresh(string blogKey, BlogData parsedBlogData, bool waitForIndexes = false) {
             using(var session = DocumentStore.OpenSession()) {
                 RefreshBlogInfo(session, blogKey, parsedBlogData);
