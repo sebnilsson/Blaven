@@ -1,17 +1,16 @@
 ﻿using System;
 
-using Raven.Client;
 using Raven.Client.Embedded;
 using Raven.Client.Indexes;
 
 namespace Blaven.Test {
     public static class DocumentStoreTestHelper {
-        public static EmbeddableDocumentStore GetEmbeddableDocumentStore() {
+        public static EmbeddableDocumentStore GetEmbeddableDocumentStore(bool createIndexes = false) {
             string randomPath = new Random().Next().ToString();
-            return GetEmbeddableDocumentStore(randomPath);
+            return GetEmbeddableDocumentStore(randomPath, createIndexes);
         }
 
-        public static EmbeddableDocumentStore GetEmbeddableDocumentStore(string path) {
+        public static EmbeddableDocumentStore GetEmbeddableDocumentStore(string path, bool createIndexes = false) {
             var documentStore = new EmbeddableDocumentStore {
                 Configuration = {
                     DataDirectory = path,
@@ -23,16 +22,12 @@ namespace Blaven.Test {
             };
             documentStore.Initialize();
 
-            IndexCreation.CreateIndexes(
-                typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, documentStore);            
+            if(createIndexes) {
+                IndexCreation.CreateIndexes(
+                    typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, documentStore);
+            }         
 
             return documentStore;
-        }
-
-        public static void WaitForIndexes(IDocumentStore documentStore) {
-            while(documentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0) {
-                System.Threading.Thread.Sleep(100);
-            }
         }
     }
 }
