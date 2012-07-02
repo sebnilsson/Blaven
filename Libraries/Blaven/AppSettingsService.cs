@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Web;
 
 using Raven.Abstractions.Data;
 
@@ -10,10 +11,18 @@ namespace Blaven {
     public static class AppSettingsService {
         private static Lazy<string> _bloggerSettingsPath = new Lazy<string>(() => {
             string value = GetConfigValue("Blaven.BloggerSettingsPath");
-            return (!string.IsNullOrWhiteSpace(value)) ? value : "~/BloggerSettings.json";
+            value = (!string.IsNullOrWhiteSpace(value)) ? value : "~/BloggerSettings.json";
+
+            string resolvedPath = string.Empty;
+            try {
+                resolvedPath = HttpContext.Current.Server.MapPath(value);
+            }
+            catch(Exception) { }
+
+            return resolvedPath;
         });
         /// <summary>
-        /// Gets the Blogger-settings file-path. Uses config-key "Blaven.BloggerSettingsPath". Defaults to "~/BloggerSettings.json".
+        /// Gets the Blogger-settings file-path. Uses config-key "Blaven.BloggerSettingsPath". App-relative paths gets resolved. Defaults to "~/BloggerSettings.json".
         /// </summary>
         public static string BloggerSettingsPath {
             get {

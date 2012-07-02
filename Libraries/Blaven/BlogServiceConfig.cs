@@ -13,6 +13,13 @@ namespace Blaven {
     /// </summary>
     public class BlogServiceConfig {
         /// <summary>
+        /// Creates a new instance of BloggerSettingsConfig. Uses the value provided in AppConfig.
+        /// </summary>
+        public BlogServiceConfig()
+            : this(BloggerSettingsService.ParseFile(AppSettingsService.BloggerSettingsPath)) {
+
+        }
+        /// <summary>
         /// Creates a new instance of BloggerSettingsConfig.
         /// </summary>
         /// <param name="bloggerSettingsFilePath">The full path to the Blogger-settings file.</param>
@@ -20,6 +27,7 @@ namespace Blaven {
             : this(BloggerSettingsService.ParseFile(bloggerSettingsFilePath)) {
 
         }
+
 
         /// <summary>
         /// Creates a new instance of BloggerSettingsConfig.

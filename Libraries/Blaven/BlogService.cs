@@ -14,6 +14,15 @@ namespace Blaven {
         private BlogServiceRefresher _refresher;
 
         /// <summary>
+        /// Creates an instance of a service-class for accessing blog-related features. Uses the default values in AppConfig.
+        /// </summary>
+        /// <param name="settings">The Blogger-settings to use.</param>
+        public BlogService()
+            : this(new BlogServiceConfig()) {
+
+        }
+
+        /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features.
         /// </summary>
         /// <param name="settings">The Blogger-settings to use.</param>
