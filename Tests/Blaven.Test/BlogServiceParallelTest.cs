@@ -10,7 +10,7 @@ using Raven.Client;
 namespace Blaven.Test.Integration {
     [TestClass]
     public class BlogServiceParallelTest {
-        private readonly IEnumerable<string> _blogKeys = new[] { "buzz", "status", };
+        private readonly IEnumerable<string> _blogKeys = new[] { "buzz_simple", "status_simple", };
         private readonly int _userCount = 3;
         private int _blogCount {
             get { return _blogKeys.Count(); }
@@ -24,12 +24,18 @@ namespace Blaven.Test.Integration {
         public void ctor_WithEnsureBlogIsRefreshed_StoreShouldContainData() {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
 
-            Parallel.For(0, _userCount, (i) => {
+            Parallel.For(0, 1, (i) => {
                 var blogService = GetBlogServiceWithMultipleBlogs(documentStore);
             });
 
             var blogStore = new RavenDbBlogStore(documentStore);
             var blogsWithDataCount = _blogKeys.Count(x => blogStore.GetHasBlogAnyData(x));
+
+            var storeDocumentCount = blogStore.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments;
+            List<StoreBlogRefresh> blogUpdates = null;
+            using(var session = blogStore.DocumentStore.OpenSession()) {
+                blogUpdates = session.Query<StoreBlogRefresh>().ToList();
+            }
 
             Assert.AreEqual<int>(_blogCount, blogsWithDataCount, "The blogs did not have data at time of query.");
         }
@@ -60,7 +66,7 @@ namespace Blaven.Test.Integration {
                 var blogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
                 
                 var updated = blogService.Refresh();
-                foreach(var update in updated.Where(x => x.Item2 == BlogServiceRefresherResult.WasUpdated).Select(x => x.Item1)) {
+                foreach(var update in updated) {
                     updatedBlogs.Add(update);
                 }
             });
@@ -80,34 +86,12 @@ namespace Blaven.Test.Integration {
                 var blogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore, ensureBlogsRefreshed: false);
 
                 var refreshResults = blogService.Refresh();
-                foreach(var update in refreshResults.Where(x => x.Item2 == BlogServiceRefresherResult.WasUpdated).Select(x => x.Item1)) {
+                foreach(var update in refreshResults) {
                     updatedBlogs.Add(update);
                 }
             });
 
             Assert.AreEqual<int>(_blogCount, updatedBlogs.Count, "The blogs weren't updated enough times.");
-        }
-
-        [TestMethod]
-        public void Refresh_WithEnsureBlogIsRefreshed_FollowingRefreshesShouldNotUpdate() {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-
-            var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
-            firstRunBlogService.Config.BlogStore.WaitForIndexes();
-
-            var unupdatedBlogs = new ConcurrentBag<string>();
-            Parallel.For(0, _userCount, (i) => {
-                var blogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore, ensureBlogsRefreshed: false);
-                
-                var refreshResults = blogService.Refresh();
-                foreach(var update in refreshResults.Where(x => x.Item2 != BlogServiceRefresherResult.WasUpdated).Select(x => x.Item1)) {
-                    unupdatedBlogs.Add(update);
-                }
-            });
-
-            int expectedUnupdatedBlogs = _userCount * _blogCount;
-
-            Assert.AreEqual<int>(expectedUnupdatedBlogs, unupdatedBlogs.Count, "Incorrect count of unupdated refreshes.");
         }
 
         private BlogService GetBlogServiceWithMultipleBlogs(IDocumentStore documentStore = null, bool refreshAsync = true, bool ensureBlogsRefreshed = true,

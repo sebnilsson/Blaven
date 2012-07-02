@@ -101,6 +101,7 @@
     <Compile Include="Blogger\BloggerParser.cs" />
     <Compile Include="Blogger\BloggerParsingException.cs" />
     <Compile Include="Blogger\BloggerServiceException.cs" />
+    <Compile Include="BlogsRefreshException.cs" />
     <Compile Include="BlogServiceConfig.cs" />
     <Compile Include="AppSettingsService.cs" />
     <Compile Include="BlogData.cs" />

@@ -227,6 +227,14 @@ namespace Blaven.RavenDb {
             }
         }
 
+        internal void UpdateStoreRefresh(string blogKey) {
+            using(var session = DocumentStore.OpenSession()) {
+                UpdateStoreRefresh(session, blogKey);
+                
+                session.SaveChanges();
+            }
+        }
+
         private void UpdateStoreRefresh(IDocumentSession session, string blogKey) {
             string storeUpdateUrl = GetKey<StoreBlogRefresh>(blogKey);
             var storeUpdate = session.Load<StoreBlogRefresh>(storeUpdateUrl);
