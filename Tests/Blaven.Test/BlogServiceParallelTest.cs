@@ -87,24 +87,6 @@ namespace Blaven.Test.Integration {
 
             Assert.AreEqual<int>(_blogCount, updatedBlogs.Count, "The blogs weren't updated enough times.");
         }
-        
-        // Not applicable
-        //[TestMethod]
-        //public void ctor_WithEnsureBlogIsRefreshedFollowingRefresh_ShouldNotPerformRefresh() {
-        //    var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-
-        //    var updatedBlogs = new ConcurrentBag<string>();
-        //    Parallel.For(0, _userCount, (i) => {
-        //        var blogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
-
-        //        var refreshResults = blogService.Refresh();
-        //        foreach(var update in refreshResults.Where(x => x.Item2 == BlogServiceRefresherResult.WasUpdated).Select(x => x.Item1)) {
-        //            updatedBlogs.Add(update);
-        //        }
-        //    });
-
-        //    Assert.AreEqual<int>(0, updatedBlogs.Count, "Too many blogs were updated.");
-        //}
 
         [TestMethod]
         public void Refresh_WithEnsureBlogIsRefreshed_FollowingRefreshesShouldNotUpdate() {

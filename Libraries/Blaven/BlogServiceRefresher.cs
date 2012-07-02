@@ -2,20 +2,20 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Blaven.Blogger;
-using System.Threading;
 
 namespace Blaven {
     internal class BlogServiceRefresher {
+        private readonly int _timeOutSeconds = 30;
         private BlogServiceConfig _config;
 
         public BlogServiceRefresher(BlogServiceConfig config) {
             _config = config;
         }
 
-        private static ConcurrentDictionary<string, bool> _blogKeyHasRan = new ConcurrentDictionary<string, bool>();
         private static ConcurrentDictionary<string, bool> _blogKeyIsUpdating = new ConcurrentDictionary<string, bool>();
 
         public IEnumerable<Tuple<string, BlogServiceRefresherResult>> RefreshBlogs(IEnumerable<string> blogKeys, bool forceRefresh = false) {
@@ -29,19 +29,19 @@ namespace Blaven {
                 }
             });
 
-            var waitTasks = from updatedBlog in results.Where(x => x.Item2 == BlogServiceRefresherResult.IsUpdating
-                || x.Item2 == BlogServiceRefresherResult.WasUpdated)
+            var waitTasks = from updatedBlog in results.Where(x => x.Item2 != BlogServiceRefresherResult.IsRefreshed)
+                            let blogKey = updatedBlog.Item1
                             select Task.Factory.StartNew(() => {
-                                while(!_config.BlogStore.GetHasBlogAnyData(updatedBlog.Item1)) {
+                                while(!_config.BlogStore.GetHasBlogAnyData(blogKey)) {
                                     Thread.Sleep(100);
                                 }
                             });
 
-            Task.WaitAll(waitTasks.ToArray());
+            Task.WaitAll(waitTasks.ToArray(), TimeSpan.FromSeconds(_timeOutSeconds));
 
             return results.AsEnumerable();
         }
-
+        
         private static object _refreshLock = new object();
         private Tuple<string, BlogServiceRefresherResult> RefreshBlog(string blogKey, bool async, bool forceRefresh = false) {
             lock(_refreshLock) {
@@ -64,12 +64,10 @@ namespace Blaven {
             try {
                 var updateTask = Task.Factory.StartNew(() => {
                     PerformRefresh(blogKey);
-                }).ContinueWith((t) => {
-                    _blogKeyHasRan[blogKey] = true;
                 });
 
-                if(!_blogKeyHasRan.ContainsKey(blogKey) || !_blogKeyHasRan[blogKey]) {
-                    updateTask.Wait();
+                if(!_config.BlogStore.GetHasBlogAnyData(blogKey)) {
+                    updateTask.Wait(TimeSpan.FromSeconds(_timeOutSeconds));
                 }
             }
             finally {
