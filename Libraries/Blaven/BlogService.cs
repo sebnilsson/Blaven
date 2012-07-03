@@ -49,13 +49,7 @@ namespace Blaven {
         /// Gets the configuration being used by the service.
         /// </summary>
         public BlogServiceConfig Config { get; private set; }
-
-        //public void Init() {
-        //    var blogKeys = GetKeysOrAll();
-
-        //    Refresh( blogKeys);
-        //}
-
+        
         public Dictionary<DateTime, int> GetArchiveCount(params string[] blogKeys) {
             blogKeys = GetKeysOrAll(blogKeys);
 
@@ -174,6 +168,8 @@ namespace Blaven {
             }
 
             Refresh(forceRefresh: false, blogKeys: blogKeys);
+
+            this.Config.BlogStore.EnsureIndexes();
         }
 
         private string GetBlogKeyOrDefault(string blogKey) {

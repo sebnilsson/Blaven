@@ -5,12 +5,12 @@ using Raven.Client.Indexes;
 
 namespace Blaven.Test {
     public static class DocumentStoreTestHelper {
-        public static EmbeddableDocumentStore GetEmbeddableDocumentStore(bool createIndexes = false) {
+        public static EmbeddableDocumentStore GetEmbeddableDocumentStore() {
             string randomPath = new Random().Next().ToString();
-            return GetEmbeddableDocumentStore(randomPath, createIndexes);
+            return GetEmbeddableDocumentStore(randomPath);
         }
 
-        public static EmbeddableDocumentStore GetEmbeddableDocumentStore(string path, bool createIndexes = false) {
+        public static EmbeddableDocumentStore GetEmbeddableDocumentStore(string path) {
             var documentStore = new EmbeddableDocumentStore {
                 Configuration = {
                     DataDirectory = path,
@@ -21,11 +21,6 @@ namespace Blaven.Test {
                 RunInMemory = true,
             };
             documentStore.Initialize();
-
-            if(createIndexes) {
-                IndexCreation.CreateIndexes(
-                    typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, documentStore);
-            }         
 
             return documentStore;
         }

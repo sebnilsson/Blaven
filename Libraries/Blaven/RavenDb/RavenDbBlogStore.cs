@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.Blogger;
 using Blaven.RavenDb.Indexes;
 using Raven.Abstractions.Commands;
 using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Linq;
+using System.Reflection;
 
 namespace Blaven.RavenDb {
     /// <summary>
@@ -247,6 +247,22 @@ namespace Blaven.RavenDb {
             string typeName = typeof(T).Name.ToLowerInvariant();
             string key = string.Join("/", new[] { typeName }.Concat(keys ?? Enumerable.Empty<string>()));
             return key;
+        }
+
+        private Lazy<IEnumerable<string>> _blavenIndexes = new Lazy<IEnumerable<string>>(() => {
+            var blavenAssembly = Assembly.GetAssembly(typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated));
+            var types = blavenAssembly.GetTypes();
+
+            return blavenAssembly.GetTypes().Where(x => x.IsSubclassOf(typeof(Raven.Client.Indexes.AbstractIndexCreationTask))).Select(x => x.Name);
+        });
+        
+        internal void EnsureIndexes() {
+            var existingIndexes = this.DocumentStore.DatabaseCommands.GetIndexNames(0, int.MaxValue);
+            bool hasAllIndexes = _blavenIndexes.Value.All(x => existingIndexes.Contains(x));
+            if(!hasAllIndexes) {
+                Raven.Client.Indexes.IndexCreation.CreateIndexes(
+                    typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, this.DocumentStore);
+            }
         }
     }
 }
