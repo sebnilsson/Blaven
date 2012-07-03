@@ -34,7 +34,7 @@ namespace Blaven {
             int skip = BlogSelection.GetSkip(PageIndex, PageSize);
             int take = BlogSelection.GetTake(PageSize);
 
-            var pagedPosts = blogPosts.Skip(skip).Take(take);
+            var pagedPosts = blogPosts.Skip(skip).Take(take).ToList();
             this.Posts = pagedPosts;
 
             if(!blogPosts.Any() || !pagedPosts.Any()) {
