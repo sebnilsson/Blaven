@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.Blogger;
+using Raven.Client;
 
 namespace Blaven {
     /// <summary>
@@ -17,6 +18,15 @@ namespace Blaven {
         /// <param name="settings">The Blogger-settings to use.</param>
         public BlogService()
             : this(new BlogServiceConfig()) {
+
+        }
+
+        /// <summary>
+        /// Creates an instance of a service-class for accessing blog-related features. Uses the default values in AppConfig.
+        /// </summary>
+        /// <param name="settings">The Blogger-settings to use.</param>
+        public BlogService(IDocumentStore documentStore)
+            : this(new BlogServiceConfig(documentStore)) {
 
         }
 

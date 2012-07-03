@@ -19,6 +19,12 @@ namespace Blaven {
             : this(BloggerSettingsService.ParseFile(AppSettingsService.BloggerSettingsPath)) {
 
         }
+
+        internal BlogServiceConfig(IDocumentStore documentStore)
+            : this() {
+            this.DocumentStore = documentStore;
+        }
+
         /// <summary>
         /// Creates a new instance of BloggerSettingsConfig.
         /// </summary>
