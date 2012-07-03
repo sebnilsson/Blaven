@@ -22,7 +22,7 @@ namespace Blaven {
             var results = new ConcurrentBag<string>();
 
             Parallel.ForEach(blogKeys, blogKey => {
-                var updated = RefreshBlog(blogKey, forceRefresh);
+                var updated = RefreshBlog(blogKey, forceRefresh: forceRefresh);
 
                 if(!string.IsNullOrWhiteSpace(updated)) {
                     results.Add(updated);
@@ -33,7 +33,7 @@ namespace Blaven {
         }
 
         private static object _refreshLock = new object();
-        private string RefreshBlog(string blogKey, bool async, bool forceRefresh = false) {
+        private string RefreshBlog(string blogKey, bool forceRefresh = false) {
             bool isBlogRefreshed = false;
             bool isBlogRefreshing = false;
 
@@ -65,7 +65,7 @@ namespace Blaven {
                     PerformRefresh(blogKey);
                 });
 
-                if(!_config.BlogStore.GetHasBlogAnyData(blogKey)) {
+                if(forceRefresh || !_config.BlogStore.GetHasBlogAnyData(blogKey)) {
                     updateTask.Wait();
 
                     WaitForData(blogKey);

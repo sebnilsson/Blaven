@@ -160,6 +160,10 @@ namespace Blaven {
 
             var updatedBlogs = _refresher.RefreshBlogs(blogKeys, forceRefresh: forceRefresh);
 
+            if(forceRefresh) {
+                this.Config.BlogStore.WaitForIndexes();
+            }
+
             return updatedBlogs;
         }
         

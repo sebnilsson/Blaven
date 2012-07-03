@@ -112,7 +112,7 @@
   <ItemGroup>
     <Compile Include="BlogDataTestHelper.cs" />
     <Compile Include="BlogPostsTestHelper.cs" />
-    <Compile Include="BlogServiceParallelTest.cs" />
+    <Compile Include="BlogServiceTest.cs" />
     <Compile Include="BlogServiceTestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RavenDb\RavenDbBlogStoreTest.cs" />

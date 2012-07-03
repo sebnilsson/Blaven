@@ -9,14 +9,14 @@ using Raven.Client;
 
 namespace Blaven.Test.Integration {
     [TestClass]
-    public class BlogServiceParallelTest {
+    public class BlogServiceTest {
         private readonly IEnumerable<string> _blogKeys = new[] { "buzz_simple", "status_simple", };
         private readonly int _userCount = 3;
         private int _blogCount {
             get { return _blogKeys.Count(); }
         }
 
-        public BlogServiceParallelTest() {
+        public BlogServiceTest() {
             
         }
 
@@ -92,6 +92,18 @@ namespace Blaven.Test.Integration {
             });
 
             Assert.AreEqual<int>(_blogCount, updatedBlogs.Count, "The blogs weren't updated enough times.");
+        }
+
+        [TestMethod]
+        public void Refresh_WithEnsureBlogsRefreshed_FollowingRefreshesWithForceRefreshShouldUpdate() {
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+
+            var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
+            firstRunBlogService.Config.BlogStore.WaitForIndexes();
+
+            var updated = firstRunBlogService.Refresh(forceRefresh: true);
+            
+            Assert.AreEqual<int>(_blogKeys.Count(), updated.Count(), "The blogs weren't updated again.");
         }
 
         private BlogService GetBlogServiceWithMultipleBlogs(IDocumentStore documentStore = null, bool refreshAsync = true, bool ensureBlogsRefreshed = true,
