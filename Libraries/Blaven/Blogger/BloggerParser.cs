@@ -4,16 +4,16 @@ using System.Xml.Linq;
 
 namespace Blaven.Blogger {
     internal static class BloggerParser {
-        public static BlogData ParseBlogData(string blogKey, XDocument bloggerDocument, bool reformatParagraphs) {
+        public static BlogData ParseBlogData(string blogKey, XDocument bloggerDocument) {
             try {
-                return ParseBlogDataImpl(blogKey, bloggerDocument, reformatParagraphs);
+                return ParseBlogDataImpl(blogKey, bloggerDocument);
             }
             catch(Exception ex) {
                 throw new BloggerParsingException(blogKey, bloggerDocument, ex);
             }
         }
 
-        private static BlogData ParseBlogDataImpl(string blogKey, XDocument bloggerDocument, bool reformatParagraphs) {
+        private static BlogData ParseBlogDataImpl(string blogKey, XDocument bloggerDocument) {
             var feed = bloggerDocument.Root;
             var ns = bloggerDocument.Root.Name.Namespace;
 
@@ -22,7 +22,7 @@ namespace Blaven.Blogger {
             var posts = from entry in blogEntries
                         where entry.Element(ns + "title") != null
                         && entry.Elements(ns + "link").Any(el => el.Attribute("rel").Value == "alternate")
-                        select ParseEntry(blogKey, ns, entry, reformatParagraphs);
+                        select ParseEntry(blogKey, ns, entry);
 
             var subtitle = feed.Element(ns + "subtitle");
             var altLink = feed.Elements(ns + "link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
@@ -38,16 +38,15 @@ namespace Blaven.Blogger {
             return new BlogData { Info = blogInfo, Posts = posts, };
         }
 
-        private static BlogPost ParseEntry(string blogKey, XNamespace ns, XElement entry, bool reformatParagraphs) {
+        private static BlogPost ParseEntry(string blogKey, XNamespace ns, XElement entry) {
             var alternateLink = entry.Elements(ns + "link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
 
             string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
-            string content = GetContent(entry.Element(ns + "content").Value, reformatParagraphs);
             long id = ParseId(entry.Element(ns + "id").Value);
             var post = new BlogPost(blogKey, id) {
                 Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
-                Content = content,
+                Content = entry.Element(ns + "content").Value,
                 PermaLinkAbsolute = permaLinkFull,
                 PermaLinkRelative = GetRelativeUrl(permaLinkFull),
                 Published = ParseDate(entry.Element(ns + "published").Value),
@@ -64,28 +63,6 @@ namespace Blaven.Blogger {
             }
 
             return post;
-        }
-
-        private static string GetContent(string content, bool reformatParagraphs) {
-            if(!reformatParagraphs) {
-                return content;
-            }
-
-            string reformatted = content;
-
-            string tooLongNewLine = string.Format("<br />\n<br />\n<br/>\n", Environment.NewLine);
-            string correctNewLine = string.Format("<br />\n<br />\n", Environment.NewLine);
-            while(reformatted.Contains(tooLongNewLine)) {
-                reformatted = reformatted.Replace(tooLongNewLine, correctNewLine);
-            }
-
-            reformatted = reformatted.Replace(correctNewLine, "</p>\n<p>");
-            
-            if(reformatted != content) {
-                reformatted = "<p>" + reformatted + "</p>";
-            }
-
-            return reformatted;
         }
 
         internal static long ParseId(string val) {
