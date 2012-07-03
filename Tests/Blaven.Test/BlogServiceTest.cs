@@ -32,10 +32,6 @@ namespace Blaven.Test.Integration {
             var blogsWithDataCount = _blogKeys.Count(x => blogStore.GetHasBlogAnyData(x));
 
             var storeDocumentCount = blogStore.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments;
-            List<StoreBlogRefresh> blogUpdates = null;
-            using(var session = blogStore.DocumentStore.OpenSession()) {
-                blogUpdates = session.Query<StoreBlogRefresh>().ToList();
-            }
 
             Assert.AreEqual<int>(_blogCount, blogsWithDataCount, "The blogs did not have data at time of query.");
         }
