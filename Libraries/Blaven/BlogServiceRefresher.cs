@@ -9,7 +9,8 @@ using Blaven.Blogger;
 
 namespace Blaven {
     internal class BlogServiceRefresher {
-        private readonly int _timeOutSeconds = 30;
+        private readonly int _ravenTimeoutSeconds = 10;
+        private readonly int _refreshTimeoutSeconds = 30;
         private BlogServiceConfig _config;
 
         public BlogServiceRefresher(BlogServiceConfig config) {
@@ -61,14 +62,19 @@ namespace Blaven {
             try {
                 _blogKeyIsRefreshing[blogKey] = true;
 
-                var updateTask = Task.Factory.StartNew(() => {
+                var updateTask = new Task(() => {
                     PerformRefresh(blogKey);
                 });
+                updateTask.Start();
 
                 if(forceRefresh || !_config.BlogStore.GetHasBlogAnyData(blogKey)) {
-                    updateTask.Wait();
-
-                    WaitForData(blogKey);
+                    var isUpdatedSuccess = updateTask.Wait(TimeSpan.FromSeconds(_ravenTimeoutSeconds));
+                    
+                    if(isUpdatedSuccess) {
+                        WaitForData(blogKey);
+                    } else {
+                        return null;
+                    }
                 }
             }
             finally {
@@ -86,7 +92,7 @@ namespace Blaven {
             });
 
             waitTask.Start();
-            waitTask.Wait(TimeSpan.FromSeconds(_timeOutSeconds));
+            waitTask.Wait(TimeSpan.FromSeconds(_ravenTimeoutSeconds));
         }
 
         private void PerformRefresh(string blogKey) {
@@ -109,7 +115,9 @@ namespace Blaven {
                     throw;
                 }
 
-                _config.BlogStore.UpdateStoreRefresh(blogKey);
+                if(_config.BlogStore.GetHasBlogAnyData(blogKey)) {
+                    _config.BlogStore.UpdateStoreRefresh(blogKey);
+                }
             }
         }
     }
