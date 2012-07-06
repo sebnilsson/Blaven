@@ -45,6 +45,10 @@ namespace Blaven {
         /// </summary>
         public IEnumerable<BloggerSetting> BloggerSettings { get; private set; }
 
+
+        /// <summary>
+        /// Gets the default cache-time, in minutes. Defaults to AppSettings default.
+        /// </summary>
         public int CacheTime { get; set; }
 
         /// <summary>

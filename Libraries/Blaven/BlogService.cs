@@ -212,15 +212,19 @@ namespace Blaven {
             };
 
             if(initStore) {
-                documentStore.Initialize();
-
                 InitStore(documentStore);
             }
 
             return documentStore;
         }
 
+        /// <summary>
+        /// Initializes the given document store and creates needed indexes for Blaven.
+        /// </summary>
+        /// <param name="documentStore"></param>
         public static void InitStore(IDocumentStore documentStore) {
+            documentStore.Initialize();
+
             Raven.Client.Indexes.IndexCreation.CreateIndexes(
                 typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, documentStore);
         }

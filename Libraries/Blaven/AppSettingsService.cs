@@ -39,7 +39,7 @@ namespace Blaven {
             return result;
         });
         /// <summary>
-        /// Gets the default cache-time. Uses config-key "Blaven.CacheTime". Defaults to 5.
+        /// Gets the default cache-time, in minutes. Uses config-key "Blaven.CacheTime". Defaults to 10 (minutes).
         /// </summary>
         public static int CacheTime {
             get {
