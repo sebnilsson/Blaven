@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.Blogger;
 using Blaven.RavenDb;
@@ -225,8 +226,22 @@ namespace Blaven {
         public static void InitStore(IDocumentStore documentStore) {
             documentStore.Initialize();
 
-            Raven.Client.Indexes.IndexCreation.CreateIndexes(
-                typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, documentStore);
+            var existingIndexes = documentStore.DatabaseCommands.GetIndexNames(0, int.MaxValue);
+            var blavenIndexes = System.Reflection.Assembly.GetAssembly(typeof(Blaven.BlogService))
+                .GetTypes().Where(x => x.IsSubclassOf(typeof(Raven.Client.Indexes.AbstractIndexCreationTask)))
+                .Select(x => x.Name);
+
+            var hasAllIndexes = blavenIndexes.All(x => existingIndexes.Contains(x));
+
+            var createIndexesTask = new Task(() => {
+                Raven.Client.Indexes.IndexCreation.CreateIndexes(
+                    typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, documentStore);
+            });
+            createIndexesTask.Start();
+
+            if(!hasAllIndexes) {
+                createIndexesTask.Wait();
+            }
         }
 
         #region IDisposable Members
