@@ -156,7 +156,7 @@ namespace Blaven {
         public IEnumerable<string> ForceRefresh(params string[] blogKeys) {
             blogKeys = GetBlogKeysOrAll(blogKeys);
 
-            return PerformRefresh(forceRefresh: true, blogKeys: blogKeys);
+            return PerformRefresh(blogKeys: blogKeys, forceRefresh: true);
         }
 
         /// <summary>
@@ -166,15 +166,12 @@ namespace Blaven {
         public IEnumerable<string> Refresh(params string[] blogKeys) {
             blogKeys = GetBlogKeysOrAll(blogKeys);
 
-            return PerformRefresh(blogKeys, forceRefresh: false);
+            return PerformRefresh(blogKeys: blogKeys, forceRefresh: false);
         }
+
         private IEnumerable<string> PerformRefresh(IEnumerable<string> blogKeys, bool forceRefresh) {
             var bloggerSettings = this.Config.BloggerSettings.Where(x => blogKeys.Contains(x.BlogKey));
 
-            return PerformRefresh(bloggerSettings, forceRefresh);
-        }
-        
-        private IEnumerable<string> PerformRefresh(IEnumerable<BloggerSetting> bloggerSettings, bool forceRefresh) {
             var updatedBlogs = BlogServiceRefresher.RefreshBlogs(this.BlogStore, bloggerSettings, this.Config.CacheTime, forceRefresh: forceRefresh);
 
             if(forceRefresh) {
