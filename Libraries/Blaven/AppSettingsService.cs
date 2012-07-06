@@ -66,27 +66,7 @@ namespace Blaven {
                 return _ensureBlogsRefreshed.Value;
             }
         }
-
-        private static Lazy<bool> _ignoreBloggerServiceFailure = new Lazy<bool>(() => {
-            string configValue = GetConfigValue("Blaven.IgnoreBloggerServiceFailure");
-
-            bool result = true;
-            if(!bool.TryParse(configValue, out result)) {
-                result = true;
-            }
-
-            return result;
-        });
-        /// <summary>
-        /// Gets or sets if the BlogService should ignore a failed call to the Blogger-service. Defaults to true.
-        /// Uses config-key "Blaven.IgnoreBloggerServiceFailure".
-        /// </summary>
-        public static bool IgnoreBloggerServiceFailure {
-            get {
-                return _ignoreBloggerServiceFailure.Value;
-            }
-        }
-
+        
         private static Lazy<int> _pageSize = new Lazy<int>(() => {
             string value = GetConfigValue("Blaven.PageSize");
             int result = 0;

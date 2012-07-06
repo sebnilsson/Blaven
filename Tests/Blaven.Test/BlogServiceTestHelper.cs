@@ -14,9 +14,9 @@ namespace Blaven.Test {
                                BloggerUri = uri,
                            };
 
-            var config = GetConfig(settings, documentStore, refreshAsync, ensureBlogsRefreshed);
+            var config = GetConfig(settings, refreshAsync, ensureBlogsRefreshed);
 
-            return new BlogService(config);
+            return new BlogService(documentStore, config);
         }
 
         //public static BlogService GetBlogService(IDocumentStore documentStore, string blogKey, string fileName = null, bool refreshAsync = true, bool ensureBlogsRefreshed = true) {
@@ -36,7 +36,7 @@ namespace Blaven.Test {
         //    return new BlogService(config);
         //}
 
-        public static BlogServiceConfig GetConfig(IEnumerable<string> blogKeys, IDocumentStore documentStore, bool refreshAsync = true, bool ensureBlogsRefreshed = true) {
+        public static BlogServiceConfig GetConfig(IEnumerable<string> blogKeys, bool refreshAsync = true, bool ensureBlogsRefreshed = true) {
             var settings = from blogKey in blogKeys
                            let uri = XmlFilesTestHelper.GetProjectPath(blogKey + ".xml")
                            select new BloggerSetting {
@@ -44,13 +44,12 @@ namespace Blaven.Test {
                                BloggerUri = uri,
                            };
 
-            return GetConfig(settings, documentStore, refreshAsync, ensureBlogsRefreshed);
+            return GetConfig(settings, refreshAsync, ensureBlogsRefreshed);
         }
 
-        public static BlogServiceConfig GetConfig(IEnumerable<BloggerSetting> settings, IDocumentStore documentStore, bool refreshAsync = true, bool ensureBlogsRefreshed = true) {
+        public static BlogServiceConfig GetConfig(IEnumerable<BloggerSetting> settings, bool refreshAsync = true, bool ensureBlogsRefreshed = true) {
             var config = new BlogServiceConfig(settings) {
                 EnsureBlogsRefreshed = ensureBlogsRefreshed,
-                DocumentStore = documentStore,
                 RefreshAsync = refreshAsync,
             };
 

@@ -97,6 +97,7 @@
   <ItemGroup>
     <Compile Include="BlavenBlogException.cs" />
     <Compile Include="BlavenException.cs" />
+    <Compile Include="BlogServiceNotInitException.cs" />
     <Compile Include="BlogAuthor.cs" />
     <Compile Include="Blogger\BloggerParser.cs" />
     <Compile Include="Blogger\BloggerParsingException.cs" />

@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using Blaven.RavenDb.Indexes;
 using Raven.Abstractions.Commands;
 using Raven.Client;
 using Raven.Client.Document;
 using Raven.Client.Linq;
-using System.Reflection;
 
 namespace Blaven.RavenDb {
     /// <summary>
@@ -31,7 +31,15 @@ namespace Blaven.RavenDb {
                                      group archive by archive.Date into g
                                      select new { Date = g.Key, Count = g.Sum(x => x.Count) };
 
-                return groupedArchive.OrderByDescending(x => x.Date).ToDictionary(x => x.Date, x => x.Count);
+                try {
+                    return groupedArchive.OrderByDescending(x => x.Date).ToDictionary(x => x.Date, x => x.Count);
+                }
+                catch(Exception ex) {
+                    if(ex.Source == "Raven.Database") {
+                        throw new BlogServiceNotInitException(ex);
+                    }
+                    throw;
+                }
             }
         }
 
@@ -112,8 +120,15 @@ namespace Blaven.RavenDb {
                 var tagsGrouped = (from result in tagCount.ToList()
                                    group result by result.Tag into g
                                    select new { Tag = g.Key, Count = g.Sum(x => x.Count), });
-
-                return tagsGrouped.OrderBy(x => x.Tag).ToDictionary(x => x.Tag, x => x.Count);
+                try {
+                    return tagsGrouped.OrderBy(x => x.Tag).ToDictionary(x => x.Tag, x => x.Count);
+                }
+                catch(Exception ex) {
+                    if(ex.Source == "Raven.Database") {
+                        throw new BlogServiceNotInitException(ex);
+                    }
+                    throw;
+                }
             }
         }
 
@@ -249,20 +264,20 @@ namespace Blaven.RavenDb {
             return key;
         }
 
-        private Lazy<IEnumerable<string>> _blavenIndexes = new Lazy<IEnumerable<string>>(() => {
-            var blavenAssembly = Assembly.GetAssembly(typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated));
-            var types = blavenAssembly.GetTypes();
+        //private Lazy<IEnumerable<string>> _blavenIndexes = new Lazy<IEnumerable<string>>(() => {
+        //    var blavenAssembly = Assembly.GetAssembly(typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated));
+        //    var types = blavenAssembly.GetTypes();
 
-            return blavenAssembly.GetTypes().Where(x => x.IsSubclassOf(typeof(Raven.Client.Indexes.AbstractIndexCreationTask))).Select(x => x.Name);
-        });
+        //    return blavenAssembly.GetTypes().Where(x => x.IsSubclassOf(typeof(Raven.Client.Indexes.AbstractIndexCreationTask))).Select(x => x.Name);
+        //});
         
-        internal void EnsureIndexes() {
-            var existingIndexes = this.DocumentStore.DatabaseCommands.GetIndexNames(0, int.MaxValue);
-            bool hasAllIndexes = _blavenIndexes.Value.All(x => existingIndexes.Contains(x));
-            if(!hasAllIndexes) {
-                Raven.Client.Indexes.IndexCreation.CreateIndexes(
-                    typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, this.DocumentStore);
-            }
-        }
+        //internal void EnsureIndexes() {
+        //    var existingIndexes = this.DocumentStore.DatabaseCommands.GetIndexNames(0, int.MaxValue);
+        //    bool hasAllIndexes = _blavenIndexes.Value.All(x => existingIndexes.Contains(x));
+        //    if(!hasAllIndexes) {
+        //        Raven.Client.Indexes.IndexCreation.CreateIndexes(
+        //            typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, this.DocumentStore);
+        //    }
+        //}
     }
 }

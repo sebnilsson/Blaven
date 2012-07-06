@@ -55,7 +55,7 @@ namespace Blaven.Test.Integration {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
 
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
-            firstRunBlogService.Config.BlogStore.WaitForIndexes();
+            firstRunBlogService.BlogStore.WaitForIndexes();
 
             var updatedBlogs = new ConcurrentBag<string>();
             Parallel.For(0, _userCount, (i) => {
@@ -75,7 +75,7 @@ namespace Blaven.Test.Integration {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
 
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore, ensureBlogsRefreshed: false);
-            firstRunBlogService.Config.BlogStore.WaitForIndexes();
+            firstRunBlogService.BlogStore.WaitForIndexes();
 
             var updatedBlogs = new ConcurrentBag<string>();
             Parallel.For(0, _userCount, (i) => {
@@ -95,9 +95,9 @@ namespace Blaven.Test.Integration {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
 
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
-            firstRunBlogService.Config.BlogStore.WaitForIndexes();
+            firstRunBlogService.BlogStore.WaitForIndexes();
 
-            var updated = firstRunBlogService.Refresh(forceRefresh: true);
+            var updated = firstRunBlogService.ForceRefresh();
             
             Assert.AreEqual<int>(_blogKeys.Count(), updated.Count(), "The blogs weren't updated again.");
         }

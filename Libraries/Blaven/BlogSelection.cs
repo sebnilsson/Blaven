@@ -25,6 +25,18 @@ namespace Blaven {
                 throw new ArgumentOutOfRangeException("pageSize", "The argument has to be a positive number above 0.");
             }
 
+            try {
+                SetFields(blogPosts, pageIndex, pageSize);
+            }
+            catch(Exception ex) {
+                if(ex.Source == "Raven.Database") {
+                    throw new BlogServiceNotInitException(ex);
+                }
+                throw;                
+            }
+        }
+
+        public void SetFields(IEnumerable<BlogPost> blogPosts, int pageIndex, int? pageSize = null) {
             this.PageIndex = pageIndex;
             this.PageSize = pageSize.Value;
 

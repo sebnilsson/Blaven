@@ -3,67 +3,65 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.Blogger;
+using Blaven.RavenDb;
 using Raven.Client;
+using Raven.Client.Document;
 
 namespace Blaven {
     /// <summary>
     /// A service-class for accessing blog-related features.
     /// </summary>
     public class BlogService : IDisposable {
-        private BlogServiceRefresher _refresher;
-
         /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features. Uses the default values in AppConfig.
         /// </summary>
-        /// <param name="settings">The Blogger-settings to use.</param>
-        public BlogService()
-            : this(new BlogServiceConfig()) {
-
-        }
-
-        /// <summary>
-        /// Creates an instance of a service-class for accessing blog-related features. Uses the default values in AppConfig.
-        /// </summary>
-        /// <param name="settings">The Blogger-settings to use.</param>
+        /// <param name="documentStore">The DocumentStore to use.</param>
         public BlogService(IDocumentStore documentStore)
-            : this(new BlogServiceConfig(documentStore)) {
+            : this(documentStore, new BlogServiceConfig()) {
 
         }
 
         /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features.
         /// </summary>
+        /// <param name="documentStore">The DocumentStore to use.</param>
         /// <param name="settings">The Blogger-settings to use.</param>
-        public BlogService(IEnumerable<BloggerSetting> settings)
-            : this(new BlogServiceConfig(settings)) {
+        public BlogService(IDocumentStore documentStore, IEnumerable<BloggerSetting> settings)
+            : this(documentStore, new BlogServiceConfig(settings)) {
 
         }
 
         /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features.
         /// </summary>
+        /// <param name="documentStore">The DocumentStore to use.</param>
         /// <param name="config">The Blogger-settings to use in the service.</param>
-        public BlogService(BlogServiceConfig config) {
+        public BlogService(IDocumentStore documentStore, BlogServiceConfig config) {
             if(config == null) {
                 throw new ArgumentNullException("config");
             }
 
-            _refresher = new BlogServiceRefresher(config);
+            this.BlogStore = new RavenDbBlogStore(documentStore);
 
             this.Config = config;
 
-            EnsureBlogsRefreshed(GetKeysOrAll());
+            if(this.Config.EnsureBlogsRefreshed) {
+                var blogKeys = GetBlogKeysOrAll();
+                Refresh(blogKeys);
+            }
         }
 
         /// <summary>
         /// Gets the configuration being used by the service.
         /// </summary>
         public BlogServiceConfig Config { get; private set; }
+
+        internal RavenDbBlogStore BlogStore { get; private set; }
         
         public Dictionary<DateTime, int> GetArchiveCount(params string[] blogKeys) {
-            blogKeys = GetKeysOrAll(blogKeys);
+            blogKeys = GetBlogKeysOrAll(blogKeys);
 
-            return this.Config.BlogStore.GetBlogArchiveCount(blogKeys);
+            return this.BlogStore.GetBlogArchiveCount(blogKeys);
         }
 
         public BlogSelection GetArchiveSelection(DateTime date, int pageIndex, params string[] blogKeys) {
@@ -71,9 +69,9 @@ namespace Blaven {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            blogKeys = GetKeysOrAll(blogKeys);
+            blogKeys = GetBlogKeysOrAll(blogKeys);
 
-            return this.Config.BlogStore.GetBlogArchiveSelection(date, pageIndex, this.Config.PageSize, blogKeys);
+            return this.BlogStore.GetBlogArchiveSelection(date, pageIndex, this.Config.PageSize, blogKeys);
         }
         
         /// <summary>
@@ -84,7 +82,7 @@ namespace Blaven {
         public BlogInfo GetInfo(string blogKey = null) {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
-            return this.Config.BlogStore.GetBlogInfo(blogKey);
+            return this.BlogStore.GetBlogInfo(blogKey);
         }
 
         /// <summary>
@@ -96,7 +94,7 @@ namespace Blaven {
         public BlogPost GetPost(string permaLink, string blogKey = null) {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
-            return this.Config.BlogStore.GetBlogPost(permaLink, blogKey);
+            return this.BlogStore.GetBlogPost(permaLink, blogKey);
         }
 
         /// <summary>
@@ -110,9 +108,9 @@ namespace Blaven {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            blogKeys = GetKeysOrAll(blogKeys);
+            blogKeys = GetBlogKeysOrAll(blogKeys);
 
-            return this.Config.BlogStore.GetBlogSelection(pageIndex, this.Config.PageSize, blogKeys);
+            return this.BlogStore.GetBlogSelection(pageIndex, this.Config.PageSize, blogKeys);
         }
 
         /// <summary>
@@ -121,9 +119,9 @@ namespace Blaven {
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
         /// <returns>Returns a dictionary of tags and their count.</returns>
         public Dictionary<string, int> GetTagsCount(params string[] blogKeys) {
-            blogKeys = GetKeysOrAll(blogKeys);
+            blogKeys = GetBlogKeysOrAll(blogKeys);
 
-            return this.Config.BlogStore.GetBlogTagsCount(blogKeys);
+            return this.BlogStore.GetBlogTagsCount(blogKeys);
         }
 
         public BlogSelection GetTagsSelection(string tagName, int pageIndex, params string[] blogKeys) {
@@ -131,9 +129,9 @@ namespace Blaven {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            blogKeys = GetKeysOrAll(blogKeys);
+            blogKeys = GetBlogKeysOrAll(blogKeys);
 
-            return this.Config.BlogStore.GetBlogTagsSelection(tagName, pageIndex, this.Config.PageSize, blogKeys);
+            return this.BlogStore.GetBlogTagsSelection(tagName, pageIndex, this.Config.PageSize, blogKeys);
         }
 
         public BlogSelection SearchPosts(string searchTerms, int pageIndex, params string[] blogKeys) {
@@ -141,45 +139,44 @@ namespace Blaven {
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
             
-            blogKeys = GetKeysOrAll(blogKeys);
+            blogKeys = GetBlogKeysOrAll(blogKeys);
 
-            return this.Config.BlogStore.SearchPosts(searchTerms ?? string.Empty, pageIndex, this.Config.PageSize, blogKeys);
+            return this.BlogStore.SearchPosts(searchTerms ?? string.Empty, pageIndex, this.Config.PageSize, blogKeys);
         }
-        
+
         /// <summary>
-        /// Refreshes blogs.
+        /// Forces refreshes blogs. Waits for stale indexes and performs update synchronously.
+        /// </summary>
+        /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
+        public IEnumerable<string> ForceRefresh(params string[] blogKeys) {
+            blogKeys = GetBlogKeysOrAll(blogKeys);
+
+            return PerformRefresh(forceRefresh: true, blogKeys: blogKeys);
+        }
+
+        /// <summary>
+        /// Refreshes blogs, if needed.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
         public IEnumerable<string> Refresh(params string[] blogKeys) {
-            return Refresh(forceRefresh: false, blogKeys: blogKeys);
+            blogKeys = GetBlogKeysOrAll(blogKeys);
+
+            return PerformRefresh(blogKeys, forceRefresh: false);
         }
+        private IEnumerable<string> PerformRefresh(IEnumerable<string> blogKeys, bool forceRefresh) {
+            var bloggerSettings = this.Config.BloggerSettings.Where(x => blogKeys.Contains(x.BlogKey));
 
-        /// <summary>
-        /// Refreshes blogs.
-        /// </summary>
-        /// <param name="forceRefresh">Sets if the blog should be forced to refresh, ignoring if Blog is up to date.</param>
-        /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs.</param>
-        public IEnumerable<string> Refresh(bool forceRefresh = false, params string[] blogKeys) {
-            blogKeys = GetKeysOrAll(blogKeys);
-
-            var updatedBlogs = _refresher.RefreshBlogs(blogKeys, forceRefresh: forceRefresh);
+            return PerformRefresh(bloggerSettings, forceRefresh);
+        }
+        
+        private IEnumerable<string> PerformRefresh(IEnumerable<BloggerSetting> bloggerSettings, bool forceRefresh) {
+            var updatedBlogs = BlogServiceRefresher.RefreshBlogs(this.BlogStore, bloggerSettings, this.Config.CacheTime, forceRefresh: forceRefresh);
 
             if(forceRefresh) {
-                this.Config.BlogStore.WaitForIndexes();
+                this.BlogStore.WaitForIndexes();
             }
 
             return updatedBlogs;
-        }
-        
-        private void EnsureBlogsRefreshed(params string[] blogKeys) {
-            // If the app uses background-service then don't handle refresh
-            if(!this.Config.EnsureBlogsRefreshed) {
-                return;
-            }
-
-            Refresh(forceRefresh: false, blogKeys: blogKeys);
-
-            this.Config.BlogStore.EnsureIndexes();
         }
 
         private string GetBlogKeyOrDefault(string blogKey) {
@@ -190,7 +187,7 @@ namespace Blaven {
             return this.Config.BloggerSettings.First().BlogKey;
         }
 
-        internal string[] GetKeysOrAll(string[] blogKeys = null) {
+        internal string[] GetBlogKeysOrAll(string[] blogKeys = null) {
             blogKeys = blogKeys ?? Enumerable.Empty<string>().ToArray();
 
             if(blogKeys.Any()) {
@@ -200,12 +197,34 @@ namespace Blaven {
             return this.Config.BloggerSettings.Select(setting => setting.BlogKey).ToArray();
         }
 
+        /// <summary>
+        /// Gets an instance of a DocumentStore, using the values in AppSettings for URL and API-key.
+        /// </summary>
+        /// <returns></returns>
+        public static DocumentStore GetDefaultBlogStore(bool initStore = true) {
+            var documentStore = new DocumentStore {
+                ApiKey = AppSettingsService.RavenDbStoreApiKey,
+                Url = AppSettingsService.RavenDbStoreUrl,
+            };
+
+            if(initStore) {
+                InitStore(documentStore);
+            }
+
+            return documentStore;
+        }
+
+        public static void InitStore(IDocumentStore documentStore) {
+            Raven.Client.Indexes.IndexCreation.CreateIndexes(
+                typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, documentStore);
+        }
+
         #region IDisposable Members
 
         public void Dispose() {
-            if(this.Config.DocumentStore != null && !this.Config.DocumentStore.WasDisposed) {
-                this.Config.DocumentStore.Dispose();
-            }
+            //if(this.Config.DocumentStore != null && !this.Config.DocumentStore.WasDisposed) {
+            //    this.Config.DocumentStore.Dispose();
+            //}
         }
 
         #endregion

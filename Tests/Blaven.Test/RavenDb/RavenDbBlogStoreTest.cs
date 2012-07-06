@@ -14,7 +14,9 @@ namespace Blaven.RavenDb.Test {
 
         [TestMethod]
         public void Resfresh_WhenBlogPostAdded_ShouldContainAddedPosts() {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore(createIndexes: true);
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            BlogService.InitStore(documentStore);
+
             var blogStore = new RavenDbBlogStore(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, BlogPostsTestHelper.GetBlogPosts(_blogKey, 2));
 
@@ -28,7 +30,9 @@ namespace Blaven.RavenDb.Test {
 
         [TestMethod]
         public void Resfresh_WhenBlogPostAddedAndSecondRefresh_ShouldContainAddedPosts() {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore(createIndexes: true);
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            BlogService.InitStore(documentStore);
+
             var blogStore = new RavenDbBlogStore(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, BlogPostsTestHelper.GetBlogPosts(_blogKey, 2));
 
@@ -45,7 +49,9 @@ namespace Blaven.RavenDb.Test {
 
         [TestMethod]
         public void Resfresh_WhenBlogPostsRemovedAndSecondRefresh_ShouldNotContainRemovedPosts() {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore(createIndexes: true);
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            BlogService.InitStore(documentStore);
+
             var blogStore = new RavenDbBlogStore(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, BlogPostsTestHelper.GetBlogPosts(_blogKey, 4));
 
@@ -63,7 +69,9 @@ namespace Blaven.RavenDb.Test {
         [TestMethod]
         public void GetBlogSelection_WhenContaining33Entries_ShouldContainTotalCorrectAmountOfEntries() {
             int postsCount = 33;
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore(createIndexes: true);
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            BlogService.InitStore(documentStore);
+
             var blogStore = new RavenDbBlogStore(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, postsCount);
 
@@ -108,7 +116,9 @@ namespace Blaven.RavenDb.Test {
 
         [TestMethod]
         public void GetBlogSelection_WhenChangeInBlogPost_ShouldShowChanges() {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore(createIndexes: true);
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            BlogService.InitStore(documentStore);
+
             var blogStore = new RavenDbBlogStore(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(_blogKey, 2);
             blogData.Posts = blogData.Posts.ToList();
