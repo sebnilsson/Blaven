@@ -212,6 +212,8 @@ namespace Blaven {
             };
 
             if(initStore) {
+                documentStore.Initialize();
+
                 InitStore(documentStore);
             }
 
