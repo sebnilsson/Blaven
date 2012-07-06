@@ -15,22 +15,20 @@ namespace Blaven {
 
         private static ConcurrentDictionary<string, bool> _blogKeyIsRefreshing = new ConcurrentDictionary<string, bool>();
 
-        public static IEnumerable<string> RefreshBlogs(RavenDbBlogStore blogStore, IEnumerable<BloggerSetting> bloggerSettings, int cacheTime, bool forceRefresh = false) {
-            var results = new ConcurrentBag<string>();
+        public static IEnumerable<Tuple<string, RefreshResult>> RefreshBlogs(RavenDbBlogStore blogStore, IEnumerable<BloggerSetting> bloggerSettings, int cacheTime, bool forceRefresh = false) {
+            var results = new ConcurrentBag<Tuple<string, RefreshResult>>();
 
             Parallel.ForEach(bloggerSettings, bloggerSetting => {
-                var updated = RefreshBlog(blogStore, bloggerSetting, cacheTime, forceRefresh: forceRefresh);
+                var updateResult = RefreshBlog(blogStore, bloggerSetting, cacheTime, forceRefresh: forceRefresh);
 
-                if(!string.IsNullOrWhiteSpace(updated)) {
-                    results.Add(updated);
-                }
+                results.Add(new Tuple<string, RefreshResult>(bloggerSetting.BlogKey, updateResult));
             });
 
             return results.AsEnumerable();
         }
 
         private static object _refreshLock = new object();
-        private static string RefreshBlog(RavenDbBlogStore blogStore, BloggerSetting bloggerSetting, int cacheTime, bool forceRefresh = false) {
+        private static RefreshResult RefreshBlog(RavenDbBlogStore blogStore, BloggerSetting bloggerSetting, int cacheTime, bool forceRefresh = false) {
             bool isBlogRefreshed = false;
             bool isBlogRefreshing = false;
 
@@ -46,7 +44,7 @@ namespace Blaven {
             }
 
             if(!forceRefresh && isBlogRefreshed) {
-                return null;
+                return RefreshResult.CancelledIsRefreshed;
             }
 
             if(isBlogRefreshing) {
@@ -54,7 +52,7 @@ namespace Blaven {
                     WaitForData(blogStore, blogKey);
                 }
 
-                return null;
+                return RefreshResult.CancelledIsRefreshing;
             }
 
             try {
@@ -70,8 +68,10 @@ namespace Blaven {
                     
                     if(isUpdatedSuccess) {
                         WaitForData(blogStore, blogKey);
+
+                        return RefreshResult.UpdateSync;
                     } else {
-                        return null;
+                        return RefreshResult.UpdateFailed;
                     }
                 }
             }
@@ -79,7 +79,7 @@ namespace Blaven {
                 _blogKeyIsRefreshing[blogKey] = false;
             }
 
-            return blogKey;
+            return RefreshResult.UpdateAsync;
         }
 
         private static void WaitForData(RavenDbBlogStore blogStore, string blogKey) {

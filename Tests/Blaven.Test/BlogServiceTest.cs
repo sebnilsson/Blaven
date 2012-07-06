@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -57,17 +58,19 @@ namespace Blaven.Test.Integration {
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
             firstRunBlogService.BlogStore.WaitForIndexes();
 
-            var updatedBlogs = new ConcurrentBag<string>();
+            var results = new ConcurrentBag<Tuple<string, RefreshResult>>();
             Parallel.For(0, _userCount, (i) => {
                 var blogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
                 
                 var updated = blogService.Refresh();
                 foreach(var update in updated) {
-                    updatedBlogs.Add(update);
+                    results.Add(update);
                 }
             });
 
-            Assert.AreEqual<int>(0, updatedBlogs.Count, "The blogs were updated too many times.");
+            var updatedCount = results.Count(x => x.Item2 == RefreshResult.UpdateSync || x.Item2 == RefreshResult.UpdateAsync);
+
+            Assert.AreEqual<int>(0, updatedCount, "The blogs were updated too many times.");
         }
 
         [TestMethod]
@@ -77,17 +80,19 @@ namespace Blaven.Test.Integration {
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore, ensureBlogsRefreshed: false);
             firstRunBlogService.BlogStore.WaitForIndexes();
 
-            var updatedBlogs = new ConcurrentBag<string>();
+            var results = new ConcurrentBag<Tuple<string, RefreshResult>>();
             Parallel.For(0, _userCount, (i) => {
                 var blogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore, ensureBlogsRefreshed: false);
 
                 var refreshResults = blogService.Refresh();
                 foreach(var update in refreshResults) {
-                    updatedBlogs.Add(update);
+                    results.Add(update);
                 }
             });
 
-            Assert.AreEqual<int>(_blogCount, updatedBlogs.Count, "The blogs weren't updated enough times.");
+            var updatedCount = results.Count(x => x.Item2 == RefreshResult.UpdateSync || x.Item2 == RefreshResult.UpdateAsync);
+
+            Assert.AreEqual<int>(_blogCount, updatedCount, "The blogs weren't updated enough times.");
         }
 
         [TestMethod]

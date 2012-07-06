@@ -153,7 +153,7 @@ namespace Blaven {
         /// Forces refreshes blogs. Waits for stale indexes and performs update synchronously.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
-        public IEnumerable<string> ForceRefresh(params string[] blogKeys) {
+        public IEnumerable<Tuple<string, RefreshResult>> ForceRefresh(params string[] blogKeys) {
             blogKeys = GetBlogKeysOrAll(blogKeys);
 
             return PerformRefresh(blogKeys: blogKeys, forceRefresh: true);
@@ -163,13 +163,13 @@ namespace Blaven {
         /// Refreshes blogs, if needed.
         /// </summary>
         /// <param name="blogKey">The keys of the blogs desired. Leave empty for all blogs</param>
-        public IEnumerable<string> Refresh(params string[] blogKeys) {
+        public IEnumerable<Tuple<string, RefreshResult>> Refresh(params string[] blogKeys) {
             blogKeys = GetBlogKeysOrAll(blogKeys);
 
             return PerformRefresh(blogKeys: blogKeys, forceRefresh: false);
         }
 
-        private IEnumerable<string> PerformRefresh(IEnumerable<string> blogKeys, bool forceRefresh) {
+        private IEnumerable<Tuple<string, RefreshResult>> PerformRefresh(IEnumerable<string> blogKeys, bool forceRefresh) {
             var bloggerSettings = this.Config.BloggerSettings.Where(x => blogKeys.Contains(x.BlogKey));
 
             var updatedBlogs = BlogServiceRefresher.RefreshBlogs(this.BlogStore, bloggerSettings, this.Config.CacheTime, forceRefresh: forceRefresh);
