@@ -45,6 +45,8 @@ namespace Blaven {
 
             this.Config = config;
 
+            this.DocumentStore = documentStore;
+
             if(this.Config.EnsureBlogsRefreshed) {
                 var blogKeys = GetBlogKeysOrAll();
                 Refresh(blogKeys);
@@ -57,6 +59,8 @@ namespace Blaven {
         public BlogServiceConfig Config { get; private set; }
 
         internal RavenDbBlogStore BlogStore { get; private set; }
+
+        public IDocumentStore DocumentStore { get; private set; }
         
         public Dictionary<DateTime, int> GetArchiveCount(params string[] blogKeys) {
             blogKeys = GetBlogKeysOrAll(blogKeys);
