@@ -32,7 +32,7 @@ namespace Blaven.Test.Integration {
             var blogStore = new RavenDbBlogStore(documentStore);
             var blogsWithDataCount = _blogKeys.Count(x => blogStore.GetHasBlogAnyData(x));
 
-            var storeDocumentCount = blogStore.DocumentStore.DatabaseCommands.GetStatistics().CountOfDocuments;
+            var storeDocumentCount = documentStore.DatabaseCommands.GetStatistics().CountOfDocuments;
 
             Assert.AreEqual<int>(_blogCount, blogsWithDataCount, "The blogs did not have data at time of query.");
         }
@@ -63,9 +63,7 @@ namespace Blaven.Test.Integration {
                 var blogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
                 
                 var updated = blogService.Refresh();
-                foreach(var update in updated) {
-                    results.Add(update);
-                }
+                updated.ToList().ForEach(x => results.Add(x));
             });
 
             var updatedCount = results.Count(x => x.Item2 == RefreshResult.UpdateSync || x.Item2 == RefreshResult.UpdateAsync);
@@ -74,7 +72,7 @@ namespace Blaven.Test.Integration {
         }
 
         [TestMethod]
-        public void Refresh_WithoutEnsureBlogsRefreshed_FollowingRefreshesShouldUpdate() {
+        public void Refresh_WithoutEnsureBlogsRefreshed_FollowingRefreshesShouldUpdateSynchronously() {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
 
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore, ensureBlogsRefreshed: false);
@@ -84,27 +82,50 @@ namespace Blaven.Test.Integration {
             Parallel.For(0, _userCount, (i) => {
                 var blogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore, ensureBlogsRefreshed: false);
 
-                var refreshResults = blogService.Refresh();
-                foreach(var update in refreshResults) {
-                    results.Add(update);
-                }
+                var userResults = blogService.Refresh();
+                userResults.ToList().ForEach(x => results.Add(x));
             });
 
-            var updatedCount = results.Count(x => x.Item2 == RefreshResult.UpdateSync || x.Item2 == RefreshResult.UpdateAsync);
+            var updatedCount = results.Count(x => x.Item2 == RefreshResult.UpdateSync);
 
             Assert.AreEqual<int>(_blogCount, updatedCount, "The blogs weren't updated enough times.");
         }
 
         [TestMethod]
-        public void Refresh_WithEnsureBlogsRefreshed_FollowingRefreshesWithForceRefreshShouldUpdate() {
+        public void Refresh_WithEnsureBlogsRefreshed_FollowingRefreshesWithForceRefreshShouldUpdateSynchronously() {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
 
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
             firstRunBlogService.BlogStore.WaitForIndexes();
 
             var updated = firstRunBlogService.ForceRefresh();
-            
-            Assert.AreEqual<int>(_blogKeys.Count(), updated.Count(), "The blogs weren't updated again.");
+            var updatedCount = updated.Count(x => x.Item2 == RefreshResult.UpdateSync);
+
+            Assert.AreEqual<int>(_blogKeys.Count(), updatedCount, "The blogs weren't updated again.");
+        }
+
+        [TestMethod]
+        public void Refresh_WithoutZeroMinutesCaching_FollowingRefreshesShouldNotUpdateSynchronously() {
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+
+            var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
+
+            firstRunBlogService.BlogStore.WaitForIndexes();
+
+            var secondRefreshResults = new ConcurrentBag<Tuple<string, RefreshResult>>();
+            Parallel.For(0, _userCount, (i) => {
+                var blogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore, ensureBlogsRefreshed: false);
+                blogService.Config.CacheTime = 0;
+
+                var secondRefresh = blogService.Refresh();
+                foreach(var refresh in secondRefresh) {
+                    secondRefreshResults.Add(refresh);
+                }
+            });
+
+            var updatedSynchronouslyCount = secondRefreshResults.Count(x => x.Item2 == RefreshResult.UpdateSync);
+
+            Assert.AreEqual<int>(0, updatedSynchronouslyCount, "The blogs were updated too many times.");
         }
 
         private BlogService GetBlogServiceWithMultipleBlogs(IDocumentStore documentStore = null, bool refreshAsync = true, bool ensureBlogsRefreshed = true,

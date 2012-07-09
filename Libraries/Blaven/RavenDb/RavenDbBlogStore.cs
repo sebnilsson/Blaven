@@ -1,46 +1,49 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using Blaven.RavenDb.Indexes;
 using Raven.Abstractions.Commands;
 using Raven.Client;
-using Raven.Client.Document;
 using Raven.Client.Linq;
 
 namespace Blaven.RavenDb {
-    /// <summary>
-    /// A store for blog-data that stores the data in a RavenDB-store. Implements IBlogStore.
-    /// </summary>
-    internal class RavenDbBlogStore {
+    internal class RavenDbBlogStore : IDisposable {
+        private IDocumentStore _documentStore;
         public RavenDbBlogStore(IDocumentStore documentStore) {
-            DocumentStore = documentStore;
+            _documentStore = documentStore;
+
+            _lazySession = new Lazy<IDocumentSession>(() => {
+                return _documentStore.OpenSession();
+            });
         }
-        
-        public IDocumentStore DocumentStore { get; private set; }
+
+        private Lazy<IDocumentSession> _lazySession;
+
+        private IDocumentSession _session {
+            get { return _lazySession.Value; }
+        }
 
         public Dictionary<DateTime, int> GetBlogArchiveCount(params string[] blogKeys) {
             if(blogKeys == null) {
                 throw new ArgumentNullException("blogKeys");
             }
 
-            using(var session = DocumentStore.OpenSession()) {
-                var archiveCount = session.Query<ArchiveCountByBlogKey.ReduceResult, ArchiveCountByBlogKey>().Where(x => x.BlogKey.In(blogKeys));
-                var groupedArchive = from archive in archiveCount.ToList()
-                                     group archive by archive.Date into g
-                                     select new { Date = g.Key, Count = g.Sum(x => x.Count) };
+            var archiveCount = _session.Query<ArchiveCountByBlogKey.ReduceResult, ArchiveCountByBlogKey>().Where(x => x.BlogKey.In(blogKeys));
+            var groupedArchive = from archive in archiveCount.ToList()
+                                 group archive by archive.Date into g
+                                 select new { Date = g.Key, Count = g.Sum(x => x.Count) };
 
-                try {
-                    return groupedArchive.OrderByDescending(x => x.Date).ToDictionary(x => x.Date, x => x.Count);
-                }
-                catch(Exception ex) {
-                    if(ex.Source == "Raven.Database") {
-                        throw new BlogServiceNotInitException(ex);
-                    }
-                    throw;
-                }
+            try {
+                return groupedArchive.OrderByDescending(x => x.Date).ToDictionary(x => x.Date, x => x.Count);
             }
+            catch(Exception ex) {
+                if(ex.Source == "Raven.Database") {
+                    throw new BlogServiceNotInitException(ex);
+                }
+                throw;
+            }
+
         }
 
         public BlogSelection GetBlogArchiveSelection(DateTime date, int pageIndex, int pageSize, string[] blogKeys) {
@@ -48,25 +51,21 @@ namespace Blaven.RavenDb {
                 throw new ArgumentNullException("blogKeys");
             }
 
-            using(var session = DocumentStore.OpenSession()) {
-                var posts = session.Query<BlogPost, BlogPostsOrderedByCreated>()
+            var posts = _session.Query<BlogPost, BlogPostsOrderedByCreated>()
                     .Where(x => x.BlogKey.In(blogKeys)
                         && x.Published.Year == date.Year && x.Published.Month == date.Month)
                         .OrderByDescending(x => x.Published);
 
-                return new BlogSelection(posts, pageIndex, pageSize);
-            }
+            return new BlogSelection(posts, pageIndex, pageSize);
         }
 
         public BlogInfo GetBlogInfo(string blogKey) {
-            using(var session = DocumentStore.OpenSession()) {
-                var blogInfo = session.Load<BlogInfo>(GetKey<BlogInfo>(blogKey));
-                if(blogInfo == null) {
-                    throw new ArgumentOutOfRangeException("blogKey", string.Format("No blog-info was found for blog-key '{0}'.", blogKey));
-                }
-
-                return blogInfo;
+            var blogInfo = _session.Load<BlogInfo>(GetKey<BlogInfo>(blogKey));
+            if(blogInfo == null) {
+                throw new ArgumentOutOfRangeException("blogKey", string.Format("No blog-info was found for blog-key '{0}'.", blogKey));
             }
+
+            return blogInfo;
         }
 
         public bool GetIsBlogRefreshed(string blogKey, int cacheTimeMinutes) {
@@ -79,21 +78,17 @@ namespace Blaven.RavenDb {
         }
 
         public DateTime? GetBlogLastRefresh(string blogKey) {
-            using(var session = DocumentStore.OpenSession()) {
-                var storeRefresh = session.Load<StoreBlogRefresh>(GetKey<StoreBlogRefresh>(blogKey));
-                if(storeRefresh == null) {
-                    return null;
-                }
-
-                return storeRefresh.Updated;
+            var storeRefresh = _session.Load<StoreBlogRefresh>(GetKey<StoreBlogRefresh>(blogKey));
+            if(storeRefresh == null) {
+                return null;
             }
+
+            return storeRefresh.Updated;
         }
 
         public BlogPost GetBlogPost(string blogKey, string permaLink) {
-            using(var session = DocumentStore.OpenSession()) {
-                var blogPost = session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.PermaLinkRelative == permaLink);
-                return blogPost;
-            }
+            var blogPost = _session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.PermaLinkRelative == permaLink);
+            return blogPost;
         }
 
         public BlogSelection GetBlogSelection(int pageIndex, int pageSize, params string[] blogKeys) {
@@ -101,13 +96,11 @@ namespace Blaven.RavenDb {
                 throw new ArgumentNullException("blogKeys");
             }
 
-            using(var session = DocumentStore.OpenSession()) {
-                var posts = session.Query<BlogPost, BlogPostsOrderedByCreated>()
-                    .Where(x => x.BlogKey.In(blogKeys)).OrderByDescending(x => x.Published)
-                    .OrderByDescending(x => x.Published);
+            var posts = _session.Query<BlogPost, BlogPostsOrderedByCreated>()
+                .Where(x => x.BlogKey.In(blogKeys)).OrderByDescending(x => x.Published)
+                .OrderByDescending(x => x.Published);
 
-                return new BlogSelection(posts, pageIndex, pageSize);
-            }
+            return new BlogSelection(posts, pageIndex, pageSize);
         }
 
         public Dictionary<string, int> GetBlogTagsCount(params string[] blogKeys) {
@@ -115,20 +108,18 @@ namespace Blaven.RavenDb {
                 throw new ArgumentNullException("blogKeys");
             }
 
-            using(var session = DocumentStore.OpenSession()) {
-                var tagCount = session.Query<TagsCountByBlogKey.ReduceResult, TagsCountByBlogKey>().Where(x => x.BlogKey.In(blogKeys));
-                var tagsGrouped = (from result in tagCount.ToList()
-                                   group result by result.Tag into g
-                                   select new { Tag = g.Key, Count = g.Sum(x => x.Count), });
-                try {
-                    return tagsGrouped.OrderBy(x => x.Tag).ToDictionary(x => x.Tag, x => x.Count);
+            var tagCount = _session.Query<TagsCountByBlogKey.ReduceResult, TagsCountByBlogKey>().Where(x => x.BlogKey.In(blogKeys));
+            var tagsGrouped = (from result in tagCount.ToList()
+                               group result by result.Tag into g
+                               select new { Tag = g.Key, Count = g.Sum(x => x.Count), });
+            try {
+                return tagsGrouped.OrderBy(x => x.Tag).ToDictionary(x => x.Tag, x => x.Count);
+            }
+            catch(Exception ex) {
+                if(ex.Source == "Raven.Database") {
+                    throw new BlogServiceNotInitException(ex);
                 }
-                catch(Exception ex) {
-                    if(ex.Source == "Raven.Database") {
-                        throw new BlogServiceNotInitException(ex);
-                    }
-                    throw;
-                }
+                throw;
             }
         }
 
@@ -137,18 +128,16 @@ namespace Blaven.RavenDb {
                 throw new ArgumentNullException("blogKeys");
             }
 
-            using(var session = DocumentStore.OpenSession()) {
-                var posts = session.Query<BlogPost, BlogPostsOrderedByCreated>()
-                    .Where(x => x.BlogKey.In(blogKeys)
-                        && x.Tags.Any(tag => tag.Equals(tagName, StringComparison.InvariantCultureIgnoreCase)))
-                        .OrderByDescending(x => x.Published);
+            var posts = _session.Query<BlogPost, BlogPostsOrderedByCreated>()
+                .Where(x => x.BlogKey.In(blogKeys)
+                    && x.Tags.Any(tag => tag.Equals(tagName, StringComparison.InvariantCultureIgnoreCase)))
+                    .OrderByDescending(x => x.Published);
 
-                return new BlogSelection(posts, pageIndex, pageSize);
-            }
+            return new BlogSelection(posts, pageIndex, pageSize);
         }
 
         public bool GetHasBlogAnyData(string blogKey) {
-            using(var session = DocumentStore.OpenSession()) {
+            using(var session = _documentStore.OpenSession()) {
                 return session.Query<StoreBlogRefresh>().Any(x => x.BlogKey == blogKey);
             }
         }
@@ -158,23 +147,19 @@ namespace Blaven.RavenDb {
                 throw new ArgumentNullException("blogKeys");
             }
 
-            using(var session = DocumentStore.OpenSession()) {
-                var posts = session.Advanced.LuceneQuery<BlogPost, SearchBlogPosts>().Search("Content", searchTerms);
+            var posts = _session.Advanced.LuceneQuery<BlogPost, SearchBlogPosts>().Search("Content", searchTerms);
 
-                return new BlogSelection(posts, pageIndex, pageSize);
-            }
+            return new BlogSelection(posts, pageIndex, pageSize);
         }
-
+        
         public void Refresh(string blogKey, BlogData parsedBlogData, bool waitForIndexes = false) {
-            using(var session = DocumentStore.OpenSession()) {
-                RefreshBlogInfo(session, blogKey, parsedBlogData);
+            RefreshBlogInfo(_session, blogKey, parsedBlogData);
 
-                RefreshBlogPosts(session, blogKey, parsedBlogData.Posts);
+            RefreshBlogPosts(_session, blogKey, parsedBlogData.Posts);
 
-                UpdateStoreRefresh(session, blogKey);
+            UpdateStoreRefresh(_session, blogKey);
 
-                session.SaveChanges();
-            }
+            _session.SaveChanges();
 
             if(waitForIndexes) {
                 WaitForIndexes();
@@ -182,7 +167,7 @@ namespace Blaven.RavenDb {
         }
 
         public void WaitForIndexes() {
-            while(DocumentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0) {
+            while(_documentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0) {
                 System.Threading.Thread.Sleep(100);
             }
         }
@@ -190,6 +175,7 @@ namespace Blaven.RavenDb {
         private void RefreshBlogInfo(IDocumentSession session, string blogKey, BlogData parsedData) {
             string blogInfoUrl = GetKey<BlogInfo>(blogKey);
             var blogInfo = session.Load<BlogInfo>(blogInfoUrl);
+
             if(blogInfo == null) {
                 blogInfo = new BlogInfo { BlogKey = blogKey };
                 session.Store(blogInfo, blogInfoUrl);
@@ -225,10 +211,8 @@ namespace Blaven.RavenDb {
                     storePost.Title = parsedPost.Title;
                     storePost.Updated = parsedPost.Updated;
                 }
-
-                storePosts[i] = storePost;
             }
-                
+
             var storePostsIds = session.Query<BlogPost>().Where(x => x.BlogKey == blogKey).Select(x => x.Id).Take(int.MaxValue).ToList();
             var removedPosts = storePostsIds.Where(postId => !parsedPostsIds.Contains(postId));
             foreach(var removedPost in removedPosts) {
@@ -237,16 +221,15 @@ namespace Blaven.RavenDb {
         }
 
         internal void UpdateStoreRefresh(string blogKey) {
-            using(var session = DocumentStore.OpenSession()) {
-                UpdateStoreRefresh(session, blogKey);
-                
-                session.SaveChanges();
-            }
+            UpdateStoreRefresh(_session, blogKey);
+
+            _session.SaveChanges();
         }
 
         private void UpdateStoreRefresh(IDocumentSession session, string blogKey) {
             string storeUpdateUrl = GetKey<StoreBlogRefresh>(blogKey);
             var storeUpdate = session.Load<StoreBlogRefresh>(storeUpdateUrl);
+
             if(storeUpdate == null) {
                 storeUpdate = new StoreBlogRefresh { BlogKey = blogKey };
                 session.Store(storeUpdate, storeUpdateUrl);
@@ -264,20 +247,14 @@ namespace Blaven.RavenDb {
             return key;
         }
 
-        //private Lazy<IEnumerable<string>> _blavenIndexes = new Lazy<IEnumerable<string>>(() => {
-        //    var blavenAssembly = Assembly.GetAssembly(typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated));
-        //    var types = blavenAssembly.GetTypes();
+        #region IDisposable Members
 
-        //    return blavenAssembly.GetTypes().Where(x => x.IsSubclassOf(typeof(Raven.Client.Indexes.AbstractIndexCreationTask))).Select(x => x.Name);
-        //});
-        
-        //internal void EnsureIndexes() {
-        //    var existingIndexes = this.DocumentStore.DatabaseCommands.GetIndexNames(0, int.MaxValue);
-        //    bool hasAllIndexes = _blavenIndexes.Value.All(x => existingIndexes.Contains(x));
-        //    if(!hasAllIndexes) {
-        //        Raven.Client.Indexes.IndexCreation.CreateIndexes(
-        //            typeof(Blaven.RavenDb.Indexes.BlogPostsOrderedByCreated).Assembly, this.DocumentStore);
-        //    }
-        //}
+        public void Dispose() {
+            if(_lazySession.IsValueCreated) {
+                _lazySession.Value.Dispose();
+            }
+        }
+
+        #endregion
     }
 }

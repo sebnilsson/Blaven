@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -13,10 +12,10 @@ namespace Blaven {
         private static readonly int _ravenTimeoutSeconds = 10;
         private static readonly int _refreshTimeoutSeconds = 30;
 
-        private static ConcurrentDictionary<string, bool> _blogKeyIsRefreshing = new ConcurrentDictionary<string, bool>();
+        private static Dictionary<string, bool> _blogKeyIsRefreshing = new Dictionary<string, bool>();
 
         public static IEnumerable<Tuple<string, RefreshResult>> RefreshBlogs(RavenDbBlogStore blogStore, IEnumerable<BloggerSetting> bloggerSettings, int cacheTime, bool forceRefresh = false) {
-            var results = new ConcurrentBag<Tuple<string, RefreshResult>>();
+            var results = new List<Tuple<string, RefreshResult>>();
 
             Parallel.ForEach(bloggerSettings, bloggerSetting => {
                 var updateResult = RefreshBlog(blogStore, bloggerSetting, cacheTime, forceRefresh: forceRefresh);
@@ -92,7 +91,7 @@ namespace Blaven {
             waitTask.Start();
             waitTask.Wait(TimeSpan.FromSeconds(_ravenTimeoutSeconds));
         }
-
+        
         private static void PerformRefresh(RavenDbBlogStore blogStore, BloggerSetting bloggerSetting) {
             // TODO: Change to commented code when Blogger API-bug is fixed:
             // http://code.google.com/p/gdata-issues/issues/detail?id=2555
@@ -106,12 +105,30 @@ namespace Blaven {
 
                 var parsedData = BloggerParser.ParseBlogData(blogKey, bloggerDocument);
 
-                blogStore.Refresh(blogKey, parsedData);
+                var blogStoreRefreshLock = GetBlogStoreRefreshLock(blogKey);
+                lock(_blogStoreRefreshLocksLock) {
+                    blogStore.Refresh(blogKey, parsedData);
+                }
             }
             catch(BloggerServiceException) {
                 if(blogStore.GetHasBlogAnyData(blogKey)) {
                     blogStore.UpdateStoreRefresh(blogKey);
                 }
+            }
+        }
+
+        private static object _blogStoreRefreshLocksLock = new object();
+        private static Dictionary<string, object> _blogStoreRefreshLocks = new Dictionary<string, object>();
+        private static object GetBlogStoreRefreshLock(string blogKey) {
+            lock(_blogStoreRefreshLocksLock) {
+                object keySyncRoot;
+
+                if(!_blogStoreRefreshLocks.TryGetValue(blogKey, out keySyncRoot)) {
+                    keySyncRoot = new object();
+                    _blogStoreRefreshLocks[blogKey] = keySyncRoot;
+                }
+
+                return keySyncRoot;
             }
         }
     }

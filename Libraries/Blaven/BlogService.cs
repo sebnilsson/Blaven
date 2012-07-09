@@ -244,9 +244,9 @@ namespace Blaven {
         #region IDisposable Members
 
         public void Dispose() {
-            //if(this.Config.DocumentStore != null && !this.Config.DocumentStore.WasDisposed) {
-            //    this.Config.DocumentStore.Dispose();
-            //}
+            if(this.BlogStore != null) {
+                this.BlogStore.Dispose();
+            }
         }
 
         #endregion
