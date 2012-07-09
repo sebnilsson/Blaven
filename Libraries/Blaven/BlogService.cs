@@ -223,6 +223,8 @@ namespace Blaven {
         public static void InitStore(IDocumentStore documentStore) {
             documentStore.Initialize();
 
+            documentStore.Conventions.MaxNumberOfRequestsPerSession = 100;
+
             var existingIndexes = documentStore.DatabaseCommands.GetIndexNames(0, int.MaxValue);
             var blavenIndexes = System.Reflection.Assembly.GetAssembly(typeof(Blaven.BlogService))
                 .GetTypes().Where(x => x.IsSubclassOf(typeof(Raven.Client.Indexes.AbstractIndexCreationTask)))

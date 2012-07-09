@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.RavenDb.Indexes;
 using Raven.Abstractions.Commands;
@@ -9,7 +10,9 @@ using Raven.Client.Linq;
 
 namespace Blaven.RavenDb {
     internal class RavenDbBlogStore : IDisposable {
+        private const int waitForIndexTimeout = 1000 * 30;
         private IDocumentStore _documentStore;
+
         public RavenDbBlogStore(IDocumentStore documentStore) {
             _documentStore = documentStore;
 
@@ -167,9 +170,13 @@ namespace Blaven.RavenDb {
         }
 
         public void WaitForIndexes() {
-            while(_documentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0) {
-                System.Threading.Thread.Sleep(100);
-            }
+            var waitTask = new Task(() => {
+                while(_documentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0) {
+                    System.Threading.Thread.Sleep(100);
+                }
+            });
+            waitTask.Start();
+            waitTask.Wait(waitForIndexTimeout);
         }
 
         private void RefreshBlogInfo(IDocumentSession session, string blogKey, BlogData parsedData) {
