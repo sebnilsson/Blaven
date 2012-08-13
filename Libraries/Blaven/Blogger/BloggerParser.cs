@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Xml.Linq;
 
+using HtmlAgilityPack;
+
 namespace Blaven.Blogger {
     internal static class BloggerParser {
         public static BlogData ParseBlogData(string blogKey, XDocument bloggerDocument) {
@@ -44,9 +46,11 @@ namespace Blaven.Blogger {
             string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
             long id = ParseId(entry.Element(ns + "id").Value);
+            string content = ParseContent(entry, ns);
+
             var post = new BlogPost(blogKey, id) {
                 Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
-                Content = entry.Element(ns + "content").Value,
+                Content = content,
                 PermaLinkAbsolute = permaLinkFull,
                 PermaLinkRelative = GetRelativeUrl(permaLinkFull),
                 Published = ParseDate(entry.Element(ns + "published").Value),
@@ -65,7 +69,7 @@ namespace Blaven.Blogger {
             return post;
         }
 
-        internal static long ParseId(string val) {
+        private static long ParseId(string val) {
             string findValue = ".post-";
             int index = val.IndexOf(findValue) + findValue.Length;
 
@@ -73,7 +77,22 @@ namespace Blaven.Blogger {
             return long.Parse(text);
         }
 
-        internal static DateTime ParseDate(string val) {
+        private static string ParseContent(XElement entry, XNamespace ns) {
+            string content = entry.Element(ns + "content").Value ?? string.Empty;
+
+            var html = new HtmlDocument();
+            html.LoadHtml(content);
+
+            var preTags = html.DocumentNode.SelectNodes("pre") ?? Enumerable.Empty<HtmlNode>();
+            foreach(var preTag in preTags) {
+                string encoded = System.Web.HttpUtility.HtmlEncode(preTag.InnerHtml);
+                preTag.InnerHtml = encoded;
+            }
+
+            return html.DocumentNode.OuterHtml;
+        }
+
+        private static DateTime ParseDate(string val) {
             var split = val.Split(new[] { 'T' }, StringSplitOptions.RemoveEmptyEntries);
             var timeString = split[1].Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)[0];
             var date = DateTime.Parse(split[0]);
