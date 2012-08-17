@@ -65,6 +65,66 @@ namespace Blaven.RavenDb.Test {
 
             Assert.AreEqual<int>(2, selection.TotalPostCount, "The removed posts was not removed from store.");
         }
+
+        private IEnumerable<BlogPost> GetBlogTagsSelectionBlogPosts() {
+            return new[] {
+                new BlogPost("BLOGKEY1", 1) {
+                    Tags = new [] {
+                        "TESTTAG",
+                    }
+                },
+                new BlogPost("BLOGKEY1", 2) {
+                    Tags = new [] {
+                        "TESTTAG",
+                    }
+                },
+                new BlogPost("BLOGKEY2", 3) {
+                    Tags = new [] {
+                        "TESTTAG",
+                    }
+                },
+            };
+        }
+
+        private RavenDbBlogStore GetBlogTagsSelectionBlogStore() {
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            BlogService.InitStore(documentStore);
+
+            var blogStore = new RavenDbBlogStore(documentStore);
+
+            string blogKey1 = "BLOGKEY1";
+            var blogData1 = new BlogData {
+                Posts = GetBlogTagsSelectionBlogPosts().Where(x => x.BlogKey == blogKey1),
+            };
+            blogStore.Refresh(blogKey1, blogData1);
+
+
+            string blogKey2 = "BLOGKEY2";
+            var blogData2 = new BlogData {
+                Posts = GetBlogTagsSelectionBlogPosts().Where(x => x.BlogKey == blogKey2),
+            };
+            blogStore.Refresh(blogKey2, blogData2, waitForIndexes: true);
+
+            return blogStore;
+        }
+
+        [TestMethod]
+        public void GetBlogTagsSelection_WhenSelectingAllBlogs_ShouldReturnAllBlogsTags() {
+            var blogStore = GetBlogTagsSelectionBlogStore();
+
+            var tagSelection = blogStore.GetBlogTagsSelection("TESTTAG", 0, int.MaxValue, new[] { "BLOGKEY1", "BLOGKEY2", });
+
+            Assert.AreEqual<int>(3, tagSelection.TotalPostCount);
+        }
+
+        [TestMethod]
+        public void GetBlogTagsSelection_WhenSelectingOneBlogs_ShouldReturnOneBlogsTags() {
+            var blogStore = GetBlogTagsSelectionBlogStore();
+
+            var tagSelection = blogStore.GetBlogTagsSelection("TESTTAG", 0, int.MaxValue, new[] { "BLOGKEY2", });
+
+            Assert.AreEqual<int>(1, tagSelection.TotalPostCount);
+        }
         
         [TestMethod]
         public void GetBlogSelection_WhenContaining33Entries_ShouldContainTotalCorrectAmountOfEntries() {
