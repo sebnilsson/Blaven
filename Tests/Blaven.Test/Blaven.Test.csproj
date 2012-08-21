@@ -144,6 +144,7 @@
     <Content Include="XmlFiles\buzz_simple_removed.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="XmlFiles\jonasrapp.xml" />
     <Content Include="XmlFiles\status_simple.xml" />
     <Content Include="XmlFiles\status.xml" />
   </ItemGroup>

@@ -127,6 +127,19 @@ namespace Blaven.Test.Integration {
             Assert.AreEqual<int>(0, updatedSynchronouslyCount, "The blogs were updated too many times.");
         }
 
+        [TestMethod]
+        public void Refresh_PostsWithUnencodedPreTagContent_ShouldNotCutContent() {
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+
+            var service = BlogServiceTestHelper.GetBlogService(documentStore, new[] { "jonasrapp" }, ensureBlogsRefreshed: true);
+            service.BlogStore.WaitForIndexes();
+
+            var preTagPost = service.GetPostById("blogpost/3351494039612406157");
+
+            Assert.IsTrue(preTagPost.Content.Contains("<pre"));
+            Assert.IsTrue(preTagPost.Content.Contains("for (var i = 0; i &lt; regardingEntities.length; i++)"));
+        }
+
         private BlogService GetBlogServiceWithMultipleBlogs(IDocumentStore documentStore = null, bool refreshAsync = true, bool ensureBlogsRefreshed = true,
             IEnumerable<string> blogKeys = null) {
             blogKeys = blogKeys ?? _blogKeys;
