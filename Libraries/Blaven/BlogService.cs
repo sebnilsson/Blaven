@@ -103,6 +103,18 @@ namespace Blaven {
         }
 
         /// <summary>
+        /// Gets a blog-post from given ID and blog-key.
+        /// </summary>
+        /// <param name="postId">The ID of the blog-post to get.</param>
+        /// <param name="blogKey">The key of the blog desired. Defaults to first blog in the collection of Blogger-settings.</param>
+        /// <returns>Returns a blog-post.</returns>
+        public BlogPost GetPostById(string postId, string blogKey = null) {
+            blogKey = GetBlogKeyOrDefault(blogKey);
+
+            return this.BlogStore.GetBlogPostById(blogKey, postId);
+        }
+
+        /// <summary>
         /// Gets a selection of blog-posts, with pagination-info.
         /// </summary>
         /// <param name="pageIndex">The current page-index of the pagination. Must have a value of 0 or higher.</param>

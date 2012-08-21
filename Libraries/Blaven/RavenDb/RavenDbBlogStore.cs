@@ -94,6 +94,11 @@ namespace Blaven.RavenDb {
             return blogPost;
         }
 
+        public BlogPost GetBlogPostById(string blogKey, string postId) {
+            var blogPost = _session.Load<BlogPost>(postId);
+            return blogPost;
+        }
+
         public BlogSelection GetBlogSelection(int pageIndex, int pageSize, params string[] blogKeys) {
             if(blogKeys == null || !blogKeys.Any()) {
                 throw new ArgumentNullException("blogKeys");
