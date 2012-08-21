@@ -3,12 +3,13 @@ using System.Xml.Linq;
 
 using Google.GData.Blogger;
 using Google.GData.Client;
+using System.IO;
 
 namespace Blaven.Blogger {
     internal static class BloggerHelper {
         public const string BloggerFeedUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
 
-        public static XDocument GetBloggerDocument(BloggerSetting setting, DateTime? ifModifiedSince = null) {
+        public static string GetBloggerDocument(BloggerSetting setting, DateTime? ifModifiedSince = null) {
             string uri = (!string.IsNullOrWhiteSpace(setting.BloggerUri)) ? setting.BloggerUri
                 : string.Format(BloggerFeedUriFormat, setting.BlogId);
                         
@@ -23,7 +24,7 @@ namespace Blaven.Blogger {
             return GetBloggerDocument(setting, query);
         }
 
-        public static XDocument GetBloggerDocument(BloggerSetting setting, BloggerQuery query) {
+        public static string GetBloggerDocument(BloggerSetting setting, BloggerQuery query) {
             var service = GetBloggerService(setting.Username, setting.Password, query.Uri.IsFile);
             
             BloggerFeed feed = null;
@@ -38,7 +39,9 @@ namespace Blaven.Blogger {
                 feed.SaveToXml(stream);
                 stream.Position = 0;
 
-                return XDocument.Load(stream);
+                var reader = new StreamReader(stream);
+                string content = reader.ReadToEnd();
+                return content;
             }
         }
 

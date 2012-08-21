@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Xml.Linq;
 
 namespace Blaven.Blogger {
     [Serializable]
     public class BloggerParsingException : BlavenBlogException {
-        public BloggerParsingException(string blogKey, XDocument bloggerDocument, Exception inner)
+        public BloggerParsingException(string blogKey, string bloggerDocumentContent, Exception inner)
             : base(blogKey, "There was an error when parsing the Blogger-document", inner) {
-            this.BloggerDocument = bloggerDocument;
+            this.BloggerDocumentContent = bloggerDocumentContent;
         }
 
-        public XDocument BloggerDocument { get; private set; }
+        public string BloggerDocumentContent { get; private set; }
     }
 }
