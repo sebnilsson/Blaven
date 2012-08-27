@@ -136,7 +136,7 @@ namespace Blaven.Test.Integration {
 
             var preTagPost = service.GetPostById("blogpost/3351494039612406157");
 
-            Assert.IsTrue(preTagPost.Content.Contains("<pre"));
+            Assert.IsTrue(preTagPost.Content.Contains("</pre>"));
             Assert.IsTrue(preTagPost.Content.Contains("for (var i = 0; i &lt; regardingEntities.length; i++)"));
         }
 

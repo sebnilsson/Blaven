@@ -3,70 +3,68 @@ using System.Linq;
 using System.Web;
 using System.Xml.Linq;
 
-using HtmlAgilityPack;
-
 namespace Blaven.Blogger {
     internal static class BloggerParser {
-        public static BlogData ParseBlogData(string blogKey, string bloggerDocumentContent) {
+        public static BlogData ParseBlogData(string blogKey, string bloggerContent) {
             try {
-                return ParseBlogDataImpl(blogKey, bloggerDocumentContent);
+                return ParseBlogDataImpl(blogKey, bloggerContent);
             }
             catch(Exception ex) {
-                throw new BloggerParsingException(blogKey, bloggerDocumentContent, ex);
+                throw new BloggerParsingException(blogKey, bloggerContent, ex);
             }
         }
 
-        private static BlogData ParseBlogDataImpl(string blogKey, string bloggerDocumentContent) {
-            var document = new HtmlDocument();
-            document.LoadHtml(bloggerDocumentContent);
+        private static BlogData ParseBlogDataImpl(string blogKey, string bloggerContent) {
+            var bloggerDocument = XDocument.Parse(bloggerContent);
 
-            var root = document.DocumentNode.Element("feed");
+            var feed = bloggerDocument.Root;
+            var ns = bloggerDocument.Root.Name.Namespace;
 
-            var blogEntries = root.SelectNodes("entry").Where(entry => !string.IsNullOrWhiteSpace(entry.InnerHtml));
+            var blogEntries = feed.Elements(ns + "entry").Where(entry => !string.IsNullOrWhiteSpace(entry.Value));
 
             var posts = from entry in blogEntries
-                        where entry.Element("title") != null
-                        && entry.Elements("link").Any(el => el.Attributes["rel"].Value == "alternate")
-                        select ParseEntry(blogKey, entry);
+                        where entry.Element(ns + "title") != null
+                        && entry.Elements(ns + "link").Any(el => el.Attribute("rel").Value == "alternate")
+                        select ParseEntry(blogKey, ns, entry);
 
-            var subtitle = root.Element("subtitle");
-            var altLink = root.Elements("link").FirstOrDefault(el => el.Attributes["rel"].Value == "alternate");
+            var subtitle = feed.Element(ns + "subtitle");
+            var altLink = feed.Elements(ns + "link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
 
             var blogInfo = new BlogInfo {
                 BlogKey = blogKey,
-                Subtitle = (subtitle != null) ? subtitle.InnerText : string.Empty,
-                Title = root.Element("title").InnerText,
-                Updated = ParseDate(root.Element("updated").InnerText),
-                Url = (altLink != null) ? ((altLink.Attributes["href"] != null) ? altLink.Attributes["href"].Value : string.Empty) : string.Empty,
+                Subtitle = (subtitle != null) ? subtitle.Value : string.Empty,
+                Title = feed.Element(ns + "title").Value,
+                Updated = ParseDate(feed.Element(ns + "updated").Value),
+                Url = (altLink != null) ? ((altLink.Attribute("href") != null) ? altLink.Attribute("href").Value : string.Empty) : string.Empty,
             };
 
             return new BlogData { Info = blogInfo, Posts = posts, };
         }
 
-        private static BlogPost ParseEntry(string blogKey, HtmlNode entry) {
-            var alternateLink = entry.Elements("link").FirstOrDefault(el => el.Attributes["rel"].Value == "alternate");
+        private static BlogPost ParseEntry(string blogKey, XNamespace ns, XElement entry) {
+            var alternateLink = entry.Elements(ns + "link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
 
-            string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attributes["href"].Value;
+            string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
-            long id = ParseId(entry.Element("id").InnerText);
-            string content = ParseContent(entry);
+            long id = ParseId(entry.Element(ns + "id").Value);
+            string content = ParseContent(entry, ns);
 
             var post = new BlogPost(blogKey, id) {
-                Tags = entry.Elements("category").Select(cat => cat.Attributes["term"].Value),
+                Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = content,
                 PermaLinkAbsolute = permaLinkFull,
                 PermaLinkRelative = GetRelativeUrl(permaLinkFull),
-                Published = ParseDate(entry.Element("published").InnerText),
-                Title = entry.Element("title").InnerText,
-                Updated = ParseDate(entry.Element("updated").InnerText),
+                Published = ParseDate(entry.Element(ns + "published").Value),
+                Title = entry.Element(ns + "title").Value,
+                Updated = ParseDate(entry.Element(ns + "updated").Value),
             };
 
-            var authorNode = entry.Element("author");
+            var authorNode = entry.Element(ns + "author");
             if(authorNode != null) {
-                post.Author.Name = authorNode.Element("name").InnerText;
+                post.Author.Name = authorNode.Element(ns + "name").Value;
 
                 var gdNs = XNamespace.Get("http://schemas.google.com/g/2005");
-                post.Author.ImageUrl = authorNode.Element("gd:image").Attributes["src"].Value;
+                post.Author.ImageUrl = authorNode.Element(gdNs + "image").Attribute("src").Value;
             }
 
             return post;
@@ -80,17 +78,18 @@ namespace Blaven.Blogger {
             return long.Parse(text);
         }
 
-        private static string ParseContent(HtmlNode entry) {
-            string decodedContent = HttpUtility.HtmlDecode(entry.Element("content").InnerHtml);
-            if(!decodedContent.Contains("</pre>")) {
-                return decodedContent;
+        private static string ParseContent(XElement entry, XNamespace ns) {
+            string content = entry.Element(ns + "content").Value ?? string.Empty;
+
+            if(!content.Contains("</pre>")) {
+                return content;
             }
 
-            string parsedContent = decodedContent;
+            string parsedContent = content;
 
-            int preStartIndex = decodedContent.IndexOf("<pre");
-            int preEndIndex = (preStartIndex >= 0) ? decodedContent.IndexOf(">", preStartIndex) : -1;
-            int preCloseIndex = (preStartIndex >= 0) ? decodedContent.IndexOf("</pre>", preEndIndex) : -1;
+            int preStartIndex = content.IndexOf("<pre");
+            int preEndIndex = (preStartIndex >= 0) ? content.IndexOf(">", preStartIndex) : -1;
+            int preCloseIndex = (preStartIndex >= 0) ? content.IndexOf("</pre>", preEndIndex) : -1;
 
             while(preStartIndex >= 0 && preCloseIndex >= 0) {
                 string preContent = parsedContent.Substring(preEndIndex + 1, preCloseIndex - preEndIndex);
@@ -100,12 +99,12 @@ namespace Blaven.Blogger {
                 parsedContent = parsedContent.Remove(preEndIndex + 1, preCloseIndex - preEndIndex - 1);
                 parsedContent = parsedContent.Insert(preEndIndex + 1, encodedPre);
 
-                preStartIndex = decodedContent.IndexOf("<pre", preStartIndex + 1);
+                preStartIndex = content.IndexOf("<pre", preStartIndex + 1);
                 if(preStartIndex < 0) {
                     break;
                 }
-                preEndIndex = decodedContent.IndexOf(">", preStartIndex);
-                preCloseIndex = decodedContent.IndexOf("</pre>", preEndIndex);
+                preEndIndex = content.IndexOf(">", preStartIndex);
+                preCloseIndex = content.IndexOf("</pre>", preEndIndex);
             }
 
             return parsedContent;
