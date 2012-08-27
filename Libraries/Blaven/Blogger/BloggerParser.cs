@@ -82,7 +82,7 @@ namespace Blaven.Blogger {
 
         private static string ParseContent(HtmlNode entry) {
             string decodedContent = HttpUtility.HtmlDecode(entry.Element("content").InnerHtml);
-            if(decodedContent.Contains("</pre>")) {
+            if(!decodedContent.Contains("</pre>")) {
                 return decodedContent;
             }
 
