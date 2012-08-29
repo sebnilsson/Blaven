@@ -10,8 +10,10 @@ namespace Blaven.RavenDb.Indexes {
 
         public SearchBlogPosts() {
             AddMap<BlogPost>(blogPosts => from post in blogPosts
+                                          where !post.IsDeleted
                                           select new Result { Content = new object[] { post.Title, post.Content, } });
             AddMap<BlogPost>(blogPosts => from post in blogPosts
+                                          where !post.IsDeleted
                                           from tag in post.Tags
                                           select new Result { Content = new object[] { tag } });
 

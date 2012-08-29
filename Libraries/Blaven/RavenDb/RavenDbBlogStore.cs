@@ -226,9 +226,11 @@ namespace Blaven.RavenDb {
             }
 
             var storePostsIds = session.Query<BlogPost>().Where(x => x.BlogKey == blogKey).Select(x => x.Id).Take(int.MaxValue).ToList();
-            var removedPosts = storePostsIds.Where(postId => !parsedPostsIds.Contains(postId));
+            var removedPostIds = storePostsIds.Where(postId => !parsedPostsIds.Contains(postId));
+            
+            var removedPosts = session.Load<BlogPost>(removedPostIds);
             foreach(var removedPost in removedPosts) {
-                session.Advanced.Defer(new DeleteCommandData() { Key = removedPost });
+                removedPost.IsDeleted = true;
             }
         }
 

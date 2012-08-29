@@ -7,6 +7,7 @@ using Blaven.Blogger;
 using Blaven.RavenDb;
 using Raven.Client;
 using Raven.Client.Document;
+using System.Reflection;
 
 namespace Blaven {
     /// <summary>
@@ -238,10 +239,18 @@ namespace Blaven {
             documentStore.Conventions.MaxNumberOfRequestsPerSession = 100;
 
             var existingIndexes = documentStore.DatabaseCommands.GetIndexNames(0, int.MaxValue);
-            var blavenIndexes = System.Reflection.Assembly.GetAssembly(typeof(Blaven.BlogService))
+            IEnumerable<string> blavenIndexes;
+            try {
+                blavenIndexes = System.Reflection.Assembly.GetAssembly(typeof(Blaven.BlogService))
                 .GetTypes().Where(x => x.IsSubclassOf(typeof(Raven.Client.Indexes.AbstractIndexCreationTask)))
                 .Select(x => x.Name);
+            }
+            catch(ReflectionTypeLoadException ex) {
+                var firstError = ex.LoaderExceptions.FirstOrDefault();
+                string message = (firstError != null) ? firstError.Message : string.Empty;
 
+                throw new BlavenException(message, ex);
+            }
             var hasAllIndexes = blavenIndexes.All(x => existingIndexes.Contains(x));
 
             var createIndexesTask = new Task(() => {

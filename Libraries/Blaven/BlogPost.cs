@@ -18,6 +18,16 @@ namespace Blaven {
         }
 
         /// <summary>
+        /// The author-information of the blog-post.
+        /// </summary>
+        public BlogAuthor Author { get; set; }
+
+        /// <summary>
+        /// The blog key the post belongs to..
+        /// </summary>
+        public string BlogKey { get; set; }
+
+        /// <summary>
         /// The text-content of a blog-post. Contains HTML-code.
         /// </summary>
         public string Content { get; set; }
@@ -28,24 +38,9 @@ namespace Blaven {
         public string Id { get; set; }
 
         /// <summary>
-        /// The tags that are set on the blog-post.
+        /// Gets or sets if the post is deleted.
         /// </summary>
-        public IEnumerable<string> Tags { get; set; }
-
-        /// <summary>
-        /// The date and time that the blog-post was posted.
-        /// </summary>
-        public DateTime Published { get; set; }
-
-        /// <summary>
-        /// The title of the blog-post.
-        /// </summary>
-        public string Title { get; set; }
-
-        /// <summary>
-        /// The date and time that the blog-post was updated.
-        /// </summary>
-        public DateTime Updated { get; set; }
+        public bool IsDeleted { get; set; }
 
         /// <summary>
         /// The absolute perma-link to the blog-post.
@@ -58,13 +53,23 @@ namespace Blaven {
         public string PermaLinkRelative { get; set; }
 
         /// <summary>
-        /// The author-information of the blog-post.
+        /// The date and time that the blog-post was posted.
         /// </summary>
-        public BlogAuthor Author { get; set; }
+        public DateTime Published { get; set; }
 
         /// <summary>
-        /// The blog key the post belongs to..
+        /// The tags that are set on the blog-post.
         /// </summary>
-        public string BlogKey { get; set; }
+        public IEnumerable<string> Tags { get; set; }
+
+        /// <summary>
+        /// The title of the blog-post.
+        /// </summary>
+        public string Title { get; set; }
+
+        /// <summary>
+        /// The date and time that the blog-post was updated.
+        /// </summary>
+        public DateTime Updated { get; set; }
     }
 }

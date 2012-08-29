@@ -13,6 +13,7 @@ namespace Blaven.RavenDb.Indexes {
 
         public BlogPostsOverviewByKey() {
             Map = posts => from post in posts
+                           where !post.IsDeleted
                            select new {
                                BlogKey = post.BlogKey,
                                ID = post.Id,

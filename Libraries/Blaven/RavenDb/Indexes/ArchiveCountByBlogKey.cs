@@ -13,6 +13,7 @@ namespace Blaven.RavenDb.Indexes {
 
         public ArchiveCountByBlogKey() {
             Map = posts => from post in posts
+                           where !post.IsDeleted
                            let date = new DateTime(post.Published.Year, post.Published.Month, 1)
                            select new {
                                BlogKey = post.BlogKey,
