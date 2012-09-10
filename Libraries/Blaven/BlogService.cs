@@ -100,7 +100,7 @@ namespace Blaven {
         public BlogPost GetPost(string permaLink, string blogKey = null) {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
-            return this.BlogStore.GetBlogPost(permaLink, blogKey);
+            return this.BlogStore.GetBlogPost(blogKey, permaLink);
         }
 
         /// <summary>
