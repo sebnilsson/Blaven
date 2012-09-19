@@ -7,6 +7,12 @@ namespace Blaven.Blogger {
     [DataContract]
     public class BloggerSetting {
         /// <summary>
+        /// The base-URL for the blog. Leave empty to use default value from Blogger.
+        /// </summary>
+        [DataMember(Name = "baseUrl")]
+        public string BaseUrl { get; set; }
+
+        /// <summary>
         /// The unique identifier for the blog.
         /// </summary>
         [DataMember(Name = "blogKey")]

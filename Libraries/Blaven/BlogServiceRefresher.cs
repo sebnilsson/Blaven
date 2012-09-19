@@ -110,7 +110,7 @@ namespace Blaven {
             try {
                 string bloggerDocument = BloggerHelper.GetBloggerDocument(bloggerSetting);
 
-                var parsedData = BloggerParser.ParseBlogData(blogKey, bloggerDocument);
+                var parsedData = BloggerParser.ParseBlogData(bloggerSetting, bloggerDocument);
 
                 var blogStoreRefreshLock = GetBlogStoreRefreshLock(blogKey);
                 lock(_blogStoreRefreshLocksLock) {
