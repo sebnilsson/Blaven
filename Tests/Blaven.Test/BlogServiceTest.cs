@@ -140,6 +140,20 @@ namespace Blaven.Test.Integration {
             Assert.IsTrue(preTagPost.Content.Contains("for (var i = 0; i &lt; regardingEntities.length; i++)"));
         }
 
+        [TestMethod]
+        public void Refresh_PostsWithPreTagContainingCodeTag_ShouldNotEncodeCodeTag() {
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            BlogService.InitStore(documentStore);
+
+            var service = BlogServiceTestHelper.GetBlogService(documentStore, new[] { "jonasrapp" }, ensureBlogsRefreshed: true);
+            service.BlogStore.WaitForIndexes();
+
+            var preTagPost = service.GetPostById("blogpost/3351494039612406158");
+
+            Assert.IsTrue(preTagPost.Content.Contains("<code>"));
+            Assert.IsTrue(preTagPost.Content.Contains("</code>"));
+        }
+
         private BlogService GetBlogServiceWithMultipleBlogs(IDocumentStore documentStore = null, bool refreshAsync = true, bool ensureBlogsRefreshed = true,
             IEnumerable<string> blogKeys = null) {
             blogKeys = blogKeys ?? _blogKeys;

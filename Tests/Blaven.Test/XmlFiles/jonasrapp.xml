@@ -38,7 +38,7 @@
       <gd:image rel="http://schemas.google.com/g/2005#thumbnail" width="32" height="32" src="//lh6.googleusercontent.com/-R_XLzSOOvqs/AAAAAAAAAAI/AAAAAAAAAsk/wfsnAqqNsCw/s512-c/photo.jpg" />
       <name>Jonas Rapp</name>
       <email>noreply@blogger.com</email>
-      <uri>https://plus.google.com/109176631335910576528</uri>
+      <uri>https://plus.google.com/109176631335910576527</uri>
     </author>
     <category term="Customization" scheme="http://www.blogger.com/atom/ns#" />
     <category term="Javascript" scheme="http://www.blogger.com/atom/ns#" />
@@ -112,6 +112,121 @@
       }
       }
       &lt;/pre&gt;
+      &lt;p&gt;&lt;em&gt;&lt;strong&gt;Note:&lt;/strong&gt; The javascript-functions in namespace&lt;/em&gt; &lt;code&gt;Cinteros.Xrm&lt;/code&gt; &lt;em&gt;are part of our internally developed tools, but the names should be quite self-explanatory.&lt;br&gt;&lt;/em&gt;REST &lt;em&gt;functionality can be replaced by similar functionality in the &lt;strong&gt;CrmRestKit&lt;/strong&gt;, see &lt;/em&gt;&lt;a href="http://crmrestkit.codeplex.com/"&gt;&lt;em&gt;http://crmrestkit.codeplex.com/&lt;/em&gt;&lt;/a&gt;&lt;em&gt;, or by other custom made code.&lt;br&gt;&lt;/em&gt;MetaData &lt;em&gt;functionality can be replaced by functionality in the &lt;strong&gt;MS CRM SDK&lt;/strong&gt;, see &lt;/em&gt;&lt;a href="http://msdn.microsoft.com/en-us/library/gg594428.aspx"&gt;&lt;em&gt;Sample: Retrieve Entity Metadata Using JScript&lt;/em&gt;&lt;/a&gt;&lt;em&gt;.&lt;br&gt;Feel free to &lt;strong&gt;contact me&lt;/strong&gt; if you have any questions.&lt;/em&gt;&lt;/p&gt;
+      &lt;p&gt;Function to register for the formLoad event on each activity entity that shall have this functionality:&lt;/p&gt;&lt;pre class="brush: js"&gt;Cinteros.Xrm.Activity = {
+      formLoad: function () {
+      try {
+      // Only do this when creating new activities
+      if (Xrm.Page.ui.getFormType() === 1) {
+      // For this example - four entities are allowed to be set as regarding
+      var allowedEntities = ["contact", "lead", "opportunity", "jr_my_custom_entity"];
+      if (this._verifyRegarding(allowedEntities) === false) {
+      window.alert("Activity must be created from a valid regarding record.\n(" + allowedEntities.toString() + ")");
+      Xrm.Page.ui.close();
+      }
+      }
+      }
+      catch (e) {
+      window.alert("Error during formLoad:\n\n" + e.description);
+      }
+      }
+      }&lt;/pre&gt;
+      &lt;p&gt;It is possible to call the &lt;code&gt;_verifyRegarding&lt;/code&gt; function without any parameter, thus allowing any entity as regarding object. This will however read all entity metadata from the database, which typically takes a few seconds. So specifying the allowed set of regarding entity types is recommended.&lt;/p&gt;
+      &lt;p&gt;Exclude the if-clause when calling the &lt;code&gt;_verifyRegarding&lt;/code&gt; function to ignore it's return value. Then the function will simply populate the regarding field when possible, without any verification that the field must be populated, or that it must be populated by a specific entity type.&lt;/p&gt;
+      &lt;p&gt;&lt;em&gt;Note that this solution uses window references and url parameters to interpret the caller. This is &lt;strong&gt;probably &lt;/strong&gt;not supported according to MS CRM SDK, but it is not unsupported either, as it does not alter the DOM or use undocumented javascript methods, and it includes quite good error handling.&lt;/em&gt;&lt;/p&gt;
+    </content>
+    <updated>2012-08-20T08:52:31+02:00</updated>
+    <published>2012-08-20T08:45:00+02:00</published>
+  </entry>
+  <entry gd:etag="W/&quot;D0IBQHg4cCp7ImA9WhJWFEl.&quot;">
+    <app:edited app="http://www.w3.org/2007/app" xmlns:app="http://www.w3.org/2007/app">2012-08-20T09:52:31.638+02:00</app:edited>
+    <media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="http://lh5.ggpht.com/-iqNUT6u6nvQ/UC4ux8tzuQI/AAAAAAAAAtI/_91LPjV_kQ4/s72-c/FileNewActivity_thumb.png?imgmax=800" height="72" width="72" />
+    <thr:total>0</thr:total>
+    <title type="text">Automatically Set Regarding 2 on New Activities</title>
+    <id>tag:blogger.com,1999:blog-3534158126191039150.post-3351494039612406158</id>
+    <link href="http://jonasrapp.cinteros.se/feeds/3351494039612406158/comments/default" rel="replies" type="application/atom+xml" title="Post Comments" />
+    <link href="http://jonasrapp.cinteros.se/2012/08/setregarding2.html#comment-form" rel="replies" type="text/html" title="0 Comments" />
+    <link href="https://www.blogger.com/feeds/3534158126191039150/posts/default/3351494039612406158" rel="edit" type="application/atom+xml" />
+    <link href="https://www.blogger.com/feeds/3534158126191039150/posts/default/3351494039612406158" rel="self" type="application/atom+xml" />
+    <link href="http://jonasrapp.cinteros.se/2012/08/setregarding2.html" rel="alternate" type="text/html" title="Automatically Set Regarding 2 on New Activities" />
+    <author>
+      <gd:image rel="http://schemas.google.com/g/2005#thumbnail" width="32" height="32" src="//lh6.googleusercontent.com/-R_XLzSOOvqs/AAAAAAAAAAI/AAAAAAAAAsk/wfsnAqqNsCw/s512-c/photo.jpg" />
+      <name>Jonas Rapp</name>
+      <email>noreply@blogger.com</email>
+      <uri>https://plus.google.com/109176631335910576528</uri>
+    </author>
+    <category term="Customization" scheme="http://www.blogger.com/atom/ns#" />
+    <category term="Javascript" scheme="http://www.blogger.com/atom/ns#" />
+    <category term="Metadata" scheme="http://www.blogger.com/atom/ns#" />
+    <content type="html">
+      &lt;h2&gt;Summary&lt;/h2&gt; &lt;p&gt;Missing functionality in the MS CRM 2011 OOB functionality:&lt;/p&gt; &lt;ul&gt; &lt;li&gt;Activities created from menu File – New Activity on entity forms do not get the Regarding field populated.  &lt;li&gt;When creating new activities from the associated view on the entity form, the Regarding field is mapped properly.&lt;/li&gt;&lt;/ul&gt; &lt;p&gt;&lt;a href="http://lh5.ggpht.com/-16CLw5Isq60/UC4uxHMm4MI/AAAAAAAAAtA/HxRtB97LyI0/s1600-h/FileNewActivity%25255B2%25255D.png" target="_blank"&gt;&lt;img style="background-image: none; border-right-width: 0px; margin: 0px auto; padding-left: 0px; padding-right: 0px; display: block; float: none; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px; padding-top: 0px" title="FileNewActivity" border="0" alt="FileNewActivity" src="http://lh5.ggpht.com/-iqNUT6u6nvQ/UC4ux8tzuQI/AAAAAAAAAtI/_91LPjV_kQ4/FileNewActivity_thumb.png?imgmax=800" width="221" height="244"&gt;&lt;/a&gt;In this post, I will demonstrate a&lt;strong&gt; javascript example of a generic way to populate the Regarding field on activities&lt;/strong&gt;, where the OOB CRM functionality fails to do this.&lt;a href="http://lh3.ggpht.com/-BMYZ-GcuEFg/UC4uyst2ycI/AAAAAAAAAtQ/l9hO2YQOSCU/s1600-h/TaskWORegarding%25255B2%25255D.png" target="_blank"&gt;&lt;img style="background-image: none; border-right-width: 0px; margin: 0px auto; padding-left: 0px; padding-right: 0px; display: block; float: none; border-top-width: 0px; border-bottom-width: 0px; border-left-width: 0px; padding-top: 0px" title="TaskWORegarding" border="0" alt="TaskWORegarding" src="http://lh3.ggpht.com/-jgK-m0lwhSs/UC4uzV-LUMI/AAAAAAAAAtY/-T-MFXj-bMI/TaskWORegarding_thumb.png?imgmax=800" width="244" height="129"&gt;&lt;/a&gt;&lt;/p&gt; &lt;h2&gt;Objective&lt;/h2&gt; &lt;p&gt;Whenever possible, the activity form shall to try to find which record that should be set as &lt;em&gt;regarding&lt;/em&gt;.&lt;/p&gt; &lt;p&gt;While doing this, also provide an opportunity to specify which entities that shall be allowed as regarding for each type of activity entity.&lt;/p&gt; &lt;h2&gt;Method&lt;/h2&gt; &lt;ol&gt; &lt;li&gt;As the activity form is not opened with any parameters indicating "where it came from", I investigate &lt;code&gt;window.parent.opener&lt;/code&gt; to find information of its origin.  &lt;li&gt;Metadata requests are used to find additional information of the source, to be able to map between &lt;em&gt;ObjectTypeCode&lt;/em&gt; and &lt;em&gt;LogicalName&lt;/em&gt;, as well as to dynamically find which attribute on the source that is the primary attribute (i.e. the "name" attribute").  &lt;li&gt;I perform a &lt;em&gt;REST&lt;/em&gt; request to find the name of the source record, instead of e.g. trying to walk through the source form's DOM to find information about it.&lt;/li&gt;&lt;/ol&gt; &lt;h2&gt;Code samples&lt;/h2&gt;  &lt;a name='more'&gt;&lt;/a&gt;  &lt;p&gt;Function to verify and populate the Regarding field:&lt;/p&gt;&lt;pre class="brush: js"&gt;&lt;code&gt;Cinteros.Xrm.Activity = {
+      _verifyRegarding: function (regardingEntities) {
+      try {
+      // First check if we have a valid mapped regardingobject
+      var regardingObjectId = Xrm.Page.getAttribute("regardingobjectid").getValue();
+      if (regardingObjectId &amp;&amp; regardingObjectId[0].entityType) {
+      // We have a regarding object through mapping, verify it is from an allowed entity
+      if (!regardingEntities || !regardingEntities.length) {
+      return true;
+      }
+      for (var i = 0; i &lt; regardingEntities.length; i++) {
+      if (regardingObjectId[0].entityType === regardingEntities[i]) {
+      return true;
+      }
+      }
+      return false;
+      }
+      // No regarding object was set - now examine opener to see where we came from
+      if (window &amp;&amp; window.parent &amp;&amp; window.parent.opener &amp;&amp; window.parent.opener.location &amp;&amp; window.parent.opener.location.href) {
+      var href = window.parent.opener.location.href;
+      // Extract parent etc from its href
+      var parentEtc = Cinteros.Xrm.SDK.getParameter(href, "etc") || Cinteros.Xrm.SDK.getParameter(href, "oType");
+      // Get metadata for parent entitytype
+      var regardingEntityMeta;
+      var entityMetadataCollection;
+      if (!regardingEntities || !regardingEntities.length) {
+      // No allowed entities specified, load metadata for all entities
+      entityMetadataCollection = Cinteros.Xrm.SDK.RetrieveAllEntities();
+      }
+      else {
+      // Load metadata only for allowed entities
+      entityMetadataCollection = [];
+      for (var i = 0; i &lt; regardingEntities.length; i++) {
+      entityMetadataCollection.push(Cinteros.Xrm.SDK.RetrieveEntity(regardingEntities[i]));
+      }
+      }
+      // Get the metadata for correct parent entity, based on etc/otc
+      for (var i = 0; i &lt; entityMetadataCollection.length; i++) {
+      if (entityMetadataCollection[i].ObjectTypeCode == parentEtc) {
+      regardingEntityMeta = entityMetadataCollection[i];
+      break;
+      }
+      }
+      if (regardingEntityMeta &amp;&amp; regardingEntityMeta.ObjectTypeCode == parentEtc) {
+      // Extract parent id from its href
+      var parentId = Cinteros.Xrm.SDK.getParameter(href, "id") || Cinteros.Xrm.SDK.getParameter(href, "oId");
+      if (parentId) {
+      parentId = unescape(parentId);
+      var attributeMeta = Cinteros.Xrm.SDK.RetrieveAttribute(regardingEntityMeta.LogicalName, regardingEntityMeta.PrimaryNameAttribute);
+      // Retrieve the regarding entity, to be able to find its primary name
+      var regardingObject = Cinteros.Xrm.REST.Retrieve(regardingEntityMeta.SchemaName, parentId, "?$select=" + attributeMeta.SchemaName);
+      if (regardingObject) {
+      // Found regarding record, create lookup object
+      var regardingLkp = [{ "id": parentId, "entityType": regardingEntityMeta.LogicalName, "name": regardingObject[attributeMeta.SchemaName]}];
+      Xrm.Page.getAttribute("regardingobjectid").setValue(regardingLkp);
+      return true;
+      }
+      }
+      }
+      }
+      return false;
+      }
+      catch (e) {
+      window.alert("Error in verifyRegarding:\n\n" + e.description);
+      }
+      }
+      }
+      &lt;/code&gt;&lt;/pre&gt;
       &lt;p&gt;&lt;em&gt;&lt;strong&gt;Note:&lt;/strong&gt; The javascript-functions in namespace&lt;/em&gt; &lt;code&gt;Cinteros.Xrm&lt;/code&gt; &lt;em&gt;are part of our internally developed tools, but the names should be quite self-explanatory.&lt;br&gt;&lt;/em&gt;REST &lt;em&gt;functionality can be replaced by similar functionality in the &lt;strong&gt;CrmRestKit&lt;/strong&gt;, see &lt;/em&gt;&lt;a href="http://crmrestkit.codeplex.com/"&gt;&lt;em&gt;http://crmrestkit.codeplex.com/&lt;/em&gt;&lt;/a&gt;&lt;em&gt;, or by other custom made code.&lt;br&gt;&lt;/em&gt;MetaData &lt;em&gt;functionality can be replaced by functionality in the &lt;strong&gt;MS CRM SDK&lt;/strong&gt;, see &lt;/em&gt;&lt;a href="http://msdn.microsoft.com/en-us/library/gg594428.aspx"&gt;&lt;em&gt;Sample: Retrieve Entity Metadata Using JScript&lt;/em&gt;&lt;/a&gt;&lt;em&gt;.&lt;br&gt;Feel free to &lt;strong&gt;contact me&lt;/strong&gt; if you have any questions.&lt;/em&gt;&lt;/p&gt;
       &lt;p&gt;Function to register for the formLoad event on each activity entity that shall have this functionality:&lt;/p&gt;&lt;pre class="brush: js"&gt;Cinteros.Xrm.Activity = {
       formLoad: function () {
