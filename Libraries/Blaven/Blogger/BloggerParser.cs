@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Web;
 using System.Xml.Linq;
+
+using Blaven.Transformers;
 
 namespace Blaven.Blogger {
     internal static class BloggerParser {
@@ -47,11 +48,11 @@ namespace Blaven.Blogger {
             string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
             long id = ParseId(entry.Element(ns + "id").Value);
-            string content = ParseContent(entry, ns);
 
             var post = new BlogPost(bloggerSetting.BlogKey, id) {
                 Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
-                Content = content,
+                Content = entry.Element(ns + "content").Value ?? string.Empty,
+                OriginalXml = entry.ToString(),
                 PermaLinkAbsolute = GetAbsoluteUrl(permaLinkFull, bloggerSetting.BaseUrl),
                 PermaLinkRelative = GetRelativeUrl(permaLinkFull),
                 Published = ParseDate(entry.Element(ns + "published").Value),
@@ -67,7 +68,16 @@ namespace Blaven.Blogger {
                 post.Author.ImageUrl = authorNode.Element(gdNs + "image").Attribute("src").Value;
             }
 
+            ApplyTransformers(post);
+
             return post;
+        }
+
+        private static void ApplyTransformers(BlogPost blogPost) {
+            var transformers = TransformersService.Instance.RegisteredBlogPostTransformers;
+            foreach(var transformer in transformers) {
+                transformer.Transform(blogPost);
+            }
         }
 
         private static long ParseId(string val) {
@@ -76,44 +86,6 @@ namespace Blaven.Blogger {
 
             string text = val.Substring(index);
             return long.Parse(text);
-        }
-
-        private static string ParseContent(XElement entry, XNamespace ns) {
-            string content = entry.Element(ns + "content").Value ?? string.Empty;
-
-            if(!content.Contains("</pre>")) {
-                return content;
-            }
-
-            string parsedContent = content;
-
-            int openTagStartIndex = parsedContent.IndexOf("<pre");
-            int openTagEndIndex = (openTagStartIndex >= 0) ? parsedContent.IndexOf(">", openTagStartIndex) : -1;
-            int closeTagStartIndex = (openTagStartIndex >= 0) ? parsedContent.IndexOf("</pre>", openTagEndIndex) : -1;
-
-            while(openTagStartIndex >= 0 && closeTagStartIndex >= 0) {
-                if(parsedContent.Substring(openTagEndIndex + 1, 5) == "<code") {
-                    openTagStartIndex = openTagEndIndex + 1;
-                    openTagEndIndex = parsedContent.IndexOf(">", openTagStartIndex);
-                    closeTagStartIndex = parsedContent.IndexOf("</code>", openTagEndIndex);
-                }
-
-                string preContent = content.Substring(openTagEndIndex + 1, closeTagStartIndex - openTagEndIndex - 1);
-
-                string encodedPre = HttpUtility.HtmlEncode(preContent);
-
-                parsedContent = parsedContent.Remove(openTagEndIndex + 1, closeTagStartIndex - openTagEndIndex - 1);
-                parsedContent = parsedContent.Insert(openTagEndIndex + 1, encodedPre);
-
-                openTagStartIndex = content.IndexOf("<pre", closeTagStartIndex);
-                if(openTagStartIndex < 0) {
-                    break;
-                }
-                openTagEndIndex = content.IndexOf(">", openTagStartIndex);
-                closeTagStartIndex = content.IndexOf("</pre>", openTagEndIndex);
-            }
-
-            return parsedContent;
         }
 
         private static DateTime ParseDate(string val) {

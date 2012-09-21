@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 using System.Web;
 
 using Raven.Abstractions.Data;
@@ -44,6 +46,22 @@ namespace Blaven {
         public static int CacheTime {
             get {
                 return _cacheTime.Value;
+            }
+        }
+
+        private static Lazy<IEnumerable<string>> _excludeTransformers = new Lazy<IEnumerable<string>>(() => {
+            string configValue = GetConfigValue("Blaven.ExcludeTransformers");
+
+            var excludeTransformers = configValue.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToArray();
+            return excludeTransformers;
+        });
+        /// <summary>
+        /// Gets or sets if the BlogService should automatically ensure that blogs are refresh upon instantiation. Defaults to true.
+        /// Uses config-key "Blaven.EnsureBlogsRefreshed".
+        /// </summary>
+        public static IEnumerable<string> ExcludeTransformers {
+            get {
+                return _excludeTransformers.Value;
             }
         }
 
