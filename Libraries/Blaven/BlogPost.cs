@@ -43,11 +43,6 @@ namespace Blaven {
         public bool IsDeleted { get; set; }
 
         /// <summary>
-        /// Gets or sets ifthe original XML for the post.
-        /// </summary>
-        public string OriginalXml { get; set; }
-
-        /// <summary>
         /// The absolute perma-link to the blog-post.
         /// </summary>
         public string PermaLinkAbsolute { get; set; }

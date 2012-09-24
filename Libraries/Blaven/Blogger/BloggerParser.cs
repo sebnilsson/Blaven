@@ -52,7 +52,6 @@ namespace Blaven.Blogger {
             var post = new BlogPost(bloggerSetting.BlogKey, id) {
                 Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value ?? string.Empty,
-                OriginalXml = entry.ToString(),
                 PermaLinkAbsolute = GetAbsoluteUrl(permaLinkFull, bloggerSetting.BaseUrl),
                 PermaLinkRelative = GetRelativeUrl(permaLinkFull),
                 Published = ParseDate(entry.Element(ns + "published").Value),
