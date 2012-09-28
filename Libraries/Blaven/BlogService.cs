@@ -94,13 +94,13 @@ namespace Blaven {
         /// <summary>
         /// Gets a blog-post from given perma-link and blog-key.
         /// </summary>
-        /// <param name="permaLink">The perma-link of the blog-post to get.</param>
+        /// <param name="postId">The ID of the blog-post to get.</param>
         /// <param name="blogKey">The key of the blog desired. Defaults to first blog in the collection of Blogger-settings.</param>
         /// <returns>Returns a blog-post.</returns>
-        public BlogPost GetPost(string permaLink, string blogKey = null) {
+        public BlogPost GetPost(string postId, string blogKey = null) {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
-            return this.BlogStore.GetBlogPost(blogKey, permaLink);
+            return this.BlogStore.GetBlogPost(blogKey, postId);
         }
 
         /// <summary>
@@ -109,10 +109,10 @@ namespace Blaven {
         /// <param name="postId">The ID of the blog-post to get.</param>
         /// <param name="blogKey">The key of the blog desired. Defaults to first blog in the collection of Blogger-settings.</param>
         /// <returns>Returns a blog-post.</returns>
-        public BlogPost GetPostById(string postId, string blogKey = null) {
+        public BlogPost GetPost(long postId, string blogKey = null) {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
-            return this.BlogStore.GetBlogPostById(blogKey, postId);
+            return this.BlogStore.GetBlogPost(blogKey, postId);
         }
 
         /// <summary>

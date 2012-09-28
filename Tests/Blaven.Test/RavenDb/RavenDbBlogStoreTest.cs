@@ -187,34 +187,34 @@ namespace Blaven.RavenDb.Test {
             post.Author.ImageUrl = "ORIGINAL_AUTHOR_IMAGE_URL";
             post.Author.Name = "ORIGINAL_AUTHOR_NAME";
             post.Content = "ORIGINAL_CONTENT";
-            post.PermaLinkAbsolute = "ORIGINAL_PERMALINK_ABSOLUTE";
-            post.PermaLinkRelative = "ORIGINAL_PERMALINK_RELATIVE";
+            post.OriginalBloggerUrl = "ORIGINAL_ORIGINAL_BLOGGER_URL";
             post.Published = DateTime.MinValue;
             post.Tags = new [] { "TAG_1", "TAG_2" };
             post.Title = "ORIGINAL_TITLE";
             post.Updated = DateTime.MinValue.AddYears(1);
+            post.UrlSlug = "ORIGINAL_URL_SLUG";
 
             blogStore.Refresh(_blogKey, blogData, waitForIndexes: true);
 
             string updatedAuthorImageUrl = "UPDATED_AUTHOR_IMAGE_URL";
             string updatedAuthorName = "UPDATED_AUTHOR_NAME";
             string updatedContent = "UPDATED_CONTENT";
-            string updatedPermaLinkAbsolute = "UPDATED_PERMALINK_ABSOLUTE";
-            string updatedPermaLinkRelative = "UPDATED_PERMALINK_RELATIVE";
+            string updatedOriginalBloggerUrl = "UPDATED_ORIGINAL_BLOGGER_URL";
             DateTime updatedPublished = DateTime.MinValue.AddDays(1);
             IEnumerable<string> updatedTags = new [] { "TAG_1", "TAG_2", "TAG_3" };
             string updatedTitle = "UPDATED_TITLE";
             DateTime updatedUpdated = DateTime.MinValue.AddYears(1).AddDays(1);
+            string updatedUrlSlug = "UPDATED_URL_SLUG";
 
             post.Author.ImageUrl = updatedAuthorImageUrl;
             post.Author.Name = updatedAuthorName;
             post.Content = updatedContent;
-            post.PermaLinkAbsolute = updatedPermaLinkAbsolute;
-            post.PermaLinkRelative = updatedPermaLinkRelative;
+            post.OriginalBloggerUrl = updatedOriginalBloggerUrl;
             post.Published = updatedPublished;
             post.Tags = updatedTags;
             post.Title = updatedTitle;
             post.Updated = updatedUpdated;
+            post.UrlSlug = updatedUrlSlug;
 
             blogStore.Refresh(_blogKey, blogData);
             blogStore.WaitForIndexes();
@@ -225,12 +225,12 @@ namespace Blaven.RavenDb.Test {
             Assert.AreEqual<string>(updatedAuthorImageUrl, selectedPost.Author.ImageUrl, "AuthorImageUrl wasn't updated in store.");
             Assert.AreEqual<string>(updatedAuthorName, selectedPost.Author.Name, "AuthorName wasn't updated in store.");
             Assert.AreEqual<string>(updatedContent, selectedPost.Content, "Content wasn't updated in store.");
-            Assert.AreEqual<string>(updatedPermaLinkAbsolute, selectedPost.PermaLinkAbsolute, "PermaLinkAbsolute wasn't updated in store.");
-            Assert.AreEqual<string>(updatedPermaLinkRelative, selectedPost.PermaLinkRelative, "PermaLinkRelative wasn't updated in store.");
+            Assert.AreEqual<string>(updatedOriginalBloggerUrl, selectedPost.OriginalBloggerUrl, "OriginalBloggerUrl wasn't updated in store.");
             Assert.AreEqual<DateTime>(updatedPublished, selectedPost.Published, "Published wasn't updated in store.");
             Assert.AreEqual<int>(updatedTags.Count(), selectedPost.Tags.Count(), "Tags wasn't updated in store.");
             Assert.AreEqual<string>(updatedTitle, selectedPost.Title, "Title wasn't updated in store.");
             Assert.AreEqual<DateTime>(updatedUpdated, selectedPost.Updated, "Updated wasn't updated in store.");
+            Assert.AreEqual<string>(updatedUrlSlug, selectedPost.UrlSlug, "UrlSlug wasn't updated in store.");
         }
     }
 }

@@ -47,16 +47,17 @@ namespace Blaven.Blogger {
 
             string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
-            long id = ParseId(entry.Element(ns + "id").Value);
+            long id = ParseBloggerId(entry.Element(ns + "id").Value);
+            string title = entry.Element(ns + "title").Value;
 
             var post = new BlogPost(bloggerSetting.BlogKey, id) {
                 Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value ?? string.Empty,
-                PermaLinkAbsolute = GetAbsoluteUrl(permaLinkFull, bloggerSetting.BaseUrl),
-                PermaLinkRelative = GetRelativeUrl(permaLinkFull),
+                OriginalBloggerUrl = GetRelativeUrl(permaLinkFull),
                 Published = ParseDate(entry.Element(ns + "published").Value),
-                Title = entry.Element(ns + "title").Value,
+                Title = title,
                 Updated = ParseDate(entry.Element(ns + "updated").Value),
+                UrlSlug = UrlSlug.Create(title),
             };
 
             var authorNode = entry.Element(ns + "author");
@@ -79,7 +80,7 @@ namespace Blaven.Blogger {
             }
         }
 
-        private static long ParseId(string val) {
+        private static long ParseBloggerId(string val) {
             string findValue = ".post-";
             int index = val.IndexOf(findValue) + findValue.Length;
 

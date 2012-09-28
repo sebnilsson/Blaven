@@ -89,14 +89,14 @@ namespace Blaven.RavenDb {
             return storeRefresh.Updated;
         }
 
-        public BlogPost GetBlogPost(string blogKey, string permaLink) {
-            var blogPost = _session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.PermaLinkRelative == permaLink);
+        public BlogPost GetBlogPost(string blogKey, string postId) {
+            var blogPost = _session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.Id == postId);
             return blogPost;
         }
 
-        public BlogPost GetBlogPostById(string blogKey, string postId) {
-            var blogPost = _session.Load<BlogPost>(postId);
-            return blogPost;
+        public BlogPost GetBlogPost(string blogKey, long postId) {
+            string postIdString = RavenDbBlogStore.GetKey<BlogPost>(Convert.ToString(postId));
+            return GetBlogPost(blogKey, postIdString);
         }
 
         public BlogSelection GetBlogSelection(int pageIndex, int pageSize, params string[] blogKeys) {
@@ -216,12 +216,12 @@ namespace Blaven.RavenDb {
                 } else {
                     storePost.Author = parsedPost.Author;
                     storePost.Content = parsedPost.Content;
-                    storePost.PermaLinkAbsolute = parsedPost.PermaLinkAbsolute;
-                    storePost.PermaLinkRelative = parsedPost.PermaLinkRelative;
+                    storePost.OriginalBloggerUrl = parsedPost.OriginalBloggerUrl;
                     storePost.Published = parsedPost.Published;
                     storePost.Tags = parsedPost.Tags;
                     storePost.Title = parsedPost.Title;
                     storePost.Updated = parsedPost.Updated;
+                    storePost.UrlSlug = parsedPost.UrlSlug;
                 }
             }
 

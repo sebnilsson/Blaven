@@ -43,14 +43,9 @@ namespace Blaven {
         public bool IsDeleted { get; set; }
 
         /// <summary>
-        /// The absolute perma-link to the blog-post.
+        /// The absolute original URL to the blog-post at Blogger.
         /// </summary>
-        public string PermaLinkAbsolute { get; set; }
-
-        /// <summary>
-        /// The relative perma-link to the blog-post.
-        /// </summary>
-        public string PermaLinkRelative { get; set; }
+        public string OriginalBloggerUrl { get; set; }
 
         /// <summary>
         /// The date and time that the blog-post was posted.
@@ -71,5 +66,10 @@ namespace Blaven {
         /// The date and time that the blog-post was updated.
         /// </summary>
         public DateTime Updated { get; set; }
+
+        /// <summary>
+        /// The URL-friendly slug, based on the title of the blog post.
+        /// </summary>
+        public string UrlSlug { get; set; }
     }
 }
