@@ -134,7 +134,7 @@ namespace Blaven.Test.Integration {
             var service = BlogServiceTestHelper.GetBlogService(documentStore, new[] { "jonasrapp" }, ensureBlogsRefreshed: true);
             service.BlogStore.WaitForIndexes();
 
-            var preTagPost = service.GetPost("blogpost/3351494039612406157");
+            var preTagPost = service.GetPostByBloggerId("blogpost/3351494039612406157");
 
             Assert.IsTrue(preTagPost.Content.Contains("</pre>"));
             Assert.IsTrue(preTagPost.Content.Contains("for (var i = 0; i &lt; regardingEntities.length; i++)"));
@@ -148,7 +148,7 @@ namespace Blaven.Test.Integration {
             var service = BlogServiceTestHelper.GetBlogService(documentStore, new[] { "jonasrapp" }, ensureBlogsRefreshed: true);
             service.BlogStore.WaitForIndexes();
 
-            var preTagPost = service.GetPost("blogpost/3351494039612406158");
+            var preTagPost = service.GetPostByBloggerId("blogpost/3351494039612406158");
 
             Assert.IsTrue(preTagPost.Content.Contains("<code>"));
             Assert.IsTrue(preTagPost.Content.Contains("</code>"));

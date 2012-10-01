@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 using Blaven.Blogger;
 using Blaven.RavenDb;
 using Raven.Client;
 using Raven.Client.Document;
-using System.Reflection;
 
 namespace Blaven {
     /// <summary>
@@ -94,25 +94,38 @@ namespace Blaven {
         /// <summary>
         /// Gets a blog-post from given perma-link and blog-key.
         /// </summary>
+        /// <param name="postId">The ID of the blog-post to get. String formatted for RavenDB</param>
+        /// <param name="blogKey">The key of the blog desired. Defaults to first blog in the collection of Blogger-settings.</param>
+        /// <returns>Returns a blog-post.</returns>
+        public BlogPost GetPostByBloggerId(string bloggerId, string blogKey = null) {
+            blogKey = GetBlogKeyOrDefault(blogKey);
+
+            return this.BlogStore.GetBlogPostByBloggerId(blogKey, bloggerId);
+        }
+
+        /// <summary>
+        /// Gets a blog-post from given perma-link and blog-key.
+        /// </summary>
         /// <param name="postId">The ID of the blog-post to get.</param>
         /// <param name="blogKey">The key of the blog desired. Defaults to first blog in the collection of Blogger-settings.</param>
         /// <returns>Returns a blog-post.</returns>
-        public BlogPost GetPost(string postId, string blogKey = null) {
+        public BlogPost GetPostByBloggerId(long bloggerId, string blogKey = null) {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
-            return this.BlogStore.GetBlogPost(blogKey, postId);
+            string ravenDbId = RavenDbBlogStore.GetKey<BlogPost>(Convert.ToString(bloggerId));
+            return this.BlogStore.GetBlogPostByBloggerId(blogKey, ravenDbId);
         }
 
         /// <summary>
         /// Gets a blog-post from given ID and blog-key.
         /// </summary>
-        /// <param name="postId">The ID of the blog-post to get.</param>
+        /// <param name="blavenId">The ID of the blog-post to get.</param>
         /// <param name="blogKey">The key of the blog desired. Defaults to first blog in the collection of Blogger-settings.</param>
         /// <returns>Returns a blog-post.</returns>
-        public BlogPost GetPost(long postId, string blogKey = null) {
+        public BlogPost GetPost(long blavenId, string blogKey = null) {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
-            return this.BlogStore.GetBlogPost(blogKey, postId);
+            return this.BlogStore.GetBlogPost(blogKey, blavenId);
         }
 
         /// <summary>
@@ -236,6 +249,8 @@ namespace Blaven {
         public static void InitStore(IDocumentStore documentStore) {
             documentStore.Initialize();
 
+            RegisterListeners(documentStore);
+
             documentStore.Conventions.MaxNumberOfRequestsPerSession = 100;
 
             var existingIndexes = documentStore.DatabaseCommands.GetIndexNames(0, int.MaxValue);
@@ -262,6 +277,15 @@ namespace Blaven {
             if(!hasAllIndexes) {
                 createIndexesTask.Wait();
             }
+        }
+
+        private static void RegisterListeners(IDocumentStore documentStore) {
+            var store = documentStore as DocumentStoreBase;
+            if(store == null) {
+                return;
+            }
+
+            store.RegisterListener(new BlavenIdStoreListener(documentStore));
         }
 
         #region IDisposable Members

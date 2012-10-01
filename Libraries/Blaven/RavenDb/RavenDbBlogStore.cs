@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.RavenDb.Indexes;
-using Raven.Abstractions.Commands;
 using Raven.Client;
 using Raven.Client.Linq;
 
@@ -89,14 +88,14 @@ namespace Blaven.RavenDb {
             return storeRefresh.Updated;
         }
 
-        public BlogPost GetBlogPost(string blogKey, string postId) {
-            var blogPost = _session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.Id == postId);
+        public BlogPost GetBlogPostByBloggerId(string blogKey, string bloggerId) {
+            var blogPost = _session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.Id == bloggerId);
             return blogPost;
         }
 
-        public BlogPost GetBlogPost(string blogKey, long postId) {
-            string postIdString = RavenDbBlogStore.GetKey<BlogPost>(Convert.ToString(postId));
-            return GetBlogPost(blogKey, postIdString);
+        public BlogPost GetBlogPost(string blogKey, long blavenId) {
+            var blogPost = _session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.BlavenId == blavenId);
+            return blogPost;
         }
 
         public BlogSelection GetBlogSelection(int pageIndex, int pageSize, params string[] blogKeys) {
@@ -166,7 +165,7 @@ namespace Blaven.RavenDb {
             RefreshBlogPosts(_session, blogKey, parsedBlogData.Posts);
 
             UpdateStoreRefresh(_session, blogKey);
-
+            
             _session.SaveChanges();
 
             if(waitForIndexes) {
@@ -200,7 +199,7 @@ namespace Blaven.RavenDb {
         }
 
         private void RefreshBlogPosts(IDocumentSession session, string blogKey, IEnumerable<BlogPost> parsedPosts) {
-            var parsedPostsList = parsedPosts.ToList();
+            var parsedPostsList = parsedPosts.OrderBy(x => x.Published).ToList();
 
             var parsedPostsIds = parsedPosts.Select(x => x.Id).ToList();
             var storePosts = session.Load<BlogPost>(parsedPostsIds);

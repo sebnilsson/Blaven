@@ -23,6 +23,11 @@ namespace Blaven {
         public BlogAuthor Author { get; set; }
 
         /// <summary>
+        /// The automatic incremented unique ID given by RavenDB.
+        /// </summary>
+        public long BlavenId { get; set; }
+
+        /// <summary>
         /// The blog key the post belongs to..
         /// </summary>
         public string BlogKey { get; set; }
