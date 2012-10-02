@@ -124,12 +124,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Libraries\Blaven\Blaven.csproj">
+    <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">
       <Project>{30FB0DDF-B9A6-4D40-A1D8-979A5DF398EA}</Project>
       <Name>Blaven</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="XmlFiles\bloggerindraft.xml" />
     <Content Include="XmlFiles\buzz.xml">
