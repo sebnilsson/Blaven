@@ -284,8 +284,6 @@ namespace Blaven {
             if(store == null) {
                 return;
             }
-
-            store.RegisterListener(new BlavenIdStoreListener(documentStore));
         }
 
         #region IDisposable Members

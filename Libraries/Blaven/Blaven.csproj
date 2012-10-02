@@ -118,7 +118,7 @@
     <Compile Include="BlogService.cs" />
     <Compile Include="Blogger\BloggerSettingsService.cs" />
     <Compile Include="BlogServiceRefresher.cs" />
-    <Compile Include="RavenDb\BlavenIdStoreListener.cs" />
+    <Compile Include="Crc32.cs" />
     <Compile Include="RefreshType.cs" />
     <Compile Include="RavenDb\StoreBlogRefresh.cs" />
     <Compile Include="RavenDb\Indexes\ArchiveCountByBlogKey.cs" />

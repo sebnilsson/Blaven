@@ -51,6 +51,7 @@ namespace Blaven.Blogger {
             string title = entry.Element(ns + "title").Value;
 
             var post = new BlogPost(bloggerSetting.BlogKey, id) {
+                BlavenId = Crc32.Compute(id),
                 Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value ?? string.Empty,
                 OriginalBloggerUrl = GetRelativeUrl(permaLinkFull),
