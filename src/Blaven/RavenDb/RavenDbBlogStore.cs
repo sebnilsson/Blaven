@@ -199,9 +199,9 @@ namespace Blaven.RavenDb {
         }
 
         private void RefreshBlogPosts(IDocumentSession session, string blogKey, IEnumerable<BlogPost> parsedPosts) {
-            var parsedPostsList = parsedPosts.OrderBy(x => x.Published).ToList();
+            var parsedPostsList = parsedPosts.OrderBy(x => x.Id).ToList();
 
-            var parsedPostsIds = parsedPosts.Select(x => x.Id).ToList();
+            var parsedPostsIds = parsedPosts.Select(x => x.Id).OrderBy(x => x).ToList();
             var storePosts = session.Load<BlogPost>(parsedPostsIds);
 
             for(int i = 0; i < storePosts.Count(); i++) {
