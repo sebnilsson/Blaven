@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Xml.Linq;
+using System.IO;
 
 using Google.GData.Blogger;
 using Google.GData.Client;
-using System.IO;
 
 namespace Blaven.Blogger {
     internal static class BloggerHelper {

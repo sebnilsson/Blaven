@@ -1,4 +1,6 @@
-﻿using System.Web;
+﻿using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Blaven.Transformers {
     public class PreTagTransformer : IBlogPostTransformer {
@@ -13,32 +15,21 @@ namespace Blaven.Transformers {
                 return content;
             }
 
+            var regex = new Regex(@"<pre.*?>(<code>)?(?<Content>.*?)(</code>)?</pre>", RegexOptions.Singleline);
+            var matches = regex.Matches(content);
+            var matchingCaptures = from match in matches.OfType<Match>()
+                                   from captures in match.Groups["Content"].Captures.OfType<Capture>()
+                                   select captures;
+            
             string parsedContent = content;
 
-            int openTagStartIndex = parsedContent.IndexOf("<pre");
-            int openTagEndIndex = (openTagStartIndex >= 0) ? parsedContent.IndexOf(">", openTagStartIndex) : -1;
-            int closeTagStartIndex = (openTagStartIndex >= 0) ? parsedContent.IndexOf("</pre>", openTagEndIndex) : -1;
+            foreach(var capture in matchingCaptures) {
+                int index = capture.Index;
+                int length = capture.Length;
 
-            while(openTagStartIndex >= 0 && closeTagStartIndex >= 0) {
-                if(parsedContent.Substring(openTagEndIndex + 1, 5) == "<code") {
-                    openTagStartIndex = openTagEndIndex + 1;
-                    openTagEndIndex = parsedContent.IndexOf(">", openTagStartIndex);
-                    closeTagStartIndex = parsedContent.IndexOf("</code>", openTagEndIndex);
-                }
-
-                string preContent = content.Substring(openTagEndIndex + 1, closeTagStartIndex - openTagEndIndex - 1);
-
-                string encodedPre = HttpUtility.HtmlEncode(preContent);
-
-                parsedContent = parsedContent.Remove(openTagEndIndex + 1, closeTagStartIndex - openTagEndIndex - 1);
-                parsedContent = parsedContent.Insert(openTagEndIndex + 1, encodedPre);
-
-                openTagStartIndex = content.IndexOf("<pre", closeTagStartIndex);
-                if(openTagStartIndex < 0) {
-                    break;
-                }
-                openTagEndIndex = content.IndexOf(">", openTagStartIndex);
-                closeTagStartIndex = content.IndexOf("</pre>", openTagEndIndex);
+                string encodedContent = HttpUtility.HtmlEncode(capture.Value);
+                parsedContent = parsedContent.Remove(index, length);
+                parsedContent = parsedContent.Insert(index, encodedContent);
             }
 
             return parsedContent;

@@ -39,12 +39,13 @@ namespace Blaven.Transformers {
         }
 
         private static void RemoveTransformers(params string[] transformerNames) {
+            transformerNames.ToList().ForEach(x => x = x.ToLowerInvariant());
+
             var foundTransformers = from transformer in TransformersService.Instance.BlogPostTransformers
                                     let type = transformer.GetType()
-                                    let typeFullName = type.FullName
+                                    let typeFullName = type.FullName.ToLowerInvariant()
                                     where type.Assembly.FullName.StartsWith("Blaven, ")
-                                    || transformerNames.Contains(typeFullName)
-                                    || transformerNames.Any(x => typeFullName.EndsWith(x))
+                                    && (transformerNames.Contains(typeFullName) || transformerNames.Any(x => typeFullName.EndsWith(x)))
                                     select transformer;
 
             foundTransformers.ToList().ForEach(x => TransformersService.Instance.BlogPostTransformers.Remove(x));
