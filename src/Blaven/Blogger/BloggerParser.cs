@@ -45,7 +45,7 @@ namespace Blaven.Blogger {
         private static BlogPost ParseEntry(BloggerSetting bloggerSetting, XNamespace ns, XElement entry) {
             var alternateLink = entry.Elements(ns + "link").FirstOrDefault(el => el.Attribute("rel").Value == "alternate");
 
-            string permaLinkFull = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
+            string originalBloggerUrl = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
             long id = ParseBloggerId(entry.Element(ns + "id").Value);
             string title = entry.Element(ns + "title").Value;
@@ -54,7 +54,7 @@ namespace Blaven.Blogger {
                 BlavenId = Crc32.Compute(id),
                 Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                 Content = entry.Element(ns + "content").Value ?? string.Empty,
-                OriginalBloggerUrl = GetRelativeUrl(permaLinkFull),
+                OriginalBloggerUrl = originalBloggerUrl,
                 Published = ParseDate(entry.Element(ns + "published").Value),
                 Title = title,
                 Updated = ParseDate(entry.Element(ns + "updated").Value),
