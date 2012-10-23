@@ -154,6 +154,25 @@ namespace Blaven.Test.Integration {
             Assert.IsTrue(preTagPost.Content.Contains("</code>"));
         }
 
+        [TestMethod]
+        public void Refresh_PostsWithUnencodedPreTagContent_EncodesAllPreTags() {
+            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+
+            var service = BlogServiceTestHelper.GetBlogService(documentStore, new[] { "jonasrapp" }, ensureBlogsRefreshed: true);
+            service.BlogStore.WaitForIndexes();
+
+            var preTagPost = service.GetPostByBloggerId("blogpost/3776549820754361006");
+
+            int preIndex = preTagPost.Content.IndexOf("<pre");
+            int preCount = 0;
+            while(preIndex >= 0) {
+                preCount++;
+                preIndex = preTagPost.Content.IndexOf("<pre", preIndex + 1);
+            }
+
+            Assert.AreEqual<int>(7, preCount, "Some instances of pre-tags disappeared.");
+        }
+
         private BlogService GetBlogServiceWithMultipleBlogs(IDocumentStore documentStore = null, bool refreshAsync = true, bool ensureBlogsRefreshed = true,
             IEnumerable<string> blogKeys = null) {
             blogKeys = blogKeys ?? _blogKeys;

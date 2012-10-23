@@ -17,9 +17,9 @@ namespace Blaven.Transformers {
 
             var regex = new Regex(@"<pre.*?>(<code>)?(?<Content>.*?)(</code>)?</pre>", RegexOptions.Singleline);
             var matches = regex.Matches(content);
-            var matchingCaptures = from match in matches.OfType<Match>()
-                                   from captures in match.Groups["Content"].Captures.OfType<Capture>()
-                                   select captures;
+            var matchingCaptures = (from match in matches.OfType<Match>()
+                                    from captures in match.Groups["Content"].Captures.OfType<Capture>()
+                                    select captures).Reverse();
             
             string parsedContent = content;
 
