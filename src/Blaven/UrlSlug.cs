@@ -1,8 +1,11 @@
 ﻿using System.Text;
 
-namespace Blaven {
-    public static class UrlSlug {
-        public static string Create(params string[] values) {
+namespace Blaven
+{
+    public static class UrlSlug
+    {
+        public static string Create(params string[] values)
+        {
             return Create(string.Join("-", values));
         }
 
@@ -16,8 +19,10 @@ namespace Blaven {
         /// http://stackoverflow.com/questions/25259/how-do-you-include-a-webpage-title-as-part-of-a-webpage-url/25486#25486
         /// http://stackoverflow.com/questions/3769457/how-can-i-remove-accents-on-a-string
         /// </summary>
-        public static string Create(string value) {
-            if(value == null) {
+        public static string Create(string value)
+        {
+            if (value == null)
+            {
                 return string.Empty;
             }
 
@@ -29,32 +34,45 @@ namespace Blaven {
             var sb = new StringBuilder(len);
             char c;
 
-            for(int i = 0; i < len; i++) {
+            for (int i = 0; i < len; i++)
+            {
                 c = normalised[i];
-                if((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9')) {
-                    if(prevDash) {
+                if ((c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))
+                {
+                    if (prevDash)
+                    {
                         sb.Append('-');
                         prevDash = false;
                     }
 
                     sb.Append(c);
-                } else if(c >= 'A' && c <= 'Z') {
-                    if(prevDash) {
+                }
+                else if (c >= 'A' && c <= 'Z')
+                {
+                    if (prevDash)
+                    {
                         sb.Append('-');
                         prevDash = false;
                     }
 
                     // tricky way to convert to lowercase
                     sb.Append((char)(c | 32));
-                } else if(c == ' ' || c == ',' || c == '.' || c == '/' || c == '\\' || c == '-' || c == '_' || c == '=') {
-                    if(!prevDash && sb.Length > 0) {
+                }
+                else if (c == ' ' || c == ',' || c == '.' || c == '/' || c == '\\' || c == '-' || c == '_' || c == '=')
+                {
+                    if (!prevDash && sb.Length > 0)
+                    {
                         prevDash = true;
                     }
-                } else {
+                }
+                else
+                {
                     string swap = ConvertEdgeCases(c);
 
-                    if(swap != null) {
-                        if(prevDash) {
+                    if (swap != null)
+                    {
+                        if (prevDash)
+                        {
                             sb.Append('-');
                             prevDash = false;
                         }
@@ -62,7 +80,8 @@ namespace Blaven {
                     }
                 }
 
-                if(sb.Length == maxlen) {
+                if (sb.Length == maxlen)
+                {
                     break;
                 }
             }
@@ -70,9 +89,11 @@ namespace Blaven {
             return sb.ToString();
         }
 
-        static string ConvertEdgeCases(char c) {
+        private static string ConvertEdgeCases(char c)
+        {
             string swap = null;
-            switch(c) {
+            switch (c)
+            {
                 case 'ı':
                     swap = "i";
                     break;

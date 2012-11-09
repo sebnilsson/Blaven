@@ -2,16 +2,21 @@
 using System.Text.RegularExpressions;
 using System.Web;
 
-namespace Blaven.Transformers {
-    public class PreTagTransformer : IBlogPostTransformer {
-        public BlogPost Transform(BlogPost blogPost) {
+namespace Blaven.Transformers
+{
+    public class PreTagTransformer : IBlogPostTransformer
+    {
+        public BlogPost Transform(BlogPost blogPost)
+        {
             blogPost.Content = EncodePreTags(blogPost.Content);
 
             return blogPost;
         }
 
-        private string EncodePreTags(string content) {
-            if(!content.Contains("</pre>")) {
+        private static string EncodePreTags(string content)
+        {
+            if (!content.Contains("</pre>"))
+            {
                 return content;
             }
 
@@ -20,10 +25,11 @@ namespace Blaven.Transformers {
             var matchingCaptures = (from match in matches.OfType<Match>()
                                     from captures in match.Groups["Content"].Captures.OfType<Capture>()
                                     select captures).Reverse();
-            
+
             string parsedContent = content;
 
-            foreach(var capture in matchingCaptures) {
+            foreach (var capture in matchingCaptures)
+            {
                 int index = capture.Index;
                 int length = capture.Length;
 

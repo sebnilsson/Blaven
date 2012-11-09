@@ -1,11 +1,13 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Blaven.Blogger {
+namespace Blaven.Blogger
+{
     /// <summary>
     /// Represents a Blogger-setting.
     /// </summary>
     [DataContract]
-    public class BloggerSetting {
+    public class BloggerSetting
+    {
         /// <summary>
         /// The base-URL for the blog. Leave empty to use default value from Blogger.
         /// </summary>
@@ -16,16 +18,16 @@ namespace Blaven.Blogger {
         /// The unique identifier for the blog.
         /// </summary>
         [DataMember(Name = "blogKey")]
-        public string BlogKey { get ; set; }
+        public string BlogKey { get; set; }
 
         /// <summary>
         /// The ID of the blog on Blogger.
         /// </summary>
         [DataMember(Name = "blogId")]
-        public string BlogId { get ; set; }
-        
+        public string BlogId { get; set; }
+
         [DataMember(Name = "passwordKey")]
-        internal string PasswordKey { get ; set; }
+        internal string PasswordKey { get; set; }
 
         [DataMember(Name = "usernameKey")]
         internal string UsernameKey { get; set; }

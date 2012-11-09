@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 
-namespace Blaven {
+namespace Blaven
+{
     /// <summary>
     /// Represents the info/meta-data of a blog.
     /// </summary>
-    public class BlogInfo {
-        public BlogInfo() {
-
-        }
-
+    public class BlogInfo
+    {
         /// <summary>
         /// The unique key to identify the blog.
         /// </summary>

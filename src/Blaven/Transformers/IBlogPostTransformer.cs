@@ -1,5 +1,7 @@
-﻿namespace Blaven.Transformers {
-    public interface IBlogPostTransformer {
+﻿namespace Blaven.Transformers
+{
+    public interface IBlogPostTransformer
+    {
         BlogPost Transform(BlogPost blogPost);
     }
 }

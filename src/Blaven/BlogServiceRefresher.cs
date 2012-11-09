@@ -7,99 +7,130 @@ using System.Threading.Tasks;
 using Blaven.Blogger;
 using Blaven.RavenDb;
 
-namespace Blaven {
-    internal static class BlogServiceRefresher {
-        private static readonly int _ravenTimeoutSeconds = 10;
-        private static readonly int _refreshTimeoutSeconds = 30;
+namespace Blaven
+{
+    internal static class BlogServiceRefresher
+    {
+        private const int RavenTimeoutSeconds = 10;
 
-        private static Dictionary<string, bool> _blogKeyIsRefreshing = new Dictionary<string, bool>();
+        private const int RefreshTimeoutSeconds = 30;
 
-        public static IEnumerable<RefreshResult> RefreshBlogs(RavenDbBlogStore blogStore, IEnumerable<BloggerSetting> bloggerSettings, int cacheTime, bool forceRefresh = false) {
+        private static readonly object RefreshLock = new object();
+
+        private static readonly object BlogStoreRefreshLocksLock = new object();
+
+        ////private static Dictionary<string, object> blogStoreRefreshLocks = new Dictionary<string, object>();
+
+        private static Dictionary<string, bool> blogKeyIsRefreshing = new Dictionary<string, bool>();
+
+        public static IEnumerable<RefreshResult> RefreshBlogs(
+            RavenDbBlogStore blogStore,
+            IEnumerable<BloggerSetting> bloggerSettings,
+            int cacheTime,
+            bool forceRefresh = false)
+        {
             var results = new List<RefreshResult>();
 
-            Parallel.ForEach(bloggerSettings, bloggerSetting => {
-                var updateResult = RefreshBlog(blogStore, bloggerSetting, cacheTime, forceRefresh: forceRefresh);
-                results.Add(updateResult);
-            });
+            Parallel.ForEach(
+                bloggerSettings,
+                bloggerSetting =>
+                    {
+                        var updateResult = RefreshBlog(blogStore, bloggerSetting, cacheTime, forceRefresh);
+                        results.Add(updateResult);
+                    });
 
             return results.AsEnumerable();
         }
 
-        private static object _refreshLock = new object();
-        private static RefreshResult RefreshBlog(RavenDbBlogStore blogStore, BloggerSetting bloggerSetting, int cacheTime, bool forceRefresh = false) {
+        private static RefreshResult RefreshBlog(
+            RavenDbBlogStore blogStore, BloggerSetting bloggerSetting, int cacheTime, bool forceRefresh = false)
+        {
             var stopwatch = new System.Diagnostics.Stopwatch();
             stopwatch.Start();
 
-            bool isBlogRefreshed = false;
-            bool isBlogRefreshing = false;
+            bool isBlogRefreshed;
+            bool isBlogRefreshing;
 
             string blogKey = bloggerSetting.BlogKey;
 
-            lock(_refreshLock) {
-                if(!_blogKeyIsRefreshing.ContainsKey(blogKey)) {
-                    _blogKeyIsRefreshing[blogKey] = false;
+            lock (RefreshLock)
+            {
+                if (!blogKeyIsRefreshing.ContainsKey(blogKey))
+                {
+                    blogKeyIsRefreshing[blogKey] = false;
                 }
 
-                isBlogRefreshing = _blogKeyIsRefreshing[blogKey];
+                isBlogRefreshing = blogKeyIsRefreshing[blogKey];
                 isBlogRefreshed = blogStore.GetIsBlogRefreshed(blogKey, cacheTime);
             }
 
-            if(!forceRefresh && isBlogRefreshed) {
+            if (!forceRefresh && isBlogRefreshed)
+            {
                 return new RefreshResult(blogKey, StopAndGetTime(stopwatch), RefreshType.CancelledIsRefreshed);
             }
 
-            if(isBlogRefreshing) {
-                if(!blogStore.GetHasBlogAnyData(blogKey)) {
+            if (isBlogRefreshing)
+            {
+                if (!blogStore.GetHasBlogAnyData(blogKey))
+                {
                     WaitForData(blogStore, blogKey);
                 }
 
                 return new RefreshResult(blogKey, StopAndGetTime(stopwatch), RefreshType.CancelledIsRefreshing);
             }
 
-            try {
-                _blogKeyIsRefreshing[blogKey] = true;
+            try
+            {
+                blogKeyIsRefreshing[blogKey] = true;
 
-                var updateTask = new Task(() => {
-                    PerformRefresh(blogStore, bloggerSetting);
-                });
+                var updateTask = new Task(() => PerformRefresh(blogStore, bloggerSetting));
                 updateTask.Start();
 
-                if(forceRefresh || !blogStore.GetHasBlogAnyData(blogKey)) {
-                    var isUpdatedSuccess = updateTask.Wait(TimeSpan.FromSeconds(_refreshTimeoutSeconds));
-                    
-                    if(isUpdatedSuccess) {
+                if (forceRefresh || !blogStore.GetHasBlogAnyData(blogKey))
+                {
+                    var isUpdatedSuccess = updateTask.Wait(TimeSpan.FromSeconds(RefreshTimeoutSeconds));
+                    var refreshType = RefreshType.UpdateFailed;
+
+                    if (isUpdatedSuccess)
+                    {
                         WaitForData(blogStore, blogKey);
 
-                        return new RefreshResult(blogKey, StopAndGetTime(stopwatch), RefreshType.UpdateSync);
-                    } else {
-                        return new RefreshResult(blogKey, StopAndGetTime(stopwatch), RefreshType.UpdateFailed);
+                        refreshType = RefreshType.UpdateSync;
                     }
+                    return new RefreshResult(blogKey, StopAndGetTime(stopwatch), refreshType);
                 }
             }
-            finally {
-                _blogKeyIsRefreshing[blogKey] = false;
+            finally
+            {
+                blogKeyIsRefreshing[blogKey] = false;
             }
 
             return new RefreshResult(blogKey, StopAndGetTime(stopwatch), RefreshType.UpdateAsync);
         }
 
-        private static TimeSpan StopAndGetTime(System.Diagnostics.Stopwatch stopwatch) {
+        private static TimeSpan StopAndGetTime(System.Diagnostics.Stopwatch stopwatch)
+        {
             stopwatch.Stop();
             return stopwatch.Elapsed;
         }
 
-        private static void WaitForData(RavenDbBlogStore blogStore, string blogKey) {
-            var waitTask = new Task(() => {
-                while(!blogStore.GetHasBlogAnyData(blogKey)) {
-                    Thread.Sleep(200);
-                }
-            });
+        private static void WaitForData(RavenDbBlogStore blogStore, string blogKey)
+        {
+            var waitTask = new Task(
+                () =>
+                    {
+                        while (!blogStore.GetHasBlogAnyData(blogKey))
+                        {
+                            Thread.Sleep(200);
+                        }
+                    });
 
             waitTask.Start();
-            waitTask.Wait(TimeSpan.FromSeconds(_ravenTimeoutSeconds));
+            waitTask.Wait(TimeSpan.FromSeconds(RavenTimeoutSeconds));
         }
-        
-        private static void PerformRefresh(RavenDbBlogStore blogStore, BloggerSetting bloggerSetting) {
+
+        private static void PerformRefresh(RavenDbBlogStore blogStore, BloggerSetting bloggerSetting)
+        {
             // TODO: Change to commented code when Blogger API-bug is fixed:
             // http://code.google.com/p/gdata-issues/issues/detail?id=2555
             //var lastRefresh = _blogStore.GetBlogLastRefresh(key);
@@ -107,36 +138,41 @@ namespace Blaven {
 
             string blogKey = bloggerSetting.BlogKey;
 
-            try {
+            try
+            {
                 string bloggerDocument = BloggerHelper.GetBloggerDocument(bloggerSetting);
 
                 var parsedData = BloggerParser.ParseBlogData(bloggerSetting, bloggerDocument);
 
-                var blogStoreRefreshLock = GetBlogStoreRefreshLock(blogKey);
-                lock(_blogStoreRefreshLocksLock) {
+                ///// var blogStoreRefreshLock = GetBlogStoreRefreshLock(blogKey);
+                lock (BlogStoreRefreshLocksLock)
+                {
                     blogStore.Refresh(blogKey, parsedData);
                 }
             }
-            catch(BloggerServiceException) {
-                if(blogStore.GetHasBlogAnyData(blogKey)) {
+            catch (BloggerServiceException)
+            {
+                if (blogStore.GetHasBlogAnyData(blogKey))
+                {
                     blogStore.UpdateStoreRefresh(blogKey);
                 }
             }
         }
 
-        private static object _blogStoreRefreshLocksLock = new object();
-        private static Dictionary<string, object> _blogStoreRefreshLocks = new Dictionary<string, object>();
-        private static object GetBlogStoreRefreshLock(string blogKey) {
-            lock(_blogStoreRefreshLocksLock) {
-                object keySyncRoot;
+        ////private static object GetBlogStoreRefreshLock(string blogKey)
+        ////{
+        ////    lock (BlogStoreRefreshLocksLock)
+        ////    {
+        ////        object keySyncRoot;
 
-                if(!_blogStoreRefreshLocks.TryGetValue(blogKey, out keySyncRoot)) {
-                    keySyncRoot = new object();
-                    _blogStoreRefreshLocks[blogKey] = keySyncRoot;
-                }
+        ////        if (!blogStoreRefreshLocks.TryGetValue(blogKey, out keySyncRoot))
+        ////        {
+        ////            keySyncRoot = new object();
+        ////            blogStoreRefreshLocks[blogKey] = keySyncRoot;
+        ////        }
 
-                return keySyncRoot;
-            }
-        }
+        ////        return keySyncRoot;
+        ////    }
+        ////}
     }
 }

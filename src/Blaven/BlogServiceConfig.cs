@@ -4,13 +4,16 @@ using System.Linq;
 
 using Blaven.Blogger;
 
-namespace Blaven {
+namespace Blaven
+{
     /// <summary>
     /// A class for setting configurations on an instance of BlogService.
     /// </summary>
-    public class BlogServiceConfig {
+    public class BlogServiceConfig
+    {
         public BlogServiceConfig()
-            : this(BloggerSettingsService.ParseFile(AppSettingsService.BloggerSettingsPath)) {
+            : this(BloggerSettingsService.ParseFile(AppSettingsService.BloggerSettingsPath))
+        {
         }
 
         /// <summary>
@@ -19,16 +22,18 @@ namespace Blaven {
         /// <param name="documentStore">The DocumentStore to use.</param>
         /// <param name="bloggerSettingsFilePath">The full path to the Blogger-settings file.</param>
         public BlogServiceConfig(string bloggerSettingsFilePath)
-            : this(BloggerSettingsService.ParseFile(bloggerSettingsFilePath)) {
-
+            : this(BloggerSettingsService.ParseFile(bloggerSettingsFilePath))
+        {
         }
 
         /// <summary>
         /// Creates a new instance of BloggerSettingsConfig.
         /// </summary>
         /// <param name="settings">The Blogger-settings to use.</param>
-        public BlogServiceConfig(IEnumerable<BloggerSetting> settings) {
-            if(settings == null || !settings.Any()) {
+        public BlogServiceConfig(IEnumerable<BloggerSetting> settings)
+        {
+            if (settings == null || !settings.Any())
+            {
                 throw new ArgumentNullException("settings", "The provided Blogger-settings cannot be null or empty.");
             }
 
@@ -55,12 +60,12 @@ namespace Blaven {
         /// Gets or sets if the BlogService should automatically ensure that blogs are refresh upon instantiation. Defaults to AppSettings default.
         /// </summary>
         public bool EnsureBlogsRefreshed { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the page-size used in the BlogServiceConfig. Defaults to AppSettings default.
         /// </summary>
         public int PageSize { get; set; }
-        
+
         /// <summary>
         /// Gets or sets which mode should be used for refreshing data from blogs.
         /// </summary>

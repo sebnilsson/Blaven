@@ -4,37 +4,44 @@ using System.IO;
 using Google.GData.Blogger;
 using Google.GData.Client;
 
-namespace Blaven.Blogger {
-    internal static class BloggerHelper {
+namespace Blaven.Blogger
+{
+    internal static class BloggerHelper
+    {
         public const string BloggerFeedUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
 
-        public static string GetBloggerDocument(BloggerSetting setting, DateTime? ifModifiedSince = null) {
-            string uri = (!string.IsNullOrWhiteSpace(setting.BloggerUri)) ? setting.BloggerUri
-                : string.Format(BloggerFeedUriFormat, setting.BlogId);
-                        
-            var query = new BloggerQuery(uri) {
-                NumberToRetrieve = int.MaxValue,
-            };
+        public static string GetBloggerDocument(BloggerSetting setting, DateTime? ifModifiedSince = null)
+        {
+            string uri = (!string.IsNullOrWhiteSpace(setting.BloggerUri))
+                             ? setting.BloggerUri
+                             : string.Format(BloggerFeedUriFormat, setting.BlogId);
 
-            if(ifModifiedSince.HasValue) {
+            var query = new BloggerQuery(uri) { NumberToRetrieve = int.MaxValue, };
+
+            if (ifModifiedSince.HasValue)
+            {
                 query.ModifiedSince = ifModifiedSince.Value;
             }
 
             return GetBloggerDocument(setting, query);
         }
 
-        public static string GetBloggerDocument(BloggerSetting setting, BloggerQuery query) {
+        public static string GetBloggerDocument(BloggerSetting setting, BloggerQuery query)
+        {
             var service = GetBloggerService(setting.Username, setting.Password, query.Uri.IsFile);
-            
+
             BloggerFeed feed = null;
-            try {
+            try
+            {
                 feed = service.Query(query);
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 throw new BloggerServiceException(setting, ex);
             }
-            
-            using(var stream = new System.IO.MemoryStream()) {
+
+            using (var stream = new MemoryStream())
+            {
                 feed.SaveToXml(stream);
                 stream.Position = 0;
 
@@ -44,25 +51,30 @@ namespace Blaven.Blogger {
             }
         }
 
-        private static BloggerService GetBloggerService(string username, string password, bool isFile = false) {
+        private static BloggerService GetBloggerService(string username, string password, bool isFile = false)
+        {
             var service = new BloggerService("Blaven");
-            if(!string.IsNullOrWhiteSpace(username)) {
+            if (!string.IsNullOrWhiteSpace(username))
+            {
                 service.Credentials = new GDataCredentials(username, password);
 
                 // For proper authentication for Google Apps users
                 SetAuthForGoogleAppsUsers(service);
             }
-            
-            if(isFile) {
-                service.RequestFactory = new Blaven.Blogger.LocalGDataRequestFactory();   
+
+            if (isFile)
+            {
+                service.RequestFactory = new LocalGDataRequestFactory();
             }
 
             return service;
         }
 
-        private static void SetAuthForGoogleAppsUsers(BloggerService service) {
-            GDataGAuthRequestFactory factory = service.RequestFactory as GDataGAuthRequestFactory;
-            if(factory == null) {
+        private static void SetAuthForGoogleAppsUsers(BloggerService service)
+        {
+            var factory = service.RequestFactory as GDataGAuthRequestFactory;
+            if (factory == null)
+            {
                 return;
             }
 
