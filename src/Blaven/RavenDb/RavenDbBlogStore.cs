@@ -174,7 +174,6 @@ namespace Blaven.RavenDb
             var posts =
                 _session.Query<BlogPost, BlogPostsOrderedByCreated>()
                         .Where(x => x.BlogKey.In(blogKeys))
-                        .OrderByDescending(x => x.Published)
                         .OrderByDescending(x => x.Published);
 
             return new BlogSelection(posts, pageIndex, pageSize);
