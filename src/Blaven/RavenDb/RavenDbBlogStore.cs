@@ -32,6 +32,45 @@ namespace Blaven.RavenDb
             }
         }
 
+        public IEnumerable<BlogPostSimple> GetAllBlogPostsSimple(params string[] blogKeys)
+        {
+            if (blogKeys == null)
+            {
+                throw new ArgumentNullException("blogKeys");
+            }
+
+            using (var session = _documentStore.OpenSession())
+            {
+                session.Advanced.MaxNumberOfRequestsPerSession = int.MaxValue;
+                var allPosts =
+                    session.Query<BlogPost, BlogPostsSimple>()
+                           .Select(
+                               x =>
+                               new BlogPostSimple
+                                   {
+                                       BlavenId = x.BlavenId,
+                                       BlogKey = x.BlogKey,
+                                       Published = x.Published,
+                                       Tags = x.Tags,
+                                       Title = x.Title,
+                                       Updated = x.Updated,
+                                       UrlSlug = x.UrlSlug,
+                                   });
+                try
+                {
+                    return allPosts.OrderByDescending(x => x.Published).ToList();
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Source == "Raven.Database")
+                    {
+                        throw new BlogServiceNotInitException(ex);
+                    }
+                    throw;
+                }
+            }
+        }
+
         public Dictionary<DateTime, int> GetBlogArchiveCount(params string[] blogKeys)
         {
             if (blogKeys == null)
@@ -40,8 +79,8 @@ namespace Blaven.RavenDb
             }
 
             var archiveCount =
-                _session.Query<ArchiveCountByBlogKey.ReduceResult, ArchiveCountByBlogKey>().Where(
-                    x => x.BlogKey.In(blogKeys));
+                _session.Query<ArchiveCountByBlogKey.ReduceResult, ArchiveCountByBlogKey>()
+                        .Where(x => x.BlogKey.In(blogKeys));
             var groupedArchive = from archive in archiveCount.ToList()
                                  group archive by archive.Date
                                  into g select new { Date = g.Key, Count = g.Sum(x => x.Count) };
@@ -58,7 +97,6 @@ namespace Blaven.RavenDb
                 }
                 throw;
             }
-
         }
 
         public BlogSelection GetBlogArchiveSelection(DateTime date, int pageIndex, int pageSize, string[] blogKeys)
@@ -69,9 +107,11 @@ namespace Blaven.RavenDb
             }
 
             var posts =
-                _session.Query<BlogPost, BlogPostsOrderedByCreated>().Where(
-                    x => x.BlogKey.In(blogKeys) && x.Published.Year == date.Year && x.Published.Month == date.Month).
-                    OrderByDescending(x => x.Published);
+                _session.Query<BlogPost, BlogPostsOrderedByCreated>()
+                        .Where(
+                            x =>
+                            x.BlogKey.In(blogKeys) && x.Published.Year == date.Year && x.Published.Month == date.Month)
+                        .OrderByDescending(x => x.Published);
 
             return new BlogSelection(posts, pageIndex, pageSize);
         }
@@ -117,7 +157,7 @@ namespace Blaven.RavenDb
             return blogPost;
         }
 
-        public BlogPost GetBlogPost(string blogKey, long blavenId)
+        public BlogPost GetBlogPost(string blogKey, string blavenId)
         {
             var blogPost =
                 _session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.BlavenId == blavenId);
@@ -132,8 +172,10 @@ namespace Blaven.RavenDb
             }
 
             var posts =
-                _session.Query<BlogPost, BlogPostsOrderedByCreated>().Where(x => x.BlogKey.In(blogKeys)).
-                    OrderByDescending(x => x.Published).OrderByDescending(x => x.Published);
+                _session.Query<BlogPost, BlogPostsOrderedByCreated>()
+                        .Where(x => x.BlogKey.In(blogKeys))
+                        .OrderByDescending(x => x.Published)
+                        .OrderByDescending(x => x.Published);
 
             return new BlogSelection(posts, pageIndex, pageSize);
         }
@@ -172,11 +214,12 @@ namespace Blaven.RavenDb
             }
 
             var posts =
-                _session.Query<BlogPost, BlogPostsOrderedByCreated>().Where(
-                    x =>
-                    x.BlogKey.In(blogKeys)
-                    && x.Tags.Any(tag => tag.Equals(tagName, StringComparison.InvariantCultureIgnoreCase))).
-                    OrderByDescending(x => x.Published);
+                _session.Query<BlogPost, BlogPostsOrderedByCreated>()
+                        .Where(
+                            x =>
+                            x.BlogKey.In(blogKeys)
+                            && x.Tags.Any(tag => tag.Equals(tagName, StringComparison.InvariantCultureIgnoreCase)))
+                        .OrderByDescending(x => x.Published);
 
             return new BlogSelection(posts, pageIndex, pageSize);
         }

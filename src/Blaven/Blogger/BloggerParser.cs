@@ -63,13 +63,14 @@ namespace Blaven.Blogger
             long id = ParseBloggerId(entry.Element(ns + "id").Value);
             string title = entry.Element(ns + "title").Value;
 
+            var published = ParseDate(entry.Element(ns + "published").Value);
             var post = new BlogPost(bloggerSetting.BlogKey, id)
                 {
-                    BlavenId = Crc32.Compute(id),
+                    BlavenId = GetBlavenId(id, published),
                     Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                     Content = entry.Element(ns + "content").Value ?? string.Empty,
                     OriginalBloggerUrl = originalBloggerUrl,
-                    Published = ParseDate(entry.Element(ns + "published").Value),
+                    Published = published,
                     Title = title,
                     Updated = ParseDate(entry.Element(ns + "updated").Value),
                     UrlSlug = UrlSlug.Create(title),
@@ -87,6 +88,12 @@ namespace Blaven.Blogger
             ApplyTransformers(post);
 
             return post;
+        }
+
+        private static string GetBlavenId(long id, DateTime published)
+        {
+            long hash = id + published.Ticks;
+            return string.Format("{0:x}", hash).ToLowerInvariant();
         }
 
         private static void ApplyTransformers(BlogPost blogPost)

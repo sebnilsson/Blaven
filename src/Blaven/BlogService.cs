@@ -16,7 +16,7 @@ namespace Blaven
     /// </summary>
     public class BlogService : IDisposable
     {
-        private string[] blogKeys;
+        private string[] serviceBlogKeys;
 
         /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features. Uses the default values in AppConfig.
@@ -58,7 +58,7 @@ namespace Blaven
 
             this.Config = config;
 
-            blogKeys = GetBlogKeysOrAll(blogKeys);
+            this.serviceBlogKeys = GetBlogKeysOrAll(blogKeys);
 
             if (this.Config.EnsureBlogsRefreshed)
             {
@@ -75,10 +75,14 @@ namespace Blaven
 
         public IDocumentStore DocumentStore { get; private set; }
 
+        public IEnumerable<BlogPostSimple> GetAllBlogPostsSimple()
+        {
+            return this.BlogStore.GetAllBlogPostsSimple(this.serviceBlogKeys);
+        }
+
         public Dictionary<DateTime, int> GetArchiveCount()
         {
-
-            return this.BlogStore.GetBlogArchiveCount(blogKeys);
+            return this.BlogStore.GetBlogArchiveCount(this.serviceBlogKeys);
         }
 
         public BlogSelection GetArchiveSelection(DateTime date, int pageIndex)
@@ -88,7 +92,7 @@ namespace Blaven
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            return this.BlogStore.GetBlogArchiveSelection(date, pageIndex, this.Config.PageSize, blogKeys);
+            return this.BlogStore.GetBlogArchiveSelection(date, pageIndex, this.Config.PageSize, this.serviceBlogKeys);
         }
 
         /// <summary>
@@ -136,7 +140,7 @@ namespace Blaven
         /// <param name="blavenId">The ID of the blog-post to get.</param>
         /// <param name="blogKey">The key of the blog desired. Defaults to first blog in the collection of Blogger-settings.</param>
         /// <returns>Returns a blog-post.</returns>
-        public BlogPost GetPost(long blavenId, string blogKey = null)
+        public BlogPost GetPost(string blavenId, string blogKey = null)
         {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
@@ -155,7 +159,7 @@ namespace Blaven
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            return this.BlogStore.GetBlogSelection(pageIndex, this.Config.PageSize, blogKeys);
+            return this.BlogStore.GetBlogSelection(pageIndex, this.Config.PageSize, this.serviceBlogKeys);
         }
 
         /// <summary>
@@ -164,7 +168,7 @@ namespace Blaven
         /// <returns>Returns a dictionary of tags and their count.</returns>
         public Dictionary<string, int> GetTagsCount()
         {
-            return this.BlogStore.GetBlogTagsCount(blogKeys);
+            return this.BlogStore.GetBlogTagsCount(this.serviceBlogKeys);
         }
 
         public BlogSelection GetTagsSelection(string tagName, int pageIndex)
@@ -174,7 +178,7 @@ namespace Blaven
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            return this.BlogStore.GetBlogTagsSelection(tagName, pageIndex, this.Config.PageSize, blogKeys);
+            return this.BlogStore.GetBlogTagsSelection(tagName, pageIndex, this.Config.PageSize, this.serviceBlogKeys);
         }
 
         public BlogSelection SearchPosts(string searchTerms, int pageIndex)
@@ -184,7 +188,7 @@ namespace Blaven
                 throw new ArgumentOutOfRangeException("pageIndex", "The page-index must be a positive number.");
             }
 
-            return this.BlogStore.SearchPosts(searchTerms ?? string.Empty, pageIndex, this.Config.PageSize, blogKeys);
+            return this.BlogStore.SearchPosts(searchTerms ?? string.Empty, pageIndex, this.Config.PageSize, this.serviceBlogKeys);
         }
 
         /// <summary>
@@ -192,7 +196,7 @@ namespace Blaven
         /// </summary>
         public IEnumerable<RefreshResult> ForceRefresh()
         {
-            return PerformRefresh(blogKeys: blogKeys, forceRefresh: true);
+            return PerformRefresh(blogKeys: this.serviceBlogKeys, forceRefresh: true);
         }
 
         /// <summary>
@@ -200,7 +204,7 @@ namespace Blaven
         /// </summary>
         public IEnumerable<RefreshResult> Refresh()
         {
-            return PerformRefresh(blogKeys: blogKeys, forceRefresh: false);
+            return PerformRefresh(blogKeys: this.serviceBlogKeys, forceRefresh: false);
         }
 
         private IEnumerable<RefreshResult> PerformRefresh(IEnumerable<string> blogKeys, bool forceRefresh)

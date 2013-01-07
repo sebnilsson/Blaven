@@ -28,7 +28,7 @@ namespace Blaven
         /// <summary>
         /// The automatic incremented unique ID given by RavenDB.
         /// </summary>
-        public long BlavenId { get; set; }
+        public string BlavenId { get; set; }
 
         /// <summary>
         /// The blog key the post belongs to.
