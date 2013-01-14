@@ -11,10 +11,10 @@ namespace Blaven
     /// </summary>
     public class BlogPost
     {
-        public BlogPost(string blogKey, long id)
+        public BlogPost(string blogKey, ulong bloggerId)
         {
             this.BlogKey = blogKey;
-            this.Id = RavenDbBlogStore.GetKey<BlogPost>(Convert.ToString(id));
+            this.Id = RavenDbBlogStore.GetKey<BlogPost>(Convert.ToString(bloggerId));
 
             this.Author = new BlogAuthor();
             this.Tags = Enumerable.Empty<string>();

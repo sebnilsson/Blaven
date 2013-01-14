@@ -13,7 +13,7 @@ namespace Blaven.Test
         public static IEnumerable<BlogPost> GetBlogPosts(string blogKey, int start, int count)
         {
             var numbers = Enumerable.Range(start, count);
-            return numbers.Select(number => new BlogPost(blogKey, number));
+            return numbers.Select(number => new BlogPost(blogKey, (uint)number));
         }
     }
 }

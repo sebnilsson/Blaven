@@ -318,6 +318,8 @@ namespace Blaven.RavenDb
                     storePost.Title = parsedPost.Title;
                     storePost.Updated = parsedPost.Updated;
                     storePost.UrlSlug = parsedPost.UrlSlug;
+
+                    storePost.IsDeleted = false;
                 }
             }
 

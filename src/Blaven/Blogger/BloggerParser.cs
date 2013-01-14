@@ -8,6 +8,8 @@ namespace Blaven.Blogger
 {
     internal static class BloggerParser
     {
+        private const string BloggerIdPrefix = ".post-";
+
         public static BlogData ParseBlogData(BloggerSetting bloggerSetting, string bloggerContent)
         {
             try
@@ -60,13 +62,13 @@ namespace Blaven.Blogger
 
             string originalBloggerUrl = alternateLink == null ? string.Empty : alternateLink.Attribute("href").Value;
 
-            long id = ParseBloggerId(entry.Element(ns + "id").Value);
+            ulong bloggerId = ParseBloggerId(entry.Element(ns + "id").Value);
             string title = entry.Element(ns + "title").Value;
 
             var published = ParseDate(entry.Element(ns + "published").Value);
-            var post = new BlogPost(bloggerSetting.BlogKey, id)
+            var post = new BlogPost(bloggerSetting.BlogKey, bloggerId)
                 {
-                    BlavenId = GetBlavenId(id, published),
+                    BlavenId = GetBlavenId(bloggerId),
                     Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
                     Content = entry.Element(ns + "content").Value ?? string.Empty,
                     OriginalBloggerUrl = originalBloggerUrl,
@@ -90,10 +92,15 @@ namespace Blaven.Blogger
             return post;
         }
 
-        private static string GetBlavenId(long id, DateTime published)
+        private static string GetBlavenId(ulong id)
         {
-            long hash = id + published.Ticks;
-            return string.Format("{0:x}", hash).ToLowerInvariant();
+            var bytes = BitConverter.GetBytes(id);
+
+            var sha1 = System.Security.Cryptography.SHA1.Create();
+            var hash = sha1.ComputeHash(bytes);
+
+            var hashInt = BitConverter.ToInt32(hash, 0);
+            return hashInt.ToString("x8");
         }
 
         private static void ApplyTransformers(BlogPost blogPost)
@@ -105,13 +112,12 @@ namespace Blaven.Blogger
             }
         }
 
-        private static long ParseBloggerId(string val)
+        private static ulong ParseBloggerId(string val)
         {
-            string findValue = ".post-";
-            int index = val.IndexOf(findValue, StringComparison.InvariantCultureIgnoreCase) + findValue.Length;
+            int index = val.IndexOf(BloggerIdPrefix, StringComparison.InvariantCultureIgnoreCase) + BloggerIdPrefix.Length;
 
             string text = val.Substring(index);
-            return long.Parse(text);
+            return ulong.Parse(text);
         }
 
         private static DateTime ParseDate(string val)

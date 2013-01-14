@@ -47,7 +47,7 @@ namespace Blaven
 
         #endregion
 
-        public static uint Compute(long value)
+        public static uint Compute(ulong value)
         {
             uint crc = 0;
             crc ^= CrcSeed;
