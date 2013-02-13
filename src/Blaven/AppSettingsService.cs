@@ -159,7 +159,7 @@ namespace Blaven
             get
             {
                 return _ravenDbStoreUrl
-                       ?? (_ravenDbStoreUrl = connectionStringParser.Value.ConnectionStringOptions.Url ?? string.Empty);
+                       ?? (_ravenDbStoreUrl = connectionStringParser.Value.ConnectionStringOptions.Url);
             }
         }
 
@@ -176,7 +176,7 @@ namespace Blaven
                 return _ravenDbStoreApiKey
                        ??
                        (_ravenDbStoreApiKey =
-                        connectionStringParser.Value.ConnectionStringOptions.ApiKey ?? string.Empty);
+                        connectionStringParser.Value.ConnectionStringOptions.ApiKey);
             }
         }
 
