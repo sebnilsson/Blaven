@@ -4,7 +4,7 @@ using System.Web;
 
 namespace Blaven.Transformers
 {
-    public class PreTagTransformer : IBlogPostTransformer
+    public class PhraseTagsTransformer : IBlogPostTransformer
     {
         public BlogPost Transform(BlogPost blogPost)
         {
@@ -20,7 +20,7 @@ namespace Blaven.Transformers
                 return content;
             }
 
-            var regex = new Regex(@"<pre.*?>(<code>)?(?<Content>.*?)(</code>)?</pre>", RegexOptions.Singleline);
+            var regex = new Regex(@"<(pre|code|samp)+.*?>(<code>)?(?<Content>.*?)(</code>)?</(pre|code|samp)+>", RegexOptions.Singleline);
             var matches = regex.Matches(content);
             var matchingCaptures = (from match in matches.OfType<Match>()
                                     from captures in match.Groups["Content"].Captures.OfType<Capture>()

@@ -42,7 +42,7 @@ namespace Blaven.Transformers
 
         private static void SetDefaultTransformers()
         {
-            Instance.BlogPostTransformers = new List<IBlogPostTransformer> { new PreTagTransformer(), };
+            Instance.BlogPostTransformers = new List<IBlogPostTransformer> { new PhraseTagsTransformer(), };
         }
 
         private static void RemoveTransformers(params string[] transformerNames)
