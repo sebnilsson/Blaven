@@ -238,7 +238,8 @@ namespace Blaven.RavenDb
                 throw new ArgumentNullException("blogKeys");
             }
 
-            var posts = _session.Advanced.LuceneQuery<BlogPost, SearchBlogPosts>().Search("Content", searchTerms);
+            string where = string.Format("Content:\"{0}\"", searchTerms);
+            var posts = _session.Advanced.LuceneQuery<BlogPost, SearchBlogPosts>().Where(where);
 
             return new BlogSelection(posts, pageIndex, pageSize);
         }
