@@ -11,24 +11,24 @@ namespace Blaven.RavenDb
 {
     internal class RavenDbBlogStore : IDisposable
     {
-        private const int waitForIndexTimeout = 1000 * 30;
+        private const int WaitForIndexTimeout = 1000 * 30;
 
-        private IDocumentStore _documentStore;
+        private readonly IDocumentStore documentStore;
+
+        private readonly Lazy<IDocumentSession> lazySession;
 
         public RavenDbBlogStore(IDocumentStore documentStore)
         {
-            _documentStore = documentStore;
+            this.documentStore = documentStore;
 
-            _lazySession = new Lazy<IDocumentSession>(() => { return _documentStore.OpenSession(); });
+            this.lazySession = new Lazy<IDocumentSession>(() => this.documentStore.OpenSession());
         }
 
-        private Lazy<IDocumentSession> _lazySession;
-
-        private IDocumentSession _session
+        private IDocumentSession Session
         {
             get
             {
-                return _lazySession.Value;
+                return this.lazySession.Value;
             }
         }
 
@@ -39,7 +39,7 @@ namespace Blaven.RavenDb
                 throw new ArgumentNullException("blogKeys");
             }
 
-            using (var session = _documentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 session.Advanced.MaxNumberOfRequestsPerSession = int.MaxValue;
                 var allPosts =
@@ -79,7 +79,7 @@ namespace Blaven.RavenDb
             }
 
             var archiveCount =
-                _session.Query<ArchiveCountByBlogKey.ReduceResult, ArchiveCountByBlogKey>()
+                this.Session.Query<ArchiveCountByBlogKey.ReduceResult, ArchiveCountByBlogKey>()
                         .Where(x => x.BlogKey.In(blogKeys));
             var groupedArchive = from archive in archiveCount.ToList()
                                  group archive by archive.Date
@@ -107,7 +107,7 @@ namespace Blaven.RavenDb
             }
 
             var posts =
-                _session.Query<BlogPost, BlogPostsOrderedByCreated>()
+                this.Session.Query<BlogPost, BlogPostsOrderedByCreated>()
                         .Where(
                             x =>
                             x.BlogKey.In(blogKeys) && x.Published.Year == date.Year && x.Published.Month == date.Month)
@@ -118,7 +118,7 @@ namespace Blaven.RavenDb
 
         public BlogInfo GetBlogInfo(string blogKey)
         {
-            var blogInfo = _session.Load<BlogInfo>(GetKey<BlogInfo>(blogKey));
+            var blogInfo = this.Session.Load<BlogInfo>(GetKey<BlogInfo>(blogKey));
             if (blogInfo == null)
             {
                 throw new ArgumentOutOfRangeException(
@@ -141,7 +141,7 @@ namespace Blaven.RavenDb
 
         public DateTime? GetBlogLastRefresh(string blogKey)
         {
-            var storeRefresh = _session.Load<StoreBlogRefresh>(GetKey<StoreBlogRefresh>(blogKey));
+            var storeRefresh = this.Session.Load<StoreBlogRefresh>(GetKey<StoreBlogRefresh>(blogKey));
             if (storeRefresh == null)
             {
                 return null;
@@ -153,14 +153,14 @@ namespace Blaven.RavenDb
         public BlogPost GetBlogPostByBloggerId(string blogKey, string bloggerId)
         {
             var blogPost =
-                _session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.Id == bloggerId);
+                this.Session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.Id == bloggerId);
             return blogPost;
         }
 
         public BlogPost GetBlogPost(string blogKey, string blavenId)
         {
             var blogPost =
-                _session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.BlavenId == blavenId);
+                this.Session.Query<BlogPost>().FirstOrDefault(post => post.BlogKey == blogKey && post.BlavenId == blavenId);
             return blogPost;
         }
 
@@ -172,7 +172,7 @@ namespace Blaven.RavenDb
             }
 
             var posts =
-                _session.Query<BlogPost, BlogPostsOrderedByCreated>()
+                this.Session.Query<BlogPost, BlogPostsOrderedByCreated>()
                         .Where(x => x.BlogKey.In(blogKeys))
                         .OrderByDescending(x => x.Published);
 
@@ -187,7 +187,7 @@ namespace Blaven.RavenDb
             }
 
             var tagCount =
-                _session.Query<TagsCountByBlogKey.ReduceResult, TagsCountByBlogKey>().Where(x => x.BlogKey.In(blogKeys));
+                this.Session.Query<TagsCountByBlogKey.ReduceResult, TagsCountByBlogKey>().Where(x => x.BlogKey.In(blogKeys));
             var tagsGrouped = (from result in tagCount.ToList()
                                group result by result.Tag
                                into g select new { Tag = g.Key, Count = g.Sum(x => x.Count), });
@@ -213,7 +213,7 @@ namespace Blaven.RavenDb
             }
 
             var posts =
-                _session.Query<BlogPost, BlogPostsOrderedByCreated>()
+                this.Session.Query<BlogPost, BlogPostsOrderedByCreated>()
                         .Where(
                             x =>
                             x.BlogKey.In(blogKeys)
@@ -225,7 +225,7 @@ namespace Blaven.RavenDb
 
         public bool GetHasBlogAnyData(string blogKey)
         {
-            using (var session = _documentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 return session.Query<StoreBlogRefresh>().Any(x => x.BlogKey == blogKey);
             }
@@ -239,20 +239,20 @@ namespace Blaven.RavenDb
             }
 
             string where = string.Format("Content:\"{0}\"", searchTerms);
-            var posts = _session.Advanced.LuceneQuery<BlogPost, SearchBlogPosts>().Where(where);
+            var posts = this.Session.Advanced.LuceneQuery<BlogPost, SearchBlogPosts>().Where(where);
 
             return new BlogSelection(posts, pageIndex, pageSize);
         }
 
         public void Refresh(string blogKey, BlogData parsedBlogData, bool waitForIndexes = false)
         {
-            RefreshBlogInfo(_session, blogKey, parsedBlogData);
+            RefreshBlogInfo(this.Session, blogKey, parsedBlogData);
 
-            RefreshBlogPosts(_session, blogKey, parsedBlogData.Posts);
+            RefreshBlogPosts(this.Session, blogKey, parsedBlogData.Posts);
 
-            UpdateStoreRefresh(_session, blogKey);
+            UpdateStoreRefresh(this.Session, blogKey);
 
-            _session.SaveChanges();
+            this.Session.SaveChanges();
 
             if (waitForIndexes)
             {
@@ -265,13 +265,13 @@ namespace Blaven.RavenDb
             var waitTask = new Task(
                 () =>
                     {
-                        while (_documentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0)
+                        while (this.documentStore.DatabaseCommands.GetStatistics().StaleIndexes.Length > 0)
                         {
                             System.Threading.Thread.Sleep(100);
                         }
                     });
             waitTask.Start();
-            waitTask.Wait(waitForIndexTimeout);
+            waitTask.Wait(WaitForIndexTimeout);
         }
 
         private void RefreshBlogInfo(IDocumentSession session, string blogKey, BlogData parsedData)
@@ -337,9 +337,9 @@ namespace Blaven.RavenDb
 
         internal void UpdateStoreRefresh(string blogKey)
         {
-            UpdateStoreRefresh(_session, blogKey);
+            UpdateStoreRefresh(this.Session, blogKey);
 
-            _session.SaveChanges();
+            this.Session.SaveChanges();
         }
 
         private void UpdateStoreRefresh(IDocumentSession session, string blogKey)
@@ -371,9 +371,9 @@ namespace Blaven.RavenDb
 
         public void Dispose()
         {
-            if (_lazySession.IsValueCreated)
+            if (this.lazySession.IsValueCreated)
             {
-                _lazySession.Value.Dispose();
+                this.lazySession.Value.Dispose();
             }
         }
 

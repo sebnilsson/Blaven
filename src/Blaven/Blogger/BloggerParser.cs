@@ -70,7 +70,7 @@ namespace Blaven.Blogger
                 {
                     BlavenId = GetBlavenId(bloggerId),
                     Tags = entry.Elements(ns + "category").Select(cat => cat.Attribute("term").Value),
-                    Content = entry.Element(ns + "content").Value ?? string.Empty,
+                    Content = entry.Element(ns + "content").Value,
                     OriginalBloggerUrl = originalBloggerUrl,
                     Published = published,
                     Title = title,
@@ -122,12 +122,8 @@ namespace Blaven.Blogger
 
         private static DateTime ParseDate(string val)
         {
-            var split = val.Split(new[] { 'T' }, StringSplitOptions.RemoveEmptyEntries);
-            var timeString = split[1].Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)[0];
-            var date = DateTime.Parse(split[0]);
-            var time = DateTime.Parse(timeString);
-
-            return new DateTime(date.Year, date.Month, date.Day, time.Hour, time.Minute, time.Second, DateTimeKind.Utc);
+            var dateTime = DateTime.Parse(val).ToUniversalTime();
+            return dateTime;
         }
 
         private static string GetAbsoluteUrl(string fullUrl, string baseUrl)
