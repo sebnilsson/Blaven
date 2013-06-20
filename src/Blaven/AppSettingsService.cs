@@ -13,19 +13,22 @@ namespace Blaven
     /// </summary>
     public static class AppSettingsService
     {
-        private static Lazy<string> bloggerSettingsPath = new Lazy<string>(
+        private const string DefaultBloggerSettingsPath = "~/BlogSettings.json";
+
+        private static readonly Lazy<string> BloggerSettingsPathLazy = new Lazy<string>(
             () =>
                 {
-                    string value = GetConfigValue("Blaven.BloggerSettingsPath");
-                    value = (!string.IsNullOrWhiteSpace(value)) ? value : "~/BloggerSettings.json";
+                    string value = GetConfigValue(
+                        "Blaven.BloggerSettingsPath", defaultValue: DefaultBloggerSettingsPath);
 
-                    string resolvedPath = string.Empty;
+                    string resolvedPath;
                     try
                     {
                         resolvedPath = HttpContext.Current.Server.MapPath(value);
                     }
                     catch (Exception)
                     {
+                        resolvedPath = DefaultBloggerSettingsPath;
                     }
 
                     return resolvedPath;
@@ -38,21 +41,12 @@ namespace Blaven
         {
             get
             {
-                return bloggerSettingsPath.Value;
+                return BloggerSettingsPathLazy.Value;
             }
         }
 
-        private static Lazy<int> cacheTime = new Lazy<int>(
-            () =>
-                {
-                    string value = GetConfigValue("Blaven.CacheTime");
-                    int result = 0;
-                    if (!int.TryParse(value, out result))
-                    {
-                        result = 5;
-                    }
-                    return result;
-                });
+        private static readonly Lazy<int> CacheTimeLazy =
+            new Lazy<int>(() => GetConfigValueInt("Blaven.CacheTime", defaultValue: 5));
 
         /// <summary>
         /// Gets the default cache-time, in minutes. Uses config-key "Blaven.CacheTime". Defaults to 10 (minutes).
@@ -61,11 +55,11 @@ namespace Blaven
         {
             get
             {
-                return cacheTime.Value;
+                return CacheTimeLazy.Value;
             }
         }
 
-        private static Lazy<IEnumerable<string>> excludeTransformers = new Lazy<IEnumerable<string>>(
+        private static readonly Lazy<IEnumerable<string>> ExcludeTransformersLazy = new Lazy<IEnumerable<string>>(
             () =>
                 {
                     string configValue = GetConfigValue("Blaven.ExcludeTransformers");
@@ -76,30 +70,19 @@ namespace Blaven
                 });
 
         /// <summary>
-        /// Gets or sets if the BlogService should automatically ensure that blogs are refresh upon instantiation. Defaults to true.
-        /// Uses config-key "Blaven.EnsureBlogsRefreshed".
+        /// Gets or sets the Transformers to exclude.
+        /// Uses config-key "Blaven.ExcludeTransformers".
         /// </summary>
         public static IEnumerable<string> ExcludeTransformers
         {
             get
             {
-                return excludeTransformers.Value;
+                return ExcludeTransformersLazy.Value;
             }
         }
 
-        private static Lazy<bool> ensureBlogsRefreshed = new Lazy<bool>(
-            () =>
-                {
-                    string configValue = GetConfigValue("Blaven.EnsureBlogsRefreshed");
-
-                    bool result = true;
-                    if (!bool.TryParse(configValue, out result))
-                    {
-                        result = true;
-                    }
-
-                    return result;
-                });
+        private static readonly Lazy<bool> EnsureBlogsRefreshedLazy =
+            new Lazy<bool>(() => GetConfigValueBool("Blaven.EnsureBlogsRefreshed", defaultValue: true));
 
         /// <summary>
         /// Gets or sets if the BlogService should automatically ensure that blogs are refresh upon instantiation. Defaults to true.
@@ -109,21 +92,12 @@ namespace Blaven
         {
             get
             {
-                return ensureBlogsRefreshed.Value;
+                return EnsureBlogsRefreshedLazy.Value;
             }
         }
 
-        private static Lazy<int> pageSize = new Lazy<int>(
-            () =>
-                {
-                    string value = GetConfigValue("Blaven.PageSize");
-                    int result = 0;
-                    if (!int.TryParse(value, out result))
-                    {
-                        result = 5;
-                    }
-                    return result;
-                });
+        private static readonly Lazy<int> PageSizeLazy =
+            new Lazy<int>(() => GetConfigValueInt("Blaven.PageSize", defaultValue: 5));
 
         /// <summary>
         /// Gets the default page-size. Uses "Blaven.PageSize". Defaults to 5.
@@ -132,23 +106,23 @@ namespace Blaven
         {
             get
             {
-                return pageSize.Value;
+                return PageSizeLazy.Value;
             }
         }
 
-        private static Lazy<ConnectionStringParser<RavenConnectionStringOptions>> connectionStringParser =
+        private static readonly Lazy<ConnectionStringParser<RavenConnectionStringOptions>> ConnectionStringParserLazy =
             new Lazy<ConnectionStringParser<RavenConnectionStringOptions>>(
                 () =>
                     {
-                        string key = GetConfigValue("Blaven.RavenDbStoreUrlKey", throwException: true);
-                        string value = GetConfigValue(key);
+                        string urlKey = GetConfigValue("Blaven.RavenDbStoreUrlKey", throwException: true);
+                        string urlValue = GetConfigValue(urlKey);
 
-                        var parser = ConnectionStringParser<RavenConnectionStringOptions>.FromConnectionString(value);
+                        var parser = ConnectionStringParser<RavenConnectionStringOptions>.FromConnectionString(urlValue);
                         parser.Parse();
                         return parser;
                     });
 
-        private static string _ravenDbStoreUrl;
+        private static string ravenDbStoreUrl;
 
         /// <summary>
         /// Gets the URL to the RavenDB store.
@@ -158,12 +132,12 @@ namespace Blaven
         {
             get
             {
-                return _ravenDbStoreUrl
-                       ?? (_ravenDbStoreUrl = connectionStringParser.Value.ConnectionStringOptions.Url);
+                return ravenDbStoreUrl
+                       ?? (ravenDbStoreUrl = ConnectionStringParserLazy.Value.ConnectionStringOptions.Url);
             }
         }
 
-        private static string _ravenDbStoreApiKey;
+        private static string ravenDbStoreApiKey;
 
         /// <summary>
         /// Gets the API-key used for the RavenDB store.
@@ -173,26 +147,13 @@ namespace Blaven
         {
             get
             {
-                return _ravenDbStoreApiKey
-                       ??
-                       (_ravenDbStoreApiKey =
-                        connectionStringParser.Value.ConnectionStringOptions.ApiKey);
+                return ravenDbStoreApiKey
+                       ?? (ravenDbStoreApiKey = ConnectionStringParserLazy.Value.ConnectionStringOptions.ApiKey);
             }
         }
 
-        private static Lazy<bool> _refreshAsync = new Lazy<bool>(
-            () =>
-                {
-                    string configValue = GetConfigValue("Blaven.RefreshAsync");
-
-                    bool result = true;
-                    if (!bool.TryParse(configValue, out result))
-                    {
-                        result = true;
-                    }
-
-                    return result;
-                });
+        private static readonly Lazy<bool> RefreshAsyncLazy =
+            new Lazy<bool>(() => GetConfigValueBool("Blaven.RefreshAsync", defaultValue: true));
 
         /// <summary>
         /// Gets if the refresh of blogs should by done async. Defaults to true.
@@ -202,11 +163,11 @@ namespace Blaven
         {
             get
             {
-                return _refreshAsync.Value;
+                return RefreshAsyncLazy.Value;
             }
         }
 
-        internal static string GetConfigValue(string configKey, bool throwException = false)
+        internal static string GetConfigValue(string configKey, bool throwException = false, string defaultValue = "")
         {
             string value = ConfigurationManager.AppSettings[configKey];
             if (throwException && string.IsNullOrWhiteSpace(value))
@@ -214,7 +175,34 @@ namespace Blaven
                 throw new ConfigurationErrorsException(
                     string.Format("Could not find configuration-value for key '{0}'.", configKey));
             }
-            return value ?? string.Empty;
+
+            return !string.IsNullOrWhiteSpace(value) ? value : defaultValue;
+        }
+
+        internal static bool GetConfigValueBool(
+            string configKey, bool throwException = false, bool defaultValue = default(bool))
+        {
+            string value = GetConfigValue(configKey, throwException);
+            bool result;
+            if (!bool.TryParse(value, out result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
+        internal static int GetConfigValueInt(
+            string configKey, bool throwException = false, int defaultValue = default(int))
+        {
+            string value = GetConfigValue(configKey, throwException);
+            int result;
+            if (!int.TryParse(value, out result))
+            {
+                result = defaultValue;
+            }
+
+            return result;
         }
     }
 }

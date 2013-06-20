@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Blaven.DataSources;
 using Blaven.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -20,12 +21,12 @@ namespace Blaven.RavenDb.Test
         public void Resfresh_WhenBlogPostAdded_ShouldContainAddedPosts()
         {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-            BlogService.InitStore(documentStore);
 
-            var blogStore = new RavenDbBlogStore(documentStore);
+            var blogStore = new RavenRepository(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(TestBlogKey, BlogPostsTestHelper.GetBlogPosts(TestBlogKey, 2));
 
-            blogStore.Refresh(TestBlogKey, blogData, waitForIndexes: true);
+            blogStore.Refresh(TestBlogKey, blogData);
+            blogStore.WaitForStaleIndexes();
 
             var selection = blogStore.GetBlogSelection(DefaultPageIndex, DefaultPageSize, TestBlogKey);
             int totalPosts = selection.TotalPostCount;
@@ -37,16 +38,17 @@ namespace Blaven.RavenDb.Test
         public void Resfresh_WhenBlogPostAddedAndSecondRefresh_ShouldContainAddedPosts()
         {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-            BlogService.InitStore(documentStore);
 
-            var blogStore = new RavenDbBlogStore(documentStore);
+            var blogStore = new RavenRepository(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(TestBlogKey, BlogPostsTestHelper.GetBlogPosts(TestBlogKey, 2));
 
-            blogStore.Refresh(TestBlogKey, blogData, waitForIndexes: true);
+            blogStore.Refresh(TestBlogKey, blogData);
+            blogStore.WaitForStaleIndexes();
 
             blogData.Posts = blogData.Posts.Concat(BlogPostsTestHelper.GetBlogPosts(TestBlogKey, 3, 2));
 
-            blogStore.Refresh(TestBlogKey, blogData, waitForIndexes: true);
+            blogStore.Refresh(TestBlogKey, blogData);
+            blogStore.WaitForStaleIndexes();
 
             var selection = blogStore.GetBlogSelection(DefaultPageIndex, DefaultPageSize, TestBlogKey);
 
@@ -57,18 +59,30 @@ namespace Blaven.RavenDb.Test
         public void Resfresh_WhenBlogPostsRemovedAndSecondRefresh_ShouldNotContainRemovedPosts()
         {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-            BlogService.InitStore(documentStore);
+            var repository = new RavenRepository(documentStore);
 
-            var blogStore = new RavenDbBlogStore(documentStore);
-            var blogData = BlogDataTestHelper.GetBlogData(TestBlogKey, BlogPostsTestHelper.GetBlogPosts(TestBlogKey, 4));
+            var blogInfo = new BlogInfo { BlogKey = TestBlogKey, Title = "TEST_TITLE" };
+            var refreshResultBefore = new DataSourceRefreshResult
+                                          {
+                                              BlogInfo = blogInfo,
+                                              ModifiedBlogPosts =
+                                                  BlogPostsTestHelper.GetBlogPosts(TestBlogKey, 4),
+                                              RemovedBlogPostIds = Enumerable.Empty<string>()
+                                          };
+            repository.Refresh(TestBlogKey, refreshResultBefore);
+            repository.WaitForStaleIndexes();
 
-            blogStore.Refresh(TestBlogKey, blogData, waitForIndexes: true);
+            var removedBlogs = refreshResultBefore.ModifiedBlogPosts.Skip(2).Select(x => x.Id);
+            var refreshResultAfter = new DataSourceRefreshResult
+                                         {
+                                             BlogInfo = blogInfo,
+                                             ModifiedBlogPosts = Enumerable.Empty<BlogPost>(),
+                                             RemovedBlogPostIds = removedBlogs
+                                         };
+            repository.Refresh(TestBlogKey, refreshResultAfter);
+            repository.WaitForStaleIndexes();
 
-            blogData.Posts = BlogPostsTestHelper.GetBlogPosts(TestBlogKey, 2);
-
-            blogStore.Refresh(TestBlogKey, blogData, waitForIndexes: true);
-
-            var selection = blogStore.GetBlogSelection(DefaultPageIndex, DefaultPageSize, TestBlogKey);
+            var selection = repository.GetBlogSelection(DefaultPageIndex, DefaultPageSize, TestBlogKey);
 
             Assert.AreEqual<int>(2, selection.TotalPostCount, "The removed posts was not removed from store.");
         }
@@ -83,12 +97,11 @@ namespace Blaven.RavenDb.Test
                 };
         }
 
-        private RavenDbBlogStore GetBlogTagsSelectionBlogStore()
+        private RavenRepository GetBlogTagsSelectionBlogStore()
         {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-            BlogService.InitStore(documentStore);
 
-            var blogStore = new RavenDbBlogStore(documentStore);
+            var blogStore = new RavenRepository(documentStore);
 
             string blogKey1 = "BLOGKEY1";
             var blogData1 = new BlogData { Posts = GetBlogTagsSelectionBlogPosts().Where(x => x.BlogKey == blogKey1), };
@@ -97,7 +110,8 @@ namespace Blaven.RavenDb.Test
 
             string blogKey2 = "BLOGKEY2";
             var blogData2 = new BlogData { Posts = GetBlogTagsSelectionBlogPosts().Where(x => x.BlogKey == blogKey2), };
-            blogStore.Refresh(blogKey2, blogData2, waitForIndexes: true);
+            blogStore.Refresh(blogKey2, blogData2);
+            blogStore.WaitForStaleIndexes();
 
             return blogStore;
         }
@@ -128,12 +142,12 @@ namespace Blaven.RavenDb.Test
         {
             int postsCount = 33;
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-            BlogService.InitStore(documentStore);
 
-            var blogStore = new RavenDbBlogStore(documentStore);
+            var blogStore = new RavenRepository(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(TestBlogKey, postsCount);
 
-            blogStore.Refresh(TestBlogKey, blogData, waitForIndexes: true);
+            blogStore.Refresh(TestBlogKey, blogData);
+            blogStore.WaitForStaleIndexes();
 
             var selection = blogStore.GetBlogSelection(0, 5, TestBlogKey);
 
@@ -145,14 +159,15 @@ namespace Blaven.RavenDb.Test
         public void GetBlogInfo_WhenChangeInBlogInfo_ShouldShowChanges()
         {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-            var blogStore = new RavenDbBlogStore(documentStore);
+            var blogStore = new RavenRepository(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(TestBlogKey, 1);
             blogData.Info.Subtitle = "ORIGINAL_SUBTITLE";
             blogData.Info.Title = "ORIGINAL_TITLE";
             blogData.Info.Updated = DateTime.MinValue;
             blogData.Info.Url = "ORIGINAL_URL";
 
-            blogStore.Refresh(TestBlogKey, blogData, waitForIndexes: true);
+            blogStore.Refresh(TestBlogKey, blogData);
+            blogStore.WaitForStaleIndexes();
 
             string updatedSubtitle = "UPDATED_SUBTITLE";
             string updatedTitle = "UPDATED_TITLE";
@@ -164,7 +179,8 @@ namespace Blaven.RavenDb.Test
             blogData.Info.Updated = updatedUpdated;
             blogData.Info.Url = updatedUrl;
 
-            blogStore.Refresh(TestBlogKey, blogData, waitForIndexes: true);
+            blogStore.Refresh(TestBlogKey, blogData);
+            blogStore.WaitForStaleIndexes();
 
             var info = blogStore.GetBlogInfo(TestBlogKey);
 
@@ -178,9 +194,8 @@ namespace Blaven.RavenDb.Test
         public void GetBlogSelection_WhenChangeInBlogPost_ShouldShowChanges()
         {
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-            BlogService.InitStore(documentStore);
 
-            var blogStore = new RavenDbBlogStore(documentStore);
+            var blogStore = new RavenRepository(documentStore);
             var blogData = BlogDataTestHelper.GetBlogData(TestBlogKey, 2);
             blogData.Posts = blogData.Posts.ToList();
 
@@ -188,14 +203,15 @@ namespace Blaven.RavenDb.Test
             post.Author.ImageUrl = "ORIGINAL_AUTHOR_IMAGE_URL";
             post.Author.Name = "ORIGINAL_AUTHOR_NAME";
             post.Content = "ORIGINAL_CONTENT";
-            post.OriginalBloggerUrl = "ORIGINAL_ORIGINAL_BLOGGER_URL";
+            post.DataSourceUrl = "ORIGINAL_ORIGINAL_BLOGGER_URL";
             post.Published = DateTime.MinValue;
             post.Tags = new[] { "TAG_1", "TAG_2" };
             post.Title = "ORIGINAL_TITLE";
             post.Updated = DateTime.MinValue.AddYears(1);
             post.UrlSlug = "ORIGINAL_URL_SLUG";
 
-            blogStore.Refresh(TestBlogKey, blogData, waitForIndexes: true);
+            blogStore.Refresh(TestBlogKey, blogData);
+            blogStore.WaitForStaleIndexes();
 
             string updatedAuthorImageUrl = "UPDATED_AUTHOR_IMAGE_URL";
             string updatedAuthorName = "UPDATED_AUTHOR_NAME";
@@ -210,7 +226,7 @@ namespace Blaven.RavenDb.Test
             post.Author.ImageUrl = updatedAuthorImageUrl;
             post.Author.Name = updatedAuthorName;
             post.Content = updatedContent;
-            post.OriginalBloggerUrl = updatedOriginalBloggerUrl;
+            post.DataSourceUrl = updatedOriginalBloggerUrl;
             post.Published = updatedPublished;
             post.Tags = updatedTags;
             post.Title = updatedTitle;
@@ -218,7 +234,7 @@ namespace Blaven.RavenDb.Test
             post.UrlSlug = updatedUrlSlug;
 
             blogStore.Refresh(TestBlogKey, blogData);
-            blogStore.WaitForIndexes();
+            blogStore.WaitForStaleIndexes();
 
             var selection = blogStore.GetBlogSelection(DefaultPageIndex, DefaultPageSize, TestBlogKey);
             var selectedPost = selection.Posts.First(x => x.Id == post.Id);
@@ -229,7 +245,7 @@ namespace Blaven.RavenDb.Test
             Assert.AreEqual<string>(updatedContent, selectedPost.Content, "Content wasn't updated in store.");
             Assert.AreEqual<string>(
                 updatedOriginalBloggerUrl,
-                selectedPost.OriginalBloggerUrl,
+                selectedPost.DataSourceUrl,
                 "OriginalBloggerUrl wasn't updated in store.");
             Assert.AreEqual<DateTime>(updatedPublished, selectedPost.Published, "Published wasn't updated in store.");
             Assert.AreEqual<int>(updatedTags.Count(), selectedPost.Tags.Count(), "Tags wasn't updated in store.");

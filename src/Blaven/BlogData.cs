@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Blaven
 {
-    internal class BlogData
+    public class BlogData
     {
         /// <summary>
         /// An object holding all the information about a blog from a parsed XML-document from Blogger.

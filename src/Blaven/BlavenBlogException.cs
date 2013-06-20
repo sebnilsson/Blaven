@@ -1,33 +1,20 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace Blaven
 {
-    [Serializable]
     public class BlavenBlogException : BlavenException
     {
-        public BlavenBlogException(string blogKey)
+        internal BlavenBlogException(string blogKey)
         {
             this.BlogKey = blogKey;
         }
 
-        public BlavenBlogException(string blogKey, string message)
-            : base(message)
+        internal BlavenBlogException(string blogKey, Exception inner = null, string message = null)
+            : base(inner, message)
         {
             this.BlogKey = blogKey;
         }
 
-        public BlavenBlogException(string blogKey, string message, Exception inner)
-            : base(message, inner)
-        {
-            this.BlogKey = blogKey;
-        }
-
-        protected BlavenBlogException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-
-        public string BlogKey { get; private set; }
+        public string BlogKey { get; internal set; }
     }
 }

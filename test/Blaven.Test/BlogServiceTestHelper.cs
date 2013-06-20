@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.Blogger;
 using Raven.Client;
 
 namespace Blaven.Test
@@ -14,48 +13,27 @@ namespace Blaven.Test
             bool refreshAsync = true,
             bool ensureBlogsRefreshed = true)
         {
-            var settings = from blogKey in blogKeys
-                           let uri = XmlFilesTestHelper.GetProjectPath(blogKey + ".xml")
-                           select new BloggerSetting { BlogKey = blogKey, BloggerUri = uri, };
+            var settings = GetBloggerSettings(blogKeys);
 
-            var config = GetConfig(settings, refreshAsync, ensureBlogsRefreshed);
+            var config = GetConfig(refreshAsync, ensureBlogsRefreshed);
 
-            return new BlogService(documentStore, config);
+            return new BlogService(documentStore, config, settings);
         }
 
-        ////public static BlogService GetBlogService(IDocumentStore documentStore, string blogKey, string fileName = null, bool refreshAsync = true, bool ensureBlogsRefreshed = true) {
-        ////    fileName = fileName ?? blogKey;
-
-        ////    string bloggerUri = XmlFilesTestHelper.GetProjectPath(fileName + ".xml");
-
-        ////    var settings = new[] {
-        ////        new BloggerSetting() {
-        ////            BlogKey = blogKey,
-        ////            BloggerUri = bloggerUri,
-        ////        }
-        ////    };
-
-        ////    var config = GetConfig(settings, documentStore, refreshAsync, ensureBlogsRefreshed);
-
-        ////    return new BlogService(config);
-        ////}
-
-        public static BlogServiceConfig GetConfig(
-            IEnumerable<string> blogKeys, bool refreshAsync = true, bool ensureBlogsRefreshed = true)
+        public static IEnumerable<BlavenBlogSetting> GetBloggerSettings(IEnumerable<string> blogKeys)
         {
-            var settings = from blogKey in blogKeys
-                           let uri = XmlFilesTestHelper.GetProjectPath(blogKey + ".xml")
-                           select new BloggerSetting { BlogKey = blogKey, BloggerUri = uri, };
-
-            return GetConfig(settings, refreshAsync, ensureBlogsRefreshed);
+            return from blogKey in blogKeys
+                   let uri = XmlFilesTestHelper.GetProjectPath(blogKey + ".xml")
+                   select new BlavenBlogSetting { BlogKey = blogKey, DataSourceUri = uri, };
         }
 
-        public static BlogServiceConfig GetConfig(
-            IEnumerable<BloggerSetting> settings, bool refreshAsync = true, bool ensureBlogsRefreshed = true)
+        public static BlogServiceConfig GetConfig(bool refreshAsync = true, bool ensureBlogsRefreshed = true)
         {
-            var config = new BlogServiceConfig(settings)
-                { EnsureBlogsRefreshed = ensureBlogsRefreshed, RefreshAsync = refreshAsync, };
-
+            var config = new BlogServiceConfig
+                             {
+                                 EnsureBlogsRefreshed = ensureBlogsRefreshed,
+                                 RefreshAsync = refreshAsync,
+                             };
             return config;
         }
     }

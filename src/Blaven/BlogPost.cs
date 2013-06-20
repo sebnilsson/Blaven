@@ -11,11 +11,32 @@ namespace Blaven
     /// </summary>
     public class BlogPost
     {
-        public BlogPost(string blogKey, ulong bloggerId)
+        public BlogPost(string blogKey, ulong dataSourceId)
+            : this(blogKey)
+        {
+            this.DataSourceId = dataSourceId.ToString("#");
+
+            this.BlavenId = BlavenHelper.GetBlavenHash(dataSourceId);
+            this.Id = RavenDbHelper.GetEntityId<BlogPost>(this.BlavenId);
+        }
+
+        public BlogPost(string blogKey, string dataSourceId)
+            : this(blogKey)
+        {
+            this.DataSourceId = dataSourceId;
+
+            this.BlavenId = BlavenHelper.GetBlavenHash(dataSourceId);
+            this.Id = RavenDbHelper.GetEntityId<BlogPost>(this.BlavenId);
+        }
+
+        internal BlogPost(string blogKey)
+            : this()
         {
             this.BlogKey = blogKey;
-            this.Id = RavenDbBlogStore.GetKey<BlogPost>(Convert.ToString(bloggerId));
+        }
 
+        internal BlogPost()
+        {
             this.Author = new BlogAuthor();
             this.Tags = Enumerable.Empty<string>();
         }
@@ -28,12 +49,12 @@ namespace Blaven
         /// <summary>
         /// The automatic incremented unique ID given by RavenDB.
         /// </summary>
-        public string BlavenId { get; set; }
+        public string BlavenId { get; internal set; }
 
         /// <summary>
         /// The blog key the post belongs to.
         /// </summary>
-        public string BlogKey { get; set; }
+        public string BlogKey { get; internal set; }
 
         /// <summary>
         /// The text-content of a blog-post. Contains HTML-code.
@@ -41,7 +62,17 @@ namespace Blaven
         public string Content { get; set; }
 
         /// <summary>
-        /// The unique identifier for the blog-post.
+        /// The original ID of the blog-post at the data-source.
+        /// </summary>
+        public string DataSourceId { get; set; }
+
+        /// <summary>
+        /// The absolute original URL to the blog-post at the data-source.
+        /// </summary>
+        public string DataSourceUrl { get; set; }
+
+        /// <summary>
+        /// The unique identifier for the blog-post in RavenDB.
         /// </summary>
         public string Id { get; set; }
 
@@ -51,9 +82,9 @@ namespace Blaven
         public bool IsDeleted { get; set; }
 
         /// <summary>
-        /// The absolute original URL to the blog-post at Blogger.
+        /// Gets or sets the hash of the blog-post.
         /// </summary>
-        public string OriginalBloggerUrl { get; set; }
+        public string Checksum { get; set; }
 
         /// <summary>
         /// The date and time that the blog-post was posted.

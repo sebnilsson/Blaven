@@ -14,14 +14,8 @@ namespace Blaven
         {
         }
 
-        public BlavenException(string message, Exception inner)
-            : base(message, inner)
-        {
-        }
-
-        protected BlavenException(
-            System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
-            : base(info, context)
+        public BlavenException(Exception innerException, string message = null)
+            : base(message ?? (innerException != null ? innerException.Message : null), innerException)
         {
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 
+using Blaven.RavenDb;
 using Raven.Client.Embedded;
 
 namespace Blaven.Test
@@ -8,11 +9,14 @@ namespace Blaven.Test
     {
         public static EmbeddableDocumentStore GetEmbeddableDocumentStore()
         {
-            string randomPath = new Random().Next().ToString();
-            return GetEmbeddableDocumentStore(randomPath);
+            var documentStore = GetEmbeddableDocumentStore(Guid.NewGuid().ToString());
+
+            RavenDbHelper.InitWithIndexes(documentStore);
+
+            return documentStore;
         }
 
-        public static EmbeddableDocumentStore GetEmbeddableDocumentStore(string path)
+        private static EmbeddableDocumentStore GetEmbeddableDocumentStore(string path)
         {
             var documentStore = new EmbeddableDocumentStore
                 {
