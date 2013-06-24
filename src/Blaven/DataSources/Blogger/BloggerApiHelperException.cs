@@ -2,10 +2,9 @@ using System;
 
 namespace Blaven.DataSources.Blogger
 {
-    [Serializable]
-    public class BloggerApiException : BlavenBlogException
+    public class BloggerApiHelperException : BlavenBlogException
     {
-        public BloggerApiException(BlavenBlogSetting bloggerSetting, Exception inner)
+        public BloggerApiHelperException(BlavenBlogSetting bloggerSetting, Exception inner)
             : base(bloggerSetting.BlogKey, inner, "There was an error when retrieving data from Blogger.")
         {
             this.BloggerSetting = bloggerSetting;

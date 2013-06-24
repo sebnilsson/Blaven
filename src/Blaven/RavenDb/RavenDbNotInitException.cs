@@ -2,7 +2,6 @@
 
 namespace Blaven.RavenDb
 {
-    [Serializable]
     public class RavenDbNotInitException : BlavenException
     {
         public RavenDbNotInitException(Exception inner)

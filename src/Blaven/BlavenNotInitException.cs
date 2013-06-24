@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace Blaven
+﻿namespace Blaven
 {
-    [Serializable]
     public class BlavenNotInitException : BlavenException
     {
         

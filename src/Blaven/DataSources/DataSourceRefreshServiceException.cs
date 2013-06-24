@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace Blaven.DataSources
 {
-    public class DataSourceRefresherException : BlavenBlogsException
+    public class DataSourceRefreshServiceException : BlavenBlogsException
     {
-        public DataSourceRefresherException(IEnumerable<RefreshResult> results, string message = null)
+        public DataSourceRefreshServiceException(IEnumerable<RefreshResult> results, string message = null)
             : base(results.Select(x => x.BlogKey), message: message)
         {
             this.RefreshResults = results;

@@ -239,7 +239,7 @@ namespace Blaven.RavenDb
             Refresh(blogKey, refreshResult, throwOnCritical);
         }
 
-        public void Refresh(string blogKey, DataSourceRefreshResult refreshResult, bool throwOnCritical = false)
+        public void Refresh(string blogKey, DataSourceRefreshResult refreshResult, bool throwOnException = false)
         {
             if (refreshResult == null)
             {
@@ -254,7 +254,7 @@ namespace Blaven.RavenDb
                 using (var refreshSession = GetMaximumRequestSession())
                 {
                     refreshResult.ModifiedBlogPosts = RemoveDuplicatePosts(
-                        blogKey, refreshResult.ModifiedBlogPosts, throwOnCritical);
+                        blogKey, refreshResult.ModifiedBlogPosts, throwOnException);
 
                     RefreshBlogInfo(refreshSession, blogKey, refreshResult.BlogInfo);
 
@@ -322,7 +322,8 @@ namespace Blaven.RavenDb
             return maximumSession;
         }
 
-        private IEnumerable<BlogPost> RemoveDuplicatePosts(string blogKey, IEnumerable<BlogPost> modifiedPosts, bool throwOnCritical)
+        private IEnumerable<BlogPost> RemoveDuplicatePosts(
+            string blogKey, IEnumerable<BlogPost> modifiedPosts, bool throwOnException)
         {
             var postMeta = this.GetAllBlogPostMeta(blogKey);
             var duplicateItems = (from modified in modifiedPosts
@@ -335,7 +336,7 @@ namespace Blaven.RavenDb
                 return modifiedPosts;
             }
 
-            if (throwOnCritical)
+            if (throwOnException)
             {
                 var duplicatePost = modifiedPosts.First();
                 string exceptionMessage =

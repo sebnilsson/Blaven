@@ -2,7 +2,6 @@
 
 namespace Blaven
 {
-    [Serializable]
     public class BlavenException : Exception
     {
         public BlavenException()

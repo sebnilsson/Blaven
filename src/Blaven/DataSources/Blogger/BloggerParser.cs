@@ -17,7 +17,7 @@ namespace Blaven.DataSources.Blogger
             }
             catch (Exception ex)
             {
-                throw new BloggerParsingException(settings.BlogKey, xmlContent, ex);
+                throw new BloggerParserException(settings.BlogKey, xmlContent, ex);
             }
         }
 
@@ -32,7 +32,7 @@ namespace Blaven.DataSources.Blogger
             }
             catch (Exception ex)
             {
-                throw new BloggerParsingException(settings.BlogKey, xmlContent, ex);
+                throw new BloggerParserException(settings.BlogKey, xmlContent, ex);
             }
         }
 

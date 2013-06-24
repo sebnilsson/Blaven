@@ -16,7 +16,7 @@ namespace Blaven.DataSources
         private readonly BlogServiceConfig config;
 
         private readonly RavenRepository repository;
-        
+
         public DataSourceRefreshService(BlogServiceConfig config, RavenRepository repository)
         {
             this.config = config;
@@ -25,24 +25,24 @@ namespace Blaven.DataSources
 
         public IEnumerable<RefreshResult> Refresh(IEnumerable<BlavenBlogSetting> settings, bool forceRefresh)
         {
-            var results = new List<RefreshResult>();
+            var successes = new List<RefreshResult>();
             Parallel.ForEach(
                 settings,
                 setting =>
                     {
                         var result = Refresh(setting, forceRefresh);
-                        results.Add(result);
+                        successes.Add(result);
                     });
 
             var criticalErrors =
-                results.Where(
+                successes.Where(
                     x => x.ResultType == RefreshResultType.UpdateFailed && (!x.HasBlogAnyData || forceRefresh)).ToList();
             if (criticalErrors.Any())
             {
-                throw new DataSourceRefresherException(criticalErrors);
+                throw new DataSourceRefreshServiceException(criticalErrors);
             }
 
-            return results.AsEnumerable();
+            return successes.AsEnumerable();
         }
 
         public RefreshResult Refresh(BlavenBlogSetting setting, bool forceRefresh)
@@ -54,7 +54,7 @@ namespace Blaven.DataSources
 
             result.ElapsedTime = measuredTime;
 
-            if (!result.HasBlogAnyData)
+            if (result.ResultType != RefreshResultType.UpdateFailed && !result.HasBlogAnyData)
             {
                 repository.WaitForData(setting.BlogKey);
             }
@@ -63,7 +63,7 @@ namespace Blaven.DataSources
 
         private RefreshResult GetLockedResult(BlavenBlogSetting setting, bool forceRefresh)
         {
-            string lockKey = string.Format("DataSourceRefresher.GetRefreshResult_{0}", setting.BlogKey);
+            string lockKey = string.Format("DataSourceRefreshService.GetLockedResult{0}", setting.BlogKey);
 
             var result = KeyLockService.PerformLockedFunction(lockKey, () => PerformRefresh(setting, forceRefresh));
             return result;
@@ -140,8 +140,8 @@ namespace Blaven.DataSources
                                      };
             var dataSource = setting.BlogDataSource;
             var refreshResult = dataSource.Refresh(refreshContext);
-            
-            repository.Refresh(blogKey, refreshResult, throwOnCritical: forceRefresh);
+
+            repository.Refresh(blogKey, refreshResult, throwOnException: forceRefresh);
         }
 
         private static bool GetIsBlogRefreshing(string blogKey, bool forceRefresh)

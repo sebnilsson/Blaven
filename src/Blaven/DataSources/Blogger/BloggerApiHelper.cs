@@ -75,7 +75,7 @@ namespace Blaven.DataSources.Blogger
             }
             catch (Exception ex)
             {
-                throw new BloggerApiException(setting, ex);
+                throw new BloggerApiHelperException(setting, ex);
             }
         }
 
