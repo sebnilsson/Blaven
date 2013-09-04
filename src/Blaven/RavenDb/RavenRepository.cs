@@ -19,13 +19,13 @@ namespace Blaven.RavenDb
 
         private readonly IDocumentStore documentStore;
 
-        private readonly Lazy<IDocumentSession> lazyQuerySession;
+        private readonly RequestLazy<IDocumentSession> lazyQuerySession;
 
         public RavenRepository(IDocumentStore documentStore)
         {
             this.documentStore = documentStore;
 
-            this.lazyQuerySession = new Lazy<IDocumentSession>(() => this.documentStore.OpenSession());
+            this.lazyQuerySession = new RequestLazy<IDocumentSession>(() => this.documentStore.OpenSession());
         }
 
         private IDocumentSession QuerySession
@@ -134,13 +134,7 @@ namespace Blaven.RavenDb
         {
             string blogInfoId = RavenDbHelper.GetEntityId<BlogInfo>(blogKey);
             var blogInfo = this.QuerySession.Load<BlogInfo>(blogInfoId);
-
-            if (blogInfo == null)
-            {
-                throw new ArgumentOutOfRangeException(
-                    "blogKey", string.Format("No blog-info was found for blog-key '{0}'.", blogKey));
-            }
-
+            
             return blogInfo;
         }
 
@@ -236,7 +230,7 @@ namespace Blaven.RavenDb
                                         BlogInfo = blogData.Info,
                                         ModifiedBlogPosts = blogData.Posts
                                     };
-            Refresh(blogKey, refreshResult, throwOnCritical);
+            this.Refresh(blogKey, refreshResult, throwOnCritical);
         }
 
         public void Refresh(string blogKey, DataSourceRefreshResult refreshResult, bool throwOnException = false)

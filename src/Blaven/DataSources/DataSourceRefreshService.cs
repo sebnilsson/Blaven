@@ -49,8 +49,7 @@ namespace Blaven.DataSources
         {
             RefreshResult result = null;
             var measuredTime = StopwatchHelper.PerformMeasuredAction(
-                () =>
-                    { result = GetLockedResult(setting, forceRefresh); });
+                () => { result = GetLockedResult(setting, forceRefresh); });
 
             result.ElapsedTime = measuredTime;
 
@@ -129,12 +128,15 @@ namespace Blaven.DataSources
             string blogKey = setting.BlogKey;
             var lastRefresh = !forceRefresh ? this.repository.GetBlogRefreshTimestamp(blogKey) : null;
 
-            var blogPostsMeta = this.repository.GetAllBlogPostMeta(setting.BlogKey);
+            var blogPostsMeta = this.repository.GetAllBlogPostMeta(blogKey);
+
+            var blogInfo = this.repository.GetBlogInfo(blogKey);
 
             var refreshContext = new DataSourceRefreshContext
                                      {
-                                         BlogPostsMetas = blogPostsMeta,
+                                         BlogInfoChecksum = (blogInfo != null) ? blogInfo.Checksum : null,
                                          BlogSetting = setting,
+                                         ExistingBlogPostsMetas = blogPostsMeta,
                                          ForceRefresh = forceRefresh,
                                          LastRefresh = lastRefresh
                                      };

@@ -6,41 +6,61 @@ namespace Blaven
 {
     public class RequestLazy<T>
     {
-        private readonly string storeKey;
-
         private readonly Func<T> valueFactory;
 
-        private readonly IDictionary customContextStore;
+        private readonly Func<IDictionary> storeFactory;
 
-        internal RequestLazy(IDictionary customContextStore, Func<T> valueFactory, string storeKey = null)
-            : this(valueFactory, storeKey)
+        internal RequestLazy(Func<T> valueFactory, string storeKey, Func<IDictionary> storeFactory)
         {
-            this.customContextStore = customContextStore;
+            this.storeFactory = storeFactory ?? (() => (HttpContext.Current != null) ? HttpContext.Current.Items : null);
+            this.valueFactory = valueFactory ?? this.GetValue;
+            this.StoreKey = string.Format("RequestLazy_{0}", storeKey ?? Guid.NewGuid().ToString());
+        }
+
+        public RequestLazy(string storeKey)
+            : this(null, storeKey)
+        {
         }
 
         public RequestLazy(Func<T> valueFactory, string storeKey = null)
+            : this(valueFactory, storeKey, null)
         {
-            this.valueFactory = valueFactory;
-            this.storeKey = storeKey ?? string.Format("ContextLazy_{0}", Guid.NewGuid());
         }
+
+        public string StoreKey { get; private set; }
 
         public T Value
         {
             get
             {
-                var contextStore = this.GetContextStore();
-                if (contextStore == null)
+                if (this.ContextStore == null)
                 {
                     return this.valueFactory();
                 }
 
-                if (!contextStore.Contains(this.storeKey))
+                if (!this.ContextStore.Contains(this.StoreKey))
                 {
-                    contextStore[this.storeKey] = this.valueFactory();
+                    this.ContextStore[this.StoreKey] = this.valueFactory();
                 }
 
-                var item = contextStore[this.storeKey];
-                return item is T ? (T)item : default(T);
+                return this.GetValue();
+            }
+            set
+            {
+                if (this.ContextStore == null)
+                {
+                    return;
+                }
+
+                this.ContextStore[this.StoreKey] = value;
+            }
+        }
+
+        private IDictionary ContextStore
+        {
+            get
+            {
+                return this.storeFactory();
             }
         }
 
@@ -48,19 +68,19 @@ namespace Blaven
         {
             get
             {
-                var contextStore = this.GetContextStore();
-                return contextStore != null && contextStore.Contains(this.storeKey);
+                return this.ContextStore != null && this.ContextStore.Contains(this.StoreKey);
             }
         }
 
         public override string ToString()
         {
-            return this.IsValueCreated ? this.Value.ToString() : string.Empty;
+            return this.IsValueCreated ? this.Value.ToString() : "(Value not created)";
         }
 
-        private IDictionary GetContextStore()
+        private T GetValue()
         {
-            return this.customContextStore ?? (HttpContext.Current != null ? HttpContext.Current.Items : null);
+            var item = this.ContextStore[this.StoreKey];
+            return item is T ? (T)item : default(T);
         }
     }
 }

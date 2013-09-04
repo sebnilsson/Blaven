@@ -186,7 +186,7 @@ namespace Blaven.RavenDb.Test
 
             Assert.AreEqual<string>(updatedSubtitle, info.Subtitle, "Subtitle wasn't updated in store.");
             Assert.AreEqual<string>(updatedTitle, info.Title, "Title wasn't updated in store.");
-            Assert.AreEqual<DateTime>(updatedUpdated, info.Updated, "Updated wasn't updated in store.");
+            Assert.AreEqual<DateTime?>(updatedUpdated, info.Updated, "Updated wasn't updated in store.");
             Assert.AreEqual<string>(updatedUrl, info.Url, "Url wasn't updated in store.");
         }
 
@@ -250,7 +250,7 @@ namespace Blaven.RavenDb.Test
             Assert.AreEqual<DateTime>(updatedPublished, selectedPost.Published, "Published wasn't updated in store.");
             Assert.AreEqual<int>(updatedTags.Count(), selectedPost.Tags.Count(), "Tags wasn't updated in store.");
             Assert.AreEqual<string>(updatedTitle, selectedPost.Title, "Title wasn't updated in store.");
-            Assert.AreEqual<DateTime>(updatedUpdated, selectedPost.Updated, "Updated wasn't updated in store.");
+            Assert.AreEqual<DateTime?>(updatedUpdated, selectedPost.Updated, "Updated wasn't updated in store.");
             Assert.AreEqual<string>(updatedUrlSlug, selectedPost.UrlSlug, "UrlSlug wasn't updated in store.");
         }
     }

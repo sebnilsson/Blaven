@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Blaven</RootNamespace>
     <AssemblyName>Blaven</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -41,6 +41,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -50,30 +51,36 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Google.GData.Blogger, Version=2.1.0.0, Culture=neutral, PublicKeyToken=6f8943d33947d761, processorArchitecture=MSIL">
+    <Reference Include="Common.Logging, Version=2.1.2.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Google.GData.Blogger.2.1.0.0\lib\Google.GData.Blogger.dll</HintPath>
+      <HintPath>..\..\packages\Common.Logging.2.1.2\lib\net40\Common.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Google.GData.Client, Version=2.1.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
+    <Reference Include="Google.GData.Blogger, Version=2.2.0.0, Culture=neutral, PublicKeyToken=6f8943d33947d761, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Google.GData.Client.2.1.0.0\lib\Google.GData.Client.dll</HintPath>
+      <HintPath>..\..\packages\Google.GData.Blogger.2.2.0.0\lib\Google.GData.Blogger.dll</HintPath>
+    </Reference>
+    <Reference Include="Google.GData.Client, Version=2.2.0.0, Culture=neutral, PublicKeyToken=04a59ca9b0273830, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\packages\Google.GData.Client.2.2.0.0\lib\Google.GData.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CompilerServices.AsyncTargetingPack.Net4">
+      <HintPath>..\..\packages\Microsoft.CompilerServices.AsyncTargetingPack.1.0.1\lib\net40\Microsoft.CompilerServices.AsyncTargetingPack.Net4.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Raven.Abstractions, Version=2.0.3.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\RavenDB.Client.2.0.2375\lib\net40\Raven.Abstractions.dll</HintPath>
+    <Reference Include="Raven.Abstractions">
+      <HintPath>..\..\packages\RavenDB.Client.2.5.2700\lib\net45\Raven.Abstractions.dll</HintPath>
     </Reference>
-    <Reference Include="Raven.Client.Lightweight, Version=2.0.3.0, Culture=neutral, PublicKeyToken=37f41c7f99471593, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\packages\RavenDB.Client.2.0.2375\lib\net40\Raven.Client.Lightweight.dll</HintPath>
+    <Reference Include="Raven.Client.Lightweight">
+      <HintPath>..\..\packages\RavenDB.Client.2.5.2700\lib\net45\Raven.Client.Lightweight.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -99,8 +106,8 @@
     <Compile Include="BlavenBlogsException.cs" />
     <Compile Include="BlogPostMeta.cs" />
     <Compile Include="BlogPostsResultExtensions.cs" />
+    <Compile Include="DataSources\DataSourceBase.cs" />
     <Compile Include="DataSources\DataSourceRefreshContext.cs" />
-    <Compile Include="DataSources\Blogger\BloggerDataSource.cs" />
     <Compile Include="DataSources\DataSourceRefreshServiceException.cs" />
     <Compile Include="BlogServiceConfig.cs" />
     <Compile Include="AppSettingsService.cs" />
@@ -109,19 +116,18 @@
     <Compile Include="BlogInfo.cs" />
     <Compile Include="BlogPostCollection.cs" />
     <Compile Include="BlogService.cs" />
-    <Compile Include="DataSources\Blogger\BloggerApiHelper.cs" />
-    <Compile Include="DataSources\Blogger\BloggerParser.cs" />
-    <Compile Include="DataSources\Blogger\BloggerParserException.cs" />
-    <Compile Include="DataSources\Blogger\BloggerApiHelperException.cs" />
     <Compile Include="BlavenBlogSetting.cs" />
     <Compile Include="BlavenBlogSettingsParser.cs" />
-    <Compile Include="DataSources\Blogger\LocalGDataRequest.cs" />
-    <Compile Include="DataSources\Blogger\LocalGDataRequestFactory.cs" />
     <Compile Include="DataSources\DataSourceRefreshResult.cs" />
+    <Compile Include="DataSources\Disk\DiskDataSource.cs" />
+    <Compile Include="DataSources\Disk\DiskFileHelper.cs" />
+    <Compile Include="DataSources\FileListItem.cs" />
+    <Compile Include="DataSources\MetaFileJson.cs" />
     <Compile Include="IEnumerableExtensions.cs" />
+    <Compile Include="JsonHelper.cs" />
     <Compile Include="KeyLockService.cs" />
     <Compile Include="DataSources\DataSourceRefreshService.cs" />
-    <Compile Include="DataSources\IBlogDataSource.cs" />
+    <Compile Include="DataSources\IDataSource.cs" />
     <Compile Include="DataSources\RefreshResultType.cs" />
     <Compile Include="RavenDb\Indexes\BlogPostMetas.cs" />
     <Compile Include="RavenDb\RavenRepositoryRefreshException.cs" />

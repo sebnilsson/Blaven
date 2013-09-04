@@ -1,16 +1,25 @@
-using Blaven.DataSources;
-using Blaven.DataSources.Blogger;
+using System;
 
+using Blaven.DataSources;
 using Newtonsoft.Json;
 
 namespace Blaven
 {
+    public class BlavenBlogSetting<TBlogDataSource> : BlavenBlogSetting
+        where TBlogDataSource : IDataSource
+    {
+        public BlavenBlogSetting(string blogKey)
+            : base(blogKey, Activator.CreateInstance<TBlogDataSource>())
+        {
+        }
+    }
+
     /// <summary>
     /// Represents a Blog-setting.
     /// </summary>
     public class BlavenBlogSetting
     {
-        public BlavenBlogSetting(string blogKey, IBlogDataSource blogDataSource)
+        public BlavenBlogSetting(string blogKey, IDataSource blogDataSource)
         {
             this.BlogKey = blogKey;
             this.BlogDataSource = blogDataSource;
@@ -41,8 +50,8 @@ namespace Blaven
         /// The data-source for the blog.
         /// </summary>
         [JsonIgnore]
-        public IBlogDataSource BlogDataSource { get; internal set; }
-        
+        public IDataSource BlogDataSource { get; internal set; }
+
         /// <summary>
         /// The ID of the blog at the data-source.
         /// </summary>
@@ -73,11 +82,27 @@ namespace Blaven
                 case "googledrive":
                     break;
                 default:
-                    this.BlogDataSource = new BloggerDataSource();
+                    this.BlogDataSource = GetBlogDataSourceFReflected(dataSourceName);
                     break;
             }
+        }
 
-            // TODO: Support full names with use of Reflection - CustomNamspace.CustomBlogDataSource
+        private IDataSource GetBlogDataSourceFReflected(string typeName)
+        {
+            var type = Type.GetType(typeName);
+            if (type == null)
+            {
+                throw new BlavenException(string.Format("No IBlogDataSource found for type-name '{0}'.", typeName));
+            }
+
+            var instance = Activator.CreateInstance(type) as IDataSource;
+
+            if (instance == null)
+            {
+                throw new BlavenException(
+                    string.Format("No IBlogDataSource could be instantiated for type-name '{0}'.", type.FullName));
+            }
+            return instance;
         }
     }
 }

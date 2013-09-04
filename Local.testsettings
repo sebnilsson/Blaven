@@ -2,6 +2,7 @@
 <TestSettings name="Local" id="f9b5d719-ef5b-4514-af24-da4f9fa3a3f8" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
   <Description>These are default test settings for a local test run.</Description>
   <Deployment>
+    <DeploymentItem filename="test\Blaven.Test\DiskFiles\" />
     <DeploymentItem filename="test\Blaven.Test\XmlFiles\" />
   </Deployment>
   <Execution>

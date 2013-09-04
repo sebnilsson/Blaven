@@ -113,7 +113,14 @@ namespace Blaven
         {
             blogKey = GetBlogKeyOrDefault(blogKey);
 
-            return this.Repository.GetBlogInfo(blogKey);
+            var blogInfo = this.Repository.GetBlogInfo(blogKey);
+            if (blogInfo == null)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "blogKey", string.Format("No blog-info was found for blog-key '{0}'.", blogKey));
+            }
+
+            return blogInfo;
         }
 
         /// <summary>

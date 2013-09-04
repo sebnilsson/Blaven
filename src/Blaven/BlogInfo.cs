@@ -13,6 +13,11 @@ namespace Blaven
         public string BlogKey { get; set; }
 
         /// <summary>
+        /// Checksum of the blog-info.
+        /// </summary>
+        public string Checksum { get; set; }
+
+        /// <summary>
         /// The alternative sub-title for the blog.
         /// </summary>
         public string Subtitle { get; set; }
@@ -25,7 +30,7 @@ namespace Blaven
         /// <summary>
         /// The date of last update of the blog.
         /// </summary>
-        public DateTime Updated { get; set; }
+        public DateTime? Updated { get; set; }
 
         /// <summary>
         /// The URL to the blog.

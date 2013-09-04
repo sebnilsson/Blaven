@@ -15,7 +15,7 @@ namespace Blaven
 
         public string Title { get; set; }
 
-        public DateTime Updated { get; set; }
+        public DateTime? Updated { get; set; }
 
         public string UrlSlug { get; set; }
     }

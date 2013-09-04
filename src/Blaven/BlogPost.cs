@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using Blaven.RavenDb;
+using Newtonsoft.Json;
 
 namespace Blaven
 {
@@ -14,31 +14,26 @@ namespace Blaven
         public BlogPost(string blogKey, ulong dataSourceId)
             : this(blogKey)
         {
-            this.DataSourceId = dataSourceId.ToString("#");
-
-            this.BlavenId = BlavenHelper.GetBlavenHash(dataSourceId);
-            this.Id = RavenDbHelper.GetEntityId<BlogPost>(this.BlavenId);
+            this.SetIds(dataSourceId);
         }
 
         public BlogPost(string blogKey, string dataSourceId)
             : this(blogKey)
         {
-            this.DataSourceId = dataSourceId;
-
-            this.BlavenId = BlavenHelper.GetBlavenHash(dataSourceId);
-            this.Id = RavenDbHelper.GetEntityId<BlogPost>(this.BlavenId);
+            this.SetIds(dataSourceId);
         }
 
         internal BlogPost(string blogKey)
             : this()
         {
             this.BlogKey = blogKey;
+
+            this.Author = new BlogAuthor();
         }
 
-        internal BlogPost()
+        [JsonConstructor]
+        private BlogPost()
         {
-            this.Author = new BlogAuthor();
-            this.Tags = Enumerable.Empty<string>();
         }
 
         /// <summary>
@@ -104,11 +99,23 @@ namespace Blaven
         /// <summary>
         /// The date and time that the blog-post was updated.
         /// </summary>
-        public DateTime Updated { get; set; }
+        public DateTime? Updated { get; set; }
 
         /// <summary>
         /// The URL-friendly slug, based on the title of the blog post.
         /// </summary>
         public string UrlSlug { get; set; }
+
+        internal void SetIds(ulong dataSourceId)
+        {
+            this.SetIds(dataSourceId.ToString("#"));
+        }
+
+        internal void SetIds(string dataSourceId)
+        {
+            this.DataSourceId = dataSourceId;
+            this.BlavenId = BlavenHelper.GetBlavenHash(dataSourceId);
+            this.Id = RavenDbHelper.GetEntityId<BlogPost>(this.BlavenId);
+        }
     }
 }

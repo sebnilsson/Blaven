@@ -5,6 +5,8 @@ using Raven.Client;
 
 namespace Blaven.Test
 {
+    using Blaven.DataSources.Blogger;
+
     public static class BlogServiceTestHelper
     {
         public static BlogService GetBlogService(
@@ -23,8 +25,8 @@ namespace Blaven.Test
         public static IEnumerable<BlavenBlogSetting> GetBloggerSettings(IEnumerable<string> blogKeys)
         {
             return from blogKey in blogKeys
-                   let uri = XmlFilesTestHelper.GetProjectPath(blogKey + ".xml")
-                   select new BlavenBlogSetting { BlogKey = blogKey, DataSourceUri = uri, };
+                   let uri = TestEnvironmentHelper.GetXmlFilePath(blogKey + ".xml")
+                   select new BlavenBlogSetting<BloggerDataSource>(blogKey) { BlogKey = blogKey, DataSourceUri = uri, };
         }
 
         public static BlogServiceConfig GetConfig(bool refreshAsync = true, bool ensureBlogsRefreshed = true)

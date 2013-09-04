@@ -16,13 +16,13 @@ namespace Blaven.DataSources.Blogger.Test
             var blogger = new BloggerDataSource();
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
 
-            string initialDataSourceUri = XmlFilesTestHelper.GetProjectPath("buzz_simple.xml");
+            string initialDataSourceUri = TestEnvironmentHelper.GetXmlFilePath("buzz_simple.xml");
             var initialSetting = new BlavenBlogSetting(TestBlogKey, blogger) { DataSourceUri = initialDataSourceUri };
             var initialService = new BlogService(documentStore, settings: new[] { initialSetting });
 
             bool addedPostExistsBeforeAdd = initialService.GetPostByDataSourceId(addedItemId) != null;
 
-            string updatedDataSourceUri = XmlFilesTestHelper.GetProjectPath("buzz_simple_added.xml");
+            string updatedDataSourceUri = TestEnvironmentHelper.GetXmlFilePath("buzz_simple_added.xml");
             var updatedSetting = new BlavenBlogSetting(TestBlogKey, blogger) { DataSourceUri = updatedDataSourceUri };
             var updatedService = new BlogService(documentStore, settings: new[] { updatedSetting });
             updatedService.Refresh(forceRefresh: true);
@@ -40,13 +40,13 @@ namespace Blaven.DataSources.Blogger.Test
             var blogger = new BloggerDataSource();
             var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
 
-            string initialDataSourceUri = XmlFilesTestHelper.GetProjectPath("buzz_simple.xml");
+            string initialDataSourceUri = TestEnvironmentHelper.GetXmlFilePath("buzz_simple.xml");
             var initialSetting = new BlavenBlogSetting(TestBlogKey, blogger) { DataSourceUri = initialDataSourceUri };
             var initialService = new BlogService(documentStore, settings: new[] { initialSetting });
             
             bool removedPostExistsBeforeRemove = initialService.GetPostByDataSourceId(removedItemId) != null;
 
-            string updatedDataSourceUri = XmlFilesTestHelper.GetProjectPath("buzz_simple_removed.xml");
+            string updatedDataSourceUri = TestEnvironmentHelper.GetXmlFilePath("buzz_simple_removed.xml");
             var updatedSetting = new BlavenBlogSetting(TestBlogKey, blogger) { DataSourceUri = updatedDataSourceUri };
             var updatedService = new BlogService(documentStore, settings: new[] { updatedSetting });
             updatedService.Refresh(forceRefresh: true);
