@@ -10,7 +10,7 @@ namespace Blaven.RavenDb.Indexes
         public ArchiveCountByBlogKey()
         {
             this.Map = posts => from post in posts
-                                where !post.IsDeleted
+                                where !post.IsDeleted && post.Published > DateTime.MinValue
                                 let date = new DateTime(post.Published.Year, post.Published.Month, 1)
                                 select new { post.BlogKey, Date = date, Count = 1, };
 

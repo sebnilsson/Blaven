@@ -1,5 +1,5 @@
-﻿using System.Linq;
-
+﻿using System;
+using System.Linq;
 using Raven.Client.Indexes;
 
 namespace Blaven.RavenDb.Indexes
@@ -8,17 +8,14 @@ namespace Blaven.RavenDb.Indexes
     {
         public TagsCountByBlogKey()
         {
-            this.Map =
-                posts =>
-                from post in posts
-                from tag in post.Tags
-                where !post.IsDeleted
-                select new { post.BlogKey, Tag = tag, Count = 1, };
+            this.Map = posts => from post in posts
+                                from tag in post.Tags
+                                where !post.IsDeleted && post.Published > DateTime.MinValue
+                                select new { post.BlogKey, Tag = tag, Count = 1, };
 
             this.Reduce = results => from result in results
                                      group result by new { result.BlogKey, result.Tag }
                                      into g select new { g.Key.BlogKey, g.Key.Tag, Count = g.Sum(x => x.Count), };
-
         }
 
         public class ReduceResult

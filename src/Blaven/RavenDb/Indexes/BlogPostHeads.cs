@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using Raven.Client.Indexes;
 
@@ -9,7 +10,7 @@ namespace Blaven.RavenDb.Indexes
         public BlogPostHeads()
         {
             this.Map = posts => from post in posts
-                                where !post.IsDeleted
+                                where !post.IsDeleted && post.Published > DateTime.MinValue
                                 select
                                     new
                                         {

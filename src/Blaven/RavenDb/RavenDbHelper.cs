@@ -17,7 +17,7 @@ namespace Blaven.RavenDb
         /// Gets an instance of a DocumentStore, using the values in AppSettings for URL and API-key.
         /// </summary>
         /// <returns></returns>
-        public static DocumentStore GetDefaultBlogStore(bool initStore = true)
+        public static DocumentStore GetDefaultDocumentStore(bool initStore = true)
         {
             var documentStore = new DocumentStore
                                     {

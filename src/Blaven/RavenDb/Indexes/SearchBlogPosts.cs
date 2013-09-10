@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 using Raven.Client.Indexes;
 
@@ -9,17 +10,15 @@ namespace Blaven.RavenDb.Indexes
         public SearchBlogPosts()
         {
             this.AddMap<BlogPost>(
-                blogPosts =>
-                from post in blogPosts
-                where !post.IsDeleted
-                select new Result { Content = new object[] { post.Title, post.Content, } });
+                blogPosts => from post in blogPosts
+                             where !post.IsDeleted && post.Published > DateTime.MinValue
+                             select new Result { Content = new object[] { post.Title, post.Content } });
 
             this.AddMap<BlogPost>(
-                blogPosts =>
-                from post in blogPosts
-                where !post.IsDeleted
-                from tag in post.Tags
-                select new Result { Content = new object[] { tag } });
+                blogPosts => from post in blogPosts
+                             where !post.IsDeleted && post.Published > DateTime.MinValue
+                             from tag in post.Tags
+                             select new Result { Content = new object[] { tag } });
 
             this.Index(x => x.Content, Raven.Abstractions.Indexing.FieldIndexing.Analyzed);
         }

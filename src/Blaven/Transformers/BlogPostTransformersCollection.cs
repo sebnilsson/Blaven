@@ -6,23 +6,6 @@ namespace Blaven.Transformers
 {
     public class BlogPostTransformersCollection
     {
-        private List<IBlogPostTransformer> Transformers { get; set; }
-
-        public BlogPostTransformersCollection(IEnumerable<IBlogPostTransformer> transformers = null)
-        {
-            this.Transformers = (transformers != null)
-                                    ? new List<IBlogPostTransformer>(transformers)
-                                    : new List<IBlogPostTransformer>();
-        }
-
-        public static BlogPostTransformersCollection Default
-        {
-            get
-            {
-                return new BlogPostTransformersCollection(DefaultTransformers.Value);
-            }
-        }
-
         private static readonly Lazy<List<IBlogPostTransformer>> DefaultTransformers =
             new Lazy<List<IBlogPostTransformer>>(
                 () =>
@@ -37,6 +20,23 @@ namespace Blaven.Transformers
 
                         return defaultTransformers;
                     });
+
+        public BlogPostTransformersCollection(IEnumerable<IBlogPostTransformer> transformers = null)
+        {
+            this.Transformers = (transformers != null)
+                                    ? new List<IBlogPostTransformer>(transformers)
+                                    : new List<IBlogPostTransformer>();
+        }
+
+        private List<IBlogPostTransformer> Transformers { get; set; }
+
+        public static BlogPostTransformersCollection Default
+        {
+            get
+            {
+                return new BlogPostTransformersCollection(DefaultTransformers.Value);
+            }
+        }
 
         public BlogPost ApplyTransformers(BlogPost blogPost)
         {

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Blaven.RavenDb
+namespace Blaven
 {
     internal class BlogRefresh
     {

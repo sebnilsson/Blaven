@@ -1,11 +1,10 @@
-﻿using Blaven.RavenDb;
-using Blaven.Test;
+﻿using Blaven.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Blaven.DataSources.Blogger.Test
 {
     [TestClass]
-    public class BloggerDataSourceTest
+    public class BloggerDataSourceTest : BlavenTestBase
     {
         private const string TestBlogKey = "TEST";
 
@@ -14,15 +13,15 @@ namespace Blaven.DataSources.Blogger.Test
         {
             ulong addedItemId = 5683021850220643338;
             var blogger = new BloggerDataSource();
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
-            string initialDataSourceUri = TestEnvironmentHelper.GetXmlFilePath("buzz_simple.xml");
+            string initialDataSourceUri = GetXmlFilePath("buzz_simple.xml");
             var initialSetting = new BlavenBlogSetting(TestBlogKey, blogger) { DataSourceUri = initialDataSourceUri };
             var initialService = new BlogService(documentStore, settings: new[] { initialSetting });
 
             bool addedPostExistsBeforeAdd = initialService.GetPostByDataSourceId(addedItemId) != null;
 
-            string updatedDataSourceUri = TestEnvironmentHelper.GetXmlFilePath("buzz_simple_added.xml");
+            string updatedDataSourceUri = GetXmlFilePath("buzz_simple_added.xml");
             var updatedSetting = new BlavenBlogSetting(TestBlogKey, blogger) { DataSourceUri = updatedDataSourceUri };
             var updatedService = new BlogService(documentStore, settings: new[] { updatedSetting });
             updatedService.Refresh(forceRefresh: true);
@@ -38,15 +37,15 @@ namespace Blaven.DataSources.Blogger.Test
         {
             ulong removedItemId = 6427494462457519921;
             var blogger = new BloggerDataSource();
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
-            string initialDataSourceUri = TestEnvironmentHelper.GetXmlFilePath("buzz_simple.xml");
+            string initialDataSourceUri = GetXmlFilePath("buzz_simple.xml");
             var initialSetting = new BlavenBlogSetting(TestBlogKey, blogger) { DataSourceUri = initialDataSourceUri };
             var initialService = new BlogService(documentStore, settings: new[] { initialSetting });
             
             bool removedPostExistsBeforeRemove = initialService.GetPostByDataSourceId(removedItemId) != null;
 
-            string updatedDataSourceUri = TestEnvironmentHelper.GetXmlFilePath("buzz_simple_removed.xml");
+            string updatedDataSourceUri = GetXmlFilePath("buzz_simple_removed.xml");
             var updatedSetting = new BlavenBlogSetting(TestBlogKey, blogger) { DataSourceUri = updatedDataSourceUri };
             var updatedService = new BlogService(documentStore, settings: new[] { updatedSetting });
             updatedService.Refresh(forceRefresh: true);

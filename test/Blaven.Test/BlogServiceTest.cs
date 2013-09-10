@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 using Blaven.DataSources;
 using Blaven.RavenDb;
 using Blaven.Test;
-
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Raven.Client;
 
 namespace Blaven.Integration.Test
 {
     [TestClass]
-    public class BlogServiceTest
+    public class BlogServiceTest : BlavenTestBase
     {
         private readonly IEnumerable<string> _blogKeys = new[] { "buzz_simple", "status_simple", };
 
@@ -31,12 +30,12 @@ namespace Blaven.Integration.Test
         [TestMethod]
         public void ctor_WithEnsureBlogIsRefreshed_StoreShouldContainData()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
             Parallel.For(0, 1, (i) => { var blogService = GetBlogServiceWithMultipleBlogs(documentStore); });
 
-            var blogStore = new RavenRepository(documentStore);
-            var blogsWithDataCount = _blogKeys.Count(x => blogStore.GetHasBlogAnyData(x));
+            var repository = new Repository(documentStore);
+            var blogsWithDataCount = _blogKeys.Count(x => repository.GetHasBlogAnyData(x));
 
             var storeDocumentCount = documentStore.DatabaseCommands.GetStatistics().CountOfDocuments;
 
@@ -46,15 +45,15 @@ namespace Blaven.Integration.Test
         [TestMethod]
         public void ctor_WithoutEnsureBlogIsRefreshed_StoreShouldNotContainData()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
             Parallel.For(
                 0,
                 _userCount,
                 (i) => this.GetBlogServiceWithMultipleBlogs(documentStore, ensureBlogsRefreshed: false));
 
-            var blogStore = new RavenRepository(documentStore);
-            var blogsWithDataCount = _blogKeys.Count(x => blogStore.GetHasBlogAnyData(x));
+            var repository = new Repository(documentStore);
+            var blogsWithDataCount = _blogKeys.Count(x => repository.GetHasBlogAnyData(x));
 
             Assert.AreEqual<int>(0, blogsWithDataCount, "The blogs had data, when expected not to.");
         }
@@ -62,12 +61,12 @@ namespace Blaven.Integration.Test
         [TestMethod]
         public void Refresh_WithEnsureBlogsRefreshed_FollowingRefreshesShouldNotUpdate()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
-            firstRunBlogService.Repository.WaitForStaleIndexes();
+            firstRunBlogService.Repository.WaitForPosts();
 
-            var results = new ConcurrentBag<RefreshResult>();
+            var results = new ConcurrentBag<RefreshSynchronizerResult>();
             Parallel.For(
                 0,
                 _userCount,
@@ -80,7 +79,7 @@ namespace Blaven.Integration.Test
                     });
 
             var updatedCount =
-                results.Count(x => x.ResultType == RefreshResultType.UpdateSync || x.ResultType == RefreshResultType.UpdateAsync);
+                results.Count(x => x.ResultType == RefreshSynchronizerResultType.UpdateSync || x.ResultType == RefreshSynchronizerResultType.UpdateAsync);
 
             Assert.AreEqual(0, updatedCount, "The blogs were updated too many times.");
         }
@@ -88,13 +87,13 @@ namespace Blaven.Integration.Test
         [TestMethod]
         public void Refresh_WithoutEnsureBlogsRefreshed_FollowingRefreshesShouldUpdateSynchronously()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(
                 documentStore: documentStore, ensureBlogsRefreshed: false);
-            firstRunBlogService.Repository.WaitForStaleIndexes();
+            firstRunBlogService.Repository.WaitForPosts();
 
-            var results = new ConcurrentBag<RefreshResult>();
+            var results = new ConcurrentBag<RefreshSynchronizerResult>();
             Parallel.For(
                 0,
                 _userCount,
@@ -107,7 +106,7 @@ namespace Blaven.Integration.Test
                         userResults.ToList().ForEach(x => results.Add(x));
                     });
 
-            var updatedCount = results.Count(x => x.ResultType == RefreshResultType.UpdateSync);
+            var updatedCount = results.Count(x => x.ResultType == RefreshSynchronizerResultType.UpdateSync);
 
             Assert.AreEqual<int>(_blogCount, updatedCount, "The blogs weren't updated enough times.");
         }
@@ -115,13 +114,13 @@ namespace Blaven.Integration.Test
         [TestMethod]
         public void Refresh_WithEnsureBlogsRefreshed_FollowingRefreshesWithForceRefreshShouldUpdateSynchronously()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
-            firstRunBlogService.Repository.WaitForStaleIndexes();
+            firstRunBlogService.Repository.WaitForPosts();
 
             var updated = firstRunBlogService.Refresh(forceRefresh: true);
-            var updatedCount = updated.Count(x => x.ResultType == RefreshResultType.UpdateSync);
+            var updatedCount = updated.Count(x => x.ResultType == RefreshSynchronizerResultType.UpdateSync);
 
             Assert.AreEqual<int>(_blogKeys.Count(), updatedCount, "The blogs weren't updated again.");
         }
@@ -129,13 +128,13 @@ namespace Blaven.Integration.Test
         [TestMethod]
         public void Refresh_WithoutZeroMinutesCaching_FollowingRefreshesShouldNotUpdateSynchronously()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
 
-            firstRunBlogService.Repository.WaitForStaleIndexes();
+            firstRunBlogService.Repository.WaitForPosts();
 
-            var secondRefreshResults = new ConcurrentBag<RefreshResult>();
+            var secondRefreshResults = new ConcurrentBag<RefreshSynchronizerResult>();
             Parallel.For(
                 0,
                 _userCount,
@@ -152,7 +151,7 @@ namespace Blaven.Integration.Test
                         }
                     });
 
-            var updatedSynchronouslyCount = secondRefreshResults.Count(x => x.ResultType == RefreshResultType.UpdateSync);
+            var updatedSynchronouslyCount = secondRefreshResults.Count(x => x.ResultType == RefreshSynchronizerResultType.UpdateSync);
 
             Assert.AreEqual<int>(0, updatedSynchronouslyCount, "The blogs were updated too many times.");
         }
@@ -160,11 +159,11 @@ namespace Blaven.Integration.Test
         [TestMethod]
         public void Refresh_PostsWithUnencodedPreTagContent_ShouldNotCutContent()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
-            var service = BlogServiceTestHelper.GetBlogService(
+            var service = GetBlogService(
                 documentStore, new[] { "jonasrapp" }, ensureBlogsRefreshed: true);
-            service.Repository.WaitForStaleIndexes();
+            service.Repository.WaitForPosts();
 
             var preTagPost = service.GetPostByDataSourceId(3351494039612406157);
 
@@ -175,11 +174,11 @@ namespace Blaven.Integration.Test
         [TestMethod]
         public void Refresh_PostsWithPreTagContainingCodeTag_ShouldNotEncodeCodeTag()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
-            var service = BlogServiceTestHelper.GetBlogService(
+            var service = GetBlogService(
                 documentStore, new[] { "jonasrapp" }, ensureBlogsRefreshed: true);
-            service.Repository.WaitForStaleIndexes();
+            service.Repository.WaitForPosts();
 
             var preTagPost = service.GetPostByDataSourceId(3351494039612406157);
 
@@ -190,11 +189,11 @@ namespace Blaven.Integration.Test
         [TestMethod]
         public void Refresh_PostsWithUnencodedPreTagContent_EncodesAllPreTags()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            var documentStore = GetEmbeddableDocumentStore();
 
-            var service = BlogServiceTestHelper.GetBlogService(
+            var service = GetBlogService(
                 documentStore, new[] { "jonasrapp" }, ensureBlogsRefreshed: true);
-            service.Repository.WaitForStaleIndexes();
+            service.Repository.WaitForPosts();
 
             var preTagPost = service.GetPostByDataSourceId(3776549820754361006);
 
@@ -228,8 +227,8 @@ namespace Blaven.Integration.Test
 
             try
             {
-                var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-                var settings = BlogServiceTestHelper.GetBloggerSettings(_blogKeys.Skip(1));
+                var documentStore = GetEmbeddableDocumentStore();
+                var settings = GetBloggerSettings(_blogKeys.Skip(1));
                 BlogService.InitInstance(documentStore, settings: settings);
 
                 var postHeads = BlogService.Instance.GetAllPostHeads();
@@ -253,9 +252,9 @@ namespace Blaven.Integration.Test
             IEnumerable<string> blogKeys = null)
         {
             blogKeys = blogKeys ?? _blogKeys;
-            documentStore = documentStore ?? DocumentStoreTestHelper.GetEmbeddableDocumentStore();
+            documentStore = documentStore ?? GetEmbeddableDocumentStore();
 
-            return BlogServiceTestHelper.GetBlogService(
+            return GetBlogService(
                 documentStore, blogKeys, refreshAsync, ensureBlogsRefreshed: ensureBlogsRefreshed);
         }
     }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 using Blaven.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -7,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Blaven.RavenDb.Test
 {
     [TestClass]
-    public class RavenRepositoryTest : BlavenTestBase
+    public class RepositoryRefreshServiceTest : BlavenTestBase
     {
         private const string DuplicatedItemTitlePrefix = "[DUPLICATE]";
 
@@ -16,8 +15,8 @@ namespace Blaven.RavenDb.Test
         [TestMethod]
         public void Refresh_WithDuplicateIdsAndThrowOnCritical_ShouldThrowException()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-            var repository = new RavenRepository(documentStore);
+            var documentStore = GetEmbeddableDocumentStore();
+            var repository = new Repository(documentStore);
 
             bool isErrorThrown = false;
             try
@@ -35,8 +34,8 @@ namespace Blaven.RavenDb.Test
         [TestMethod]
         public void Refresh_WithDuplicateIdsAndWithoutThrowOnCritical_ShouldNotThrowException()
         {
-            var documentStore = DocumentStoreTestHelper.GetEmbeddableDocumentStore();
-            var repository = new RavenRepository(documentStore);
+            var documentStore = GetEmbeddableDocumentStore();
+            var repository = new Repository(documentStore);
 
             bool isErrorThrown = false;
             bool isRepoDuplicatedItemUpdated = false;
@@ -56,13 +55,13 @@ namespace Blaven.RavenDb.Test
             Assert.IsTrue(isRepoDuplicatedItemUpdated, "Duplicated item has been updated unexpectedly");
         }
 
-        private BlogPost RefreshWithDuplicateIds(RavenRepository repository, bool throwOnCritical)
+        private static BlogPost RefreshWithDuplicateIds(Repository repository, bool throwOnCritical)
         {
-            var posts = BlogPostsTestHelper.GetBlogPosts(TestBlogKey, 3).ToList();
+            var posts = GenerateBlogPosts(TestBlogKey, 3).ToList();
             var blogData = new BlogData { Info = new BlogInfo(), Posts = posts };
 
             repository.Refresh(TestBlogKey, blogData, throwOnCritical);
-            repository.WaitForStaleIndexes();
+            repository.WaitForPosts();
 
             var updatedItem = posts[0];
             var duplicateItem = posts[1];
@@ -74,7 +73,7 @@ namespace Blaven.RavenDb.Test
             duplicateItem.Title = DuplicatedItemTitlePrefix + duplicateItem.Title;
 
             repository.Refresh(TestBlogKey, blogData, throwOnCritical);
-            repository.WaitForStaleIndexes();
+            repository.WaitForPosts();
 
             return duplicateItem;
         }

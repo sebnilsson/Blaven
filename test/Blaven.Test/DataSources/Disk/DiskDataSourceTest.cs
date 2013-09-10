@@ -8,13 +8,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Blaven.DataSources.Disk.Test
 {
     [TestClass]
-    public class DiskDataSourceTest
+    public class DiskDataSourceTest : BlavenTestBase
     {
         protected internal const string BlogKey = "TESTBLOGKEY";
 
         internal virtual BlavenBlogSetting GetSettings(IDataSource dataSource)
         {
-            string dataSourceUri = TestEnvironmentHelper.GetDiskFilePath();
+            string dataSourceUri = GetDiskFilePath();
             return new BlavenBlogSetting(BlogKey, dataSource) { DataSourceUri = dataSourceUri };
         }
 

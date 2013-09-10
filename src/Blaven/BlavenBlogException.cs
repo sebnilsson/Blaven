@@ -1,20 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Blaven
 {
     public class BlavenBlogException : BlavenException
     {
-        protected internal BlavenBlogException(string blogKey)
+        public BlavenBlogException(string blogKey, Exception innerException = null, string message = null)
+            : this(new[] { blogKey }, innerException, message)
         {
-            this.BlogKey = blogKey;
         }
 
-        protected internal BlavenBlogException(string blogKey, Exception inner = null, string message = null)
-            : base(inner, message)
+        public BlavenBlogException(IEnumerable<string> blogKeys, Exception innerException = null, string message = null)
+            : base(innerException, message)
         {
-            this.BlogKey = blogKey;
+            this.BlogKeys = (blogKeys ?? Enumerable.Empty<string>()).ToList();
         }
 
-        public string BlogKey { get; internal set; }
+        public IEnumerable<string> BlogKeys { get; private set; }
     }
 }

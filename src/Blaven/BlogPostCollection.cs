@@ -18,7 +18,7 @@ namespace Blaven
         /// <param name="ravenQuery">The blog-posts to paginate over.</param>
         /// <param name="pageIndex">The current page-index of pagination.</param>
         /// <param name="pageSize">Optional parameter for page-size. Defaults to value in configuration.</param>
-        public BlogPostCollection(IEnumerable<BlogPost> ravenQuery, int pageIndex, int? pageSize = null)
+        public BlogPostCollection(IQueryable<BlogPost> ravenQuery, int pageIndex, int? pageSize = null)
         {
             if (ravenQuery == null)
             {
@@ -30,7 +30,7 @@ namespace Blaven
                     "pageIndex", "The argument has to be a positive number of 0 or higher.");
             }
 
-            pageSize = pageSize.GetValueOrDefault(AppSettingsService.PageSize);
+            pageSize = pageSize ?? AppSettingsService.PageSize;
             if (pageSize < 1)
             {
                 throw new ArgumentOutOfRangeException("pageSize", "The argument has to be a positive number above 0.");
@@ -83,37 +83,32 @@ namespace Blaven
             return this;
         }
 
-        public static int GetSkip(int pageIndex, int pageSize)
-        {
-            return (pageIndex * pageSize);
-        }
-
-        public static int GetTake(int pageSize)
-        {
-            return pageSize;
-        }
-
-        private void SetFields(IEnumerable<BlogPost> blogPosts, int pageIndex, int pageSize)
+        private void SetFields(IQueryable<BlogPost> queryBlogPosts, int pageIndex, int pageSize)
         {
             this.PageIndex = pageIndex;
             this.PageSize = pageSize;
 
-            this.TotalPostCount = blogPosts.Count();
+            this.TotalPostCount = queryBlogPosts.Count();
             this.PageCount = this.TotalPostCount / this.PageSize;
 
             int skip = GetSkip(PageIndex, PageSize);
-            int take = GetTake(PageSize);
+            int take = this.PageSize;
 
-            var pagedPosts = blogPosts.Skip(skip).Take(take).ToList();
+            var pagedPosts = queryBlogPosts.Skip(skip).Take(take).ToList();
             this.Posts = pagedPosts;
 
-            if (!blogPosts.Any() || !pagedPosts.Any())
+            if (!queryBlogPosts.Any() || !pagedPosts.Any())
             {
                 return;
             }
 
-            this.HasNextItems = (blogPosts.LastOrDefault().Id != pagedPosts.LastOrDefault().Id);
-            this.HasPreviousItems = (blogPosts.FirstOrDefault().Id != pagedPosts.FirstOrDefault().Id);
+            this.HasNextItems = (queryBlogPosts.LastOrDefault().Id != pagedPosts.LastOrDefault().Id);
+            this.HasPreviousItems = (queryBlogPosts.FirstOrDefault().Id != pagedPosts.FirstOrDefault().Id);
+        }
+
+        private static int GetSkip(int pageIndex, int pageSize)
+        {
+            return (pageIndex * pageSize);
         }
     }
 }

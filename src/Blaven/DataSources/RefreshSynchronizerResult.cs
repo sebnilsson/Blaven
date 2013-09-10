@@ -2,10 +2,10 @@
 
 namespace Blaven.DataSources
 {
-    public class RefreshResult
+    public class RefreshSynchronizerResult
     {
-        public RefreshResult(
-            string blogKey, RefreshResultType resultType, bool hasBlogAnyData = true, Exception exception = null)
+        public RefreshSynchronizerResult(
+            string blogKey, RefreshSynchronizerResultType resultType, bool hasBlogAnyData = true, Exception exception = null)
         {
             this.BlogKey = blogKey;
             this.Exception = exception;
@@ -21,6 +21,8 @@ namespace Blaven.DataSources
 
         public bool HasBlogAnyData { get; private set; }
 
-        public RefreshResultType ResultType { get; set; }
+        public RefreshSynchronizerResultType ResultType { get; set; }
+
+        public DataSourceRefreshResult RefreshResult { get; set; }
     }
 }

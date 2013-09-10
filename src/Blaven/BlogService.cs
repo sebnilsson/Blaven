@@ -39,27 +39,28 @@ namespace Blaven
             }
 
             this.DocumentStore = documentStore;
-            this.Repository = new RavenRepository(this.DocumentStore);
+            this.Repository = new Repository(this.DocumentStore);
 
             this.Config = config ?? new BlogServiceConfig();
-            this.Settings = settings ?? BlavenBlogSettingsParser.ParseFile();
+            this.Settings = (settings ?? BlavenBlogSettingsParser.ParseFile()).ToList();
             this.BlogPostTransformers = blogPostTransformers ?? BlogPostTransformersCollection.Default;
 
-            if (blogKeysFilter == null || !blogKeysFilter.Any())
+            var blogKeysFilterItems = (blogKeysFilter ?? Enumerable.Empty<string>()).ToArray();
+            if (!blogKeysFilterItems.Any())
             {
-                blogKeysFilter = this.Settings.Select(x => x.BlogKey).ToArray();
+                blogKeysFilterItems = this.Settings.Select(x => x.BlogKey).ToArray();
             }
             else
             {
-                if (this.Settings.Any(x => !blogKeysFilter.Contains(x.BlogKey)))
+                if (this.Settings.Any(x => !blogKeysFilterItems.Contains(x.BlogKey)))
                 {
                     throw new ArgumentOutOfRangeException(
-                        "blogKeys", "One or more blogKeys are not present in provided settings.");
+                        "settings", "One or more blogKeys are not present in provided settings.");
                 }
-                this.Settings = this.Settings.Where(x => blogKeysFilter.Contains(x.BlogKey));
+                this.Settings = this.Settings.Where(x => blogKeysFilterItems.Contains(x.BlogKey));
             }
 
-            this.blogKeysFilter = blogKeysFilter.ToArray();
+            this.blogKeysFilter = blogKeysFilterItems.ToArray();
 
             this.dataSourceRefresher = new DataSourceRefreshService(this.Config, this.Repository);
 
@@ -69,7 +70,7 @@ namespace Blaven
             }
         }
 
-        internal RavenRepository Repository { get; private set; }
+        internal Repository Repository { get; private set; }
 
         /// <summary>
         /// Gets the configuration being used by the service.
@@ -216,7 +217,7 @@ namespace Blaven
             }
 
             return
-                this.Repository.SearchPosts(
+                this.Repository.GetBlogPostsSearch(
                     searchTerms ?? string.Empty, pageIndex, this.Config.PageSize, this.blogKeysFilter)
                     .ApplyTransformers(this.BlogPostTransformers);
         }
@@ -225,13 +226,13 @@ namespace Blaven
         /// Refreshes blogs, if needed.
         /// <param name="forceRefresh">Sets if the refresh should be forced. Defaults to "false".</param>
         /// </summary>
-        public IEnumerable<RefreshResult> Refresh(bool forceRefresh = false)
+        public IEnumerable<RefreshSynchronizerResult> Refresh(bool forceRefresh = false)
         {
             var updatedBlogs = dataSourceRefresher.Refresh(this.Settings, forceRefresh);
 
             if (forceRefresh)
             {
-                this.Repository.WaitForStaleIndexes();
+                this.Repository.WaitForPosts(this.Settings.Select(x => x.BlogKey).ToArray());
             }
 
             return updatedBlogs;

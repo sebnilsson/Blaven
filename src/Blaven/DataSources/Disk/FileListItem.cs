@@ -1,4 +1,4 @@
-﻿namespace Blaven.DataSources
+﻿namespace Blaven.DataSources.Disk
 {
     public class FileListItem
     {
