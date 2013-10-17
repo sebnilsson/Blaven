@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using Raven.Client.Linq;
 
@@ -15,6 +17,11 @@ namespace Blaven.RavenDb
             }
 
             return query.Where(x => x.BlogKey.In(blogKeys));
+        }
+
+        public static IList<T> ToListHandled<T>(this IRavenQueryable<T> query)
+        {
+            return RavenDbHelper.HandleRavenExceptions(() => query.ToList());
         }
     }
 }

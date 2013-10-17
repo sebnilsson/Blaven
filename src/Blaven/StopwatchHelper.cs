@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Blaven
 {
-    public static class StopwatchHelper
+    internal static class StopwatchHelper
     {
         public static TimeSpan PerformMeasuredAction(Action action)
         {

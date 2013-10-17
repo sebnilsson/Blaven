@@ -15,6 +15,8 @@ namespace Blaven.Test
     {
         public const string TestBlogKey = "TEST";
 
+        public const string TestBlogTitle = "TEST_BLOG_TITLE";
+
         private static string projectDirectory;
 
         public static readonly IEnumerable<string> TestBlogKeys = new[] { "TEST1", "TEST2" };
@@ -34,7 +36,8 @@ namespace Blaven.Test
             }
         }
 
-        public static EmbeddableDocumentStore GetEmbeddableDocumentStore(string path = null)
+        public static EmbeddableDocumentStore GetEmbeddableDocumentStore(
+            string path = null, bool initWithIndexes = true)
         {
             path = !string.IsNullOrWhiteSpace(path) ? path : Guid.NewGuid().ToString();
 
@@ -50,35 +53,40 @@ namespace Blaven.Test
                                             },
                                         RunInMemory = true,
                                     };
-            documentStore.Initialize();
 
-            RavenDbHelper.InitWithIndexes(documentStore);
+            if (initWithIndexes)
+            {
+                RavenDbHelper.InitWithIndexes(documentStore);
+            }
 
             return documentStore;
         }
 
-        public static BlogData GenerateBlogData(string blogKey, int postsCount)
+        public static BlogData GenerateBlogData(int postsCount, string blogKey = TestBlogKey)
         {
-            var posts = GenerateBlogPosts(blogKey, postsCount);
-            return GenerateBlogData(blogKey, posts);
+            var posts = GenerateBlogPosts(postsCount, blogKey);
+            return GenerateBlogData(posts, blogKey);
         }
 
-        public static BlogData GenerateBlogData(string blogKey, IEnumerable<BlogPost> posts = null)
+        public static BlogData GenerateBlogData(IEnumerable<BlogPost> posts = null, string blogKey = TestBlogKey)
         {
             posts = posts ?? Enumerable.Empty<BlogPost>();
 
-            return new BlogData { Info = new BlogInfo { BlogKey = blogKey, Title = "TEST_TITLE", }, Posts = posts, };
+            return new BlogData { Info = new BlogInfo { BlogKey = blogKey, Title = TestBlogTitle, }, Posts = posts, };
         }
 
-        public static IEnumerable<BlogPost> GenerateBlogPosts(string blogKey, int count)
+        public static IEnumerable<BlogPost> GenerateBlogPosts(int count, string blogKey = TestBlogKey)
         {
-            return GenerateBlogPosts(blogKey, 1, count);
+            return GenerateBlogPosts(1, count, blogKey);
         }
 
-        public static IEnumerable<BlogPost> GenerateBlogPosts(string blogKey, int start, int count)
+        public static IEnumerable<BlogPost> GenerateBlogPosts(int start, int count, string blogKey = TestBlogKey)
         {
-            var numbers = Enumerable.Range(start, count);
-            return numbers.Select(number => new BlogPost(blogKey, (uint)number));
+            var random = new Random();
+
+            return from number in Enumerable.Range(start, count)
+                   let published = DateTime.Now.AddMinutes(random.NextDouble() * 100)
+                   select new BlogPost(blogKey, (uint)number) { Published = published };
         }
 
         public static BlogService GetBlogService(

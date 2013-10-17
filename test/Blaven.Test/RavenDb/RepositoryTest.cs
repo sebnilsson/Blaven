@@ -3,26 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.DataSources;
-using Blaven.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Blaven.RavenDb.Test
 {
     [TestClass]
-    public class RepositoryTest : BlavenTestBase
+    public class RepositoryTest : RepositoryTestBase
     {
         private const int DefaultPageIndex = 0;
 
         private const int DefaultPageSize = 5;
-
-        private const string TestBlogKey = "TEST";
 
         [TestMethod]
         public void Resfresh_WhenBlogPostAdded_ShouldContainAddedPosts()
         {
             var repository = GetRepository();
 
-            var blogData = GenerateBlogData(TestBlogKey, GenerateBlogPosts(TestBlogKey, 2));
+            var blogData = GenerateBlogData(2);
 
             repository.Refresh(TestBlogKey, blogData);
             repository.WaitForPosts();
@@ -38,12 +35,12 @@ namespace Blaven.RavenDb.Test
         {
             var repository = GetRepository();
 
-            var blogData = GenerateBlogData(TestBlogKey, GenerateBlogPosts(TestBlogKey, 2));
+            var blogData = GenerateBlogData(2);
 
             repository.Refresh(TestBlogKey, blogData);
             repository.WaitForPosts();
 
-            blogData.Posts = blogData.Posts.Concat(GenerateBlogPosts(TestBlogKey, 3, 2));
+            blogData.Posts = blogData.Posts.Concat(GenerateBlogPosts(3, 2));
 
             repository.Refresh(TestBlogKey, blogData);
             repository.WaitForPosts();
@@ -62,8 +59,7 @@ namespace Blaven.RavenDb.Test
             var refreshResultBefore = new DataSourceRefreshResult
                                           {
                                               BlogInfo = blogInfo,
-                                              ModifiedBlogPosts =
-                                                  GenerateBlogPosts(TestBlogKey, 4),
+                                              ModifiedBlogPosts = GenerateBlogPosts(4),
                                               RemovedBlogPostIds = Enumerable.Empty<string>()
                                           };
             repository.Refresh(TestBlogKey, refreshResultBefore);
@@ -138,7 +134,7 @@ namespace Blaven.RavenDb.Test
 
             int postsCount = 33;
 
-            var blogData = GenerateBlogData(TestBlogKey, postsCount);
+            var blogData = GenerateBlogData(postsCount);
 
             repository.Refresh(TestBlogKey, blogData);
             repository.WaitForPosts();
@@ -154,7 +150,7 @@ namespace Blaven.RavenDb.Test
         {
             var repository = GetRepository();
 
-            var blogData = GenerateBlogData(TestBlogKey, 1);
+            var blogData = GenerateBlogData(1);
             blogData.Info.Subtitle = "ORIGINAL_SUBTITLE";
             blogData.Info.Title = "ORIGINAL_TITLE";
             blogData.Info.Updated = DateTime.MinValue;
@@ -189,7 +185,7 @@ namespace Blaven.RavenDb.Test
         {
             var repository = GetRepository();
 
-            var blogData = GenerateBlogData(TestBlogKey, 2);
+            var blogData = GenerateBlogData(2);
             blogData.Posts = blogData.Posts.ToList();
 
             var post = blogData.Posts.Last(); // Using second post to avoid false positives

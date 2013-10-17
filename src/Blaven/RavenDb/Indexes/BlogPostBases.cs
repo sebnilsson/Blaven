@@ -5,9 +5,9 @@ using Raven.Client.Indexes;
 
 namespace Blaven.RavenDb.Indexes
 {
-    public class BlogPostHeads : AbstractIndexCreationTask<BlogPost, BlogPostHead>
+    public class BlogPostBases : AbstractIndexCreationTask<BlogPost, BlogPostBase>
     {
-        public BlogPostHeads()
+        public BlogPostBases()
         {
             this.Map = posts => from post in posts
                                 where !post.IsDeleted && post.Published > DateTime.MinValue

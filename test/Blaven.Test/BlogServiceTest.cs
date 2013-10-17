@@ -66,7 +66,7 @@ namespace Blaven.Integration.Test
             var firstRunBlogService = GetBlogServiceWithMultipleBlogs(documentStore: documentStore);
             firstRunBlogService.Repository.WaitForPosts();
 
-            var results = new ConcurrentBag<RefreshSynchronizerResult>();
+            var results = new ConcurrentBag<BlogRefreshResult>();
             Parallel.For(
                 0,
                 _userCount,
@@ -79,7 +79,7 @@ namespace Blaven.Integration.Test
                     });
 
             var updatedCount =
-                results.Count(x => x.ResultType == RefreshSynchronizerResultType.UpdateSync || x.ResultType == RefreshSynchronizerResultType.UpdateAsync);
+                results.Count(x => x.ResultType == BlogRefreshResultType.UpdateSync || x.ResultType == BlogRefreshResultType.UpdateAsync);
 
             Assert.AreEqual(0, updatedCount, "The blogs were updated too many times.");
         }
@@ -93,7 +93,7 @@ namespace Blaven.Integration.Test
                 documentStore: documentStore, ensureBlogsRefreshed: false);
             firstRunBlogService.Repository.WaitForPosts();
 
-            var results = new ConcurrentBag<RefreshSynchronizerResult>();
+            var results = new ConcurrentBag<BlogRefreshResult>();
             Parallel.For(
                 0,
                 _userCount,
@@ -106,7 +106,7 @@ namespace Blaven.Integration.Test
                         userResults.ToList().ForEach(x => results.Add(x));
                     });
 
-            var updatedCount = results.Count(x => x.ResultType == RefreshSynchronizerResultType.UpdateSync);
+            var updatedCount = results.Count(x => x.ResultType == BlogRefreshResultType.UpdateSync);
 
             Assert.AreEqual<int>(_blogCount, updatedCount, "The blogs weren't updated enough times.");
         }
@@ -120,7 +120,7 @@ namespace Blaven.Integration.Test
             firstRunBlogService.Repository.WaitForPosts();
 
             var updated = firstRunBlogService.Refresh(forceRefresh: true);
-            var updatedCount = updated.Count(x => x.ResultType == RefreshSynchronizerResultType.UpdateSync);
+            var updatedCount = updated.Count(x => x.ResultType == BlogRefreshResultType.UpdateSync);
 
             Assert.AreEqual<int>(_blogKeys.Count(), updatedCount, "The blogs weren't updated again.");
         }
@@ -134,7 +134,7 @@ namespace Blaven.Integration.Test
 
             firstRunBlogService.Repository.WaitForPosts();
 
-            var secondRefreshResults = new ConcurrentBag<RefreshSynchronizerResult>();
+            var secondRefreshResults = new ConcurrentBag<BlogRefreshResult>();
             Parallel.For(
                 0,
                 _userCount,
@@ -151,7 +151,7 @@ namespace Blaven.Integration.Test
                         }
                     });
 
-            var updatedSynchronouslyCount = secondRefreshResults.Count(x => x.ResultType == RefreshSynchronizerResultType.UpdateSync);
+            var updatedSynchronouslyCount = secondRefreshResults.Count(x => x.ResultType == BlogRefreshResultType.UpdateSync);
 
             Assert.AreEqual<int>(0, updatedSynchronouslyCount, "The blogs were updated too many times.");
         }

@@ -1,6 +1,6 @@
-﻿namespace Blaven.DataSources
+﻿namespace Blaven
 {
-    public enum RefreshSynchronizerResultType
+    public enum BlogRefreshResultType
     {
         UpdateFailed = -1,
 

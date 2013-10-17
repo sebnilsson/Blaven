@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Blaven.RavenDb;
+﻿using Blaven.RavenDb;
 using Newtonsoft.Json;
 
 namespace Blaven
@@ -9,7 +6,7 @@ namespace Blaven
     /// <summary>
     /// Represents a blog-post on a blog.
     /// </summary>
-    public class BlogPost
+    public class BlogPost : BlogPostBase
     {
         public BlogPost(string blogKey, ulong dataSourceId)
             : this(blogKey)
@@ -42,16 +39,6 @@ namespace Blaven
         public BlogAuthor Author { get; set; }
 
         /// <summary>
-        /// The automatic incremented unique ID given by RavenDB.
-        /// </summary>
-        public string BlavenId { get; internal set; }
-
-        /// <summary>
-        /// The blog key the post belongs to.
-        /// </summary>
-        public string BlogKey { get; internal set; }
-
-        /// <summary>
         /// The text-content of a blog-post. Contains HTML-code.
         /// </summary>
         public string Content { get; set; }
@@ -80,31 +67,6 @@ namespace Blaven
         /// Gets or sets the hash of the blog-post.
         /// </summary>
         public string Checksum { get; set; }
-
-        /// <summary>
-        /// The date and time that the blog-post was posted.
-        /// </summary>
-        public DateTime Published { get; set; }
-
-        /// <summary>
-        /// The tags that are set on the blog-post.
-        /// </summary>
-        public IEnumerable<string> Tags { get; set; }
-
-        /// <summary>
-        /// The title of the blog-post.
-        /// </summary>
-        public string Title { get; set; }
-
-        /// <summary>
-        /// The date and time that the blog-post was updated.
-        /// </summary>
-        public DateTime? Updated { get; set; }
-
-        /// <summary>
-        /// The URL-friendly slug, based on the title of the blog post.
-        /// </summary>
-        public string UrlSlug { get; set; }
 
         internal void SetIds(ulong dataSourceId)
         {

@@ -3,19 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.RavenDb.Indexes;
+using Raven.Client;
 using Raven.Client.Linq;
 
 namespace Blaven.RavenDb
 {
     internal static class RepositoryQueryExtensions
     {
-        public static IList<BlogPostHead> GetAllBlogPostHeads(this Repository repository, params string[] blogKeys)
+        public static IList<BlogPostBase> GetAllBlogPostHeads(this Repository repository, params string[] blogKeys)
         {
             var allPosts =
-                repository.GetMaxRequestQuery<BlogPostHeads>(blogKeys)
-                          .Select(x => new BlogPostHead(x))
+                repository.GetMaxRequestQuery<BlogPostBases>(blogKeys)
                           .OrderByDescending(x => x.Published)
-                          .Take(int.MaxValue);
+                          .Take(int.MaxValue)
+                          .ProjectFromIndexFieldsInto<BlogPostBase>();
 
             return allPosts.ToListHandled();
         }
@@ -24,9 +25,9 @@ namespace Blaven.RavenDb
         {
             var postMetas =
                 repository.GetMaxRequestQuery<BlogPostMetas>(blogKeys)
-                          .Select(x => new BlogPostMeta(x))
                           .OrderByDescending(x => x.Published)
-                          .Take(int.MaxValue);
+                          .Take(int.MaxValue)
+                          .ProjectFromIndexFieldsInto<BlogPostMeta>();
 
             return postMetas.ToListHandled();
         }

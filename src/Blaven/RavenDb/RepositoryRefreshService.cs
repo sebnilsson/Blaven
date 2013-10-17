@@ -1,27 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.DataSources;
 using Raven.Client;
 
 namespace Blaven.RavenDb
 {
-    internal static class RepositoryRefreshHelper
+    internal class RepositoryRefreshService
     {
-        internal static void Refresh(
-            Repository repository, string blogKey, BlogData blogData, bool throwOnCritical = false)
+        private readonly Repository repository;
+
+        private readonly string blogKey;
+
+        private readonly bool throwOnCritical;
+
+        public RepositoryRefreshService(Repository repository, string blogKey, bool throwOnCritical = false)
+        {
+            this.repository = repository;
+            this.blogKey = blogKey;
+            this.throwOnCritical = throwOnCritical;
+        }
+
+        internal async Task Refresh(BlogData blogData)
         {
             var refreshResult = new DataSourceRefreshResult
                                     {
                                         BlogInfo = blogData.Info,
                                         ModifiedBlogPosts = blogData.Posts
                                     };
-            Refresh(repository, blogKey, refreshResult, throwOnCritical);
+            await Refresh(refreshResult);
         }
 
-        public static void Refresh(
-            Repository repository, string blogKey, DataSourceRefreshResult refreshResult, bool throwOnException = false)
+        public async Task Refresh(DataSourceRefreshResult refreshResult)
         {
             if (refreshResult == null)
             {
@@ -33,34 +45,33 @@ namespace Blaven.RavenDb
 
             try
             {
-                using (var refreshSession = repository.GetMaxRequestSession())
+                using (var refreshSession = repository.GetMaxRequestSessionAsync())
                 {
-                    refreshResult.ModifiedBlogPosts = RemoveDuplicatePosts(
-                        repository, blogKey, refreshResult.ModifiedBlogPosts, throwOnException);
+                    refreshResult.ModifiedBlogPosts = this.RemoveDuplicatePosts(
+                        refreshResult.ModifiedBlogPosts);
 
-                    RefreshBlogInfo(refreshSession, blogKey, refreshResult.BlogInfo);
+                    this.RefreshBlogInfo(refreshSession, refreshResult.BlogInfo);
 
-                    RefreshBlogPosts(refreshSession, refreshResult.ModifiedBlogPosts);
+                    this.RefreshBlogPosts(refreshSession, refreshResult.ModifiedBlogPosts);
 
                     FlagDeletedBlogPosts(refreshSession, refreshResult.RemovedBlogPostIds);
 
-                    UpdateBlogRefresh(refreshSession, blogKey);
+                    this.UpdateBlogRefresh(refreshSession);
 
-                    refreshSession.SaveChanges();
+                    await refreshSession.SaveChangesAsync();
                 }
             }
             catch (Exception ex)
             {
-                throw new RepositoryRefreshException(blogKey, ex);
+                throw new RepositoryRefreshServiceException(blogKey, ex);
             }
         }
 
-        private static IEnumerable<BlogPost> RemoveDuplicatePosts(
-            Repository repository, string blogKey, IEnumerable<BlogPost> modifiedPosts, bool throwOnException)
+        private IEnumerable<BlogPost> RemoveDuplicatePosts(IEnumerable<BlogPost> modifiedPosts)
         {
             var modifiedPostList = modifiedPosts.ToList();
 
-            var postMeta = repository.GetAllBlogPostMeta(blogKey);
+            var postMeta = repository.GetAllBlogPostMeta(this.blogKey);
             var duplicateItems = (from modified in modifiedPostList
                                   where
                                       postMeta.Any(x => x.Id == modified.Id && x.DataSourceId != modified.DataSourceId)
@@ -71,7 +82,7 @@ namespace Blaven.RavenDb
                 return modifiedPostList;
             }
 
-            if (throwOnException)
+            if (this.throwOnCritical)
             {
                 var duplicatePost = modifiedPostList.First();
                 string exceptionMessage =
@@ -79,7 +90,7 @@ namespace Blaven.RavenDb
                         "Duplicate calculated ID by Blaven for post with title '{0}'."
                         + " Move content of post to a new item to get a new calculated ID.",
                         duplicatePost.Title);
-                throw new BlavenBlogException(blogKey, message: exceptionMessage);
+                throw new BlavenBlogException(this.blogKey, message: exceptionMessage);
             }
 
             duplicateItems.ForEach(x => modifiedPostList.Remove(x));
@@ -87,20 +98,20 @@ namespace Blaven.RavenDb
             return modifiedPostList;
         }
 
-        private static void RefreshBlogInfo(IDocumentSession session, string blogKey, BlogInfo updateInfo)
+        private async void RefreshBlogInfo(IAsyncDocumentSession session, BlogInfo updateInfo)
         {
             if (updateInfo == null)
             {
                 return;
             }
 
-            string blogInfoUrl = RavenDbHelper.GetEntityId<BlogInfo>(blogKey);
-            var blogInfo = session.Load<BlogInfo>(blogInfoUrl);
+            string blogInfoUrl = RavenDbHelper.GetEntityId<BlogInfo>(this.blogKey);
+            var blogInfo = await session.LoadAsync<BlogInfo>(blogInfoUrl);
 
             if (blogInfo == null)
             {
                 blogInfo = new BlogInfo { BlogKey = blogKey };
-                session.Store(blogInfo, blogInfoUrl);
+                await session.StoreAsync(blogInfo, blogInfoUrl);
             }
 
             blogInfo.Subtitle = updateInfo.Subtitle;
@@ -109,7 +120,7 @@ namespace Blaven.RavenDb
             blogInfo.Url = updateInfo.Url;
         }
 
-        private static void RefreshBlogPosts(IDocumentSession session, IEnumerable<BlogPost> modifiedPosts)
+        private async void RefreshBlogPosts(IAsyncDocumentSession session, IEnumerable<BlogPost> modifiedPosts)
         {
             var posts = modifiedPosts.ToList();
             if (!posts.Any())
@@ -118,9 +129,9 @@ namespace Blaven.RavenDb
             }
 
             var updatedPostsList = posts.OrderBy(x => x.Id).ToList();
-            var updatedPostsIds = updatedPostsList.Select(GetPostRavenId).ToList();
+            var updatedPostsIds = updatedPostsList.Select(GetPostBlavenId).ToList();
 
-            var storedPosts = session.Load<BlogPost>(updatedPostsIds);
+            var storedPosts = await session.LoadAsync<BlogPost>(updatedPostsIds);
             for (int i = 0; i < storedPosts.Length; i++)
             {
                 var storedPost = storedPosts[i];
@@ -129,7 +140,7 @@ namespace Blaven.RavenDb
                 if (storedPost == null)
                 {
                     storedPost = updatedPost;
-                    session.Store(storedPost);
+                    await session.StoreAsync(storedPost);
                 }
                 else
                 {
@@ -150,29 +161,29 @@ namespace Blaven.RavenDb
             }
         }
 
-        private static string GetPostRavenId(BlogPost blogPost)
+        private static string GetPostBlavenId(BlogPost blogPost)
         {
             return !string.IsNullOrWhiteSpace(blogPost.Id)
                        ? blogPost.Id
                        : BlavenHelper.GetBlavenHash(blogPost.DataSourceId);
         }
 
-        private static void UpdateBlogRefresh(IDocumentSession session, string blogKey)
+        private async void UpdateBlogRefresh(IAsyncDocumentSession session)
         {
-            string blogRefreshId = RavenDbHelper.GetEntityId<BlogRefresh>(blogKey);
-            var blogRefresh = session.Load<BlogRefresh>(blogRefreshId);
+            string blogRefreshId = RavenDbHelper.GetEntityId<BlogRefresh>(this.blogKey);
+            var blogRefresh = await session.LoadAsync<BlogRefresh>(blogRefreshId);
 
             if (blogRefresh == null)
             {
-                blogRefresh = new BlogRefresh { BlogKey = blogKey };
-                session.Store(blogRefresh, blogRefreshId);
+                blogRefresh = new BlogRefresh { BlogKey = this.blogKey };
+                await session.StoreAsync(blogRefresh, blogRefreshId);
             }
             blogRefresh.Timestamp = DateTime.Now;
         }
 
-        private static void FlagDeletedBlogPosts(IDocumentSession session, IEnumerable<string> blogPostIds)
+        private static async void FlagDeletedBlogPosts(IAsyncDocumentSession session, IEnumerable<string> blogPostIds)
         {
-            var deletedPosts = session.Load<BlogPost>(blogPostIds);
+            var deletedPosts = await session.LoadAsync<BlogPost>(blogPostIds);
             foreach (var deletedPost in deletedPosts)
             {
                 deletedPost.IsDeleted = true;

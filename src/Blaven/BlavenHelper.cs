@@ -26,7 +26,6 @@ namespace Blaven
 
             var hashInt = BitConverter.ToInt32(hash, 0);
             return hashInt.ToString("x8");
-
         }
     }
 }

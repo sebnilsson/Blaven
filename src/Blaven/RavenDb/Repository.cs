@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.DataSources;
 using Blaven.RavenDb.Indexes;
@@ -33,14 +35,26 @@ namespace Blaven.RavenDb
             }
         }
 
-        internal void Refresh(string blogKey, BlogData blogData, bool throwOnException = false)
+#if DEBUG
+        internal IEnumerable<BlogPost> DebugAllBlogPosts()
         {
-            RepositoryRefreshHelper.Refresh(this, blogKey, blogData, throwOnException);
+            using (var session = this.documentStore.OpenSession())
+            {
+                return session.Query<BlogPost>().ToList();
+            }
+        }
+#endif
+
+        internal async Task Refresh(string blogKey, BlogData blogData, bool throwOnException = false)
+        {
+            var repositoryRefreshService = new RepositoryRefreshService(this, blogKey, throwOnException);
+            await repositoryRefreshService.Refresh(blogData);
         }
 
-        public void Refresh(string blogKey, DataSourceRefreshResult refreshResult, bool throwOnException = false)
+        public async Task Refresh(string blogKey, DataSourceRefreshResult refreshResult, bool throwOnException = false)
         {
-            RepositoryRefreshHelper.Refresh(this, blogKey, refreshResult, throwOnException);
+            var repositoryRefreshService = new RepositoryRefreshService(this, blogKey, throwOnException);
+            await repositoryRefreshService.Refresh(refreshResult);
         }
 
         public bool WaitForData(params string[] blogKeys)
@@ -73,6 +87,14 @@ namespace Blaven.RavenDb
                 this.GetQuery<BlogPost, BlogPostsOrderedByCreated>()
                     .FilterOnBlogKeys(blogKeys)
                     .OrderByDescending(x => x.Published);
+        }
+
+        internal IAsyncDocumentSession GetMaxRequestSessionAsync()
+        {
+            var maximumSession = this.documentStore.OpenAsyncSession();
+            maximumSession.Advanced.MaxNumberOfRequestsPerSession = int.MaxValue;
+
+            return maximumSession;
         }
 
         internal IDocumentSession GetMaxRequestSession()

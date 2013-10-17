@@ -94,6 +94,7 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>appSettings.config</DependentUpon>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Compile>
     <Compile Include="BlavenTestBase.cs" />
     <Compile Include="BlogServiceTest.cs" />
@@ -103,7 +104,8 @@
     <Compile Include="DataSources\MockDataSource.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RavenDb\RepositoryTest.cs" />
-    <Compile Include="RavenDb\RepositoryRefreshServiceTest.cs" />
+    <Compile Include="RavenDb\RepositoryRefreshHelperTest.cs" />
+    <Compile Include="RavenDb\RepositoryTestBase.cs" />
     <Compile Include="Resources\DiskFileResources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -115,6 +117,7 @@
     <None Include="appSettings.config">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>appSettings.Designer.cs</LastGenOutput>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Resources\DiskFiles\blog-post-1.json" />
     <None Include="packages.config">

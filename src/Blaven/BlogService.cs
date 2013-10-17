@@ -16,7 +16,7 @@ namespace Blaven
     {
         private readonly string[] blogKeysFilter;
 
-        private readonly DataSourceRefreshService dataSourceRefresher;
+        private readonly BlogRefreshService blogRefreshService;
 
         /// <summary>
         /// Creates an instance of a service-class for accessing blog-related features.
@@ -62,11 +62,11 @@ namespace Blaven
 
             this.blogKeysFilter = blogKeysFilterItems.ToArray();
 
-            this.dataSourceRefresher = new DataSourceRefreshService(this.Config, this.Repository);
+            this.blogRefreshService = new BlogRefreshService(this.Repository, this.Config);
 
             if (this.Config.EnsureBlogsRefreshed)
             {
-                Refresh();
+                this.Refresh();
             }
         }
 
@@ -83,7 +83,7 @@ namespace Blaven
 
         public IEnumerable<BlavenBlogSetting> Settings { get; private set; }
 
-        public IEnumerable<BlogPostHead> GetAllPostHeads()
+        public IEnumerable<BlogPostBase> GetAllPostHeads()
         {
             return this.Repository.GetAllBlogPostHeads(this.blogKeysFilter);
         }
@@ -176,7 +176,7 @@ namespace Blaven
         /// </summary>
         /// <param name="pageIndex">The current page-index of the pagination. Must have a value of 0 or higher.</param>
         /// <returns>Returns a blog-selection with pagination-info.</returns>
-        public BlogPostCollection GetPosts(int pageIndex)
+        public BlogPostCollection GetPosts(int pageIndex = 0)
         {
             if (pageIndex < 0)
             {
@@ -192,12 +192,18 @@ namespace Blaven
         /// Gets the blog-tags count.
         /// </summary>
         /// <returns>Returns a dictionary of tags and their count.</returns>
-        public Dictionary<string, int> GetTagsCount()
+        public Dictionary<string, int> GetTagsMeta()
         {
             return this.Repository.GetBlogTagsCount(this.blogKeysFilter);
         }
 
-        public BlogPostCollection GetTagPosts(string tagName, int pageIndex)
+        /// <summary>
+        /// Get blog-posts within a specific tag.
+        /// </summary>
+        /// <param name="tagName"></param>
+        /// <param name="pageIndex"></param>
+        /// <returns></returns>
+        public BlogPostCollection GetTagPosts(string tagName, int pageIndex = 0)
         {
             if (pageIndex < 0)
             {
@@ -209,7 +215,7 @@ namespace Blaven
                     .ApplyTransformers(this.BlogPostTransformers);
         }
 
-        public BlogPostCollection SearchPosts(string searchTerms, int pageIndex)
+        public BlogPostCollection SearchPosts(string searchTerms, int pageIndex = 0)
         {
             if (pageIndex < 0)
             {
@@ -226,9 +232,9 @@ namespace Blaven
         /// Refreshes blogs, if needed.
         /// <param name="forceRefresh">Sets if the refresh should be forced. Defaults to "false".</param>
         /// </summary>
-        public IEnumerable<RefreshSynchronizerResult> Refresh(bool forceRefresh = false)
+        public IEnumerable<BlogRefreshResult> Refresh(bool forceRefresh = false)
         {
-            var updatedBlogs = dataSourceRefresher.Refresh(this.Settings, forceRefresh);
+            var updatedBlogs = this.blogRefreshService.Refresh(this.Settings, forceRefresh);
 
             if (forceRefresh)
             {

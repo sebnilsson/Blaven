@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace Blaven.DataSources
+namespace Blaven
 {
-    public class RefreshSynchronizerResult
+    public class BlogRefreshResult
     {
-        public RefreshSynchronizerResult(
-            string blogKey, RefreshSynchronizerResultType resultType, bool hasBlogAnyData = true, Exception exception = null)
+        public BlogRefreshResult(
+            string blogKey, BlogRefreshResultType resultType, bool hasBlogAnyData = true, Exception exception = null)
         {
             this.BlogKey = blogKey;
             this.Exception = exception;
@@ -21,8 +21,6 @@ namespace Blaven.DataSources
 
         public bool HasBlogAnyData { get; private set; }
 
-        public RefreshSynchronizerResultType ResultType { get; set; }
-
-        public DataSourceRefreshResult RefreshResult { get; set; }
+        public BlogRefreshResultType ResultType { get; set; }
     }
 }

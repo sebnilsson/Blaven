@@ -1,22 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 
 namespace Blaven
 {
-    public static class KeyLockService
+    internal static class KeyLockService
     {
-        private static readonly object KeyLock = new object();
+        private static readonly ConcurrentDictionary<string, object> KeyLocks =
+            new ConcurrentDictionary<string, object>();
 
-        private static readonly Dictionary<string, object> KeyLocks = new Dictionary<string, object>();
-
-        public static void PerformLockedAction(string key, Action action)
-        {
-            var keyLock = GetKeyLock(key);
-            lock (keyLock)
-            {
-                action();
-            }
-        }
+        //public static void PerformLockedAction(string key, Action action)
+        //{
+        //    var keyLock = GetKeyLock(key);
+        //    lock (keyLock)
+        //    {
+        //        action();
+        //    }
+        //}
 
         public static TResult PerformLockedFunction<TResult>(string key, Func<TResult> func)
         {
@@ -29,15 +28,7 @@ namespace Blaven
 
         private static object GetKeyLock(string key)
         {
-            lock (KeyLock)
-            {
-                if (!KeyLocks.ContainsKey(key))
-                {
-                    KeyLocks[key] = new object();
-                }
-
-                return KeyLocks[key];
-            }
+            return KeyLocks.GetOrAdd(key, new object());
         }
     }
 }

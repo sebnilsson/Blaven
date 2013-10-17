@@ -1,12 +1,11 @@
 ﻿using System.Linq;
 
-using Blaven.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Blaven.RavenDb.Test
 {
     [TestClass]
-    public class RepositoryRefreshServiceTest : BlavenTestBase
+    public class RepositoryRefreshHelperTest : RepositoryTestBase
     {
         private const string DuplicatedItemTitlePrefix = "[DUPLICATE]";
 
@@ -15,8 +14,7 @@ namespace Blaven.RavenDb.Test
         [TestMethod]
         public void Refresh_WithDuplicateIdsAndThrowOnCritical_ShouldThrowException()
         {
-            var documentStore = GetEmbeddableDocumentStore();
-            var repository = new Repository(documentStore);
+            var repository = GetRepository();
 
             bool isErrorThrown = false;
             try
@@ -34,8 +32,7 @@ namespace Blaven.RavenDb.Test
         [TestMethod]
         public void Refresh_WithDuplicateIdsAndWithoutThrowOnCritical_ShouldNotThrowException()
         {
-            var documentStore = GetEmbeddableDocumentStore();
-            var repository = new Repository(documentStore);
+            var repository = GetRepository();
 
             bool isErrorThrown = false;
             bool isRepoDuplicatedItemUpdated = false;
@@ -57,8 +54,8 @@ namespace Blaven.RavenDb.Test
 
         private static BlogPost RefreshWithDuplicateIds(Repository repository, bool throwOnCritical)
         {
-            var posts = GenerateBlogPosts(TestBlogKey, 3).ToList();
-            var blogData = new BlogData { Info = new BlogInfo(), Posts = posts };
+            var posts = GenerateBlogPosts(3).ToList();
+            var blogData = GenerateBlogData(posts);
 
             repository.Refresh(TestBlogKey, blogData, throwOnCritical);
             repository.WaitForPosts();

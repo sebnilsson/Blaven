@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 using Blaven.RavenDb;
 
-namespace Blaven.DataSources
+namespace Blaven
 {
-    internal class RefreshSynchronizerService
+    internal class BlogRefreshServiceSynchronizer
     {
         private const int RefreshTimeoutSeconds = 30;
 
@@ -17,47 +17,56 @@ namespace Blaven.DataSources
 
         private readonly bool forceRefresh;
 
-        private readonly Action<BlavenBlogSetting, bool> refreshAction;
-
         private readonly Repository repository;
 
-        public RefreshSynchronizerService(
-            Action<BlavenBlogSetting, bool> refreshAction,
-            Repository repository,
-            BlogServiceConfig config,
-            bool forceRefresh)
+        private readonly Action<BlavenBlogSetting> refreshAction;
+
+        public BlogRefreshServiceSynchronizer(
+            Action<BlavenBlogSetting> refreshAction, Repository repository, BlogServiceConfig config, bool forceRefresh)
         {
+            if (refreshAction == null)
+            {
+                throw new ArgumentNullException("refreshAction");
+            }
+            if (repository == null)
+            {
+                throw new ArgumentNullException("repository");
+            }
+            if (config == null)
+            {
+                throw new ArgumentNullException("config");
+            }
+
             this.refreshAction = refreshAction;
             this.repository = repository;
             this.config = config;
             this.forceRefresh = forceRefresh;
         }
 
-        public IEnumerable<RefreshSynchronizerResult> RefreshSynchronized(IEnumerable<BlavenBlogSetting> settings)
+        public IEnumerable<BlogRefreshResult> RefreshSynchronized(IEnumerable<BlavenBlogSetting> settings)
         {
             var results = settings.AsParallel().Select(this.RefreshBlog).ToList();
 
             var criticalErrors =
                 results.Where(
-                    x =>
-                    x.ResultType == RefreshSynchronizerResultType.UpdateFailed && (!x.HasBlogAnyData || this.forceRefresh))
+                    x => x.ResultType == BlogRefreshResultType.UpdateFailed && (!x.HasBlogAnyData || this.forceRefresh))
                        .ToList();
             if (criticalErrors.Any())
             {
-                throw new RefreshSynchronizerServiceException(criticalErrors);
+                throw new BlogRefreshServiceException(criticalErrors);
             }
 
             return results;
         }
 
-        private RefreshSynchronizerResult RefreshBlog(BlavenBlogSetting setting)
+        private BlogRefreshResult RefreshBlog(BlavenBlogSetting setting)
         {
-            RefreshSynchronizerResult result = null;
-            var measuredTime = StopwatchHelper.PerformMeasuredAction(() => { result = PerformRefreshLocked(setting); });
+            BlogRefreshResult result = null;
+            var measuredTime = StopwatchHelper.PerformMeasuredAction(() => { result = RefreshBlogLocked(setting); });
 
             result.ElapsedTime = measuredTime;
 
-            if (result.ResultType != RefreshSynchronizerResultType.UpdateFailed && !result.HasBlogAnyData)
+            if (result.ResultType != BlogRefreshResultType.UpdateFailed && !result.HasBlogAnyData)
             {
                 this.repository.WaitForData(setting.BlogKey);
             }
@@ -65,15 +74,15 @@ namespace Blaven.DataSources
             return result;
         }
 
-        private RefreshSynchronizerResult PerformRefreshLocked(BlavenBlogSetting setting)
+        private BlogRefreshResult RefreshBlogLocked(BlavenBlogSetting setting)
         {
-            string lockKey = string.Format("DataSourceRefreshService.GetLockedResult_{0}", setting.BlogKey);
+            string lockKey = string.Format("RefreshMutexService.PerformRefreshLocked_{0}", setting.BlogKey);
 
             var result = KeyLockService.PerformLockedFunction(lockKey, () => PerformRefresh(setting));
             return result;
         }
 
-        private RefreshSynchronizerResult PerformRefresh(BlavenBlogSetting setting)
+        private BlogRefreshResult PerformRefresh(BlavenBlogSetting setting)
         {
             string blogKey = setting.BlogKey;
 
@@ -87,7 +96,7 @@ namespace Blaven.DataSources
 
             try
             {
-                var refreshTask = Task.Factory.StartNew(() => this.refreshAction(setting, forceRefresh));
+                var refreshTask = Task.Factory.StartNew(() => this.refreshAction(setting));
 
                 bool hasBlogAnyData = repository.GetHasBlogAnyData(blogKey);
                 if (this.forceRefresh || this.config.RefreshAsync || !hasBlogAnyData)
@@ -95,17 +104,15 @@ namespace Blaven.DataSources
                     refreshTask.Wait(TimeSpan.FromSeconds(RefreshTimeoutSeconds));
 
                     hasBlogAnyData = this.repository.GetHasBlogAnyData(blogKey);
-                    return new RefreshSynchronizerResult(
-                        blogKey, RefreshSynchronizerResultType.UpdateSync, hasBlogAnyData);
+                    return new BlogRefreshResult(blogKey, BlogRefreshResultType.UpdateSync, hasBlogAnyData);
                 }
 
-                return new RefreshSynchronizerResult(blogKey, RefreshSynchronizerResultType.UpdateAsync);
+                return new BlogRefreshResult(blogKey, BlogRefreshResultType.UpdateAsync);
             }
             catch (Exception ex)
             {
                 bool hasBlogAnyData = repository.GetHasBlogAnyData(blogKey);
-                return new RefreshSynchronizerResult(
-                    blogKey, RefreshSynchronizerResultType.UpdateFailed, hasBlogAnyData, ex);
+                return new BlogRefreshResult(blogKey, BlogRefreshResultType.UpdateFailed, hasBlogAnyData, ex);
             }
             finally
             {
@@ -113,18 +120,17 @@ namespace Blaven.DataSources
             }
         }
 
-        private RefreshSynchronizerResult GetCancelRefresh(string blogKey)
+        private BlogRefreshResult GetCancelRefresh(string blogKey)
         {
             if (this.GetIsBlogRefreshing(blogKey))
             {
                 bool hasBlogAnyData = this.repository.GetHasBlogAnyData(blogKey);
-                return new RefreshSynchronizerResult(
-                    blogKey, RefreshSynchronizerResultType.CancelledIsRefreshing, hasBlogAnyData);
+                return new BlogRefreshResult(blogKey, BlogRefreshResultType.CancelledIsRefreshing, hasBlogAnyData);
             }
 
             if (!this.forceRefresh && this.repository.GetIsBlogRefreshed(blogKey, this.config.CacheTime))
             {
-                return new RefreshSynchronizerResult(blogKey, RefreshSynchronizerResultType.CancelledIsRefreshed);
+                return new BlogRefreshResult(blogKey, BlogRefreshResultType.CancelledIsRefreshed);
             }
 
             return null;
