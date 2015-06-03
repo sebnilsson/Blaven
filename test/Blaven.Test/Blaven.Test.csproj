@@ -90,12 +90,6 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="appSettings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>appSettings.config</DependentUpon>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
     <Compile Include="BlavenTestBase.cs" />
     <Compile Include="BlogServiceTest.cs" />
     <Compile Include="DataSources\Blogger\BloggerDataSourceTest.cs" />
@@ -114,11 +108,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="appSettings.config">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>appSettings.Designer.cs</LastGenOutput>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="Resources\DiskFiles\blog-post-1.json" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
