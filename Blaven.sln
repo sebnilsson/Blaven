@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AA6B3409-A338-44A7-87B1-5881F0568B89}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{A6B847C1-6C74-4F83-9C40-F0D4B5946056}"
@@ -19,10 +21,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataSources.Blogger"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataSources.GitHub", "src\Blaven.DataSources.GitHub\Blaven.DataSources.GitHub.csproj", "{791D0A28-5E5C-4B27-932F-A06FA3DFFCA1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src-futures", "src-futures", "{8B67A7B2-83DC-496F-9A8C-1CA3A8710BBA}"
+EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = Blaven.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -78,8 +79,11 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{30FB0DDF-B9A6-4D40-A1D8-979A5DF398EA} = {AA6B3409-A338-44A7-87B1-5881F0568B89}
-		{9D0B9BF3-FC5F-48A7-8F54-553D97C88C8F} = {AA6B3409-A338-44A7-87B1-5881F0568B89}
-		{791D0A28-5E5C-4B27-932F-A06FA3DFFCA1} = {AA6B3409-A338-44A7-87B1-5881F0568B89}
 		{1644FBD1-085D-40E1-8B1F-CFCE1FC059AE} = {A6B847C1-6C74-4F83-9C40-F0D4B5946056}
+		{9D0B9BF3-FC5F-48A7-8F54-553D97C88C8F} = {AA6B3409-A338-44A7-87B1-5881F0568B89}
+		{791D0A28-5E5C-4B27-932F-A06FA3DFFCA1} = {8B67A7B2-83DC-496F-9A8C-1CA3A8710BBA}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = Blaven.vsmdi
 	EndGlobalSection
 EndGlobal
