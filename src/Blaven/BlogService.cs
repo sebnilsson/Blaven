@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.DataSources;
 using Blaven.RavenDb;
 using Blaven.Transformers;
 using Raven.Client;
@@ -192,9 +191,18 @@ namespace Blaven
         /// Gets the blog-tags count.
         /// </summary>
         /// <returns>Returns a dictionary of tags and their count.</returns>
-        public Dictionary<string, int> GetTagsMeta()
+        public Dictionary<string, int> GetTagsCount()
         {
             return this.Repository.GetBlogTagsCount(this.blogKeysFilter);
+        }
+
+        /// <summary>
+        /// Gets the blog-tags.
+        /// </summary>
+        /// <returns>Returns a dictionary of tags and their count.</returns>
+        public BlogPostCollection GetTagsMeta(string tagName, int pageIndex)
+        {
+            return this.Repository.GetBlogTagsSelection(tagName, pageIndex, this.Config.PageSize, this.blogKeysFilter);
         }
 
         /// <summary>

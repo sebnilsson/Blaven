@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
-using Google.GData.Blogger;
-using Google.GData.Client;
+using Google.Apis.Blogger.v3;
+using Google.Apis.Blogger.v3.Data;
+using Google.Apis.Requests;
+using Google.Apis.Services;
 
 namespace Blaven.DataSources.Blogger
 {
@@ -12,102 +13,75 @@ namespace Blaven.DataSources.Blogger
     {
         public const string BloggerFeedUriFormat = "https://www.blogger.com/feeds/{0}/posts/default";
 
-        public static string GetModifiedPostsContent(DataSourceRefreshContext refreshInfo)
+        public static Blog GetBlogInfo(DataSourceRefreshContext refreshInfo)
         {
-            var query = GetQuery(refreshInfo.BlogSetting);
-            query.ModifiedSince = refreshInfo.LastRefresh ?? DateTime.MinValue;
+            var service = GetService(refreshInfo.BlogSetting);
 
-            return GetBloggerDocument(refreshInfo.BlogSetting, query);
+            var request = service.Blogs.Get(refreshInfo.BlogSetting.DataSourceId);
+
+            var blogInfo = request.Execute();
+            return blogInfo;
         }
 
-        public static string GetBloggerDocument(BlavenBlogSetting setting, BloggerQuery query)
+        public static PostList GetBloggerDocument(BlavenBlogSetting setting, PostsResource.ListRequest request)
         {
-            var service = GetService(setting.Username, setting.Password);
+            var posts = GetPosts(request, setting);
+            return posts;
+        }
 
-            string feedContent = GetFeedContent(setting, service, query);
-            return feedContent;
+        public static PostList GetModifiedPostsContent(DataSourceRefreshContext refreshInfo)
+        {
+            var service = GetService(refreshInfo.BlogSetting);
+
+            var request = GetRequest(service, refreshInfo.BlogSetting);
+            request.EndDate = refreshInfo.LastRefresh ?? DateTime.MinValue;
+
+            return GetBloggerDocument(refreshInfo.BlogSetting, request);
         }
 
         public static IEnumerable<ulong> GetAllBloggerIds(BlavenBlogSetting setting)
         {
-            var service = GetService(setting.Username, setting.Password);
+            var service = GetService(setting);
 
-            var query = GetQuery(setting);
+            var request = GetRequest(service, setting);
 
-            var feed = GetFeed(setting, service, query);
+            var posts = GetPosts(request, setting);
 
-            return feed.Entries.Select(x => BloggerParser.ParseBloggerId(x.Id.Uri.Content));
+            return posts.Items.Select(x => ulong.Parse(x.Id)).ToList();
         }
 
-        private static BloggerService GetService(string username, string password)
+        private static BloggerService GetService(BlavenBlogSetting setting)
         {
-            var service = new BloggerService("Blaven");
-            if (!string.IsNullOrWhiteSpace(username))
-            {
-                service.Credentials = new GDataCredentials(username, password);
-
-                SetAuthForGoogleAppsUsers(service);
-            }
+            var initializer = new BaseClientService.Initializer
+                                  {
+                                      ApiKey = setting.Password,
+                                      ApplicationName = "Blaven"
+                                  };
+            var service = new BloggerService(initializer);
 
             return service;
         }
 
-        private static BloggerQuery GetQuery(BlavenBlogSetting setting)
+        private static PostsResource.ListRequest GetRequest(BloggerService service, BlavenBlogSetting setting)
         {
-            string uri = (!string.IsNullOrWhiteSpace(setting.DataSourceUri))
-                             ? setting.DataSourceUri
-                             : string.Format(BloggerFeedUriFormat, setting.DataSourceId);
+            var request = service.Posts.List(setting.DataSourceId);
+            request.MaxResults = 500;
+            request.OrderBy = PostsResource.ListRequest.OrderByEnum.Updated;
 
-            var query = new BloggerQuery(uri) { NumberToRetrieve = int.MaxValue, OrderBy = "updated" };
-            return query;
+            return request;
         }
 
-        private static BloggerFeed GetFeed(BlavenBlogSetting setting, BloggerService service, BloggerQuery query)
+        private static PostList GetPosts(IClientServiceRequest<PostList> request, BlavenBlogSetting setting)
         {
-            if (query.Uri.IsFile)
-            {
-                service.RequestFactory = new LocalGDataRequestFactory();
-            }
-
             try
             {
-                return service.Query(query);
+                var posts = request.Execute();
+                return posts;
             }
             catch (Exception ex)
             {
                 throw new BloggerApiHelperException(setting, ex);
             }
-        }
-
-        private static string GetFeedContent(BlavenBlogSetting setting, BloggerService service, BloggerQuery query)
-        {
-            var feed = GetFeed(setting, service, query);
-            return GetFeedContent(feed);
-        }
-
-        private static string GetFeedContent(BloggerFeed feed)
-        {
-            using (var stream = new MemoryStream())
-            {
-                feed.SaveToXml(stream);
-                stream.Position = 0;
-
-                var reader = new StreamReader(stream);
-                string content = reader.ReadToEnd();
-                return content;
-            }
-        }
-
-        private static void SetAuthForGoogleAppsUsers(BloggerService service)
-        {
-            var factory = service.RequestFactory as GDataGAuthRequestFactory;
-            if (factory == null)
-            {
-                return;
-            }
-            
-            // For proper authentication for Google Apps users
-            factory.AccountType = "GOOGLE";
         }
     }
 }

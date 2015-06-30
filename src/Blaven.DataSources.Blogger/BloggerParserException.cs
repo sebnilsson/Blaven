@@ -4,12 +4,9 @@ namespace Blaven.DataSources.Blogger
 {
     public class BloggerParserException : BlavenBlogException
     {
-        public BloggerParserException(string blogKey, string bloggerDocumentContent, Exception inner)
+        public BloggerParserException(string blogKey, Exception inner)
             : base(blogKey, inner, "There was an error when parsing the Blogger-document")
         {
-            this.BloggerDocumentContent = bloggerDocumentContent;
         }
-
-        public string BloggerDocumentContent { get; private set; }
     }
 }

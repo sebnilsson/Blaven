@@ -49,12 +49,13 @@ namespace Blaven
                     throw new System.Configuration.ConfigurationErrorsException(
                         "Blog-settings cannot have a blank blog-key.");
                 }
-                if (string.IsNullOrWhiteSpace(setting.UsernameKey) || string.IsNullOrWhiteSpace(setting.PasswordKey))
+                if (string.IsNullOrWhiteSpace(setting.PasswordKey))
                 {
                     throw new System.Configuration.ConfigurationErrorsException(
-                        "Blog-settings must contain Username-key and Password-key.");
+                        "Blog-settings must contain Password-key.");
                 }
-                setting.Username = AppSettingsService.GetConfigValue(setting.UsernameKey, throwException: true);
+                setting.DataSource = AppSettingsService.GetConfigValue("Blaven.DataSource", throwException: false);
+                //setting.Username = AppSettingsService.GetConfigValue(setting.UsernameKey, throwException: true);
                 setting.Password = AppSettingsService.GetConfigValue(setting.PasswordKey, throwException: true);
 
                 setting.SetBlogDataSource(setting.DataSource);

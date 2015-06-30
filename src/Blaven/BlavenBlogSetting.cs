@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 using Blaven.DataSources;
 using Newtonsoft.Json;
@@ -50,7 +51,7 @@ namespace Blaven
         /// The data-source for the blog.
         /// </summary>
         [JsonIgnore]
-        public IDataSource BlogDataSource { get; internal set; }
+        public IDataSource BlogDataSource { get; set; }
 
         /// <summary>
         /// The ID of the blog at the data-source.
@@ -70,7 +71,7 @@ namespace Blaven
         /// <summary>
         /// The username for the account at the data-source.
         /// </summary>
-        public string Username { get; internal set; }
+        //public string Username { get; internal set; }
 
         public void SetBlogDataSource(string dataSourceName)
         {
@@ -82,14 +83,21 @@ namespace Blaven
                 case "googledrive":
                     break;
                 default:
-                    this.BlogDataSource = GetBlogDataSourceFReflected(dataSourceName);
+                    this.BlogDataSource = GetBlogDataSourceReflected(dataSourceName);
                     break;
             }
         }
 
-        private IDataSource GetBlogDataSourceFReflected(string typeName)
+        private static IDataSource GetBlogDataSourceReflected(string typeName)
         {
-            var type = Type.GetType(typeName);
+            if (string.IsNullOrWhiteSpace(typeName))
+            {
+                return null;
+            }
+
+            var types = AppDomainAssemblyTypeScanner.GetTypesOf<IDataSource>();
+            var type = types.FirstOrDefault(x => x.Name.Equals(typeName, StringComparison.InvariantCultureIgnoreCase));
+
             if (type == null)
             {
                 throw new BlavenException(string.Format("No IBlogDataSource found for type-name '{0}'.", typeName));

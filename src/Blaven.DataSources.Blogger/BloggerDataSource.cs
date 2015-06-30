@@ -12,8 +12,10 @@ namespace Blaven.DataSources.Blogger
             // TODO: Wait for Blogger API-bug to be fixed:
             // http://code.google.com/p/gdata-issues/issues/detail?id=2555
 
-            string modifiedPostsContent = BloggerApiHelper.GetModifiedPostsContent(refreshInfo);
-            var blogData = BloggerParser.ParseBlogData(refreshInfo.BlogSetting, modifiedPostsContent);
+            var bloggerBlog = BloggerApiHelper.GetBlogInfo(refreshInfo);
+            var modifiedPosts = BloggerApiHelper.GetModifiedPostsContent(refreshInfo);
+
+            var blogData = BloggerParser.ParseBlogData(refreshInfo.BlogSetting, bloggerBlog, modifiedPosts);
 
             var existingBlogPostsMeta = refreshInfo.ExistingBlogPostsMetas.ToList();
             var modifiedBlogPosts = from post in blogData.Posts
