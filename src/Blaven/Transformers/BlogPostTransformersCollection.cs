@@ -12,7 +12,7 @@ namespace Blaven.Transformers
                     {
                         var defaultTransformers = new List<IBlogPostTransformer> { new PhraseTagsTransformer() };
 
-                        var excludedTransformers = AppSettingsService.ExcludeTransformers.ToList();
+                        var excludedTransformers = BlogServiceConfig.ExcludeTransformers.ToList();
                         if (excludedTransformers.Any())
                         {
                             RemoveTransformers(defaultTransformers, excludedTransformers.ToArray());

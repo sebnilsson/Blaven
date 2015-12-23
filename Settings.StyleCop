@@ -12,7 +12,22 @@
   <Analyzers>
     <Analyzer AnalyzerId="StyleCop.CSharp.NamingRules">
       <Rules>
+        <Rule Name="ConstFieldNamesMustBeginWithUpperCaseLetter">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
         <Rule Name="FieldNamesMustNotBeginWithUnderscore">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+        <Rule Name="FieldNamesMustNotUseHungarianNotation">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+        <Rule Name="StaticReadonlyFieldsMustBeginWithUpperCaseLetter">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
@@ -254,7 +269,22 @@
     </Analyzer>
     <Analyzer AnalyzerId="StyleCop.CSharp.ReadabilityRules">
       <Rules>
+        <Rule Name="OpeningParenthesisMustBeOnDeclarationLine">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
         <Rule Name="ParameterMustNotSpanMultipleLines">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+        <Rule Name="UseStringEmptyForEmptyStrings">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+        <Rule Name="PrefixCallsCorrectly">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
@@ -286,6 +316,11 @@
         </Rule>
       </Rules>
       <AnalyzerSettings />
+    </Analyzer>
+    <Analyzer AnalyzerId="Microsoft.Web.StyleCop.Rules">
+      <AnalyzerSettings>
+        <StringProperty Name="FileHeaderText"> Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.</StringProperty>
+      </AnalyzerSettings>
     </Analyzer>
     <Analyzer AnalyzerId="StyleCop.CSharp.LayoutRules">
       <Rules>
@@ -319,6 +354,11 @@
     </Analyzer>
     <Analyzer AnalyzerId="StyleCop.CSharp.MaintainabilityRules">
       <Rules>
+        <Rule Name="ConditionalExpressionsMustDeclarePrecedence">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
         <Rule Name="FieldsMustBePrivate">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
@@ -359,7 +399,17 @@
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
+        <Rule Name="InstanceReadonlyElementsMustAppearBeforeInstanceNonReadonlyElements">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
         <Rule Name="StaticElementsMustAppearBeforeInstanceElements">
+          <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+        <Rule Name="StaticReadonlyElementsMustAppearBeforeStaticNonReadonlyElements">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
@@ -374,13 +424,31 @@
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
         </Rule>
+
+        <!-- Creates a lot of noise with anonymous objects -->
+        <Rule Name="OpeningCurlyBracketsMustBeSpacedCorrectly">
+           <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
+        <Rule Name="ClosingCurlyBracketsMustBeSpacedCorrectly">
+           <RuleSettings>
+            <BooleanProperty Name="Enabled">False</BooleanProperty>
+          </RuleSettings>
+        </Rule>
       </Rules>
       <AnalyzerSettings />
     </Analyzer>
-    <Analyzer AnalyzerId="Microsoft.Web.StyleCop.Rules">
+    <Analyzer AnalyzerId="StyleCop.KRules.FileHeaderRule">
       <Rules />
       <AnalyzerSettings>
-        <StringProperty Name="FileHeaderText"> Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. See License.txt in the project root for license information.</StringProperty>
+        <StringProperty Name="FileHeaderText"> Copyright (c) Microsoft Open Technologies, Inc. All rights reserved. Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.</StringProperty>
+      </AnalyzerSettings>
+    </Analyzer>
+    <Analyzer AnalyzerId="StyleCop.KRules.LineLengthRule">
+      <Rules />
+      <AnalyzerSettings>
+        <IntegerProperty Name="LineLength">120</IntegerProperty>
       </AnalyzerSettings>
     </Analyzer>
   </Analyzers>

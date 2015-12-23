@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.RavenDb;
 using Blaven.Transformers;
-using Raven.Client;
 
 namespace Blaven
 {
@@ -26,7 +24,6 @@ namespace Blaven
         /// <param name="blogPostTransformers">The transformers to apply to blog-posts.</param>
         /// <param name="blogKeysFilter">A list of keys to filter the service on. Leave empty for all blogs.</param>
         public BlogService(
-            IDocumentStore documentStore,
             BlogServiceConfig config = null,
             IEnumerable<BlavenBlogSetting> settings = null,
             BlogPostTransformersCollection blogPostTransformers = null,

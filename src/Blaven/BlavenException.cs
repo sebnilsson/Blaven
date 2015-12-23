@@ -13,8 +13,8 @@ namespace Blaven
         {
         }
 
-        public BlavenException(Exception innerException, string message = null)
-            : base(message ?? (innerException != null ? innerException.Message : null), innerException)
+        public BlavenException(string message, Exception innerException)
+            : base(message, innerException)
         {
         }
     }

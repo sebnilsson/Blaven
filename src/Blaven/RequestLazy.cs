@@ -14,7 +14,7 @@ namespace Blaven
         {
             this.storeFactory = storeFactory ?? (() => (HttpContext.Current != null) ? HttpContext.Current.Items : null);
             this.valueFactory = valueFactory ?? this.GetValue;
-            this.StoreKey = string.Format("RequestLazy_{0}", storeKey ?? Guid.NewGuid().ToString());
+            this.StoreKey = $"RequestLazy_{storeKey ?? Guid.NewGuid().ToString()}";
         }
 
         public RequestLazy(string storeKey)

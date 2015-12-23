@@ -1,83 +1,39 @@
-﻿using Blaven.RavenDb;
-using Newtonsoft.Json;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Blaven
 {
-    /// <summary>
-    /// Represents a blog-post on a blog.
-    /// </summary>
     public class BlogPost : BlogPostBase
     {
-        public BlogPost(string blogKey, ulong dataSourceId)
-            : this(blogKey)
+        public BlogPost()
         {
-            this.SetIds(dataSourceId);
-        }
-
-        public BlogPost(string blogKey, string dataSourceId)
-            : this(blogKey)
-        {
-            this.SetIds(dataSourceId);
-        }
-
-        internal BlogPost(string blogKey)
-            : this()
-        {
-            this.BlogKey = blogKey;
-
             this.Author = new BlogAuthor();
+            this.Tags = Enumerable.Empty<string>();
         }
 
-        [JsonConstructor]
-        private BlogPost()
-        {
-        }
-
-        /// <summary>
-        /// The author-information of the blog-post.
-        /// </summary>
         public BlogAuthor Author { get; set; }
 
-        /// <summary>
-        /// The text-content of a blog-post. Contains HTML-code.
-        /// </summary>
+        public string BlavenId { get; set; }
+
+        public string BlogKey { get; set; }
+
         public string Content { get; set; }
 
-        /// <summary>
-        /// The original ID of the blog-post at the data-source.
-        /// </summary>
-        public string DataSourceId { get; set; }
+        public string ImageUrl { get; set; }
 
-        /// <summary>
-        /// The absolute original URL to the blog-post at the data-source.
-        /// </summary>
-        public string DataSourceUrl { get; set; }
+        public DateTime PublishedAt { get; set; }
 
-        /// <summary>
-        /// The unique identifier for the blog-post in RavenDB.
-        /// </summary>
-        public string Id { get; set; }
+        public string SourceUrl { get; set; }
 
-        /// <summary>
-        /// Gets or sets if the post is deleted.
-        /// </summary>
-        public bool IsDeleted { get; set; }
+        public string Summary { get; set; }
 
-        /// <summary>
-        /// Gets or sets the hash of the blog-post.
-        /// </summary>
-        public string Checksum { get; set; }
+        public IEnumerable<string> Tags { get; set; }
 
-        internal void SetIds(ulong dataSourceId)
-        {
-            this.SetIds(dataSourceId.ToString("#"));
-        }
+        public string Title { get; set; }
 
-        internal void SetIds(string dataSourceId)
-        {
-            this.DataSourceId = dataSourceId;
-            this.BlavenId = BlavenHelper.GetBlavenHash(dataSourceId);
-            this.Id = RavenDbHelper.GetEntityId<BlogPost>(this.BlavenId);
-        }
+        public string UrlSlug { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
     }
 }

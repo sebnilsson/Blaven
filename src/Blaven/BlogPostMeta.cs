@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Blaven.RavenDb;
-
 namespace Blaven
 {
     public class BlogPostMeta
@@ -20,7 +18,7 @@ namespace Blaven
             this.Id = blogPost.Id;
             this.BlogKey = blogPost.BlogKey;
             this.Checksum = blogPost.Checksum;
-            this.DataSourceId = blogPost.DataSourceId;
+            this.DataSourceId = blogPost.SourceId;
             this.Published = blogPost.Published;
         }
 
@@ -38,8 +36,8 @@ namespace Blaven
         {
             this.DataSourceId = dataSourceId;
 
-            var blavenId = BlavenHelper.GetBlavenHash(dataSourceId);
-            this.Id = RavenDbHelper.GetEntityId<BlogPost>(blavenId);
+            //var blavenId = BlavenHelper.GetBlavenHash(dataSourceId);
+            //this.Id = RavenDbHelper.GetEntityId<BlogPost>(blavenId);
         }
     }
 }

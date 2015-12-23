@@ -69,7 +69,7 @@ namespace Blaven
 
                     if (inspectedAssembly == null
                         || !inspectedAssembly.GetReferencedAssemblies()
-                                .Any(r => r.Name.StartsWith("Nancy", StringComparison.OrdinalIgnoreCase)))
+                                .Any(r => r.Name.StartsWith("Blaven", StringComparison.OrdinalIgnoreCase)))
                     {
                         continue;
                     }
