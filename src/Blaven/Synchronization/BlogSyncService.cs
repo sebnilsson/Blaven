@@ -243,6 +243,7 @@ namespace Blaven.Synchronization
                 dataCacheHandler: null,
                 blavenIdProvider: null,
                 slugProvider: null,
+                transformersProvider: null,
                 blogSettings: blogSettings);
             return config;
         }

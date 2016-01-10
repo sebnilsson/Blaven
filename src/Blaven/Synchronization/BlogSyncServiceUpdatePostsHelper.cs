@@ -51,6 +51,8 @@ namespace Blaven.Synchronization
 
                 post.BlavenId = config.BlavenIdProvider.GetId(post);
                 post.UrlSlug = config.SlugProvider.GetSlug(post);
+
+                config.TransformersProvider.ApplyTransformers(post);
             }
         }
     }

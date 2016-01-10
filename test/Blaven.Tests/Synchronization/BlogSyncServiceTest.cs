@@ -288,6 +288,7 @@ namespace Blaven.Synchronization.Tests
                 dataCacheHandler,
                 BlogSyncConfigurationDefaults.BlavenIdProvider.Value,
                 BlogSyncConfigurationDefaults.SlugProvider.Value,
+                null,
                 blogSettings);
 
             var service = new BlogSyncService(config);

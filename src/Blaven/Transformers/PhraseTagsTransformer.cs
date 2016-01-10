@@ -18,7 +18,9 @@ namespace Blaven.Transformers
 
         private static string EncodePreTags(string content)
         {
-            var regex = new Regex(@"<(pre|code|samp)+.*?>(<code>)?(?<Content>.*?)(</code>)?</(pre|code|samp)+>", RegexOptions.Singleline);
+            var regex = new Regex(
+                @"<(pre|code|samp)+.*?>(<code>)?(?<Content>.*?)(</code>)?</(pre|code|samp)+>",
+                RegexOptions.Singleline);
             var matches = regex.Matches(content).OfType<Match>().ToList();
 
             if (!matches.Any())
@@ -26,9 +28,10 @@ namespace Blaven.Transformers
                 return content;
             }
 
-            var matchingCaptures = (from match in matches
-                                    from captures in match.Groups["Content"].Captures.OfType<Capture>()
-                                    select captures).Reverse();
+            var matchingCaptures =
+                (from match in matches
+                 from captures in match.Groups["Content"].Captures.OfType<Capture>()
+                 select captures).Reverse();
 
             string parsedContent = content;
 

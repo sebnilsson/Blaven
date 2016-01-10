@@ -4,6 +4,7 @@ using System.Linq;
 
 using Blaven.BlogSources;
 using Blaven.Data;
+using Blaven.Transformers;
 
 namespace Blaven.Synchronization
 {
@@ -15,6 +16,7 @@ namespace Blaven.Synchronization
             IDataCacheHandler dataCacheHandler,
             IBlogPostBlavenIdProvider blavenIdProvider,
             IBlogPostUrlSlugProvider slugProvider,
+            BlogTransformersProvider transformersProvider,
             params BlogSetting[] blogSettings)
         {
             if (blogSource == null)
@@ -32,6 +34,7 @@ namespace Blaven.Synchronization
             this.DataCacheHandler = dataCacheHandler ?? BlogSyncConfigurationDefaults.DataCacheHandler.Value;
             this.BlavenIdProvider = blavenIdProvider ?? BlogSyncConfigurationDefaults.BlavenIdProvider.Value;
             this.SlugProvider = slugProvider ?? BlogSyncConfigurationDefaults.SlugProvider.Value;
+            this.TransformersProvider = transformersProvider ?? BlogSyncConfigurationDefaults.TransformersProvider.Value;
             this.BlogSettings = (blogSettings ?? new BlogSetting[0]).Where(x => x.BlogKey != null).ToList();
         }
 
@@ -46,6 +49,8 @@ namespace Blaven.Synchronization
         public IDataStorage DataStorage { get; private set; }
 
         public IBlogPostUrlSlugProvider SlugProvider { get; private set; }
+
+        public BlogTransformersProvider TransformersProvider { get; private set; }
 
         public BlogSetting TryGetBlogSetting(string blogKey)
         {
