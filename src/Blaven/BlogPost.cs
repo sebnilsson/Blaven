@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Blaven
 {
+    [DebuggerDisplay("Hash={Hash}, SourceId={SourceId}, BlogKey={BlogKey}, BlavenId={BlavenId}, Title={Title}")]
     public class BlogPost : BlogPostBase
     {
         public BlogPost()

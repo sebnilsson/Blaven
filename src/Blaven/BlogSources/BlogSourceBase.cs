@@ -6,13 +6,13 @@ namespace Blaven.BlogSources
 {
     public abstract class BlogSourceBase : IBlogSource
     {
-        public abstract BlogMeta GetMeta(string blogKey);
+        public abstract BlogMeta GetMeta(BlogSetting blogSetting);
 
-        public virtual BlogSourceChangeSet GetChanges(string blogKey, IEnumerable<BlogPostBase> dbBlogPosts)
+        public virtual BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbBlogPosts)
         {
-            if (blogKey == null)
+            if (blogSetting == null)
             {
-                throw new ArgumentNullException(nameof(blogKey));
+                throw new ArgumentNullException(nameof(blogSetting));
             }
             if (dbBlogPosts == null)
             {

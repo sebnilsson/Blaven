@@ -1,5 +1,8 @@
-﻿namespace Blaven
+﻿using System.Diagnostics;
+
+namespace Blaven
 {
+    [DebuggerDisplay("Hash={Hash}, SourceId={SourceId}")]
     public class BlogPostBase
     {
         public string Hash { get; set; }

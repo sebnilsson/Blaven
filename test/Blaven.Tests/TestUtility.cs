@@ -6,7 +6,7 @@ namespace Blaven.Tests
 {
     public static class TestUtility
     {
-        public const int ParallelUsersCount = 10;
+        public const int ParallelUsersCount = 5;
 
         public static void RunParallelUsers(Action action)
         {

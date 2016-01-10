@@ -1,5 +1,8 @@
-﻿namespace Blaven
+﻿using System.Diagnostics;
+
+namespace Blaven
 {
+    [DebuggerDisplay("Id={Id}, Name={Name}, Url={Url}")]
     public class BlogAuthor
     {
         public string Name { get; set; }

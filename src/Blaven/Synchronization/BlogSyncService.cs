@@ -13,10 +13,10 @@ namespace Blaven.Synchronization
 
         private readonly BlogSyncConfiguration config;
 
-        internal readonly ICollection<string> IsRunningBlogKeys = new HashSet<string>();
+        internal static readonly ICollection<string> IsRunningBlogKeys = new HashSet<string>();
 
-        public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage)
-            : this(GetConfig(blogSource, dataStorage))
+        public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage, params BlogSetting[] blogSettings)
+            : this(GetConfig(blogSource, dataStorage, blogSettings))
         {
         }
 
@@ -35,6 +35,8 @@ namespace Blaven.Synchronization
         public IDataStorage DataStorage => this.config.DataStorage;
 
         public IDataCacheHandler DataCacheHandler => this.config.DataCacheHandler;
+
+        public IList<BlogSetting> BlogSettings => this.config.BlogSettings;
 
         public bool IsUpdated(string blogKey)
         {
@@ -138,9 +140,9 @@ namespace Blaven.Synchronization
 
         private bool IsRunning(string blogKey)
         {
-            lock (this.IsRunningBlogKeys)
+            lock (IsRunningBlogKeys)
             {
-                bool isRunning = this.IsRunningBlogKeys.Contains(blogKey);
+                bool isRunning = IsRunningBlogKeys.Contains(blogKey);
                 return isRunning;
             }
         }
@@ -149,35 +151,53 @@ namespace Blaven.Synchronization
         {
             try
             {
-                lock (this.IsRunningBlogKeys)
+                lock (IsRunningBlogKeys)
                 {
-                    this.IsRunningBlogKeys.Add(blogKey);
+                    IsRunningBlogKeys.Add(blogKey);
                 }
 
-                this.UpdateBlogData(blogKey);
+                var blogSetting = this.GetBlogSetting(blogKey);
+
+                this.UpdateBlogData(blogSetting);
 
                 this.config.DataCacheHandler.OnUpdated(blogKey, now);
             }
             finally
             {
-                lock (this.IsRunningBlogKeys)
+                lock (IsRunningBlogKeys)
                 {
-                    if (this.IsRunningBlogKeys.Contains(blogKey))
+                    if (IsRunningBlogKeys.Contains(blogKey))
                     {
-                        this.IsRunningBlogKeys.Remove(blogKey);
+                        IsRunningBlogKeys.Remove(blogKey);
                     }
                 }
             }
         }
 
-        private void UpdateBlogData(string blogKey)
+        private BlogSetting GetBlogSetting(string blogKey)
         {
-            Parallel.Invoke(
-                () => BlogSyncServiceBlogPostsHelper.Update(blogKey, this.config),
-                () => BlogSyncServiceBlogMetaHelper.Update(blogKey, this.config));
+            var blogSetting = this.config.TryGetBlogSetting(blogKey);
+            if (blogSetting == null)
+            {
+                string message =
+                    $"{this.config.GetType().Name} did not contain any {nameof(BlogSetting)} with {nameof(blogKey)} '{blogKey}'.";
+                throw new ArgumentOutOfRangeException(nameof(blogKey), message);
+            }
+
+            return blogSetting;
         }
 
-        private static BlogSyncConfiguration GetConfig(IBlogSource blogSource, IDataStorage dataStorage)
+        private void UpdateBlogData(BlogSetting blogSetting)
+        {
+            Parallel.Invoke(
+                () => BlogSyncServiceBlogPostsHelper.Update(blogSetting, this.config),
+                () => BlogSyncServiceBlogMetaHelper.Update(blogSetting, this.config));
+        }
+
+        private static BlogSyncConfiguration GetConfig(
+            IBlogSource blogSource,
+            IDataStorage dataStorage,
+            params BlogSetting[] blogSettings)
         {
             if (blogSource == null)
             {
@@ -187,6 +207,10 @@ namespace Blaven.Synchronization
             {
                 throw new ArgumentNullException(nameof(dataStorage));
             }
+            if (blogSettings == null)
+            {
+                throw new ArgumentNullException(nameof(blogSettings));
+            }
 
 
             var config = new BlogSyncConfiguration(
@@ -194,7 +218,8 @@ namespace Blaven.Synchronization
                 dataStorage,
                 dataCacheHandler: null,
                 blavenIdProvider: null,
-                slugProvider: null);
+                slugProvider: null,
+                blogSettings: blogSettings);
             return config;
         }
     }

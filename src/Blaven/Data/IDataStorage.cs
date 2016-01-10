@@ -6,10 +6,10 @@ namespace Blaven.Data
 {
     public interface IDataStorage
     {
-        IEnumerable<BlogPostBase> GetBlogPosts(string blogKey);
+        IEnumerable<BlogPostBase> GetBlogPosts(BlogSetting blogSetting);
 
-        void SaveBlogMeta(string blogKey, BlogMeta blogMeta);
+        void SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta);
 
-        void SaveChanges(string blogKey, BlogSourceChangeSet changeSet);
+        void SaveChanges(BlogSetting blogSetting, BlogSourceChangeSet changeSet);
     }
 }

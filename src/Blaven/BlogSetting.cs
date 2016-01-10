@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Blaven
 {
+    [DebuggerDisplay("BlogKey={BlogKey}, Id={Id}, Name={Name}")]
     public class BlogSetting
     {
         public BlogSetting(string blogKey, string id, string name)
@@ -16,10 +18,10 @@ namespace Blaven
             this.Name = name;
         }
 
-        public string BlogKey { get; private set; }
+        public string BlogKey { get; }
 
-        public string Id { get; private set; }
+        public string Id { get; }
 
-        public string Name { get; private set; }
+        public string Name { get; }
     }
 }

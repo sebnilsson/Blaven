@@ -52,8 +52,8 @@ namespace Blaven
         {
             var appSettings = ConfigurationManager.AppSettings.ToDictionaryIgnoreCase();
 
-            var blogs = GetBlogSettingsInternal(appSettings);
-            return blogs;
+            var blogSettings = GetBlogSettingsInternal(appSettings);
+            return blogSettings;
         }
 
         internal static IEnumerable<BlogSetting> GetBlogSettingsInternal(IDictionary<string, string> appSettings)

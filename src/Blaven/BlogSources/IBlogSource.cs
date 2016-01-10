@@ -4,8 +4,8 @@ namespace Blaven.BlogSources
 {
     public interface IBlogSource
     {
-        BlogMeta GetMeta(string blogKey);
+        BlogMeta GetMeta(BlogSetting blogSetting);
 
-        BlogSourceChangeSet GetChanges(string blogKey, IEnumerable<BlogPostBase> dbBlogPosts);
+        BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbBlogPosts);
     }
 }

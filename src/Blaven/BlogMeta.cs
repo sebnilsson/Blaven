@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Blaven
 {
+    [DebuggerDisplay("BlogKey={BlogKey}, SourceId={SourceId}, Name={Name}")]
     public class BlogMeta
     {
         public string BlogKey { get; set; }

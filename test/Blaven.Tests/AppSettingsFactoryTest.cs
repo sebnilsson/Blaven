@@ -43,10 +43,10 @@ namespace Blaven.BlogSources.Tests
         {
             var appSettings = TestData.GetAppSettings();
 
-            var blogs = AppSettingsFactory.GetBlogSettingsInternal(appSettings).ToList();
+            var blogSettings = AppSettingsFactory.GetBlogSettingsInternal(appSettings).ToList();
 
-            var blogSetting1 = blogs.FirstOrDefault(x => x.BlogKey == nameof(TestData.BlogKey1));
-            var blogSetting2 = blogs.FirstOrDefault(x => x.BlogKey == nameof(TestData.BlogKey2));
+            var blogSetting1 = blogSettings.FirstOrDefault(x => x.BlogKey == nameof(TestData.BlogKey1));
+            var blogSetting2 = blogSettings.FirstOrDefault(x => x.BlogKey == nameof(TestData.BlogKey2));
 
             Assert.NotNull(blogSetting1);
             Assert.Equal(nameof(TestData.BlogKey1), blogSetting1.BlogKey);
@@ -64,9 +64,9 @@ namespace Blaven.BlogSources.Tests
         {
             var appSettings = TestData.GetAppSettings();
 
-            var blogs = AppSettingsFactory.GetBlogSettingsInternal(appSettings).ToList();
+            var blogSettings = AppSettingsFactory.GetBlogSettingsInternal(appSettings).ToList();
 
-            var blogSetting3 = blogs.FirstOrDefault(x => x.BlogKey == nameof(TestData.BlogKey3));
+            var blogSetting3 = blogSettings.FirstOrDefault(x => x.BlogKey == nameof(TestData.BlogKey3));
 
             Assert.NotNull(blogSetting3);
             Assert.Equal(nameof(TestData.BlogKey3), blogSetting3.BlogKey);

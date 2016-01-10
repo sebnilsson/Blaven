@@ -25,15 +25,20 @@ namespace Blaven.BlogSources.Blogger
             this.bloggerApiHelper = new BloggerApiHelper(bloggerService);
         }
 
-        public BlogMeta GetMeta(string blogKey)
+        public BlogMeta GetMeta(BlogSetting blogSetting)
         {
-            var meta = this.bloggerApiHelper.GetMeta(blogKey);
+            if (blogSetting == null)
+            {
+                throw new ArgumentNullException(nameof(blogSetting));
+            }
+
+            var meta = this.bloggerApiHelper.GetMeta(blogSetting);
             return meta;
         }
 
-        public BlogSourceChangeSet GetChanges(string blogKey, IEnumerable<BlogPostBase> dbBlogPosts)
+        public BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbBlogPosts)
         {
-            var changes = this.bloggerApiHelper.GetChanges(blogKey, dbBlogPosts);
+            var changes = this.bloggerApiHelper.GetChanges(blogSetting, dbBlogPosts);
             return changes;
         }
 

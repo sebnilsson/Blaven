@@ -176,7 +176,7 @@ namespace Blaven.Synchronization.Tests
             Assert.True(allTrackersHasRunAll);
         }
 
-        private static bool AllTrackers(Func<DelegateTracker<string>, bool> predicate, BlogSyncService service)
+        private static bool AllTrackers(Func<DelegateTracker<BlogSetting>, bool> predicate, BlogSyncService service)
         {
             var trackers = GetServiceTrackers(service);
 
@@ -185,14 +185,14 @@ namespace Blaven.Synchronization.Tests
         }
 
         private static bool AllTrackers(
-            Func<DelegateTracker<string>, bool> predicate,
-            params DelegateTracker<string>[] trackers)
+            Func<DelegateTracker<BlogSetting>, bool> predicate,
+            params DelegateTracker<BlogSetting>[] trackers)
         {
             bool allTrackers = trackers.All(predicate);
             return allTrackers;
         }
 
-        private static bool AnyTrackers(Func<DelegateTracker<string>, bool> predicate, BlogSyncService service)
+        private static bool AnyTrackers(Func<DelegateTracker<BlogSetting>, bool> predicate, BlogSyncService service)
         {
             var trackers = GetServiceTrackers(service);
 
@@ -201,20 +201,20 @@ namespace Blaven.Synchronization.Tests
         }
 
         private static bool AnyTrackers(
-            Func<DelegateTracker<string>, bool> predicate,
-            params DelegateTracker<string>[] trackers)
+            Func<DelegateTracker<BlogSetting>, bool> predicate,
+            params DelegateTracker<BlogSetting>[] trackers)
         {
             bool allTrackers = trackers.Any(predicate);
             return allTrackers;
         }
 
-        private static DelegateTracker<string>[] GetServiceTrackers(BlogSyncService service)
+        private static DelegateTracker<BlogSetting>[] GetServiceTrackers(BlogSyncService service)
         {
             var trackers = GetServiceTrackersInternal(service).Where(x => x != null).ToArray();
             return trackers;
         }
 
-        private static IEnumerable<DelegateTracker<string>> GetServiceTrackersInternal(BlogSyncService service)
+        private static IEnumerable<DelegateTracker<BlogSetting>> GetServiceTrackersInternal(BlogSyncService service)
         {
             var blogSource = service.BlogSource as MockBlogSource;
             var dataStorage = service.DataStorage as MockDataStorage;
@@ -233,6 +233,12 @@ namespace Blaven.Synchronization.Tests
             }
         }
 
+        private static BlogSetting GetTestBlogSetting(string blogKey, string blogKeyName)
+        {
+            var blogSetting = new BlogSetting(blogKey, $"{blogKeyName}Id", $"{blogKeyName}Name");
+            return blogSetting;
+        }
+
         private static BlogSyncService GetTestSynchronizationService(
             IBlogSource blogSource = null,
             IDataStorage dataStorage = null)
@@ -242,22 +248,34 @@ namespace Blaven.Synchronization.Tests
 
             var dataCacheHandler = new MemoryDataCacheHandler();
 
+            var blogSettings = new[]
+                                   {
+                                       GetTestBlogSetting(TestData.BlogKey, nameof(TestData.BlogKey)),
+                                       GetTestBlogSetting(TestData.BlogKey1, nameof(TestData.BlogKey1)),
+                                       GetTestBlogSetting(TestData.BlogKey2, nameof(TestData.BlogKey2)),
+                                       GetTestBlogSetting(TestData.BlogKey3, nameof(TestData.BlogKey3)),
+                                   };
+
             var config = new BlogSyncConfiguration(
                 blogSource,
                 dataStorage,
                 dataCacheHandler,
                 BlogSyncConfigurationDefaults.BlavenIdProvider.Value,
-                BlogSyncConfigurationDefaults.SlugProvider.Value);
+                BlogSyncConfigurationDefaults.SlugProvider.Value,
+                blogSettings);
 
             var service = new BlogSyncService(config);
             return service;
         }
 
-        private static bool HasRunTimesPerTestBlogKey(DelegateTracker<string> tracker, int expectedCount = 1)
+        private static bool HasRunTimesPerTestBlogKey(DelegateTracker<BlogSetting> tracker, int expectedCount = 1)
         {
-            bool hasRunOncePerBlogKey =
-                TestData.BlogKeys.All(
-                    blogKey => tracker.KeyRunCount.ContainsKey(blogKey) && tracker.KeyRunCount[blogKey] == expectedCount);
+            bool hasRunOncePerBlogKey = TestData.BlogKeys.All(
+                blogKey =>
+                    {
+                        var trackerKvp = tracker.KeyRunCount.FirstOrDefault(x => x.Key.BlogKey == blogKey);
+                        return trackerKvp.Key != null && trackerKvp.Value == expectedCount;
+                    });
             return hasRunOncePerBlogKey;
         }
     }

@@ -26,20 +26,20 @@ namespace Blaven.BlogSources.Blogger
             this.bloggerService = bloggerService;
         }
 
-        public virtual BlogMeta GetMeta(string blogKey)
+        public virtual BlogMeta GetMeta(BlogSetting blogSetting)
         {
-            if (blogKey == null)
+            if (blogSetting == null)
             {
-                throw new ArgumentNullException(nameof(blogKey));
+                throw new ArgumentNullException(nameof(blogSetting));
             }
 
-            var request = this.bloggerService.Blogs.Get(blogKey);
+            var request = this.bloggerService.Blogs.Get(blogSetting.Id);
 
             var blog = request.Execute();
 
             var blogMeta = new BlogMeta
                                {
-                                   BlogKey = blogKey,
+                                   BlogKey = blogSetting.BlogKey,
                                    Description = blog.Description,
                                    Name = blog.Name,
                                    Published = blog.Published,
@@ -50,17 +50,17 @@ namespace Blaven.BlogSources.Blogger
             return blogMeta;
         }
 
-        public virtual BlogSourceChangeSet GetChanges(string blogKey, IEnumerable<BlogPostBase> dbBlogPosts)
+        public virtual BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbBlogPosts)
         {
-            if (blogKey == null)
+            if (blogSetting == null)
             {
-                throw new ArgumentNullException(nameof(blogKey));
+                throw new ArgumentNullException(nameof(blogSetting));
             }
 
             var changes = new BlogSourceChangeSet();
 
 
-            var postsRequest = this.bloggerService.Posts.List(blogKey);
+            var postsRequest = this.bloggerService.Posts.List(blogSetting.Id);
             postsRequest.MaxResults = PostRequestMaxResults;
             postsRequest.OrderBy = PostsResource.ListRequest.OrderByEnum.Updated;
             // TODO: Slim request
