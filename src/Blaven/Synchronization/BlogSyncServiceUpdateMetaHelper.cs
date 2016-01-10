@@ -2,7 +2,7 @@
 
 namespace Blaven.Synchronization
 {
-    internal static class BlogSyncServiceBlogMetaHelper
+    internal static class BlogSyncServiceUpdateMetaHelper
     {
         public static BlogMeta Update(BlogSetting blogSetting, BlogSyncConfiguration config)
         {

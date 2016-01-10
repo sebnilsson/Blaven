@@ -8,11 +8,11 @@ namespace Blaven.Tests
     {
         public const int ParallelUsersCount = 5;
 
-        public static void RunParallelUsers(Action action)
+        public static void RunParallelUsers(Action action, int userCount = ParallelUsersCount)
         {
             Parallel.For(
                 0,
-                ParallelUsersCount,
+                userCount,
                 _ =>
                     {
                         int randomSleep = GetRandomSleep();

@@ -4,7 +4,7 @@ using Blaven.BlogSources;
 
 namespace Blaven.Synchronization
 {
-    internal static class BlogSyncServiceBlogPostsHelper
+    internal static class BlogSyncServiceUpdatePostsHelper
     {
         public static BlogSourceChangeSet Update(BlogSetting blogSetting, BlogSyncConfiguration config)
         {

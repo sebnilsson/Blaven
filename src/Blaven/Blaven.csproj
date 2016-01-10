@@ -100,8 +100,8 @@
     <Compile Include="BlavenBlogPostUrlSlugProvider.cs" />
     <Compile Include="Synchronization\BlogSyncConfiguration.cs" />
     <Compile Include="Synchronization\BlogSyncConfigurationDefaults.cs" />
-    <Compile Include="Synchronization\BlogSyncServiceBlogMetaHelper.cs" />
-    <Compile Include="Synchronization\BlogSyncServiceBlogPostsHelper.cs" />
+    <Compile Include="Synchronization\BlogSyncServiceUpdateMetaHelper.cs" />
+    <Compile Include="Synchronization\BlogSyncServiceUpdatePostsHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0,Profile=Client">
