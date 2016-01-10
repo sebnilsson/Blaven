@@ -7,7 +7,8 @@ namespace Blaven.Data
     {
         public const int DefaultTimeoutMinutes = 15;
 
-        internal readonly Dictionary<string, DateTime> DataUpdatedAt = new Dictionary<string, DateTime>();
+        internal readonly Dictionary<string, DateTime> DataUpdatedAt =
+            new Dictionary<string, DateTime>(StringComparer.InvariantCultureIgnoreCase);
 
         public MemoryDataCacheHandler()
             : this(DefaultTimeoutMinutes)

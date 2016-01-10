@@ -80,27 +80,30 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AppSettingsFactoryTest.cs" />
+    <Compile Include="BlogSources\BlogSourceAppSettingsUtilityTest.cs" />
     <Compile Include="DelegateTracker.cs" />
     <Compile Include="ActionExtensions.cs" />
     <Compile Include="DelegateTrackerEvent.cs" />
     <Compile Include="FuncExtensions.cs" />
-    <Compile Include="Synchronization\SynchronizationConfigurationTest.cs" />
+    <Compile Include="Synchronization\BlogSyncConfigurationTest.cs" />
     <Compile Include="TestUtility.cs" />
     <Compile Include="TestData.BlogPost.cs" />
     <Compile Include="TestData.BlogPostBase.cs" />
     <Compile Include="TestData.BlogSourceChangeSet.cs" />
     <Compile Include="TestData.BlogMeta.cs" />
-    <Compile Include="BlogSources\TestBlogSource.cs" />
+    <Compile Include="BlogSources\MockBlogSource.cs" />
     <Compile Include="Data\MemoryDataCacheHandlerTest.cs" />
-    <Compile Include="Data\TestDataStorage.cs" />
+    <Compile Include="Data\MockDataStorage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Synchronization\SynchronizationServiceTest.cs" />
+    <Compile Include="Synchronization\BlogSyncServiceTest.cs" />
     <Compile Include="TestData.cs" />
     <Compile Include="DelegateTrackerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <Compile Include="TestData.AppSettings.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">

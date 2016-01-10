@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Blaven
+namespace Blaven.Tests
 {
     [DebuggerDisplay("TKey={typeof(TKey)}, Key={Key}, ThreadId={ThreadId}, StartedAt={StartedAt}, EndedAt={EndedAt}")]
     public class DelegateTrackerEvent<TKey>

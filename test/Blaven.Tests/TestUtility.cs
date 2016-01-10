@@ -1,52 +1,25 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
-using Blaven.Tests;
-
-namespace Blaven
+namespace Blaven.Tests
 {
     public static class TestUtility
     {
-        public const int SingleKeyUserCount = 20;
+        public const int ParallelUsersCount = 10;
 
-        public const int MultipleKeysUserCount = 10;
-
-        public static Action[] GetParallelActionsForSingleKey(Action body, int userCount = SingleKeyUserCount)
+        public static void RunParallelUsers(Action action)
         {
-            var actions = Enumerable.Range(0, userCount).Select(
+            Parallel.For(
+                0,
+                ParallelUsersCount,
                 _ =>
                     {
-                        Action action = (() =>
-                            {
-                                int randomSleep = GetRandomSleep();
-                                Thread.Sleep(randomSleep);
+                        int randomSleep = GetRandomSleep();
+                        Thread.Sleep(randomSleep);
 
-                                body();
-                            });
-                        return action;
-                    }).ToArray();
-            return actions;
-        }
-
-        public static Action[] GetParallelActionsForMultipleKeys(
-            Action<string> body,
-            int userCount = MultipleKeysUserCount)
-        {
-            var actions = TestData.BlogKeys.SelectMany(
-                blogKey => Enumerable.Range(0, userCount).Select(
-                    _ =>
-                        {
-                            Action action = (() =>
-                                {
-                                    int randomSleep = GetRandomSleep();
-                                    Thread.Sleep(randomSleep);
-
-                                    body(blogKey);
-                                });
-                            return action;
-                        })).ToArray();
-            return actions;
+                        action();
+                    });
         }
 
         public static int GetRandomSleep()

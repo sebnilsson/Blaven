@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace Blaven.Tests
 {
@@ -13,7 +13,7 @@ namespace Blaven.Tests
 
         public const string BlogKey3 = "Blog-Test Key Trees";
 
-        public static readonly IReadOnlyList<string> BlogKeys =
-            new ReadOnlyCollection<string>(new[] { BlogKey1, BlogKey2, BlogKey3 });
+        public static readonly string[] BlogKeys =
+            new ReadOnlyCollection<string>(new[] { BlogKey1, BlogKey2, BlogKey3 }).ToArray();
     }
 }

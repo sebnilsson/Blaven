@@ -8,21 +8,25 @@ namespace Blaven.Transformers
     {
         public BlogPost Transform(BlogPost blogPost)
         {
-            blogPost.Content = EncodePreTags(blogPost.Content);
+            if (blogPost.Content != null)
+            {
+                blogPost.Content = EncodePreTags(blogPost.Content);
+            }
 
             return blogPost;
         }
 
         private static string EncodePreTags(string content)
         {
-            if (!content.Contains("</pre>"))
+            var regex = new Regex(@"<(pre|code|samp)+.*?>(<code>)?(?<Content>.*?)(</code>)?</(pre|code|samp)+>", RegexOptions.Singleline);
+            var matches = regex.Matches(content).OfType<Match>().ToList();
+
+            if (!matches.Any())
             {
                 return content;
             }
 
-            var regex = new Regex(@"<(pre|code|samp)+.*?>(<code>)?(?<Content>.*?)(</code>)?</(pre|code|samp)+>", RegexOptions.Singleline);
-            var matches = regex.Matches(content);
-            var matchingCaptures = (from match in matches.OfType<Match>()
+            var matchingCaptures = (from match in matches
                                     from captures in match.Groups["Content"].Captures.OfType<Capture>()
                                     select captures).Reverse();
 
