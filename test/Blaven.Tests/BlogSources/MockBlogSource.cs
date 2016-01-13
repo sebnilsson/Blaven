@@ -35,18 +35,18 @@ namespace Blaven.BlogSources.Tests
 
         public DelegateTracker<BlogSetting> GetMetaTracker { get; } = new DelegateTracker<BlogSetting>();
 
-        public BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbBlogPosts)
+        public BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbPosts)
         {
             if (blogSetting == null)
             {
                 throw new ArgumentNullException(nameof(blogSetting));
             }
-            if (dbBlogPosts == null)
+            if (dbPosts == null)
             {
-                throw new ArgumentNullException(nameof(dbBlogPosts));
+                throw new ArgumentNullException(nameof(dbPosts));
             }
 
-            return this.getChangesFunc?.Invoke(blogSetting, dbBlogPosts);
+            return this.getChangesFunc?.Invoke(blogSetting, dbPosts);
         }
 
         public DelegateTracker<BlogSetting> GetChangesTracker { get; } = new DelegateTracker<BlogSetting>();

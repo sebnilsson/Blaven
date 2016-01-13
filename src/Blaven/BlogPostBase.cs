@@ -2,7 +2,7 @@
 
 namespace Blaven
 {
-    [DebuggerDisplay("Hash={Hash}, SourceId={SourceId}")]
+    [DebuggerDisplay("SourceId={SourceId}, Hash={Hash}")]
     public class BlogPostBase
     {
         public string Hash { get; set; }

@@ -50,13 +50,13 @@ namespace Blaven.BlogSources.Tests
 
             Assert.NotNull(blogSetting1);
             Assert.Equal(nameof(TestData.BlogKey1), blogSetting1.BlogKey);
-            Assert.Equal(nameof(TestData.BlogKey1) + "Id", blogSetting1.Id);
-            Assert.Equal(nameof(TestData.BlogKey1) + "Name", blogSetting1.Name);
+            Assert.Equal($"{nameof(TestData.BlogKey1)}Id", blogSetting1.Id);
+            Assert.Equal($"{nameof(TestData.BlogKey1)}Name", blogSetting1.Name);
 
             Assert.NotNull(blogSetting2);
             Assert.Equal(nameof(TestData.BlogKey2), blogSetting2.BlogKey);
-            Assert.Equal(nameof(TestData.BlogKey2) + "Id", blogSetting2.Id);
-            Assert.Equal(nameof(TestData.BlogKey2) + "Name", blogSetting2.Name);
+            Assert.Equal($"{nameof(TestData.BlogKey2)}Id", blogSetting2.Id);
+            Assert.Equal($"{nameof(TestData.BlogKey2)}Name", blogSetting2.Name);
         }
 
         [Fact]

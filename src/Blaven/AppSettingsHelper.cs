@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Blaven
 {
-    internal static class AppSettingsHelper
+    public static class AppSettingsHelper
     {
         public const string BlogsKeyFormat = "Blaven.Blogs.{0}.{1}";
 
@@ -27,7 +27,7 @@ namespace Blaven
             if (!appSettings.ContainsKey(appSettingsKey))
             {
                 string message = $"AppSettings does not contain key '{appSettingsKey}'.";
-                throw new ArgumentOutOfRangeException(nameof(appSettingsKey), message);
+                throw new KeyNotFoundException(message);
             }
 
             string value = appSettings[appSettingsKey];

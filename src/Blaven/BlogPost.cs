@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Blaven
 {
-    [DebuggerDisplay("Hash={Hash}, SourceId={SourceId}, BlogKey={BlogKey}, BlavenId={BlavenId}, Title={Title}")]
+    [DebuggerDisplay("SourceId={SourceId}, Hash={Hash}, BlogKey={BlogKey}, BlavenId={BlavenId}, Title={Title}")]
     public class BlogPost : BlogPostBase
     {
         public BlogPost()
@@ -24,7 +24,7 @@ namespace Blaven
 
         public string ImageUrl { get; set; }
 
-        public DateTime PublishedAt { get; set; }
+        public DateTime? PublishedAt { get; set; }
 
         public string SourceUrl { get; set; }
 

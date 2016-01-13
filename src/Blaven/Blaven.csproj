@@ -79,7 +79,7 @@
     <Compile Include="BlogPostBase.cs" />
     <Compile Include="BlogSetting.cs" />
     <Compile Include="BlogSources\BlogSourceBase.cs" />
-    <Compile Include="BlogSources\BlogSourceChangeHelper.cs" />
+    <Compile Include="BlogSources\BlogSourceChangesHelper.cs" />
     <Compile Include="AppSettingsFactory.cs" />
     <Compile Include="Data\IDataCacheHandler.cs" />
     <Compile Include="Data\MemoryDataCacheHandler.cs" />

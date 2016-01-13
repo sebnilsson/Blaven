@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 
 using Blaven.Tests;
 using Xunit;
@@ -32,7 +32,7 @@ namespace Blaven.BlogSources.Tests
         {
             var appSettings = TestData.GetAppSettings();
 
-            Assert.Throws<ArgumentOutOfRangeException>(
+            Assert.Throws<KeyNotFoundException>(
                 () => BlogSourceAppSettingsUtility.GetValueInternal<MockBlogSource>("NonExistingKey", appSettings));
         }
     }

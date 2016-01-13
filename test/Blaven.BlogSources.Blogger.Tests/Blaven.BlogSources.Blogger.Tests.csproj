@@ -7,7 +7,7 @@
     <ProjectGuid>{FFA84615-99B6-4498-B5AE-43161A364BBF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blaven.BlogSources.Blogger.Tests</RootNamespace>
+    <RootNamespace>Blaven.BlogSources.Blogger</RootNamespace>
     <AssemblyName>Blaven.BlogSources.Blogger.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -112,6 +112,10 @@
       <HintPath>..\..\packages\xunit.extensibility.core.2.1.0\lib\dotnet\xunit.core.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="xunit.execution.desktop, Version=2.1.0.3179, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\xunit.extensibility.execution.2.1.0\lib\net45\xunit.execution.desktop.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Zlib.Portable, Version=1.11.0.0, Culture=neutral, PublicKeyToken=431cba815f6a8b5b, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Zlib.Portable.Signed.1.11.0\lib\portable-net4+sl5+wp8+win8+wpa81+MonoTouch+MonoAndroid\Zlib.Portable.dll</HintPath>
       <Private>True</Private>
@@ -130,8 +134,11 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="BloggerBlogSourceAppSettingsHelperTest.cs" />
+    <Compile Include="BloggerBlogSourceTest.cs" />
+    <Compile Include="BloggerTestData.cs" />
+    <Compile Include="MockBloggerApiProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestBloggerService.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

@@ -11,9 +11,9 @@ namespace Blaven.Tests
                                BlogKey = blogKey ?? BlogKey,
                                Description = "Test Description",
                                Name = "Test_Name",
-                               Published = new DateTime(2015, 2, 1),
+                               PublishedAt = new DateTime(2015, 2, 1),
                                SourceId = "SourceId-TEST",
-                               Updated = new DateTime(2015, 3, 1),
+                               UpdatedAt = new DateTime(2015, 3, 1),
                                Url = "http://testurl.com/testar/test.html"
                            };
             return meta;

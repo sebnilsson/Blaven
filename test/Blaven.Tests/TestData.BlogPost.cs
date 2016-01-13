@@ -6,16 +6,16 @@ namespace Blaven.Tests
 {
     public static partial class TestData
     {
-        public static BlogPost GetBlogPost(string blogKey, int index, bool isUpdate)
+        public const int DefaultTagCount = 5;
+
+        public static BlogPost GetBlogPost(
+            string blogKey,
+            int index,
+            int tagCount = DefaultTagCount,
+            bool isUpdate = false)
         {
             var author = new BlogAuthor
                              {
-                                 Id =
-                                     GetTestString(
-                                         nameof(BlogPost.Author) + nameof(BlogAuthor.Id),
-                                         blogKey,
-                                         index,
-                                         isUpdate),
                                  ImageUrl =
                                      GetTestString(
                                          nameof(BlogPost.Author) + nameof(BlogAuthor.ImageUrl),
@@ -52,11 +52,11 @@ namespace Blaven.Tests
                                    Hash = HashUtility.GetBase64(blogKey, index),
                                    ImageUrl = GetTestString(nameof(BlogPost.ImageUrl), blogKey, index, isUpdate),
                                    PublishedAt = TestPublishedAt.AddDays(index),
-                                   SourceId = GetTestString(nameof(BlogPost.SourceId), blogKey, index, isUpdate),
+                                   SourceId = GetPostId(index, blogKey),
                                    SourceUrl =
                                        GetTestString(nameof(BlogPost.SourceUrl), blogKey, index, isUpdate),
                                    Summary = GetTestString(nameof(BlogPost.Summary), blogKey, index, isUpdate),
-                                   Tags = GetTestBlogPostTags(5),
+                                   Tags = GetPostTags(index, tagCount).ToList(),
                                    Title = GetTestString(nameof(BlogPost.Title), blogKey, index, isUpdate),
                                    UrlSlug = GetTestString(nameof(BlogPost.UrlSlug), blogKey, index, isUpdate),
                                    UpdatedAt = TestUpdatedAt.AddDays(index)
@@ -67,18 +67,22 @@ namespace Blaven.Tests
             return blogPost;
         }
 
-        internal static string GetTestString(string name, string blogKey, int index, bool isUpdate)
+        public static IEnumerable<BlogPost> GetBlogPosts(int start, int count, string blogKey = BlogKey)
         {
-            string prefix = isUpdate ? "Updated" : null;
-
-            string testString = $"{prefix}Test{name}_{blogKey}_{index}";
-            return testString;
+            var posts = Enumerable.Range(start, count).Select(x => GetBlogPost(blogKey, x));
+            return posts;
         }
 
-        private static IEnumerable<string> GetTestBlogPostTags(int tagCount)
+        public static IEnumerable<string> GetPostTags(int start, int count)
         {
-            var tags = Enumerable.Range(0, tagCount).Select(i => $"TestTag_{i}").ToList();
+            var tags = Enumerable.Range(start, count).Select(i => $"Test Tag {i + 1}");
             return tags;
+        }
+
+        public static string GetPostId(int index, string blogKey = BlogKey)
+        {
+            string postId = $"[{blogKey}]-Post Id-{index + 1}";
+            return postId;
         }
     }
 }

@@ -15,5 +15,13 @@ namespace Blaven.Tests
 
         public static readonly string[] BlogKeys =
             new ReadOnlyCollection<string>(new[] { BlogKey1, BlogKey2, BlogKey3 }).ToArray();
+
+        public static string GetTestString(string name, string blogKey, int index, bool isUpdate = false)
+        {
+            string prefix = isUpdate ? "Updated" : null;
+
+            string testString = $"{prefix}Test{name}_{blogKey}_{index}";
+            return testString;
+        }
     }
 }

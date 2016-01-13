@@ -6,6 +6,6 @@ namespace Blaven.BlogSources
     {
         BlogMeta GetMeta(BlogSetting blogSetting);
 
-        BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbBlogPosts);
+        BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbPosts);
     }
 }

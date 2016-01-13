@@ -2,12 +2,10 @@
 
 namespace Blaven
 {
-    [DebuggerDisplay("Id={Id}, Name={Name}, Url={Url}")]
+    [DebuggerDisplay("SourceId={SourceId}, Name={Name}, Url={Url}")]
     public class BlogAuthor
     {
         public string Name { get; set; }
-
-        public string Id { get; set; }
 
         public string ImageUrl { get; set; }
 
