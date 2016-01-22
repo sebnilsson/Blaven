@@ -42,10 +42,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
@@ -81,12 +77,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSettingsFactoryTest.cs" />
+    <Compile Include="BlogQueryServiceTest.cs" />
+    <Compile Include="BlogSettingsManagerTest.cs" />
     <Compile Include="BlogSources\BlogSourceAppSettingsUtilityTest.cs" />
+    <Compile Include="Data\MockRepository.cs" />
     <Compile Include="DelegateTracker.cs" />
     <Compile Include="ActionExtensions.cs" />
     <Compile Include="DelegateTrackerEvent.cs" />
     <Compile Include="FuncExtensions.cs" />
+    <Compile Include="PagingUtilityTest.cs" />
     <Compile Include="Synchronization\BlogSyncConfigurationTest.cs" />
+    <Compile Include="TestData.BlogSettingsManager.cs" />
     <Compile Include="TestUtility.cs" />
     <Compile Include="TestData.BlogPost.cs" />
     <Compile Include="TestData.BlogPostBase.cs" />

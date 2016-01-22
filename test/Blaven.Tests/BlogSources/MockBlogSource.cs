@@ -23,6 +23,10 @@ namespace Blaven.BlogSources.Tests
             this.getChangesFunc = (getChangesFunc ?? ((_, __) => null)).WithTracking(this.GetChangesTracker);
         }
 
+        public DelegateTracker<BlogSetting> GetMetaTracker { get; } = new DelegateTracker<BlogSetting>();
+
+        public DelegateTracker<BlogSetting> GetChangesTracker { get; } = new DelegateTracker<BlogSetting>();
+
         public BlogMeta GetMeta(BlogSetting blogSetting)
         {
             if (blogSetting == null)
@@ -30,10 +34,9 @@ namespace Blaven.BlogSources.Tests
                 throw new ArgumentNullException(nameof(blogSetting));
             }
 
-            return this.getMetaFunc?.Invoke(blogSetting);
+            var meta = this.getMetaFunc?.Invoke(blogSetting);
+            return meta;
         }
-
-        public DelegateTracker<BlogSetting> GetMetaTracker { get; } = new DelegateTracker<BlogSetting>();
 
         public BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbPosts)
         {
@@ -46,10 +49,9 @@ namespace Blaven.BlogSources.Tests
                 throw new ArgumentNullException(nameof(dbPosts));
             }
 
-            return this.getChangesFunc?.Invoke(blogSetting, dbPosts);
+            var changes = this.getChangesFunc?.Invoke(blogSetting, dbPosts);
+            return changes;
         }
-
-        public DelegateTracker<BlogSetting> GetChangesTracker { get; } = new DelegateTracker<BlogSetting>();
 
         public static MockBlogSource Create(int getMetaFuncSleep = 100, int getChangesFuncSleep = 100)
         {

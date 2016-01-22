@@ -17,11 +17,11 @@ namespace Blaven.Synchronization
                 throw new ArgumentNullException(nameof(config));
             }
 
-            var dbBlogPosts = config.DataStorage.GetBlogPosts(blogSetting);
+            var dbBlogPosts = config.DataStorage.GetPostBases(blogSetting);
             if (dbBlogPosts == null)
             {
                 string message =
-                    $"{nameof(config.DataStorage)} returned a null result from {nameof(config.DataStorage.GetBlogPosts)} for {nameof(blogSetting)}.{nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
+                    $"{nameof(config.DataStorage)} returned a null result from {nameof(config.DataStorage.GetPostBases)} for {nameof(blogSetting)}.{nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
                 throw new BlogSyncException(message);
             }
 

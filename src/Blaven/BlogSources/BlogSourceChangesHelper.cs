@@ -7,9 +7,14 @@ namespace Blaven.BlogSources
     internal static class BlogSourceChangesHelper
     {
         public static BlogSourceChangeSet GetChangeSet(
+            string blogKey,
             ICollection<BlogPost> sourcePosts,
             ICollection<BlogPostBase> dbPosts)
         {
+            if (blogKey == null)
+            {
+                throw new ArgumentNullException(nameof(blogKey));
+            }
             if (sourcePosts == null)
             {
                 throw new ArgumentNullException(nameof(sourcePosts));
@@ -19,7 +24,7 @@ namespace Blaven.BlogSources
                 throw new ArgumentNullException(nameof(dbPosts));
             }
 
-            var result = new BlogSourceChangeSet();
+            var result = new BlogSourceChangeSet(blogKey);
 
             SyncDeletedPosts(sourcePosts, dbPosts, result);
             SyncInsertedPosts(sourcePosts, dbPosts, result);

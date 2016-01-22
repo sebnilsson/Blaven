@@ -21,7 +21,7 @@ namespace Blaven.BlogSources
 
             var sourcePosts = this.GetSourcePosts(blogSetting).ToList();
 
-            var changeSet = BlogSourceChangesHelper.GetChangeSet(sourcePosts, dbBlogPostsList);
+            var changeSet = BlogSourceChangesHelper.GetChangeSet(blogSetting.BlogKey, sourcePosts, dbBlogPostsList);
             return changeSet;
         }
 

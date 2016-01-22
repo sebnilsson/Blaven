@@ -24,8 +24,16 @@ namespace Blaven.Tests
             this.events = new List<DelegateTrackerEvent<TKey>>(events);
         }
 
-        public IReadOnlyCollection<DelegateTrackerEvent<TKey>> Events
-            => new ReadOnlyCollection<DelegateTrackerEvent<TKey>>(this.events);
+        public IReadOnlyList<DelegateTrackerEvent<TKey>> Events
+        {
+            get
+            {
+                lock (this.events)
+                {
+                    return this.events.ToReadOnlyList();
+                }
+            }
+        }
 
         public IReadOnlyDictionary<TKey, int> KeyCollisionCount => this.GetKeyCollisionCount();
 

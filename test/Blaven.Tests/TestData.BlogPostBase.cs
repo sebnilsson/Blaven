@@ -29,6 +29,9 @@ namespace Blaven.Tests
                                                index,
                                                isUpdate: isUpdate)
                                    };
+
+            blogPostBase.BlavenId = BlavenIdProvider.GetId(blogPostBase);
+
             return blogPostBase;
         }
     }

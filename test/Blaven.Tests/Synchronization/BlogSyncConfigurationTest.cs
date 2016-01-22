@@ -66,7 +66,7 @@ namespace Blaven.Synchronization.Tests
             IBlogSource blogSource = null,
             IDataStorage dataStorage = null)
         {
-            var config = new BlogSyncConfiguration(blogSource, dataStorage, null, null, null, null);
+            var config = new BlogSyncConfiguration(blogSource, dataStorage, null, null, null, null, null);
             return config;
         }
     }

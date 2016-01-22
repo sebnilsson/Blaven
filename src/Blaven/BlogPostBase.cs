@@ -2,9 +2,13 @@
 
 namespace Blaven
 {
-    [DebuggerDisplay("SourceId={SourceId}, Hash={Hash}")]
+    [DebuggerDisplay("BlogKey={BlogKey}, BlavenId={BlavenId}, SourceId={SourceId}, Hash={Hash}")]
     public class BlogPostBase
     {
+        public string BlavenId { get; set; }
+
+        public string BlogKey { get; set; }
+
         public string Hash { get; set; }
 
         public string SourceId { get; set; }

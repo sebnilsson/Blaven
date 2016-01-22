@@ -5,37 +5,17 @@ using System.Linq;
 
 namespace Blaven
 {
-    [DebuggerDisplay("SourceId={SourceId}, Hash={Hash}, BlogKey={BlogKey}, BlavenId={BlavenId}, Title={Title}")]
-    public class BlogPost : BlogPostBase
+    [DebuggerDisplay(
+        "BlogKey={BlogKey}, BlavenId={BlavenId}, SourceId={SourceId}, Hash={Hash}, "
+        + "Title={Title}, Content.Length={Content.Length}")]
+    public class BlogPost : BlogPostHead
     {
-        public BlogPost()
-        {
-            this.Author = new BlogAuthor();
-            this.Tags = Enumerable.Empty<string>();
-        }
-
-        public BlogAuthor Author { get; set; }
-
-        public string BlavenId { get; set; }
-
-        public string BlogKey { get; set; }
-
         public string Content { get; set; }
-
-        public string ImageUrl { get; set; }
 
         public DateTime? PublishedAt { get; set; }
 
         public string SourceUrl { get; set; }
 
-        public string Summary { get; set; }
-
-        public IEnumerable<string> Tags { get; set; }
-
-        public string Title { get; set; }
-
-        public string UrlSlug { get; set; }
-
-        public DateTime? UpdatedAt { get; set; }
+        public IEnumerable<string> Tags { get; set; } = Enumerable.Empty<string>();
     }
 }

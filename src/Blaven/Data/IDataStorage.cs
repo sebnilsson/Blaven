@@ -6,7 +6,7 @@ namespace Blaven.Data
 {
     public interface IDataStorage
     {
-        IEnumerable<BlogPostBase> GetBlogPosts(BlogSetting blogSetting);
+        IReadOnlyCollection<BlogPostBase> GetPostBases(BlogSetting blogSetting);
 
         void SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta);
 

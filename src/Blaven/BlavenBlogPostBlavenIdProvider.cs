@@ -5,7 +5,7 @@ namespace Blaven
 {
     public class BlavenBlogPostBlavenIdProvider : IBlogPostBlavenIdProvider
     {
-        public string GetId(BlogPost blogPost)
+        public string GetId(BlogPostBase blogPost)
         {
             if (blogPost == null)
             {

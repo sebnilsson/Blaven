@@ -5,7 +5,7 @@ using System.Diagnostics;
 using Blaven.Tests;
 using Google.Apis.Blogger.v3.Data;
 
-namespace Blaven.BlogSources.Blogger
+namespace Blaven.BlogSources.Blogger.Tests
 {
     [DebuggerDisplay(
         "GetBlogPostsTracker={GetBlogTracker.Events.Count}, " + "SaveBlogMetaTracker={GetPostsTracker.Events.Count}, "

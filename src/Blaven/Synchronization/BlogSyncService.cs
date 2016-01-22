@@ -18,7 +18,7 @@ namespace Blaven.Synchronization
 
         private readonly BlogSyncConfiguration config;
 
-        public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage, params BlogSetting[] blogSettings)
+        public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage, IEnumerable<BlogSetting> blogSettings)
             : this(GetConfig(blogSource, dataStorage, blogSettings))
         {
         }
@@ -67,7 +67,7 @@ namespace Blaven.Synchronization
             return shouldUpdate;
         }
 
-        public IReadOnlyCollection<string> TryUpdate(params string[] blogKeys)
+        public IReadOnlyList<string> TryUpdate(params string[] blogKeys)
         {
             if (blogKeys == null)
             {
@@ -114,7 +114,7 @@ namespace Blaven.Synchronization
             return !isUpdated;
         }
 
-        internal IReadOnlyCollection<string> TryUpdateInternal(DateTime now, params string[] blogKeys)
+        internal IReadOnlyList<string> TryUpdateInternal(DateTime now, params string[] blogKeys)
         {
             var updatedBlogKeys = new List<string>();
 
@@ -130,7 +130,7 @@ namespace Blaven.Synchronization
                         }
                     });
 
-            return new ReadOnlyCollection<string>(updatedBlogKeys);
+            return updatedBlogKeys.ToReadOnlyList();
         }
 
         internal void UpdateInternal(DateTime now, params string[] blogKeys)
@@ -222,7 +222,7 @@ namespace Blaven.Synchronization
         private static BlogSyncConfiguration GetConfig(
             IBlogSource blogSource,
             IDataStorage dataStorage,
-            params BlogSetting[] blogSettings)
+            IEnumerable<BlogSetting> blogSettings)
         {
             if (blogSource == null)
             {

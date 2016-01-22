@@ -10,7 +10,7 @@ namespace Blaven.Tests
 
         public static BlogPost GetBlogPost(
             string blogKey,
-            int index,
+            int index = 0,
             int tagCount = DefaultTagCount,
             bool isUpdate = false)
         {

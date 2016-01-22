@@ -17,7 +17,7 @@ namespace Blaven.Synchronization
             IBlogPostBlavenIdProvider blavenIdProvider,
             IBlogPostUrlSlugProvider slugProvider,
             BlogTransformersProvider transformersProvider,
-            params BlogSetting[] blogSettings)
+            IEnumerable<BlogSetting> blogSettings)
         {
             if (blogSource == null)
             {
@@ -40,7 +40,7 @@ namespace Blaven.Synchronization
 
         public IBlogPostBlavenIdProvider BlavenIdProvider { get; private set; }
 
-        public IList<BlogSetting> BlogSettings { get; private set; }
+        public IList<BlogSetting> BlogSettings { get; }
 
         public IBlogSource BlogSource { get; private set; }
 
