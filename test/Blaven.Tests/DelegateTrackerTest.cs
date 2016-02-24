@@ -13,52 +13,64 @@ namespace Blaven.Tests
         private const int TestThreadId2 = 200;
 
         [Fact]
-        public void KeyCollisionCount_WithCollisions_ShouldReturnCollisionCount()
+        public void KeyCollisionCount_Collisions_ShouldReturnCollisionCount()
         {
+            // Arrange
             var action = GetTestAction();
             var tracking = GetTestDelegateTrackingWithEvents(action);
 
+            // Act
             action(TestData.BlogKey1);
 
+            // Assert
             int collisionCount = tracking.KeyCollisionCount[TestData.BlogKey1];
 
             Assert.Equal(2, collisionCount);
         }
 
         [Fact]
-        public void KeyRunCount_WithEvents_ShouldReturnCount()
+        public void KeyRunCount_Events_ShouldReturnCount()
         {
+            // Arrange
             var action = GetTestAction();
             var tracking = GetTestDelegateTrackingWithEvents(action);
 
+            // Act
             action(TestData.BlogKey1);
 
+            // Assert
             int runCount = tracking.KeyRunCount[TestData.BlogKey1];
 
             Assert.Equal(3, runCount);
         }
 
         [Fact]
-        public void KeyRunOtherCount_WithEvents_ShouldReturnCount()
+        public void KeyRunOtherCount_Events_ShouldReturnCount()
         {
+            // Arrange
             var action = GetTestAction();
             var tracking = GetTestDelegateTrackingWithEvents(action);
 
+            // Act
             action(TestData.BlogKey1);
 
+            // Assert
             int runOtherCount = tracking.KeyRunOtherCount[TestData.BlogKey1];
 
             Assert.Equal(2, runOtherCount);
         }
 
         [Fact]
-        public void RunCount_WithEvents_ShouldReturnCount()
+        public void RunCount_Events_ShouldReturnCount()
         {
+            // Arrange
             var action = GetTestAction();
             var tracking = GetTestDelegateTrackingWithEvents(action);
 
+            // Act
             action(TestData.BlogKey1);
 
+            // Assert
             Assert.Equal(tracking.Events.Count, tracking.RunCount);
         }
 

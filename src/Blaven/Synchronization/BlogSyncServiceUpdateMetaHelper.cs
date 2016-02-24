@@ -4,7 +4,7 @@ namespace Blaven.Synchronization
 {
     internal static class BlogSyncServiceUpdateMetaHelper
     {
-        public static BlogMeta Update(BlogSetting blogSetting, BlogSyncConfiguration config)
+        public static BlogMeta Update(BlogSetting blogSetting, DateTime lastUpdatedAt, BlogSyncConfiguration config)
         {
             if (blogSetting == null)
             {
@@ -15,7 +15,7 @@ namespace Blaven.Synchronization
                 throw new ArgumentNullException(nameof(config));
             }
 
-            var meta = config.BlogSource.GetMeta(blogSetting);
+            var meta = config.BlogSource.GetMeta(blogSetting, lastUpdatedAt);
             if (meta == null)
             {
                 string message =

@@ -31,10 +31,10 @@ namespace Blaven.Synchronization
             this.BlogSource = blogSource;
             this.DataStorage = dataStorage;
 
-            this.DataCacheHandler = dataCacheHandler ?? BlogSyncConfigurationDefaults.DataCacheHandler.Value;
-            this.BlavenIdProvider = blavenIdProvider ?? BlogSyncConfigurationDefaults.BlavenIdProvider.Value;
-            this.SlugProvider = slugProvider ?? BlogSyncConfigurationDefaults.SlugProvider.Value;
-            this.TransformersProvider = transformersProvider ?? BlogSyncConfigurationDefaults.TransformersProvider.Value;
+            this.DataCacheHandler = dataCacheHandler ?? BlogSyncConfigurationDefaults.DataCacheHandler;
+            this.BlavenIdProvider = blavenIdProvider ?? BlogSyncConfigurationDefaults.BlavenIdProvider;
+            this.SlugProvider = slugProvider ?? BlogSyncConfigurationDefaults.SlugProvider;
+            this.TransformersProvider = transformersProvider ?? BlogSyncConfigurationDefaults.TransformersProvider;
             this.BlogSettings = (blogSettings ?? new BlogSetting[0]).Where(x => x.BlogKey != null).ToList();
         }
 

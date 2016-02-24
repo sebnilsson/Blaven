@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Blaven.Data.RavenDb2.Indexes;
 using Raven.Client;
+using Raven.Client.Linq;
 
 namespace Blaven.Data.RavenDb2
 {
     public class RavenDbRepository : IRepository
     {
-        private readonly IDocumentStore documentStore;
-
         public RavenDbRepository(IDocumentStore documentStore)
         {
             if (documentStore == null)
@@ -17,7 +17,18 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(documentStore));
             }
 
-            this.documentStore = documentStore;
+            this.DocumentStore = documentStore;
+        }
+
+        public IDocumentStore DocumentStore { get; }
+
+        public IQueryable<BlogMeta> GetBlogMetas()
+        {
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var metas = session.Query<BlogMeta>().OrderBy(x => x.Name);
+                return metas;
+            }
         }
 
         public BlogMeta GetBlogMeta(string blogKey)
@@ -27,7 +38,13 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(blogKey));
             }
 
-            throw new NotImplementedException();
+            string blogMetaId = RavenDbIdConventions.GetBlogMetaId(blogKey);
+
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var meta = session.Load<BlogMeta>(blogMetaId);
+                return meta;
+            }
         }
 
         public BlogPost GetPost(string blogKey, string blavenId)
@@ -41,7 +58,13 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(blavenId));
             }
 
-            throw new NotImplementedException();
+            string blogPostId = RavenDbIdConventions.GetBlogPostId(blogKey, blavenId);
+
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var post = session.Load<BlogPost>(blogPostId);
+                return post;
+            }
         }
 
         public BlogPost GetPostBySourceId(string blogKey, string sourceId)
@@ -55,7 +78,13 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(sourceId));
             }
 
-            throw new NotImplementedException();
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var post =
+                    session.Query<BlogPost, BlogPostsIndex>()
+                        .FirstOrDefault(x => x.BlogKey == blogKey && x.SourceId == sourceId);
+                return post;
+            }
         }
 
         public IQueryable<BlogArchiveItem> ListArchive(IEnumerable<string> blogKeys)
@@ -65,7 +94,11 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            throw new NotImplementedException();
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var archive = session.Query<BlogArchiveItem, ArchiveCountIndex>().Where(x => x.BlogKey.In(blogKeys));
+                return archive;
+            }
         }
 
         public IQueryable<BlogTagItem> ListTags(IEnumerable<string> blogKeys)
@@ -75,7 +108,11 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            throw new NotImplementedException();
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var tags = session.Query<BlogTagItem, TagsCountIndex>().Where(x => x.BlogKey.In(blogKeys));
+                return tags;
+            }
         }
 
         public IQueryable<BlogPostHead> ListPostHeads(IEnumerable<string> blogKeys)
@@ -85,7 +122,11 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            throw new NotImplementedException();
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var heads = session.Query<BlogPostHead, BlogPostsIndex>().Where(x => x.BlogKey.In(blogKeys));
+                return heads;
+            }
         }
 
         public IQueryable<BlogPost> ListPosts(IEnumerable<string> blogKeys)
@@ -95,17 +136,33 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            throw new NotImplementedException();
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var posts = session.Query<BlogPost, BlogPostsIndex>().Where(x => x.BlogKey.In(blogKeys));
+                return posts;
+            }
         }
 
-        public IQueryable<BlogPost> ListPostsByArchive(IEnumerable<string> blogKeys, DateTime date)
+        public IQueryable<BlogPost> ListPostsByArchive(IEnumerable<string> blogKeys, DateTime archiveDate)
         {
             if (blogKeys == null)
             {
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            throw new NotImplementedException();
+            var archiveDateStart = new DateTime(archiveDate.Year, archiveDate.Month, 1);
+            var archiveDateEnd = archiveDateStart.AddMonths(1);
+
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var posts =
+                    session.Query<BlogPost, BlogPostsIndex>()
+                        .Where(
+                            x =>
+                            x.BlogKey.In(blogKeys) && x.PublishedAt >= archiveDateStart
+                            && x.PublishedAt < archiveDateEnd);
+                return posts;
+            }
         }
 
         public IQueryable<BlogPost> ListPostsByTag(IEnumerable<string> blogKeys, string tagName)
@@ -114,8 +171,47 @@ namespace Blaven.Data.RavenDb2
             {
                 throw new ArgumentNullException(nameof(blogKeys));
             }
+            if (tagName == null)
+            {
+                throw new ArgumentNullException(nameof(tagName));
+            }
 
-            throw new NotImplementedException();
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var posts =
+                    session.Query<BlogPost, BlogPostsIndex>()
+                        .Where(x => x.BlogKey.In(blogKeys) && x.Tags.Any(tag => tag == tagName));
+                return posts;
+            }
+        }
+
+        public IQueryable<BlogPost> SearchPosts(IEnumerable<string> blogKeys, string search)
+        {
+            if (blogKeys == null)
+            {
+                throw new ArgumentNullException(nameof(blogKeys));
+            }
+            if (search == null)
+            {
+                throw new ArgumentNullException(nameof(search));
+            }
+
+            string escapedSearch = search.Replace("\"", "\\\"");
+
+            var escapedBlogKeys = blogKeys.Select(key => key.Replace("\"", "\\\""));
+
+            string blogKeysValues = string.Join(" OR ", escapedBlogKeys.Select(key => $"BlogKey:\"{key}\""));
+
+            string blogKeysClause = !string.IsNullOrWhiteSpace(blogKeysValues) ? $" AND ({blogKeysValues})" : null;
+
+            string whereClause = $"Content:\"{escapedSearch}\" {blogKeysClause}";
+
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var posts =
+                    session.Advanced.LuceneQuery<BlogPost, SearchBlogPostsIndex>().Where(whereClause).AsQueryable();
+                return posts;
+            }
         }
     }
 }

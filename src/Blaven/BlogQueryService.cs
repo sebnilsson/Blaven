@@ -24,6 +24,12 @@ namespace Blaven
             this.blogSettings = new BlogSettingsManager(blogSettings ?? Enumerable.Empty<BlogSetting>());
         }
 
+        public IQueryable<BlogMeta> GetBlogMetas()
+        {
+            var meta = this.repository.GetBlogMetas();
+            return meta;
+        }
+
         public BlogMeta GetBlogMeta(string blogKey = null)
         {
             var ensuredBlogKey = this.blogSettings.GetEnsuredBlogKey(blogKey);
@@ -103,6 +109,19 @@ namespace Blaven
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
             var posts = this.repository.ListPostsByTag(ensuredBlogKeys, tagName);
+            return posts;
+        }
+
+        public IQueryable<BlogPost> Search(string search, params string[] blogKeys)
+        {
+            if (search == null)
+            {
+                throw new ArgumentNullException(nameof(search));
+            }
+
+            var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
+
+            var posts = this.repository.SearchPosts(ensuredBlogKeys, search);
             return posts;
         }
     }

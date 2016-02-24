@@ -12,12 +12,15 @@ namespace Blaven.Tests
         [InlineData(21)]
         public void GetPaged_PageIndexZero_ShouldReturnFirstPage(int pageSize)
         {
+            // Arrange
             var firstPageBlogPosts = TestData.GetBlogPosts(0, pageSize).ToList();
             var secondPageBlogPosts = TestData.GetBlogPosts(pageSize, pageSize);
             var allBlogPosts = firstPageBlogPosts.Concat(secondPageBlogPosts);
 
+            // Act
             var pagedBlogPosts = PagingUtility.GetPaged(allBlogPosts, pageSize, pageIndex: 0).ToList();
 
+            // Assert
             bool pagedBlogPostsSequenceEquals = pagedBlogPosts.SequenceEqual(firstPageBlogPosts);
 
             Assert.True(pagedBlogPostsSequenceEquals);
@@ -30,12 +33,15 @@ namespace Blaven.Tests
         [InlineData(21)]
         public void GetPaged_PageIndexOne_ShouldReturnSecondPage(int pageSize)
         {
+            // Arrange
             var firstPageBlogPosts = TestData.GetBlogPosts(0, pageSize);
             var secondPageBlogPosts = TestData.GetBlogPosts(pageSize, pageSize).ToList();
             var allBlogPosts = firstPageBlogPosts.Concat(secondPageBlogPosts);
 
+            // Act
             var pagedBlogPosts = PagingUtility.GetPaged(allBlogPosts, pageSize, pageIndex: 1).ToList();
 
+            // Assert
             bool pagedBlogPostsSequenceEquals = pagedBlogPosts.SequenceEqual(secondPageBlogPosts);
 
             Assert.True(pagedBlogPostsSequenceEquals);

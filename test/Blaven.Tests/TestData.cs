@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Blaven.Tests
 {
@@ -17,7 +18,7 @@ namespace Blaven.Tests
         public static string GetTestString(string name, string blogKey, int index, bool isUpdate = false)
         {
             string prefix = isUpdate ? "Updated" : null;
-            
+
             string testString = $"{prefix}Test{name}_{blogKey}_{index}";
             return testString;
         }

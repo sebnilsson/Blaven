@@ -103,6 +103,7 @@
     <Compile Include="BlogSources\IBlogSource.cs" />
     <Compile Include="BlogSources\BlogSourceAppSettingsUtility.cs" />
     <Compile Include="Synchronization\BlogSyncException.cs" />
+    <Compile Include="Synchronization\BlogSyncResult.cs" />
     <Compile Include="Synchronization\BlogSyncService.cs" />
     <Compile Include="BlavenBlogPostUrlSlugProvider.cs" />
     <Compile Include="Synchronization\BlogSyncConfiguration.cs" />

@@ -27,6 +27,8 @@ namespace Blaven.Data.Tests
 
         private readonly Func<IEnumerable<string>, string, IQueryable<BlogPost>> listPostsByTagFunc;
 
+        private readonly Func<IEnumerable<string>, string, IQueryable<BlogPost>> searchPostsFunc;
+
         public MockRepository(
             Func<string, BlogMeta> getBlogMetaFunc = null,
             Func<string, string, BlogPost> getPostFunc = null,
@@ -36,7 +38,8 @@ namespace Blaven.Data.Tests
             Func<IEnumerable<string>, IQueryable<BlogPostHead>> listPostHeadsFunc = null,
             Func<IEnumerable<string>, IQueryable<BlogPost>> listPostsFunc = null,
             Func<IEnumerable<string>, DateTime, IQueryable<BlogPost>> listPostsByArchiveFunc = null,
-            Func<IEnumerable<string>, string, IQueryable<BlogPost>> listPostsByTagFunc = null)
+            Func<IEnumerable<string>, string, IQueryable<BlogPost>> listPostsByTagFunc = null,
+            Func<IEnumerable<string>, string, IQueryable<BlogPost>> searchPostsFunc = null)
         {
             this.getBlogMetaFunc = (getBlogMetaFunc ?? (_ => null)).WithTracking(this.GetBlogMetaTracker);
             this.getPostFunc = (getPostFunc ?? ((_, __) => null)).WithTracking(this.GetPostTracker);
@@ -49,6 +52,7 @@ namespace Blaven.Data.Tests
             this.listPostsByArchiveFunc =
                 (listPostsByArchiveFunc ?? ((_, __) => null)).WithTracking(this.ListPostsByArchiveTracker);
             this.listPostsByTagFunc = (listPostsByTagFunc ?? ((_, __) => null)).WithTracking(this.ListPostsByTagTracker);
+            this.searchPostsFunc = (searchPostsFunc ?? ((_, __) => null)).WithTracking(this.SearchPostsTracker);
         }
 
         public DelegateTracker<string> GetBlogMetaTracker { get; } = new DelegateTracker<string>();
@@ -74,6 +78,14 @@ namespace Blaven.Data.Tests
 
         public DelegateTracker<IEnumerable<string>> ListPostsByTagTracker { get; } =
             new DelegateTracker<IEnumerable<string>>();
+
+        public DelegateTracker<IEnumerable<string>> SearchPostsTracker { get; } =
+            new DelegateTracker<IEnumerable<string>>();
+
+        public IQueryable<BlogMeta> GetBlogMetas()
+        {
+            throw new NotImplementedException();
+        }
 
         public BlogMeta GetBlogMeta(string blogKey)
         {
@@ -120,6 +132,14 @@ namespace Blaven.Data.Tests
         public IQueryable<BlogPost> ListPostsByTag(IEnumerable<string> blogKeys, string tagName)
         {
             var posts = this.listPostsByTagFunc?.Invoke(blogKeys, tagName);
+            return posts;
+        }
+
+        public IQueryable<BlogPost> SearchPosts(IEnumerable<string> blogKeys, string search)
+        {
+            throw new NotImplementedException();
+
+            var posts = this.searchPostsFunc?.Invoke(blogKeys, search);
             return posts;
         }
 

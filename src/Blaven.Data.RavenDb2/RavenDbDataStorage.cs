@@ -32,7 +32,7 @@ namespace Blaven.Data.RavenDb2
             using (var session = this.DocumentStore.OpenSession())
             {
                 var posts =
-                    session.Query<BlogPostBase, BlogPostBasesOrderedByCreated>()
+                    session.Query<BlogPostBase, BlogPostsIndex>()
                         .Customize(x => x.WaitForNonStaleResultsAsOfNow())
                         .Where(x => x.BlogKey == blogSetting.BlogKey)
                         .AsProjection<BlogPostBase>()
@@ -55,7 +55,9 @@ namespace Blaven.Data.RavenDb2
 
             using (var session = this.DocumentStore.OpenSession())
             {
-                var updatedBlogMeta = session.Load<BlogMeta>(blogSetting.BlogKey);
+                string blogMetaId = RavenDbIdConventions.GetBlogMetaId(blogSetting.BlogKey);
+
+                var updatedBlogMeta = session.Load<BlogMeta>(blogMetaId);
                 if (updatedBlogMeta == null)
                 {
                     updatedBlogMeta = new BlogMeta { BlogKey = blogSetting.BlogKey };
@@ -100,7 +102,9 @@ namespace Blaven.Data.RavenDb2
         {
             foreach (var deletedPost in deletedPosts)
             {
-                var existingPost = session.Load<BlogPost>(deletedPost.BlavenId);
+                string postId = RavenDbIdConventions.GetBlogPostId(deletedPost.BlogKey, deletedPost.BlavenId);
+
+                var existingPost = session.Load<BlogPost>(postId);
                 if (existingPost != null)
                 {
                     session.Delete(existingPost);
@@ -112,7 +116,9 @@ namespace Blaven.Data.RavenDb2
         {
             foreach (var post in insertedOrUpdatedPosts)
             {
-                var ravenDbPost = session.Load<BlogPost>(post.BlavenId);
+                string postId = RavenDbIdConventions.GetBlogPostId(post.BlogKey, post.BlavenId);
+
+                var ravenDbPost = session.Load<BlogPost>(postId);
                 if (ravenDbPost == null)
                 {
                     ravenDbPost = new BlogPost { BlogKey = post.BlogKey, BlavenId = post.BlavenId };

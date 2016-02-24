@@ -12,26 +12,34 @@ namespace Blaven.Tests
         [Fact]
         public void ctor_NullBlogSettings_ShouldNotThrow()
         {
+            // Arrange
             var repository = new MockRepository();
+
+            // Act
             var service = new BlogQueryService(repository, blogSettings: null);
 
+            // Assert
             Assert.NotNull(service);
         }
 
         [Fact]
         public void ctor_NullRepository_ShouldThrow()
         {
+            // Act & Assert
             Assert.Throws<ArgumentNullException>(() => new BlogQueryService(repository: null));
         }
 
         [Fact]
         public void GetBlogMeta_ExistingBlogKey_ReturnsBlogMeta()
         {
+            // Arrange
             var blogMetas = new[] { new BlogMeta { BlogKey = TestData.BlogKey, Name = TestData.BlogMetaName } };
             var service = GetBlogQueryService(blogMetas: blogMetas);
 
+            // Act
             var meta = service.GetBlogMeta(TestData.BlogKey);
 
+            // Assert
             Assert.Equal(TestData.BlogKey, meta.BlogKey);
             Assert.Equal(TestData.BlogMetaName, meta.Name);
         }
@@ -39,6 +47,7 @@ namespace Blaven.Tests
         [Fact]
         public void GetBlogMeta_EmptyExistingBlogKey_ReturnsFirstBlogMeta()
         {
+            // Arrange
             var blogMetas = new[]
                                 {
                                     new BlogMeta { BlogKey = TestData.BlogKey1, Name = TestData.BlogMetaName },
@@ -46,8 +55,10 @@ namespace Blaven.Tests
                                 };
             var service = GetBlogQueryService(blogMetas: blogMetas);
 
+            // Act
             var meta = service.GetBlogMeta();
 
+            // Assert
             Assert.Equal(TestData.BlogKeys.First(), meta.BlogKey);
             Assert.Equal(TestData.BlogMetaName, meta.Name);
         }
@@ -55,21 +66,27 @@ namespace Blaven.Tests
         [Fact]
         public void GetBlogMeta_NonExistingBlogKey_ReturnsNull()
         {
+            // Arrange
             var service = GetBlogQueryService();
 
+            // Act
             var meta = service.GetBlogMeta($"NonExisting_{TestData.BlogKey}");
 
+            // Assert
             Assert.Null(meta);
         }
 
         [Fact]
         public void GetPost_ExistingBlogKey_ReturnsBlogPost()
         {
+            // Arrange
             var mockBlogPost = TestData.GetBlogPost(TestData.BlogKey);
             var service = GetBlogQueryService(blogPosts: new[] { mockBlogPost });
 
+            // Act
             var post = service.GetPost(mockBlogPost.BlavenId, TestData.BlogKey);
 
+            // Assert
             Assert.Equal(mockBlogPost.BlogKey, post.BlogKey);
             Assert.Equal(mockBlogPost.Content, post.Content);
         }
@@ -77,21 +94,27 @@ namespace Blaven.Tests
         [Fact]
         public void GetPost_NonExistingBlogKey_ReturnsNull()
         {
+            // Arrange
             var service = GetBlogQueryService();
 
+            // Act
             var post = service.GetPost($"NonExisting_{TestData.BlogKey}", string.Empty);
 
+            // Assert
             Assert.Null(post);
         }
 
         [Fact]
         public void GetPostBySourceId_ExistingBlogKey_ReturnsBlogPost()
         {
+            // Arrange
             var mockBlogPost = TestData.GetBlogPost(TestData.BlogKey);
             var service = GetBlogQueryService(blogPosts: new[] { mockBlogPost });
 
+            // Act
             var post = service.GetPostBySourceId(mockBlogPost.SourceId, TestData.BlogKey);
 
+            // Assert
             Assert.Equal(mockBlogPost.BlogKey, post.BlogKey);
             Assert.Equal(mockBlogPost.Content, post.Content);
         }
@@ -99,21 +122,27 @@ namespace Blaven.Tests
         [Fact]
         public void GetPostBySourceId_NonExistingBlogKey_ReturnsNull()
         {
+            // Arrange
             var service = GetBlogQueryService();
 
+            // Act
             var post = service.GetPostBySourceId($"NonExisting_{TestData.BlogKey}", string.Empty);
 
+            // Assert
             Assert.Null(post);
         }
 
         [Fact]
         public void ListArchive_ExistingBlogKey_ReturnsAll()
         {
+            // Arrange
             var mockBlogPosts = TestData.GetBlogPosts(0, 5, TestData.BlogKey).ToList();
             var service = GetBlogQueryService(mockBlogPosts);
 
+            // Act
             var archive = service.ListArchive(TestData.BlogKey).ToList();
 
+            // Assert
             bool archiveContainsAllMockPosts = GetArchiveAllContainsBlogPosts(archive, mockBlogPosts);
 
             Assert.True(archiveContainsAllMockPosts);
@@ -122,14 +151,17 @@ namespace Blaven.Tests
         [Fact]
         public void ListArchive_SpecificBlogKey_ReturnsWithBlogPostsOnlyForBlogKey()
         {
+            // Arrange
             var mockBlogPosts1 = TestData.GetBlogPosts(0, 5, TestData.BlogKey1).ToList();
             var mockBlogPosts2 = TestData.GetBlogPosts(35, 5, TestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
             var service = GetBlogQueryService(allMockBlogPosts);
 
+            // Act
             var archive = service.ListArchive(TestData.BlogKey2).ToList();
 
+            // Assert
             var firstArchiveItem = archive.FirstOrDefault();
 
             bool archiveContainsBlogKeyMockPosts = GetArchiveAllContainsBlogPosts(archive, mockBlogPosts2);
@@ -141,14 +173,17 @@ namespace Blaven.Tests
         [Fact]
         public void ListArchive_AllBlogKeys_ReturnsWithAllBlogPosts()
         {
+            // Arrange
             var mockBlogPosts1 = TestData.GetBlogPosts(0, 5, TestData.BlogKey1).ToList();
             var mockBlogPosts2 = TestData.GetBlogPosts(35, 5, TestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
             var service = GetBlogQueryService(allMockBlogPosts);
 
+            // Act
             var archive = service.ListArchive(TestData.BlogKey1, TestData.BlogKey2).ToList();
 
+            // Assert
             var firstArchiveItem = archive.FirstOrDefault();
             var secondArchiveItem = archive.ElementAtOrDefault(1);
 
@@ -162,21 +197,27 @@ namespace Blaven.Tests
         [Fact]
         public void ListArchive_NonExistingBlogKeys_ReturnsNull()
         {
+            // Arrange
             var service = GetBlogQueryService();
 
+            // Act
             var archive = service.ListArchive($"NonExisting_{TestData.BlogKey}");
 
+            // Assert
             Assert.False(archive.Any());
         }
 
         [Fact]
         public void ListTags_ExistingBlogKey_ReturnsAll()
         {
+            // Arrange
             var mockBlogPosts = TestData.GetBlogPosts(0, 5, TestData.BlogKey).ToList();
             var service = GetBlogQueryService(mockBlogPosts);
 
+            // Act
             var tags = service.ListTags(TestData.BlogKey).ToList();
 
+            // Assert
             bool tagsContainsAllMockPosts = GetTagsAllContainsBlogPostTags(tags, mockBlogPosts);
 
             Assert.True(tagsContainsAllMockPosts);
@@ -185,14 +226,17 @@ namespace Blaven.Tests
         [Fact]
         public void ListTags_SpecificBlogKey_ReturnsWithBlogPostsOnlyForBlogKey()
         {
+            // Arrange
             var mockBlogPosts1 = TestData.GetBlogPosts(0, 5, TestData.BlogKey1).ToList();
             var mockBlogPosts2 = TestData.GetBlogPosts(5, 5, TestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
             var service = GetBlogQueryService(allMockBlogPosts);
 
+            // Act
             var tags = service.ListTags(TestData.BlogKey1).ToList();
 
+            // Assert
             var tag5 = tags.FirstOrDefault(x => x.Name.EndsWith(" 5"));
 
             bool archiveContainsBlogKeyMockPosts = GetTagsAllContainsBlogPostTags(tags, mockBlogPosts1);
@@ -204,14 +248,17 @@ namespace Blaven.Tests
         [Fact]
         public void ListTags_AllBlogKeys_ReturnsWithAllBlogPosts()
         {
+            // Arrange
             var mockBlogPosts1 = TestData.GetBlogPosts(0, 5, TestData.BlogKey1).ToList();
             var mockBlogPosts2 = TestData.GetBlogPosts(5, 5, TestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
             var service = GetBlogQueryService(allMockBlogPosts);
 
+            // Act
             var tags = service.ListTags(TestData.BlogKey1, TestData.BlogKey2).ToList();
 
+            // Assert
             var tag5 = tags.FirstOrDefault(x => x.Name.EndsWith(" 5"));
             var tag11 = tags.FirstOrDefault(x => x.Name.EndsWith(" 11"));
 
@@ -225,21 +272,27 @@ namespace Blaven.Tests
         [Fact]
         public void ListTags_NonExistingBlogKeys_ReturnsNull()
         {
+            // Arrange
             var service = GetBlogQueryService();
 
+            // Act
             var tags = service.ListTags($"NonExisting_{TestData.BlogKey}");
 
+            // Assert
             Assert.False(tags.Any());
         }
 
         [Fact]
         public void ListPostHeads_ExistingBlogKey_ReturnsAll()
         {
+            // Arrange
             var mockBlogPosts = TestData.GetBlogPosts(0, 5, TestData.BlogKey).ToList();
             var service = GetBlogQueryService(mockBlogPosts);
 
+            // Act
             var postHeads = service.ListPostHeads(TestData.BlogKey).ToList();
 
+            // Assert
             bool tagsContainsAllMockPosts = GetPostHeadsAllContainsBlogs(postHeads, mockBlogPosts);
 
             Assert.True(tagsContainsAllMockPosts);
@@ -248,14 +301,17 @@ namespace Blaven.Tests
         [Fact]
         public void ListPostHeads_SpecificBlogKey_ReturnsWithBlogPostsOnlyForBlogKey()
         {
+            // Arrange
             var mockBlogPosts1 = TestData.GetBlogPosts(0, 5, TestData.BlogKey1).ToList();
             var mockBlogPosts2 = TestData.GetBlogPosts(5, 5, TestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
             var service = GetBlogQueryService(allMockBlogPosts);
 
+            // Act
             var postHeads = service.ListPostHeads(TestData.BlogKey1).ToList();
 
+            // Assert
             bool archiveContainsBlogKeyMockPosts = GetPostHeadsAllContainsBlogs(postHeads, mockBlogPosts1);
 
             Assert.True(archiveContainsBlogKeyMockPosts);
@@ -264,14 +320,17 @@ namespace Blaven.Tests
         [Fact]
         public void ListPostHeads_AllBlogKeys_ReturnsWithAllBlogPosts()
         {
+            // Arrange
             var mockBlogPosts1 = TestData.GetBlogPosts(0, 5, TestData.BlogKey1).ToList();
             var mockBlogPosts2 = TestData.GetBlogPosts(5, 5, TestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
             var service = GetBlogQueryService(allMockBlogPosts);
 
+            // Act
             var postHeads = service.ListPostHeads(TestData.BlogKey1, TestData.BlogKey2).ToList();
 
+            // Assert
             bool archiveContainsAllMockPosts = GetPostHeadsAllContainsBlogs(postHeads, allMockBlogPosts);
 
             Assert.True(archiveContainsAllMockPosts);
@@ -280,21 +339,27 @@ namespace Blaven.Tests
         [Fact]
         public void ListPostHeads_NonExistingBlogKeys_ReturnsNull()
         {
+            // Arrange
             var service = GetBlogQueryService();
 
+            // Act
             var postHeads = service.ListPostHeads($"NonExisting_{TestData.BlogKey}");
 
+            // Assert
             Assert.False(postHeads.Any());
         }
 
         [Fact]
         public void ListPosts_ExistingBlogKey_ReturnsAll()
         {
+            // Arrange
             var mockBlogPosts = TestData.GetBlogPosts(0, 5, TestData.BlogKey).ToList();
             var service = GetBlogQueryService(mockBlogPosts);
 
+            // Act
             var posts = service.ListPosts(TestData.BlogKey).ToList();
 
+            // Assert
             bool tagsContainsAllMockPosts = GetPostsAllContainsBlogPosts(posts, mockBlogPosts);
 
             Assert.True(tagsContainsAllMockPosts);
@@ -303,14 +368,17 @@ namespace Blaven.Tests
         [Fact]
         public void ListPosts_SpecificBlogKey_ReturnsWithBlogPostsOnlyForBlogKey()
         {
+            // Arrange
             var mockBlogPosts1 = TestData.GetBlogPosts(0, 5, TestData.BlogKey1).ToList();
             var mockBlogPosts2 = TestData.GetBlogPosts(5, 5, TestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
             var service = GetBlogQueryService(allMockBlogPosts);
 
+            // Act
             var posts = service.ListPosts(TestData.BlogKey1).ToList();
 
+            // Assert
             bool archiveContainsBlogKeyMockPosts = GetPostsAllContainsBlogPosts(posts, mockBlogPosts1);
 
             Assert.True(archiveContainsBlogKeyMockPosts);
@@ -319,14 +387,17 @@ namespace Blaven.Tests
         [Fact]
         public void ListPosts_AllBlogKeys_ReturnsWithAllBlogPosts()
         {
+            // Arrange
             var mockBlogPosts1 = TestData.GetBlogPosts(0, 5, TestData.BlogKey1).ToList();
             var mockBlogPosts2 = TestData.GetBlogPosts(5, 5, TestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
             var service = GetBlogQueryService(allMockBlogPosts);
 
+            // Act
             var posts = service.ListPosts(TestData.BlogKey1, TestData.BlogKey2).ToList();
 
+            // Assert
             bool archiveContainsAllMockPosts = GetPostsAllContainsBlogPosts(posts, allMockBlogPosts);
 
             Assert.True(archiveContainsAllMockPosts);
@@ -335,10 +406,13 @@ namespace Blaven.Tests
         [Fact]
         public void ListPosts_NonExistingBlogKeys_ReturnsNull()
         {
+            // Arrange
             var service = GetBlogQueryService();
 
+            // Act
             var posts = service.ListPosts($"NonExisting_{TestData.BlogKey}");
 
+            // Assert
             Assert.False(posts.Any());
         }
 

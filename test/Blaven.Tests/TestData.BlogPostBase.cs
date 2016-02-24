@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Blaven.Synchronization;
+
 namespace Blaven.Tests
 {
     public static partial class TestData
@@ -13,7 +15,9 @@ namespace Blaven.Tests
             bool isUpdate = false)
         {
             var blogPostBases =
-                Enumerable.Range(blogPostStart, blogPostCount).Select(i => GetBlogPostBase(blogKey, i, isUpdate)).ToList();
+                Enumerable.Range(blogPostStart, blogPostCount)
+                    .Select(i => GetBlogPostBase(blogKey, i, isUpdate))
+                    .ToList();
             return blogPostBases;
         }
 
@@ -30,7 +34,7 @@ namespace Blaven.Tests
                                                isUpdate: isUpdate)
                                    };
 
-            blogPostBase.BlavenId = BlavenIdProvider.GetId(blogPostBase);
+            blogPostBase.BlavenId = BlavenBlogPostBlavenIdProvider.GetId(blogPostBase.SourceId);
 
             return blogPostBase;
         }

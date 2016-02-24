@@ -6,7 +6,10 @@ namespace Blaven.Synchronization
 {
     internal static class BlogSyncServiceUpdatePostsHelper
     {
-        public static BlogSourceChangeSet Update(BlogSetting blogSetting, BlogSyncConfiguration config)
+        public static BlogSourceChangeSet Update(
+            BlogSetting blogSetting,
+            DateTime lastUpdatedAt,
+            BlogSyncConfiguration config)
         {
             if (blogSetting == null)
             {
@@ -17,15 +20,15 @@ namespace Blaven.Synchronization
                 throw new ArgumentNullException(nameof(config));
             }
 
-            var dbBlogPosts = config.DataStorage.GetPostBases(blogSetting);
-            if (dbBlogPosts == null)
+            var existingPosts = config.DataStorage.GetPostBases(blogSetting);
+            if (existingPosts == null)
             {
                 string message =
                     $"{nameof(config.DataStorage)} returned a null result from {nameof(config.DataStorage.GetPostBases)} for {nameof(blogSetting)}.{nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
                 throw new BlogSyncException(message);
             }
 
-            var sourceChanges = config.BlogSource.GetChanges(blogSetting, dbBlogPosts);
+            var sourceChanges = config.BlogSource.GetChanges(blogSetting, lastUpdatedAt, existingPosts);
             if (sourceChanges == null)
             {
                 string message =

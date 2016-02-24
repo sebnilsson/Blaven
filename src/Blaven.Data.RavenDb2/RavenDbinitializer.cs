@@ -21,7 +21,7 @@ namespace Blaven.Data.RavenDb2
 
             documentStore.Initialize();
 
-            InitIdConventions(documentStore);
+            RavenDbIdConventions.Init(documentStore);
 
             InitIndexes(documentStore);
         }
@@ -35,23 +35,12 @@ namespace Blaven.Data.RavenDb2
 
             var createIndexesTask =
                 Task.Factory.StartNew(
-                    () => IndexCreation.CreateIndexes(typeof(BlogPostBasesOrderedByCreated).Assembly, documentStore));
+                    () => IndexCreation.CreateIndexes(typeof(BlogPostsIndex).Assembly, documentStore));
 
             if (!hasAllIndexes)
             {
                 createIndexesTask.Wait();
             }
-        }
-
-        private static void InitIdConventions(IDocumentStore documentStore)
-        {
-            documentStore.Conventions.RegisterIdConvention<BlogMeta>((dbName, commands, meta) => meta.BlogKey);
-            documentStore.Conventions.RegisterAsyncIdConvention<BlogMeta>(
-                (dbName, commands, meta) => Task.FromResult(meta.BlogKey));
-
-            documentStore.Conventions.RegisterIdConvention<BlogPost>((dbName, commands, post) => post.BlavenId);
-            documentStore.Conventions.RegisterAsyncIdConvention<BlogPost>(
-                (dbName, commands, post) => Task.FromResult(post.BlavenId));
         }
 
         private static IEnumerable<string> GetBlavenIndexNames()

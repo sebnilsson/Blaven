@@ -3,7 +3,7 @@
 using Raven.Client;
 using Raven.Client.Linq;
 
-namespace Blaven.Data.RavenDb2
+namespace Blaven.Data.RavenDb2.Tests
 {
     public static class DocumentSessionExtensions
     {

@@ -10,11 +10,13 @@ namespace Blaven.BlogSources.Tests
         [Fact]
         public void BuildBlogSourceInternal_NullMockBlogSource_FuncContainsUsernameAndPassword()
         {
+            // Arrange
             var appSettings = TestData.GetAppSettings();
 
             string username = null;
             string password = null;
 
+            // Act
             AppSettingsFactory.BuildBlogSourceInternal<MockBlogSource>(
                 (appSettingUsername, appSettingsPassword) =>
                     {
@@ -24,6 +26,7 @@ namespace Blaven.BlogSources.Tests
                     },
                 appSettings);
 
+            // Assert
             Assert.Equal(TestData.AppSettingsTestUsername, username);
             Assert.Equal(TestData.AppSettingsTestPassword, password);
         }
@@ -31,20 +34,26 @@ namespace Blaven.BlogSources.Tests
         [Fact]
         public void BuildBlogSourceInternal_MockBlogSource_ReturnsNotNullBlogSource()
         {
+            // Arrange
             var appSettings = TestData.GetAppSettings();
 
+            // Act
             var blogSource = AppSettingsFactory.BuildBlogSourceInternal((_, __) => MockBlogSource.Create(), appSettings);
 
+            // Assert
             Assert.NotNull(blogSource);
         }
 
         [Fact]
         public void GetBlogSettingsInternal_AppSettingsContainingSettings_ReturnsBlogSettings()
         {
+            // Arrange
             var appSettings = TestData.GetAppSettings();
 
+            // Act
             var blogSettings = AppSettingsFactory.GetBlogSettingsInternal(appSettings).ToList();
 
+            // Assert
             var blogSetting1 = blogSettings.FirstOrDefault(x => x.BlogKey == nameof(TestData.BlogKey1));
             var blogSetting2 = blogSettings.FirstOrDefault(x => x.BlogKey == nameof(TestData.BlogKey2));
 
@@ -62,10 +71,13 @@ namespace Blaven.BlogSources.Tests
         [Fact]
         public void GetBlogSettingsInternal_AppSettingsContainingSettings_ReturnsBlogSettingsWithoutIdOrName()
         {
+            // Arrange
             var appSettings = TestData.GetAppSettings();
 
+            // Act
             var blogSettings = AppSettingsFactory.GetBlogSettingsInternal(appSettings).ToList();
 
+            // Assert
             var blogSetting3 = blogSettings.FirstOrDefault(x => x.BlogKey == nameof(TestData.BlogKey3));
 
             Assert.NotNull(blogSetting3);

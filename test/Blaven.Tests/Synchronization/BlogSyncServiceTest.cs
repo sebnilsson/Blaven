@@ -14,20 +14,76 @@ namespace Blaven.Synchronization.Tests
     public class SynchronizationServiceTest
     {
         [Fact]
-        public void TryUpdate_BlogKeyNotExisting_ShouldThrow()
+        public void ForceUpdate_ParallelUsersAndSingleBlogKey_ShouldNotRunWithCollsion()
         {
+            // Arrange
             var service = GetTestSynchronizationService();
 
+            // Act
+            TestUtility.RunParallelUsers(() => service.ForceUpdate(TestData.BlogKey));
+
+            // Assert
+            bool anyTrackersWithCollision = AnyTrackers(
+                tracker => tracker.KeyCollisionCount.Any(x => x.Value > 0),
+                service);
+
+            Assert.False(anyTrackersWithCollision);
+        }
+
+        [Fact]
+        public void ForceUpdate_ParallelUsersAndSingleBlogKey_ShouldRunAllBlogSourceAndDataStorage()
+        {
+            // Arrange
+            var service = GetTestSynchronizationService();
+
+            // Act
+            TestUtility.RunParallelUsers(() => service.ForceUpdate(TestData.BlogKey));
+
+            // Assert
+            bool allTrackersHasRunAll = AllTrackers(
+                tracker => tracker.RunCount == TestUtility.ParallelUsersCount,
+                service);
+
+            Assert.True(allTrackersHasRunAll);
+        }
+
+        [Fact]
+        public void ForceUpdate_ParallelUsersAndMultipleBlogKeys_ShouldRunAllBlogSourceAndDataStorage()
+        {
+            // Arrange
+            var service = GetTestSynchronizationService();
+
+            // Act
+            TestUtility.RunParallelUsers(() => service.ForceUpdate(TestData.BlogKeys));
+
+            // Assert
+            int expectedRunCount = (TestUtility.ParallelUsersCount * TestData.BlogKeys.Length);
+
+            bool allTrackersHasRunAll = AllTrackers(tracker => tracker.RunCount == expectedRunCount, service);
+
+            Assert.True(allTrackersHasRunAll);
+        }
+
+        [Fact]
+        public void TryUpdate_BlogKeyNotExisting_ShouldThrow()
+        {
+            // Arrange
+            var service = GetTestSynchronizationService();
+
+            // Act & Assert
             Assert.Throws<AggregateException>(() => service.TryUpdate("NON_EXISTING_BLOGKEY"));
         }
 
         [Fact]
         public void TryUpdate_SingleBlogKey_ShouldRunAllBlogSourceAndDataStorageDelegatesOnce()
         {
+            // Arrange
             var service = GetTestSynchronizationService();
 
+            // Act
             service.TryUpdate(TestData.BlogKey);
 
+            // Assert
             bool allTrackersHasRunOnce = AllTrackers(tracker => tracker.RunCount == 1, service);
 
             Assert.True(allTrackersHasRunOnce);
@@ -39,10 +95,13 @@ namespace Blaven.Synchronization.Tests
         public void TryUpdate_MultipleOrSingleBlogKey_ShouldRunAllBlogSourceAndDataStorageDelegatesOnce(
             string[] blogKeys)
         {
+            // Arrange
             var service = GetTestSynchronizationService();
 
+            // Act
             TestUtility.RunParallelUsers(() => service.TryUpdate(blogKeys));
 
+            // Assert
             bool allTrackersHasRunOnce = AllTrackers(tracker => tracker.RunCount == blogKeys.Length, service);
 
             Assert.True(allTrackersHasRunOnce);
@@ -54,10 +113,13 @@ namespace Blaven.Synchronization.Tests
         public void TryUpdate_MultipleOrSingleBlogKey_ShouldRunAllBlogSourceAndDataStorageDelegatesOncePerBlogKey(
             string[] blogKeys)
         {
+            // Arrange
             var service = GetTestSynchronizationService();
 
+            // Act
             TestUtility.RunParallelUsers(() => service.TryUpdate(blogKeys));
 
+            // Assert
             bool allTrackersHasRunOncePerTestBlogKey =
                 AllTrackers(
                     tracker => HasRunTimesPerTestBlogKey(tracker, expectedCount: 1, blogKeys: blogKeys),
@@ -71,10 +133,13 @@ namespace Blaven.Synchronization.Tests
         [MemberData(nameof(GetSingleBlogKey))]
         public void TryUpdate_MultipleOrSingleBlogKey_ShouldNotRunWithAnyCollsion(string[] blogKeys)
         {
+            // Arrange
             var service = GetTestSynchronizationService();
 
+            // Act
             TestUtility.RunParallelUsers(() => service.TryUpdate(blogKeys));
 
+            // Assert
             bool anyTrackersWithCollision = AnyTrackers(
                 tracker => tracker.KeyCollisionCount.Any(x => x.Value > 0),
                 service);
@@ -90,10 +155,12 @@ namespace Blaven.Synchronization.Tests
             TryUpdateInternal_RunMultipleTimesAndParallelUsersAndMultipleBlogKeys_ShouldRunAllBlogSourceAndDataStorageDelegatesOncePerTimeAndBlogKey
             (int additionalRunCount)
         {
+            // Arrange
             var service = GetTestSynchronizationService();
 
             var firstRunNow = new DateTime(2015, 1, 1, 12, 0, 0);
 
+            // Act
             TestUtility.RunParallelUsers(() => service.TryUpdateInternal(firstRunNow, TestData.BlogKeys));
 
             for (int i = 0; i < additionalRunCount; i++)
@@ -106,6 +173,7 @@ namespace Blaven.Synchronization.Tests
                 TestUtility.RunParallelUsers(() => service.TryUpdateInternal(additionalRunNow, TestData.BlogKeys));
             }
 
+            // Assert
             int expectedCount = (additionalRunCount + 1);
 
             bool allTrackersHasRunTwicePerTestBlogKey =
@@ -117,79 +185,51 @@ namespace Blaven.Synchronization.Tests
         [Fact]
         public void TryUpdateInternal_RunTwiceWithinCacheTimeout_ShouldRunAllBlogSourceAndDataStorageDelegatesOnce()
         {
+            // Arrange
             var service = GetTestSynchronizationService();
 
             var now1 = new DateTime(2015, 1, 1);
             var now2 = now1.AddMinutes(service.DataCacheHandler.TimeoutMinutes).AddMinutes(-1);
 
+            // Act
             var updatedBlogKeys1 = service.TryUpdateInternal(now1, TestData.BlogKey);
             var updatedBlogKeys2 = service.TryUpdateInternal(now2, TestData.BlogKey);
 
+            // Assert
+            bool updateBlogKeys1ContainsUpdatedBlogKey =
+                updatedBlogKeys1.Any(x => x.BlogKey == TestData.BlogKey && x.IsUpdated);
+            bool updateBlogKeys2ContainsUpdatedBlogKey =
+                updatedBlogKeys2.Any(x => x.BlogKey == TestData.BlogKey && x.IsUpdated);
             bool allTrackersRunOnce = AllTrackers(tracker => tracker.RunCount == 1, service);
 
-            Assert.True(updatedBlogKeys1.Contains(TestData.BlogKey));
-            Assert.False(updatedBlogKeys2.Contains(TestData.BlogKey));
+            Assert.True(updateBlogKeys1ContainsUpdatedBlogKey);
+            Assert.False(updateBlogKeys2ContainsUpdatedBlogKey);
             Assert.True(allTrackersRunOnce);
         }
 
         [Fact]
         public void TryUpdateInternal_RunTwiceOutsideCacheTimeout_ShouldRunAllBlogSourceAndDataStorageDelegatesTwice()
         {
+            // Arrange
             var service = GetTestSynchronizationService();
 
             var now1 = new DateTime(2015, 1, 1);
             var now2 = now1.AddMinutes(service.DataCacheHandler.TimeoutMinutes).AddMinutes(1);
 
+            // Act
             var updatedBlogKeys1 = service.TryUpdateInternal(now1, TestData.BlogKey);
             var updatedBlogKeys2 = service.TryUpdateInternal(now2, TestData.BlogKey);
 
+            // Assert
+            bool updateBlogKeys1ContainsUpdatedBlogKey =
+                updatedBlogKeys1.Any(x => x.BlogKey == TestData.BlogKey && x.IsUpdated);
+            bool updateBlogKeys2ContainsUpdatedBlogKey =
+                updatedBlogKeys2.Any(x => x.BlogKey == TestData.BlogKey && x.IsUpdated);
             bool allTrackersRunTwice = AllTrackers(tracker => tracker.RunCount == 2, service);
 
-            Assert.True(updatedBlogKeys1.Contains(TestData.BlogKey));
-            Assert.True(updatedBlogKeys2.Contains(TestData.BlogKey));
+            Assert.True(updateBlogKeys1ContainsUpdatedBlogKey);
+            Assert.True(updateBlogKeys2ContainsUpdatedBlogKey);
             Assert.True(allTrackersRunTwice);
-        }
-
-        [Fact]
-        public void Update_ParallelUsersAndSingleBlogKey_ShouldNotRunWithCollsion()
-        {
-            var service = GetTestSynchronizationService();
-
-            TestUtility.RunParallelUsers(() => service.Update(TestData.BlogKey));
-
-            bool anyTrackersWithCollision = AnyTrackers(
-                tracker => tracker.KeyCollisionCount.Any(x => x.Value > 0),
-                service);
-
-            Assert.False(anyTrackersWithCollision);
-        }
-
-        [Fact]
-        public void Update_ParallelUsersAndSingleBlogKey_ShouldRunAllBlogSourceAndDataStorage()
-        {
-            var service = GetTestSynchronizationService();
-
-            TestUtility.RunParallelUsers(() => service.Update(TestData.BlogKey));
-
-            bool allTrackersHasRunAll = AllTrackers(
-                tracker => tracker.RunCount == TestUtility.ParallelUsersCount,
-                service);
-
-            Assert.True(allTrackersHasRunAll);
-        }
-
-        [Fact]
-        public void Update_ParallelUsersAndMultipleBlogKeys_ShouldRunAllBlogSourceAndDataStorage()
-        {
-            var service = GetTestSynchronizationService();
-
-            TestUtility.RunParallelUsers(() => service.Update(TestData.BlogKeys));
-
-            int expectedRunCount = (TestUtility.ParallelUsersCount * TestData.BlogKeys.Length);
-
-            bool allTrackersHasRunAll = AllTrackers(tracker => tracker.RunCount == expectedRunCount, service);
-
-            Assert.True(allTrackersHasRunAll);
         }
 
         public static IEnumerable<object[]> GetMultipleBlogKeys()
@@ -286,8 +326,8 @@ namespace Blaven.Synchronization.Tests
                 blogSource,
                 dataStorage,
                 dataCacheHandler,
-                BlogSyncConfigurationDefaults.BlavenIdProvider.Value,
-                BlogSyncConfigurationDefaults.SlugProvider.Value,
+                BlogSyncConfigurationDefaults.BlavenIdProvider,
+                BlogSyncConfigurationDefaults.SlugProvider,
                 null,
                 blogSettings);
 

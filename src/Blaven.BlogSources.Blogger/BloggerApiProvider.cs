@@ -59,7 +59,7 @@ namespace Blaven.BlogSources.Blogger
             return blog;
         }
 
-        public virtual IEnumerable<Post> GetPosts(string blogId)
+        public virtual IEnumerable<Post> GetPosts(string blogId, DateTime lastUpdatedAt)
         {
             if (blogId == null)
             {
@@ -67,6 +67,11 @@ namespace Blaven.BlogSources.Blogger
             }
 
             var postListRequest = this.GetPostListRequest(blogId);
+
+            if (lastUpdatedAt > DateTime.MinValue)
+            {
+                postListRequest.StartDate = lastUpdatedAt;
+            }
 
             var posts = GetPostListRequestAllPosts(postListRequest);
             return posts;

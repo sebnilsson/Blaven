@@ -2,12 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Raven.Client;
 using Raven.Client.Embedded;
+using Raven.Client.Listeners;
 
 namespace Blaven.Data.RavenDb2.Tests
 {
     public static class EmbeddableDocumentStoreHelper
     {
+        private static readonly object RavenDbInitializerLock = new object();
+
         public static EmbeddableDocumentStore Get(string path = null, bool initIndexes = true)
         {
             path = !string.IsNullOrWhiteSpace(path) ? path : $"{Guid.NewGuid()}";
@@ -26,8 +30,13 @@ namespace Blaven.Data.RavenDb2.Tests
 
             if (initIndexes)
             {
-                RavenDbInitializer.Initialize(documentStore);
+                lock (RavenDbInitializerLock)
+                {
+                    RavenDbInitializer.Initialize(documentStore);
+                }
             }
+
+            documentStore.RegisterListener(new WaitForNonStaleResultsAsOfNowQueryListener());
 
             return documentStore;
         }
@@ -55,6 +64,14 @@ namespace Blaven.Data.RavenDb2.Tests
             }
 
             return documentStore;
+        }
+
+        private class WaitForNonStaleResultsAsOfNowQueryListener : IDocumentQueryListener
+        {
+            public void BeforeQueryExecuted(IDocumentQueryCustomization customization)
+            {
+                customization.WaitForNonStaleResultsAsOfNow();
+            }
         }
     }
 }

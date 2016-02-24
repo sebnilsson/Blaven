@@ -7,17 +7,22 @@ namespace Blaven.Synchronization
 {
     internal static class BlogSyncConfigurationDefaults
     {
-        internal static readonly Lazy<IDataCacheHandler> DataCacheHandler =
+        private static readonly Lazy<IDataCacheHandler> DataCacheHandlerLazy =
             new Lazy<IDataCacheHandler>(() => new MemoryDataCacheHandler());
 
-        internal static readonly Lazy<IBlogPostBlavenIdProvider> BlavenIdProvider =
-            new Lazy<IBlogPostBlavenIdProvider>(() => new BlavenBlogPostBlavenIdProvider());
-
-        internal static readonly Lazy<IBlogPostUrlSlugProvider> SlugProvider =
+        private static readonly Lazy<IBlogPostUrlSlugProvider> SlugProviderLazy =
             new Lazy<IBlogPostUrlSlugProvider>(() => new BlavenBlogPostUrlSlugProvider());
 
-        internal static readonly Lazy<BlogTransformersProvider> TransformersProvider =
+        private static readonly Lazy<BlogTransformersProvider> TransformersProviderLazy =
             new Lazy<BlogTransformersProvider>(
                 () => new BlogTransformersProvider(BlogTransformersProvider.GetDefaultTransformers()));
+
+        public static BlavenBlogPostBlavenIdProvider BlavenIdProvider => BlavenBlogPostBlavenIdProvider.Instance;
+
+        public static IDataCacheHandler DataCacheHandler => DataCacheHandlerLazy.Value;
+
+        public static IBlogPostUrlSlugProvider SlugProvider => SlugProviderLazy.Value;
+
+        public static BlogTransformersProvider TransformersProvider => TransformersProviderLazy.Value;
     }
 }

@@ -2,11 +2,27 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Blaven.Synchronization;
+
 namespace Blaven.Tests
 {
     public static partial class TestData
     {
         public const int DefaultTagCount = 5;
+
+        public static readonly string BlavenId1 = GetBlavenId(1);
+
+        public static readonly string BlavenId2 = GetBlavenId(2);
+
+        public static readonly string BlavenId3 = GetBlavenId(3);
+
+        public static string GetBlavenId(int index, string blogKey = BlogKey)
+        {
+            var blogPost = GetBlogPost(blogKey, index);
+
+            var blavenId = BlogSyncConfigurationDefaults.BlavenIdProvider.GetId(blogPost);
+            return blavenId;
+        }
 
         public static BlogPost GetBlogPost(
             string blogKey,
@@ -52,7 +68,7 @@ namespace Blaven.Tests
                                    Hash = HashUtility.GetBase64(blogKey, index),
                                    ImageUrl = GetTestString(nameof(BlogPost.ImageUrl), blogKey, index, isUpdate),
                                    PublishedAt = TestPublishedAt.AddDays(index),
-                                   SourceId = GetPostId(index, blogKey),
+                                   SourceId = GetPostSourceId(index, blogKey),
                                    SourceUrl =
                                        GetTestString(nameof(BlogPost.SourceUrl), blogKey, index, isUpdate),
                                    Summary = GetTestString(nameof(BlogPost.Summary), blogKey, index, isUpdate),
@@ -62,7 +78,7 @@ namespace Blaven.Tests
                                    UpdatedAt = TestUpdatedAt.AddDays(index)
                                };
 
-            blogPost.BlavenId = BlavenIdProvider.GetId(blogPost);
+            blogPost.BlavenId = BlogSyncConfigurationDefaults.BlavenIdProvider.GetId(blogPost);
 
             return blogPost;
         }
@@ -73,15 +89,49 @@ namespace Blaven.Tests
             return posts;
         }
 
+        public static IEnumerable<object[]> GetDbBlogPostsForSingleKey(int start, int count)
+        {
+            yield return new object[] { GetBlogPosts(start: start, count: count) };
+        }
+
+        public static IEnumerable<object[]> GetDbBlogPostsForMultipleKeys(int start, int count)
+        {
+            var blogPosts1 = GetBlogPosts(start: start, count: count, blogKey: BlogKey);
+            var blogPosts2 = GetBlogPosts(start: start, count: count, blogKey: BlogKey2);
+            var blogPosts3 = GetBlogPosts(start: start, count: count, blogKey: BlogKey3);
+
+            var blogPosts = blogPosts1.Concat(blogPosts2).Concat(blogPosts3).ToList();
+            yield return new object[] { blogPosts };
+        }
+
+        public static IEnumerable<object[]> GetDbBlogPostsForSingleAndMultipleKeys(int start, int count)
+        {
+            foreach (var obj in GetDbBlogPostsForSingleKey(start, count))
+            {
+                yield return obj;
+            }
+
+            foreach (var obj in GetDbBlogPostsForMultipleKeys(start, count))
+            {
+                yield return obj;
+            }
+        }
+
+        public static string GetPostTag(int index)
+        {
+            string tag = $"Test Tag {index + 1}";
+            return tag;
+        }
+
         public static IEnumerable<string> GetPostTags(int start, int count)
         {
-            var tags = Enumerable.Range(start, count).Select(i => $"Test Tag {i + 1}");
+            var tags = Enumerable.Range(start, count).Select(GetPostTag);
             return tags;
         }
 
-        public static string GetPostId(int index, string blogKey = BlogKey)
+        public static string GetPostSourceId(int index, string blogKey = BlogKey)
         {
-            string postId = $"[{blogKey}]-Post Id-{index + 1}";
+            string postId = $"[{blogKey}]-Post Source Id-{index + 1}";
             return postId;
         }
     }

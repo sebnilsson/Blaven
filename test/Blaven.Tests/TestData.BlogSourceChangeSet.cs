@@ -12,8 +12,6 @@ namespace Blaven.Tests
 
         public static readonly DateTime TestUpdatedAt = new DateTime(2015, 2, 2, 14, 45, 30);
 
-        private static readonly BlavenBlogPostBlavenIdProvider BlavenIdProvider = new BlavenBlogPostBlavenIdProvider();
-
         public static BlogSourceChangeSet GetBlogSourceChangeSetWithData(
             string blogKey = null,
             IEnumerable<BlogPostBase> deletedBlogPosts = null,
@@ -56,7 +54,7 @@ namespace Blaven.Tests
                             })
                     .ToList();
 
-            deletedBlogPosts.ForEach(x => x.BlavenId = BlavenIdProvider.GetId(x));
+            deletedBlogPosts.ForEach(x => x.BlavenId = BlavenBlogPostBlavenIdProvider.GetId(x.SourceId));
 
             var insertedBlogPosts =
                 Enumerable.Range(0, insertedBlogPostsCount)

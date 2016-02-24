@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.BlogSources;
@@ -10,11 +10,12 @@ namespace Blaven.Synchronization
 {
     public class BlogSyncService
     {
-        private static readonly ICollection<string> IsUpdatingBlogKeys = new HashSet<string>();
+        private static readonly ICollection<string> IsUpdatingBlogKeys =
+            new HashSet<string>(StringComparer.InvariantCultureIgnoreCase);
 
-        private static readonly KeyLocker TryUpdateLocker = new KeyLocker();
+        private static readonly KeyLocker TryUpdateBlogLocker = new KeyLocker();
 
-        private static readonly KeyLocker UpdateAllBlogDataLocker = new KeyLocker();
+        private static readonly KeyLocker UpdateBlogLocker = new KeyLocker();
 
         private readonly BlogSyncConfiguration config;
 
@@ -40,6 +41,19 @@ namespace Blaven.Synchronization
         public IDataCacheHandler DataCacheHandler => this.config.DataCacheHandler;
 
         public IList<BlogSetting> BlogSettings => this.config.BlogSettings;
+
+        public IReadOnlyList<BlogSyncResult> ForceUpdate(params string[] blogKeys)
+        {
+            if (blogKeys == null)
+            {
+                throw new ArgumentNullException(nameof(blogKeys));
+            }
+
+            var now = DateTime.Now;
+
+            var result = this.ForceUpdateInternal(now, blogKeys);
+            return result;
+        }
 
         public bool IsUpdated(string blogKey)
         {
@@ -67,7 +81,7 @@ namespace Blaven.Synchronization
             return shouldUpdate;
         }
 
-        public IReadOnlyList<string> TryUpdate(params string[] blogKeys)
+        public IReadOnlyList<BlogSyncResult> TryUpdate(params string[] blogKeys)
         {
             if (blogKeys == null)
             {
@@ -76,23 +90,38 @@ namespace Blaven.Synchronization
 
             var now = DateTime.Now;
 
-            var updatedBlogKeys = this.TryUpdateInternal(now, blogKeys);
-            return updatedBlogKeys;
+            var result = this.TryUpdateInternal(now, blogKeys);
+            return result;
         }
 
-        public void Update(params string[] blogKeys)
+        internal IReadOnlyList<BlogSyncResult> ForceUpdateInternal(DateTime now, params string[] blogKeys)
         {
             if (blogKeys == null)
             {
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            var now = DateTime.Now;
-            this.UpdateInternal(now, blogKeys);
+            var results = blogKeys.AsParallel().Select(
+                blogKey =>
+                    {
+                        var result = new BlogSyncResult(blogKey);
+
+                        this.UpdateBlog(blogKey, now, lastUpdatedAt: DateTime.MinValue);
+
+                        result.HandleDone(isUpdated: true);
+
+                        return result;
+                    }).ToReadOnlyList();
+            return results;
         }
 
         internal bool IsUpdatedInternal(string blogKey, DateTime now)
         {
+            if (blogKey == null)
+            {
+                throw new ArgumentNullException(nameof(blogKey));
+            }
+
             bool isUpdated = this.config.DataCacheHandler.IsUpdated(blogKey, now);
             return isUpdated;
         }
@@ -114,28 +143,34 @@ namespace Blaven.Synchronization
             return !isUpdated;
         }
 
-        internal IReadOnlyList<string> TryUpdateInternal(DateTime now, params string[] blogKeys)
+        internal IReadOnlyList<BlogSyncResult> TryUpdateInternal(DateTime now, params string[] blogKeys)
         {
-            var updatedBlogKeys = new List<string>();
+            if (blogKeys == null)
+            {
+                throw new ArgumentNullException(nameof(blogKeys));
+            }
 
-            Parallel.ForEach(
-                blogKeys,
+            var results = blogKeys.AsParallel().Select(
                 blogKey =>
                     {
+                        var result = new BlogSyncResult(blogKey);
+
                         bool isUpdated = this.TryUpdateBlog(blogKey, now);
 
-                        if (isUpdated)
-                        {
-                            updatedBlogKeys.Add(blogKey);
-                        }
-                    });
+                        result.HandleDone(isUpdated);
 
-            return updatedBlogKeys.ToReadOnlyList();
+                        return result;
+                    }).ToReadOnlyList();
+            return results;
         }
 
-        internal void UpdateInternal(DateTime now, params string[] blogKeys)
+        private static bool IsUpdating(string blogKey)
         {
-            Parallel.ForEach(blogKeys, blogKey => this.UpdateBlog(blogKey, now));
+            lock (IsUpdatingBlogKeys)
+            {
+                bool isRunning = IsUpdatingBlogKeys.Contains(blogKey);
+                return isRunning;
+            }
         }
 
         private BlogSetting GetBlogSetting(string blogKey)
@@ -153,7 +188,7 @@ namespace Blaven.Synchronization
 
         private bool TryUpdateBlog(string blogKey, DateTime now)
         {
-            bool isUpdated = TryUpdateLocker.RunWithLock(
+            bool isUpdated = TryUpdateBlogLocker.RunWithLock(
                 blogKey.ToLowerInvariant(),
                 () =>
                     {
@@ -163,60 +198,50 @@ namespace Blaven.Synchronization
                             return false;
                         }
 
-                        this.UpdateBlog(blogKey, now);
+                        this.UpdateBlog(blogKey, now, lastUpdatedAt: now);
 
                         return true;
                     });
-
             return isUpdated;
         }
 
-        private void UpdateBlog(string blogKey, DateTime now)
+        private void UpdateBlog(string blogKey, DateTime now, DateTime lastUpdatedAt)
         {
-            try
-            {
-                lock (IsUpdatingBlogKeys)
-                {
-                    IsUpdatingBlogKeys.Add(blogKey);
-                }
-
-                var blogSetting = this.GetBlogSetting(blogKey);
-
-                this.UpdateAllBlogData(blogSetting);
-
-                this.config.DataCacheHandler.OnUpdated(blogKey, now);
-            }
-            finally
-            {
-                lock (IsUpdatingBlogKeys)
-                {
-                    if (IsUpdatingBlogKeys.Contains(blogKey))
-                    {
-                        IsUpdatingBlogKeys.Remove(blogKey);
-                    }
-                }
-            }
-        }
-
-        private void UpdateAllBlogData(BlogSetting blogSetting)
-        {
-            UpdateAllBlogDataLocker.RunWithLock(
-                blogSetting.BlogKey.ToLowerInvariant(),
+            UpdateBlogLocker.RunWithLock(
+                blogKey.ToLowerInvariant(),
                 () =>
                     {
-                        Parallel.Invoke(
-                            () => BlogSyncServiceUpdatePostsHelper.Update(blogSetting, this.config),
-                            () => BlogSyncServiceUpdateMetaHelper.Update(blogSetting, this.config));
+                        try
+                        {
+                            lock (IsUpdatingBlogKeys)
+                            {
+                                IsUpdatingBlogKeys.Add(blogKey);
+                            }
+
+                            var blogSetting = this.GetBlogSetting(blogKey);
+
+                            this.UpdateBlogData(blogSetting, lastUpdatedAt);
+
+                            this.config.DataCacheHandler.OnUpdated(blogKey, now);
+                        }
+                        finally
+                        {
+                            lock (IsUpdatingBlogKeys)
+                            {
+                                if (IsUpdatingBlogKeys.Contains(blogKey))
+                                {
+                                    IsUpdatingBlogKeys.Remove(blogKey);
+                                }
+                            }
+                        }
                     });
         }
 
-        private static bool IsUpdating(string blogKey)
+        private void UpdateBlogData(BlogSetting blogSetting, DateTime lastUpdatedAt)
         {
-            lock (IsUpdatingBlogKeys)
-            {
-                bool isRunning = IsUpdatingBlogKeys.Contains(blogKey);
-                return isRunning;
-            }
+            Parallel.Invoke(
+                () => BlogSyncServiceUpdateMetaHelper.Update(blogSetting, lastUpdatedAt, this.config),
+                () => BlogSyncServiceUpdatePostsHelper.Update(blogSetting, lastUpdatedAt, this.config));
         }
 
         private static BlogSyncConfiguration GetConfig(

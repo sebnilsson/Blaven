@@ -49,9 +49,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Indexes\BlogPostBasesOrderedByCreated.cs" />
-    <Compile Include="Indexes\BlogPostsOrderedByCreated.cs" />
+    <Compile Include="DocumentConventionExtensions.cs" />
+    <Compile Include="Indexes\ArchiveCountIndex.cs" />
+    <Compile Include="Indexes\BlogPostsIndex.cs" />
+    <Compile Include="Indexes\SearchBlogPostsIndex.cs" />
+    <Compile Include="Indexes\TagsCountIndex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RavenDbIdConventions.cs" />
     <Compile Include="RavenDbDataStorage.cs" />
     <Compile Include="RavenDbInitializer.cs" />
     <Compile Include="RavenDbInitializerException.cs" />

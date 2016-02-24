@@ -6,7 +6,10 @@ namespace Blaven.BlogSources
 {
     public abstract class BlogSourceBase : IBlogSource
     {
-        public virtual BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbPosts)
+        public virtual BlogSourceChangeSet GetChanges(
+            BlogSetting blogSetting,
+            DateTime lastUpdatedAt,
+            IEnumerable<BlogPostBase> dbPosts)
         {
             if (blogSetting == null)
             {
@@ -19,14 +22,14 @@ namespace Blaven.BlogSources
 
             var dbBlogPostsList = dbPosts.ToList();
 
-            var sourcePosts = this.GetSourcePosts(blogSetting).ToList();
+            var sourcePosts = this.GetSourcePosts(blogSetting, lastUpdatedAt).ToList();
 
             var changeSet = BlogSourceChangesHelper.GetChangeSet(blogSetting.BlogKey, sourcePosts, dbBlogPostsList);
             return changeSet;
         }
 
-        public abstract BlogMeta GetMeta(BlogSetting blogSetting);
+        public abstract BlogMeta GetMeta(BlogSetting blogSetting, DateTime lastUpdatedAt);
 
-        protected abstract IEnumerable<BlogPost> GetSourcePosts(BlogSetting blogSetting);
+        protected abstract IEnumerable<BlogPost> GetSourcePosts(BlogSetting blogSetting, DateTime lastUpdatedAt);
     }
 }

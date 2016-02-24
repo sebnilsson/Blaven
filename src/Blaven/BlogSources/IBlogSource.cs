@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Blaven.BlogSources
 {
     public interface IBlogSource
     {
-        BlogMeta GetMeta(BlogSetting blogSetting);
+        BlogMeta GetMeta(BlogSetting blogSetting, DateTime lastUpdatedAt);
 
-        BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbPosts);
+        BlogSourceChangeSet GetChanges(
+            BlogSetting blogSetting,
+            DateTime lastUpdatedAt,
+            IEnumerable<BlogPostBase> existingPosts);
     }
 }

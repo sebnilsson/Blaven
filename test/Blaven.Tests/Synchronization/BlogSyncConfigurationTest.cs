@@ -13,27 +13,34 @@ namespace Blaven.Synchronization.Tests
         [Fact]
         public void Ctor_BlogSourceNullArgument_ThrowsArgumentNullException()
         {
+            // Arrange
             var dataStorage = new MockDataStorage();
-
+            
+            // Act & Assert
             Assert.Throws<ArgumentNullException>(() => GetTestBlogSyncConfiguration(null, dataStorage));
         }
 
         [Fact]
         public void Ctor_DataStorageNullArgument_ThrowsArgumentNullException()
         {
+            // Arrange
             var blogSource = new MockBlogSource();
 
+            // Act & Assert
             Assert.Throws<ArgumentNullException>(() => GetTestBlogSyncConfiguration(blogSource));
         }
 
         [Fact]
         public void BlavenIdProvider_CtorNullArgument_ReturnsDefaultType()
         {
+            // Arrange
             var blogSource = new MockBlogSource();
             var dataStorage = new MockDataStorage();
 
+            // Act
             var config = GetTestBlogSyncConfiguration(blogSource, dataStorage);
 
+            // Assert
             Assert.NotNull(config.BlavenIdProvider);
             Assert.IsType<BlavenBlogPostBlavenIdProvider>(config.BlavenIdProvider);
         }
@@ -41,11 +48,14 @@ namespace Blaven.Synchronization.Tests
         [Fact]
         public void DataCacheHandler_CtorNullArgument_ReturnsDefaultType()
         {
+            // Arrange
             var blogSource = new MockBlogSource();
             var dataStorage = new MockDataStorage();
 
+            // Act
             var config = GetTestBlogSyncConfiguration(blogSource, dataStorage);
 
+            // Assert
             Assert.NotNull(config.DataCacheHandler);
             Assert.IsType<MemoryDataCacheHandler>(config.DataCacheHandler);
         }
@@ -53,11 +63,14 @@ namespace Blaven.Synchronization.Tests
         [Fact]
         public void SlugProvider_CtorNullArgument_ReturnsDefaultType()
         {
+            // Arrange
             var blogSource = new MockBlogSource();
             var dataStorage = new MockDataStorage();
 
+            // Act
             var config = GetTestBlogSyncConfiguration(blogSource, dataStorage);
 
+            // Assert
             Assert.NotNull(config.SlugProvider);
             Assert.IsType<BlavenBlogPostUrlSlugProvider>(config.SlugProvider);
         }

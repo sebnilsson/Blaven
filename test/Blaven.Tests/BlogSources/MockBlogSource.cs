@@ -27,7 +27,7 @@ namespace Blaven.BlogSources.Tests
 
         public DelegateTracker<BlogSetting> GetChangesTracker { get; } = new DelegateTracker<BlogSetting>();
 
-        public BlogMeta GetMeta(BlogSetting blogSetting)
+        public BlogMeta GetMeta(BlogSetting blogSetting, DateTime lastUpdatedAt)
         {
             if (blogSetting == null)
             {
@@ -38,7 +38,10 @@ namespace Blaven.BlogSources.Tests
             return meta;
         }
 
-        public BlogSourceChangeSet GetChanges(BlogSetting blogSetting, IEnumerable<BlogPostBase> dbPosts)
+        public BlogSourceChangeSet GetChanges(
+            BlogSetting blogSetting,
+            DateTime lastUpdatedAt,
+            IEnumerable<BlogPostBase> dbPosts)
         {
             if (blogSetting == null)
             {

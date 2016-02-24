@@ -10,18 +10,23 @@ namespace Blaven.BlogSources.Blogger.Tests
         [Fact]
         public void CreateFromAppSettingsInternal_AppSettingsContainingApiKey_ReturnsBloggerBlogSource()
         {
+            // Arrange
             var appSettings = TestData.GetAppSettings();
 
+            // Act
             var bloggerBlogSource = BloggerBlogSourceAppSettingsHelper.CreateFromAppSettingsInternal(appSettings);
 
+            // Assert
             Assert.NotNull(bloggerBlogSource);
         }
 
         [Fact]
         public void CreateFromAppSettingsInternal_EmptyAppSettings_ThrowsException()
         {
+            // Arrange
             var appSettings = new Dictionary<string, string>(0);
 
+            // Act & Assert
             Assert.Throws<KeyNotFoundException>(
                 () => BloggerBlogSourceAppSettingsHelper.CreateFromAppSettingsInternal(appSettings));
         }

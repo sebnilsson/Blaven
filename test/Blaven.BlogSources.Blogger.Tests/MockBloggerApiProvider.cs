@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 using Blaven.Tests;
 using Google.Apis.Blogger.v3.Data;
@@ -37,7 +38,7 @@ namespace Blaven.BlogSources.Blogger.Tests
 
         public DelegateTracker<string> GetBlogTracker { get; } = new DelegateTracker<string>();
 
-        public override IEnumerable<Post> GetPosts(string blogId)
+        public override IEnumerable<Post> GetPosts(string blogId, DateTime lastUpdatedAt)
         {
             if (blogId == null)
             {
@@ -45,6 +46,12 @@ namespace Blaven.BlogSources.Blogger.Tests
             }
 
             var posts = this.getPostsFunc?.Invoke(blogId);
+
+            if (lastUpdatedAt > DateTime.MinValue)
+            {
+                posts = posts?.Where(x => x.Updated > lastUpdatedAt);
+            }
+
             return posts;
         }
 

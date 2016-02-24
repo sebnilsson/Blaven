@@ -14,14 +14,19 @@ namespace Blaven.BlogSources.Blogger.Tests
 
         private const string TestBlogName = "TestBlogName";
 
+        private static readonly DateTime TestLastUpdatedAt = new DateTime(2015, 1, 1);
+
         [Fact]
         public void GetMeta_BloggerApiProviderContainsData_ShouldReturnAllFields()
         {
+            // Arrange
             var bloggerBlogSource = GetTestBloggerBlogSource(getBlogFunc: _ => BloggerTestData.GetBlog());
             var blogSetting = GetTestBlogSetting();
 
-            var meta = bloggerBlogSource.GetMeta(blogSetting);
+            // Act
+            var meta = bloggerBlogSource.GetMeta(blogSetting, TestLastUpdatedAt);
 
+            // Assert
             Assert.NotNull(meta);
             Assert.Equal(blogSetting.BlogKey, meta.BlogKey);
             Assert.Equal(BloggerTestData.BlogDescription, meta.Description);
@@ -35,12 +40,15 @@ namespace Blaven.BlogSources.Blogger.Tests
         [Fact]
         public void GetChanges_BloggerApiProviderContainsDataAndEmptyDb_ReturnsInsertWithAllFields()
         {
+            // Arrange
             var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts());
             var blogSetting = GetTestBlogSetting();
             var dbPosts = Enumerable.Empty<BlogPostBase>();
 
-            var changes = bloggerBlogSource.GetChanges(blogSetting, dbPosts);
+            // Act
+            var changes = bloggerBlogSource.GetChanges(blogSetting, TestLastUpdatedAt, dbPosts);
 
+            // Assert
             var inserted = changes.InsertedBlogPosts.FirstOrDefault();
 
             Assert.NotNull(inserted);
@@ -61,36 +69,45 @@ namespace Blaven.BlogSources.Blogger.Tests
         [Fact]
         public void GetChanges_BlogSourceInsertedPosts_ReturnsInsertedPosts()
         {
+            // Arrange
             var dbPosts = GetTestBlogPosts(0, 1).ToList();
 
             var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 3));
 
+            // Act
             var changes = GetTestBlogSourceChangeSet(bloggerBlogSource, dbPosts);
 
+            // Assert
             Assert.Equal(2, changes.InsertedBlogPosts.Count);
         }
 
         [Fact]
         public void GetChanges_BlogSourceDeletedPosts_ReturnsDeletedPosts()
         {
+            // Arrange
             var dbPosts = GetTestBlogPosts(0, 3).ToList();
 
             var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 1));
 
+            // Act
             var changes = GetTestBlogSourceChangeSet(bloggerBlogSource, dbPosts);
 
+            // Assert
             Assert.Equal(2, changes.DeletedBlogPosts.Count);
         }
 
         [Fact]
         public void GetChanges_BlogSourceUpdatedPosts_ReturnsUpdatedPosts()
         {
+            // Arrange
             var dbPosts = GetTestBlogPosts(0, 2).ToList();
 
             var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => GetTestModifiedPosts(0, 2));
 
+            // Act
             var changes = GetTestBlogSourceChangeSet(bloggerBlogSource, dbPosts);
 
+            // Assert
             Assert.Equal(2, changes.UpdatedBlogPosts.Count);
         }
 
@@ -114,7 +131,7 @@ namespace Blaven.BlogSources.Blogger.Tests
         {
             var blogSetting = GetTestBlogSetting();
 
-            var changes = bloggerBlogSource.GetChanges(blogSetting, dbPosts);
+            var changes = bloggerBlogSource.GetChanges(blogSetting, TestLastUpdatedAt, dbPosts);
             return changes;
         }
 

@@ -95,7 +95,7 @@ namespace Blaven.BlogSources.Blogger.Tests
                                Author = author,
                                Content =
                                    TestData.GetTestString($"{nameof(Post)}.{nameof(Post.Content)}", blogKey, index),
-                               Id = TestData.GetPostId(index, blogKey),
+                               Id = TestData.GetPostSourceId(index, blogKey),
                                Labels = TestData.GetPostTags(index, tagCount).ToList(),
                                Published = PostPublishedAt.AddDays(index),
                                Title = TestData.GetTestString($"{nameof(Post)}.{nameof(Post.Title)}", blogKey, index),
