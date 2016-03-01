@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace Blaven.Tests
 {
@@ -13,7 +12,7 @@ namespace Blaven.Tests
 
         public const string BlogKey3 = "Blog-Test Key Trees";
 
-        public static readonly string[] BlogKeys = new[] { BlogKey1, BlogKey2, BlogKey3 }.ToArray();
+        public static string[] BlogKeys => new[] { BlogKey1, BlogKey2, BlogKey3 }.ToArray();
 
         public static string GetTestString(string name, string blogKey, int index, bool isUpdate = false)
         {

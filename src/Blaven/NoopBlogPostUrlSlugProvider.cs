@@ -4,7 +4,7 @@ namespace Blaven
 {
     public class NoopBlogPostUrlSlugProvider : IBlogPostUrlSlugProvider
     {
-        public string GetSlug(BlogPost blogPost)
+        public string GetUrlSlug(BlogPost blogPost)
         {
             if (blogPost == null)
             {

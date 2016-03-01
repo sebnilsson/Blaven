@@ -42,7 +42,7 @@ namespace Blaven.Synchronization.Tests
 
             // Assert
             Assert.NotNull(config.BlavenIdProvider);
-            Assert.IsType<BlavenBlogPostBlavenIdProvider>(config.BlavenIdProvider);
+            Assert.IsType<PermalinkBlogPostBlavenIdProvider>(config.BlavenIdProvider);
         }
 
         [Fact]

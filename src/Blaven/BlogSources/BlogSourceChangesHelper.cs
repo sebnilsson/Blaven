@@ -33,7 +33,8 @@ namespace Blaven.BlogSources
             }
 
             SyncInsertedPosts(sourcePosts, dbPosts, changeSet);
-            SyncModifiedPosts(sourcePosts, dbPosts, changeSet);
+
+            SyncModifiedPosts(sourcePosts, dbPosts, changeSet, lastUpdatedAt);
 
             return changeSet;
         }
@@ -65,7 +66,8 @@ namespace Blaven.BlogSources
         private static void SyncModifiedPosts(
             IEnumerable<BlogPost> sourcePosts,
             IEnumerable<BlogPostBase> dbPosts,
-            BlogSourceChangeSet changeSet)
+            BlogSourceChangeSet changeSet,
+            DateTime? lastUpdatedAt)
         {
             var modifiedPosts =
                 dbPosts.Join(
@@ -79,7 +81,7 @@ namespace Blaven.BlogSources
                 var dbPost = modifiedPost.DbPost;
                 var sourcePost = modifiedPost.SourcePost;
 
-                bool isModified = (dbPost.Hash != sourcePost.Hash);
+                bool isModified = (lastUpdatedAt == null) || (dbPost.Hash != sourcePost.Hash);
                 if (isModified)
                 {
                     changeSet.UpdatedBlogPosts.Add(sourcePost);

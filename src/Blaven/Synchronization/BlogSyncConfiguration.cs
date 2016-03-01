@@ -13,11 +13,11 @@ namespace Blaven.Synchronization
         public BlogSyncConfiguration(
             IBlogSource blogSource,
             IDataStorage dataStorage,
-            IDataCacheHandler dataCacheHandler,
-            IBlogPostBlavenIdProvider blavenIdProvider,
-            IBlogPostUrlSlugProvider slugProvider,
-            BlogTransformersProvider transformersProvider,
-            IEnumerable<BlogSetting> blogSettings)
+            IBlogPostBlavenIdProvider blavenIdProvider = null,
+            IBlogPostUrlSlugProvider slugProvider = null,
+            IDataCacheHandler dataCacheHandler = null,
+            BlogTransformersProvider transformersProvider = null,
+            IEnumerable<BlogSetting> blogSettings = null)
         {
             if (blogSource == null)
             {
@@ -31,9 +31,9 @@ namespace Blaven.Synchronization
             this.BlogSource = blogSource;
             this.DataStorage = dataStorage;
 
-            this.DataCacheHandler = dataCacheHandler ?? BlogSyncConfigurationDefaults.DataCacheHandler;
             this.BlavenIdProvider = blavenIdProvider ?? BlogSyncConfigurationDefaults.BlavenIdProvider;
             this.SlugProvider = slugProvider ?? BlogSyncConfigurationDefaults.SlugProvider;
+            this.DataCacheHandler = dataCacheHandler ?? BlogSyncConfigurationDefaults.DataCacheHandler;
             this.TransformersProvider = transformersProvider ?? BlogSyncConfigurationDefaults.TransformersProvider;
             this.BlogSettings = (blogSettings ?? new BlogSetting[0]).Where(x => x.BlogKey != null).ToList();
         }

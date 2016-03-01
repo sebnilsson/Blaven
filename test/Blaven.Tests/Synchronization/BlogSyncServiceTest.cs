@@ -325,9 +325,9 @@ namespace Blaven.Synchronization.Tests
             var config = new BlogSyncConfiguration(
                 blogSource,
                 dataStorage,
-                dataCacheHandler,
                 BlogSyncConfigurationDefaults.BlavenIdProvider,
                 BlogSyncConfigurationDefaults.SlugProvider,
+                dataCacheHandler,
                 null,
                 blogSettings);
 

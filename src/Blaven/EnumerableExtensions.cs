@@ -59,7 +59,7 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(source));
             }
 
-            var paged = PagingUtility.GetPaged(source, pageSize: pageSize, pageIndex: 0);
+            var paged = PagingUtility.GetPaged(source, pageSize: pageSize, pageIndex: pageIndex);
             return paged;
         }
 

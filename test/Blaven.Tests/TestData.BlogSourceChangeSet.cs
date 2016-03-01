@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.BlogSources;
@@ -8,10 +7,6 @@ namespace Blaven.Tests
 {
     public static partial class TestData
     {
-        public static readonly DateTime TestPublishedAt = new DateTime(2015, 1, 1, 12, 30, 45);
-
-        public static readonly DateTime TestUpdatedAt = new DateTime(2015, 2, 2, 14, 45, 30);
-
         public static BlogSourceChangeSet GetBlogSourceChangeSetWithData(
             string blogKey = null,
             IEnumerable<BlogPostBase> deletedBlogPosts = null,
@@ -42,19 +37,7 @@ namespace Blaven.Tests
 
             var changeSet = new BlogSourceChangeSet(blogKey);
 
-            var deletedBlogPosts =
-                Enumerable.Range(0, deletedBlogPostsCount)
-                    .Select(
-                        i =>
-                        new BlogPostBase
-                            {
-                                Hash = HashUtility.GetBase64(i),
-                                SourceId =
-                                    GetTestString(nameof(BlogPostBase.SourceId), blogKey, i, isUpdate: false)
-                            })
-                    .ToList();
-
-            deletedBlogPosts.ForEach(x => x.BlavenId = BlavenBlogPostBlavenIdProvider.GetId(x.SourceId));
+            var deletedBlogPosts = GetBlogPosts(0, deletedBlogPostsCount, blogKey).OfType<BlogPostBase>().ToList();
 
             var insertedBlogPosts =
                 Enumerable.Range(0, insertedBlogPostsCount)

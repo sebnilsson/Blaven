@@ -10,25 +10,28 @@ namespace Blaven.Tests
     {
         public const int DefaultTagCount = 5;
 
-        public static readonly string BlavenId1 = GetBlavenId(1);
+        public static string BlavenId1 => GetBlavenId(1);
 
-        public static readonly string BlavenId2 = GetBlavenId(2);
+        public static string BlavenId2 => GetBlavenId(2);
 
-        public static readonly string BlavenId3 = GetBlavenId(3);
+        public static string BlavenId3 => GetBlavenId(3);
+
+        public static DateTime TestPublishedAt => new DateTime(2015, 1, 1, 12, 30, 45);
+
+        public static DateTime TestUpdatedAt => new DateTime(2015, 2, 2, 14, 45, 30);
 
         public static string GetBlavenId(int index, string blogKey = BlogKey)
         {
             var blogPost = GetBlogPost(blogKey, index);
-
-            var blavenId = BlogSyncConfigurationDefaults.BlavenIdProvider.GetId(blogPost);
-            return blavenId;
+            
+            return blogPost.BlavenId;
         }
 
         public static BlogPost GetBlogPost(
             string blogKey,
             int index = 0,
-            int tagCount = DefaultTagCount,
-            bool isUpdate = false)
+            bool isUpdate = false,
+            int tagCount = DefaultTagCount)
         {
             var author = new BlogAuthor
                              {
@@ -74,11 +77,12 @@ namespace Blaven.Tests
                                    Summary = GetTestString(nameof(BlogPost.Summary), blogKey, index, isUpdate),
                                    Tags = GetPostTags(index, tagCount).ToList(),
                                    Title = GetTestString(nameof(BlogPost.Title), blogKey, index, isUpdate),
-                                   UrlSlug = GetTestString(nameof(BlogPost.UrlSlug), blogKey, index, isUpdate),
                                    UpdatedAt = TestUpdatedAt.AddDays(index)
                                };
 
-            blogPost.BlavenId = BlogSyncConfigurationDefaults.BlavenIdProvider.GetId(blogPost);
+            blogPost.UrlSlug = BlogSyncConfigurationDefaults.SlugProvider.GetUrlSlug(blogPost);
+
+            blogPost.BlavenId = BlogSyncConfigurationDefaults.BlavenIdProvider.GetBlavenId(blogPost);
 
             return blogPost;
         }

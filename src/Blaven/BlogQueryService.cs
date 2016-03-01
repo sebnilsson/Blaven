@@ -121,7 +121,7 @@ namespace Blaven
 
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
-            var posts = this.repository.SearchPosts(ensuredBlogKeys, search);
+            var posts = this.repository.SearchPosts(ensuredBlogKeys, search).OrderByDescending(x => x.PublishedAt);
             return posts;
         }
     }

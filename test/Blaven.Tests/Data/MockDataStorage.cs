@@ -103,7 +103,7 @@ namespace Blaven.Data.Tests
                     {
                         Thread.Sleep(getBlogPostsFuncSleep);
                         return
-                            TestData.GetBlogPostBases(blogSetting.BlogKey, blogPostCount: 10, blogPostStart: 100)
+                            TestData.GetBlogPostBases(start: 10, count: 100, blogKey: blogSetting.BlogKey)
                                 .ToReadOnlyList();
                     },
                 getLastPostUpdatedAtFunc: blogSetting =>

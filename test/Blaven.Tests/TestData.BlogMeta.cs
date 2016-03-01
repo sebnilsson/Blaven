@@ -10,9 +10,9 @@ namespace Blaven.Tests
 
         public const string BlogMetaSourceId = "SourceId-TEST";
 
-        public static readonly DateTime BlogMetaPublishedAt = new DateTime(2015, 2, 1);
+        public static DateTime BlogMetaPublishedAt => new DateTime(2015, 2, 1);
 
-        public static readonly DateTime BlogMetaUpdatedAt = new DateTime(2015, 3, 1);
+        public static DateTime BlogMetaUpdatedAt => new DateTime(2015, 3, 1);
 
         public static BlogMeta GetBlogMeta(string blogKey = null)
         {

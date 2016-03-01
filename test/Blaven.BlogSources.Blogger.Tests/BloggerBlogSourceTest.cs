@@ -61,6 +61,7 @@ namespace Blaven.BlogSources.Blogger.Tests
             Assert.Equal(BloggerTestData.PostId, inserted.SourceId);
             Assert.Equal(BloggerTestData.PostTitle, inserted.Title);
             Assert.Equal(BloggerTestData.PostUrl, inserted.SourceUrl);
+            Assert.Equal(BloggerTestData.PostPublishedAt, inserted.PublishedAt);
             bool tagsAreSequenceEquals =
                 BloggerTestData.PostTags.OrderBy(x => x).SequenceEqual(inserted.Tags.OrderBy(x => x));
             Assert.True(tagsAreSequenceEquals);

@@ -55,8 +55,8 @@ namespace Blaven.Synchronization
             {
                 post.BlogKey = blogSetting.BlogKey;
 
-                post.BlavenId = config.BlavenIdProvider.GetId(post);
-                post.UrlSlug = config.SlugProvider.GetSlug(post);
+                post.UrlSlug = config.SlugProvider.GetUrlSlug(post);
+                post.BlavenId = config.BlavenIdProvider.GetBlavenId(post);
 
                 config.TransformersProvider.ApplyTransformers(post);
             }

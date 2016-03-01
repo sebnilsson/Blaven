@@ -2,6 +2,6 @@
 {
     public interface IBlogPostUrlSlugProvider
     {
-        string GetSlug(BlogPost blogPost);
+        string GetUrlSlug(BlogPost blogPost);
     }
 }

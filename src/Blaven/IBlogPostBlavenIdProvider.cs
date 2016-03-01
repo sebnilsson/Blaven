@@ -2,6 +2,6 @@
 {
     public interface IBlogPostBlavenIdProvider
     {
-        string GetId(BlogPost blogPost);
+        string GetBlavenId(BlogPostHead blogPost);
     }
 }

@@ -281,10 +281,9 @@ namespace Blaven.Synchronization
                 blogSource,
                 dataStorage,
                 dataCacheHandler: null,
-                blavenIdProvider: null,
                 slugProvider: null,
-                transformersProvider: null,
-                blogSettings: blogSettings ?? Enumerable.Empty<BlogSetting>());
+                blavenIdProvider: null,
+                transformersProvider: null, blogSettings: blogSettings ?? Enumerable.Empty<BlogSetting>());
             return config;
         }
     }

@@ -5,7 +5,7 @@ namespace Blaven
 {
     public class BlavenBlogPostUrlSlugProvider : IBlogPostUrlSlugProvider
     {
-        public string GetSlug(BlogPost blogPost)
+        public string GetUrlSlug(BlogPost blogPost)
         {
             if (blogPost == null)
             {
@@ -31,7 +31,7 @@ namespace Blaven
         /// http://stackoverflow.com/questions/25259/how-do-you-include-a-webpage-title-as-part-of-a-webpage-url/25486#25486
         /// http://stackoverflow.com/questions/3769457/how-can-i-remove-accents-on-a-string
         /// </summary>
-        private static string Create(string value)
+        public static string Create(string value)
         {
             if (value == null)
             {
