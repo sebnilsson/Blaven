@@ -6,7 +6,7 @@ namespace Blaven
     [DebuggerDisplay("BlogKey={BlogKey}, Id={Id}, Name={Name}")]
     public class BlogSetting
     {
-        public BlogSetting(string blogKey, string id, string name)
+        public BlogSetting(string blogKey, string id = null, string name = null)
         {
             if (blogKey == null)
             {

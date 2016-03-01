@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 
 using Blaven.BlogSources;
@@ -14,27 +15,44 @@ namespace Blaven.Data.Tests
         + "SaveChangesTracker={SaveChangesTracker.Events.Count}")]
     public class MockDataStorage : IDataStorage
     {
-        private readonly Func<BlogSetting, IReadOnlyCollection<BlogPostBase>> getBlogPostsFunc;
+        private readonly Func<BlogSetting, IReadOnlyCollection<BlogPostBase>> getPostBasesFunc;
+
+        private readonly Func<BlogSetting, DateTime?> getLastPostUpdatedAtFunc;
 
         private readonly Action<BlogSetting, BlogMeta> saveBlogMetaAction;
 
         private readonly Action<BlogSetting, BlogSourceChangeSet> saveChangesAction;
 
         public MockDataStorage(
-            Func<BlogSetting, IReadOnlyCollection<BlogPostBase>> getBlogPostsFunc = null,
+            Func<BlogSetting, IReadOnlyCollection<BlogPostBase>> getPostBasesFunc = null,
             Action<BlogSetting, BlogMeta> saveBlogMetaAction = null,
-            Action<BlogSetting, BlogSourceChangeSet> saveChangesAction = null)
+            Action<BlogSetting, BlogSourceChangeSet> saveChangesAction = null,
+            Func<BlogSetting, DateTime?> getLastPostUpdatedAtFunc = null)
         {
-            this.getBlogPostsFunc = (getBlogPostsFunc ?? (_ => null)).WithTracking(this.GetBlogPostsTracker);
+            this.getPostBasesFunc = (getPostBasesFunc ?? (_ => null)).WithTracking(this.GetBlogPostsTracker);
+            this.getLastPostUpdatedAtFunc =
+                (getLastPostUpdatedAtFunc ?? (_ => null)).WithTracking(this.GetLastPostUpdatedAtTracker);
             this.saveBlogMetaAction = (saveBlogMetaAction ?? ((_, __) => { })).WithTracking(this.SaveBlogMetaTracker);
             this.saveChangesAction = (saveChangesAction ?? ((_, __) => { })).WithTracking(this.SaveChangesTracker);
         }
+
+        public DelegateTracker<BlogSetting> GetLastPostUpdatedAtTracker { get; } = new DelegateTracker<BlogSetting>();
 
         public DelegateTracker<BlogSetting> GetBlogPostsTracker { get; } = new DelegateTracker<BlogSetting>();
 
         public DelegateTracker<BlogSetting> SaveBlogMetaTracker { get; } = new DelegateTracker<BlogSetting>();
 
         public DelegateTracker<BlogSetting> SaveChangesTracker { get; } = new DelegateTracker<BlogSetting>();
+
+        public DateTime? GetLastPostUpdatedAt(BlogSetting blogSetting)
+        {
+            if (blogSetting == null)
+            {
+                throw new ArgumentNullException(nameof(blogSetting));
+            }
+
+            return this.getLastPostUpdatedAtFunc?.Invoke(blogSetting);
+        }
 
         public IReadOnlyCollection<BlogPostBase> GetPostBases(BlogSetting blogSetting)
         {
@@ -43,7 +61,7 @@ namespace Blaven.Data.Tests
                 throw new ArgumentNullException(nameof(blogSetting));
             }
 
-            return this.getBlogPostsFunc?.Invoke(blogSetting);
+            return this.getPostBasesFunc?.Invoke(blogSetting);
         }
 
         public void SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta)
@@ -76,16 +94,26 @@ namespace Blaven.Data.Tests
 
         public static MockDataStorage Create(
             int getBlogPostsFuncSleep = 100,
+            int getLastPostUpdatedAtFuncSleep = 100,
             int saveBlogMetaActionSleep = 100,
             int saveChangesActionSleep = 100)
         {
             var dataStorage = new MockDataStorage(
-                getBlogPostsFunc: blogSetting =>
+                getPostBasesFunc: blogSetting =>
                     {
                         Thread.Sleep(getBlogPostsFuncSleep);
                         return
                             TestData.GetBlogPostBases(blogSetting.BlogKey, blogPostCount: 10, blogPostStart: 100)
                                 .ToReadOnlyList();
+                    },
+                getLastPostUpdatedAtFunc: blogSetting =>
+                    {
+                        Thread.Sleep(getLastPostUpdatedAtFuncSleep);
+                        return
+                            TestData.GetBlogPosts(start: 100, count: 10, blogKey: blogSetting.BlogKey)
+                                .Select(x => x.PublishedAt)
+                                .OrderByDescending(x => x)
+                                .FirstOrDefault();
                     },
                 saveBlogMetaAction: (_, __) => { Thread.Sleep(saveBlogMetaActionSleep); },
                 saveChangesAction: (_, __) => { Thread.Sleep(saveChangesActionSleep); });

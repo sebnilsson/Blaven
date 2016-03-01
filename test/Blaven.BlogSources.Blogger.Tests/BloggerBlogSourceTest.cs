@@ -46,7 +46,7 @@ namespace Blaven.BlogSources.Blogger.Tests
             var dbPosts = Enumerable.Empty<BlogPostBase>();
 
             // Act
-            var changes = bloggerBlogSource.GetChanges(blogSetting, TestLastUpdatedAt, dbPosts);
+            var changes = bloggerBlogSource.GetChanges(blogSetting, dbPosts, TestLastUpdatedAt);
 
             // Assert
             var inserted = changes.InsertedBlogPosts.FirstOrDefault();
@@ -127,11 +127,12 @@ namespace Blaven.BlogSources.Blogger.Tests
 
         private static BlogSourceChangeSet GetTestBlogSourceChangeSet(
             IBlogSource bloggerBlogSource,
-            IEnumerable<BlogPostBase> dbPosts)
+            IEnumerable<BlogPostBase> dbPosts,
+            DateTime? lastUpdatedAt = null)
         {
             var blogSetting = GetTestBlogSetting();
 
-            var changes = bloggerBlogSource.GetChanges(blogSetting, TestLastUpdatedAt, dbPosts);
+            var changes = bloggerBlogSource.GetChanges(blogSetting, dbPosts, lastUpdatedAt);
             return changes;
         }
 

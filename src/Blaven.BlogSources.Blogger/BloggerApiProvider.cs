@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Google;
+using Google.Apis;
+using Google.Apis.Auth.OAuth2;
 using Google.Apis.Blogger.v3;
 using Google.Apis.Blogger.v3.Data;
 using Google.Apis.Services;
@@ -11,6 +14,8 @@ namespace Blaven.BlogSources.Blogger
     public class BloggerApiProvider
     {
         public const int DefaultPostListRequestMaxResults = 500;
+
+        private const string BloggerApplicationName = "Blaven";
 
         private readonly BloggerService bloggerService;
 
@@ -55,11 +60,20 @@ namespace Blaven.BlogSources.Blogger
 
             var request = this.bloggerService.Blogs.Get(blogId);
 
-            var blog = request.Execute();
-            return blog;
+            try
+            {
+                var blog = request.Execute();
+                return blog;
+            }
+            catch (GoogleApiException ex)
+            {
+                string message =
+                    $"Execution failed for {nameof(this.bloggerService.Blogs)}.{nameof(this.bloggerService.Blogs.Get)} with Blog ID '{blogId}'.";
+                throw new BloggerApiRequestExecuteException(message, ex);
+            }
         }
 
-        public virtual IEnumerable<Post> GetPosts(string blogId, DateTime lastUpdatedAt)
+        public virtual IEnumerable<Post> GetPosts(string blogId, DateTime? lastUpdatedAt)
         {
             if (blogId == null)
             {
@@ -68,13 +82,22 @@ namespace Blaven.BlogSources.Blogger
 
             var postListRequest = this.GetPostListRequest(blogId);
 
-            if (lastUpdatedAt > DateTime.MinValue)
+            if (lastUpdatedAt != null && lastUpdatedAt > DateTime.MinValue)
             {
                 postListRequest.StartDate = lastUpdatedAt;
             }
 
-            var posts = GetPostListRequestAllPosts(postListRequest);
-            return posts;
+            try
+            {
+                var posts = GetPostListRequestAllPosts(postListRequest);
+                return posts;
+            }
+            catch (GoogleApiException ex)
+            {
+                string message =
+                    $"Execution failed for {nameof(this.bloggerService.Posts)}.{nameof(this.bloggerService.Posts.List)} with Blog ID '{blogId}'.";
+                throw new BloggerApiRequestExecuteException(message, ex);
+            }
         }
 
         //public virtual IEnumerable<Post> GetPostsSlim(string blogId)
@@ -137,8 +160,12 @@ namespace Blaven.BlogSources.Blogger
             {
                 throw new ArgumentNullException(nameof(apiKey));
             }
-
-            var initializer = new BaseClientService.Initializer { ApiKey = apiKey, ApplicationName = "Blaven" };
+            
+            var initializer = new BaseClientService.Initializer
+                                  {
+                                      ApiKey = apiKey,
+                                      ApplicationName = BloggerApplicationName
+                                  };
 
             var service = new BloggerService(initializer);
             return service;

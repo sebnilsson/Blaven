@@ -443,7 +443,7 @@ namespace Blaven.Tests
         {
             var blogSettings =
                 (blogSettingBlogKeys ?? TestData.BlogKeys).Select(x => new BlogSetting(x, $"{x}_Id", $"{x}_Name"))
-                    .ToList();
+                    .ToArray();
 
             var repository = MockRepository.Create(blogPosts, blogMetas, funcSleep);
 

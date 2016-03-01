@@ -38,7 +38,15 @@ namespace Blaven
 
             int skip = GetSkip(pageSize: pageSize, pageIndex: pageIndex);
 
-            var paged = source.Skip(skip).Take(pageSize);
+            var paged = source;
+            if (skip > 0)
+            {
+                paged = paged.Skip(skip);
+            }
+
+            paged = paged.Take(pageSize);
+
+            //var paged = source.Skip(skip).Take(pageSize);
             return paged;
         }
     }

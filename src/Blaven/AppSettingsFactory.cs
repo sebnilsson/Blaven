@@ -28,6 +28,14 @@ namespace Blaven
             return blogSource;
         }
 
+        public static IEnumerable<BlogSetting> GetBlogSettings()
+        {
+            var appSettings = ConfigurationManager.AppSettings.ToDictionaryIgnoreCase();
+
+            var blogSettings = GetBlogSettingsInternal(appSettings);
+            return blogSettings;
+        }
+
         internal static TBlogSource BuildBlogSourceInternal<TBlogSource>(
             Func<string, string, TBlogSource> blogSourceUsernameAndPasswordFactory,
             IDictionary<string, string> appSettings) where TBlogSource : IBlogSource
@@ -46,14 +54,6 @@ namespace Blaven
 
             var blogSource = blogSourceUsernameAndPasswordFactory(username, password);
             return blogSource;
-        }
-
-        public static IEnumerable<BlogSetting> GetBlogSettings()
-        {
-            var appSettings = ConfigurationManager.AppSettings.ToDictionaryIgnoreCase();
-
-            var blogSettings = GetBlogSettingsInternal(appSettings);
-            return blogSettings;
         }
 
         internal static IEnumerable<BlogSetting> GetBlogSettingsInternal(IDictionary<string, string> appSettings)

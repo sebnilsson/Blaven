@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 using Blaven.BlogSources;
 
@@ -8,7 +9,7 @@ namespace Blaven.Synchronization
     {
         public static BlogSourceChangeSet Update(
             BlogSetting blogSetting,
-            DateTime lastUpdatedAt,
+            DateTime? lastUpdatedAt,
             BlogSyncConfiguration config)
         {
             if (blogSetting == null)
@@ -28,7 +29,7 @@ namespace Blaven.Synchronization
                 throw new BlogSyncException(message);
             }
 
-            var sourceChanges = config.BlogSource.GetChanges(blogSetting, lastUpdatedAt, existingPosts);
+            var sourceChanges = config.BlogSource.GetChanges(blogSetting, existingPosts, lastUpdatedAt);
             if (sourceChanges == null)
             {
                 string message =
@@ -48,7 +49,9 @@ namespace Blaven.Synchronization
             BlogSourceChangeSet sourceChanges,
             BlogSyncConfiguration config)
         {
-            foreach (var post in sourceChanges.InsertedBlogPosts)
+            var posts = sourceChanges.InsertedBlogPosts.Concat(sourceChanges.UpdatedBlogPosts).ToList();
+
+            foreach (var post in posts)
             {
                 post.BlogKey = blogSetting.BlogKey;
 

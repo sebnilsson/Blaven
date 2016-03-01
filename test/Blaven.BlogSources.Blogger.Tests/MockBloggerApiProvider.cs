@@ -38,7 +38,7 @@ namespace Blaven.BlogSources.Blogger.Tests
 
         public DelegateTracker<string> GetBlogTracker { get; } = new DelegateTracker<string>();
 
-        public override IEnumerable<Post> GetPosts(string blogId, DateTime lastUpdatedAt)
+        public override IEnumerable<Post> GetPosts(string blogId, DateTime? lastUpdatedAt)
         {
             if (blogId == null)
             {

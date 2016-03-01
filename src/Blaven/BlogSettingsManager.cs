@@ -8,8 +8,6 @@ namespace Blaven
     {
         private readonly IReadOnlyList<BlogSetting> blogSettings;
 
-        private readonly Lazy<IReadOnlyList<string>> blogSettingsBlogKeysLazy;
-
         public BlogSettingsManager(IEnumerable<BlogSetting> blogSettings)
         {
             if (blogSettings == null)
@@ -17,13 +15,12 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(blogSettings));
             }
 
-            this.blogSettings = blogSettings.ToList();
+            this.blogSettings = blogSettings.ToReadOnlyList();
 
-            this.blogSettingsBlogKeysLazy =
-                new Lazy<IReadOnlyList<string>>(() => this.blogSettings.Select(x => x.BlogKey).ToReadOnlyList());
+            this.BlogKeys = this.blogSettings.Select(x => x.BlogKey).ToReadOnlyList();
         }
 
-        public IReadOnlyList<string> BlogKeys => this.blogSettingsBlogKeysLazy.Value;
+        public IReadOnlyList<string> BlogKeys { get; }
 
         public string GetEnsuredBlogKey(string blogKey)
         {
@@ -32,7 +29,7 @@ namespace Blaven
                 return blogKey;
             }
 
-            string blogSettingsBlogKey = this.blogSettingsBlogKeysLazy.Value.FirstOrDefault();
+            string blogSettingsBlogKey = this.BlogKeys.FirstOrDefault();
             if (blogSettingsBlogKey == null)
             {
                 string message =
@@ -52,7 +49,7 @@ namespace Blaven
                 return blogKeyList;
             }
 
-            var blogSettingsBlogKeys = this.blogSettingsBlogKeysLazy.Value.ToList();
+            var blogSettingsBlogKeys = this.BlogKeys.ToList();
             if (!blogSettingsBlogKeys.Any())
             {
                 string message =

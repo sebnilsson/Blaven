@@ -11,6 +11,11 @@
     <AssemblyName>Blaven.Data.RavenDb2</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -60,7 +65,7 @@
     <Compile Include="RavenDbInitializer.cs" />
     <Compile Include="RavenDbInitializerException.cs" />
     <Compile Include="RavenDbRepository.cs" />
-    <Compile Include="RavenQueryableExtensions.cs" />
+    <Compile Include="QueryableExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Blaven\Blaven.csproj">

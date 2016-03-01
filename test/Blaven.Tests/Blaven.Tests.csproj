@@ -80,6 +80,7 @@
     <Compile Include="BlogQueryServiceTest.cs" />
     <Compile Include="BlogSettingsManagerTest.cs" />
     <Compile Include="BlogSources\BlogSourceAppSettingsUtilityTest.cs" />
+    <Compile Include="BlogSources\BlogSourceChangesHelperTest.cs" />
     <Compile Include="Data\MockRepository.cs" />
     <Compile Include="DelegateTracker.cs" />
     <Compile Include="ActionExtensions.cs" />

@@ -13,21 +13,21 @@ namespace Blaven.BlogSources.Tests
     {
         private readonly Func<BlogSetting, BlogMeta> getMetaFunc;
 
-        private readonly Func<BlogSetting, IEnumerable<BlogPostBase>, BlogSourceChangeSet> getChangesFunc;
+        private readonly Func<BlogSetting, DateTime?, IEnumerable<BlogPostBase>, BlogSourceChangeSet> getChangesFunc;
 
         public MockBlogSource(
             Func<BlogSetting, BlogMeta> getMetaFunc = null,
-            Func<BlogSetting, IEnumerable<BlogPostBase>, BlogSourceChangeSet> getChangesFunc = null)
+            Func<BlogSetting, DateTime?, IEnumerable<BlogPostBase>, BlogSourceChangeSet> getChangesFunc = null)
         {
             this.getMetaFunc = (getMetaFunc ?? (_ => null)).WithTracking(this.GetMetaTracker);
-            this.getChangesFunc = (getChangesFunc ?? ((_, __) => null)).WithTracking(this.GetChangesTracker);
+            this.getChangesFunc = (getChangesFunc ?? ((_, __, ___) => null)).WithTracking(this.GetChangesTracker);
         }
 
         public DelegateTracker<BlogSetting> GetMetaTracker { get; } = new DelegateTracker<BlogSetting>();
 
         public DelegateTracker<BlogSetting> GetChangesTracker { get; } = new DelegateTracker<BlogSetting>();
 
-        public BlogMeta GetMeta(BlogSetting blogSetting, DateTime lastUpdatedAt)
+        public BlogMeta GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
@@ -40,8 +40,8 @@ namespace Blaven.BlogSources.Tests
 
         public BlogSourceChangeSet GetChanges(
             BlogSetting blogSetting,
-            DateTime lastUpdatedAt,
-            IEnumerable<BlogPostBase> dbPosts)
+            IEnumerable<BlogPostBase> dbPosts,
+            DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
@@ -52,7 +52,7 @@ namespace Blaven.BlogSources.Tests
                 throw new ArgumentNullException(nameof(dbPosts));
             }
 
-            var changes = this.getChangesFunc?.Invoke(blogSetting, dbPosts);
+            var changes = this.getChangesFunc?.Invoke(blogSetting, lastUpdatedAt, dbPosts);
             return changes;
         }
 
@@ -64,7 +64,7 @@ namespace Blaven.BlogSources.Tests
                         Thread.Sleep(getMetaFuncSleep);
                         return TestData.GetBlogMeta(blogSetting.BlogKey);
                     },
-                getChangesFunc: (blogSetting, __) =>
+                getChangesFunc: (blogSetting, __, ___) =>
                     {
                         Thread.Sleep(getChangesFuncSleep);
                         return TestData.GetBlogSourceChangeSet(blogSetting.BlogKey);

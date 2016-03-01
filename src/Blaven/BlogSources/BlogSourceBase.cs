@@ -8,8 +8,8 @@ namespace Blaven.BlogSources
     {
         public virtual BlogSourceChangeSet GetChanges(
             BlogSetting blogSetting,
-            DateTime lastUpdatedAt,
-            IEnumerable<BlogPostBase> dbPosts)
+            IEnumerable<BlogPostBase> dbPosts,
+            DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
@@ -24,12 +24,16 @@ namespace Blaven.BlogSources
 
             var sourcePosts = this.GetSourcePosts(blogSetting, lastUpdatedAt).ToList();
 
-            var changeSet = BlogSourceChangesHelper.GetChangeSet(blogSetting.BlogKey, sourcePosts, dbBlogPostsList);
+            var changeSet = BlogSourceChangesHelper.GetChangeSet(
+                blogSetting.BlogKey,
+                sourcePosts,
+                dbBlogPostsList,
+                lastUpdatedAt);
             return changeSet;
         }
 
-        public abstract BlogMeta GetMeta(BlogSetting blogSetting, DateTime lastUpdatedAt);
+        public abstract BlogMeta GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt);
 
-        protected abstract IEnumerable<BlogPost> GetSourcePosts(BlogSetting blogSetting, DateTime lastUpdatedAt);
+        protected abstract IEnumerable<BlogPost> GetSourcePosts(BlogSetting blogSetting, DateTime? lastUpdatedAt);
     }
 }

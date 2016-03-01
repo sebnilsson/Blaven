@@ -4,7 +4,7 @@ namespace Blaven.Synchronization
 {
     internal static class BlogSyncServiceUpdateMetaHelper
     {
-        public static BlogMeta Update(BlogSetting blogSetting, DateTime lastUpdatedAt, BlogSyncConfiguration config)
+        public static BlogMeta Update(BlogSetting blogSetting, DateTime? lastUpdatedAt, BlogSyncConfiguration config)
         {
             if (blogSetting == null)
             {

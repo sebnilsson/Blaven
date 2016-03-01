@@ -17,9 +17,11 @@ namespace Blaven.Synchronization
 
         private static readonly KeyLocker UpdateBlogLocker = new KeyLocker();
 
+        private readonly BlogSettingsManager blogSettings;
+
         private readonly BlogSyncConfiguration config;
 
-        public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage, IEnumerable<BlogSetting> blogSettings)
+        public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage, params BlogSetting[] blogSettings)
             : this(GetConfig(blogSource, dataStorage, blogSettings))
         {
         }
@@ -32,6 +34,8 @@ namespace Blaven.Synchronization
             }
 
             this.config = config;
+
+            this.blogSettings = new BlogSettingsManager(config.BlogSettings);
         }
 
         public IBlogSource BlogSource => this.config.BlogSource;
@@ -49,9 +53,11 @@ namespace Blaven.Synchronization
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
+            var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys).ToArray();
+
             var now = DateTime.Now;
 
-            var result = this.ForceUpdateInternal(now, blogKeys);
+            var result = this.ForceUpdateInternal(now, ensuredBlogKeys);
             return result;
         }
 
@@ -62,9 +68,11 @@ namespace Blaven.Synchronization
                 throw new ArgumentNullException(nameof(blogKey));
             }
 
+            var ensuredBlogKey = this.blogSettings.GetEnsuredBlogKey(blogKey);
+
             var now = DateTime.Now;
 
-            bool isUpdated = this.IsUpdatedInternal(blogKey, now);
+            bool isUpdated = this.IsUpdatedInternal(ensuredBlogKey, now);
             return isUpdated;
         }
 
@@ -75,9 +83,11 @@ namespace Blaven.Synchronization
                 throw new ArgumentNullException(nameof(blogKey));
             }
 
+            var ensuredBlogKey = this.blogSettings.GetEnsuredBlogKey(blogKey);
+
             var now = DateTime.Now;
 
-            bool shouldUpdate = this.ShouldUpdateInternal(blogKey, now);
+            bool shouldUpdate = this.ShouldUpdateInternal(ensuredBlogKey, now);
             return shouldUpdate;
         }
 
@@ -90,7 +100,9 @@ namespace Blaven.Synchronization
 
             var now = DateTime.Now;
 
-            var result = this.TryUpdateInternal(now, blogKeys);
+            var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys).ToArray();
+
+            var result = this.TryUpdateInternal(now, ensuredBlogKeys);
             return result;
         }
 
@@ -106,7 +118,7 @@ namespace Blaven.Synchronization
                     {
                         var result = new BlogSyncResult(blogKey);
 
-                        this.UpdateBlog(blogKey, now, lastUpdatedAt: DateTime.MinValue);
+                        this.UpdateBlog(blogKey, now, lastUpdatedAt: null);
 
                         result.HandleDone(isUpdated: true);
 
@@ -198,14 +210,18 @@ namespace Blaven.Synchronization
                             return false;
                         }
 
-                        this.UpdateBlog(blogKey, now, lastUpdatedAt: now);
+                        var blogSetting = this.GetBlogSetting(blogKey);
+
+                        var lastUpdatedAt = this.DataStorage.GetLastPostUpdatedAt(blogSetting);
+
+                        this.UpdateBlog(blogKey, now, lastUpdatedAt);
 
                         return true;
                     });
             return isUpdated;
         }
 
-        private void UpdateBlog(string blogKey, DateTime now, DateTime lastUpdatedAt)
+        private void UpdateBlog(string blogKey, DateTime now, DateTime? lastUpdatedAt)
         {
             UpdateBlogLocker.RunWithLock(
                 blogKey.ToLowerInvariant(),
@@ -237,11 +253,14 @@ namespace Blaven.Synchronization
                     });
         }
 
-        private void UpdateBlogData(BlogSetting blogSetting, DateTime lastUpdatedAt)
+        private void UpdateBlogData(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             Parallel.Invoke(
                 () => BlogSyncServiceUpdateMetaHelper.Update(blogSetting, lastUpdatedAt, this.config),
                 () => BlogSyncServiceUpdatePostsHelper.Update(blogSetting, lastUpdatedAt, this.config));
+
+            //BlogSyncServiceUpdateMetaHelper.Update(blogSetting, lastUpdatedAt, this.config);
+            //BlogSyncServiceUpdatePostsHelper.Update(blogSetting, lastUpdatedAt, this.config);
         }
 
         private static BlogSyncConfiguration GetConfig(
@@ -257,10 +276,6 @@ namespace Blaven.Synchronization
             {
                 throw new ArgumentNullException(nameof(dataStorage));
             }
-            if (blogSettings == null)
-            {
-                throw new ArgumentNullException(nameof(blogSettings));
-            }
 
             var config = new BlogSyncConfiguration(
                 blogSource,
@@ -269,7 +284,7 @@ namespace Blaven.Synchronization
                 blavenIdProvider: null,
                 slugProvider: null,
                 transformersProvider: null,
-                blogSettings: blogSettings);
+                blogSettings: blogSettings ?? Enumerable.Empty<BlogSetting>());
             return config;
         }
     }

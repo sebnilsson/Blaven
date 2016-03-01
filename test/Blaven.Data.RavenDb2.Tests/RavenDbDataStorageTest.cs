@@ -43,7 +43,7 @@ namespace Blaven.Data.RavenDb2.Tests
             // Arrange
             const int PostCount = 2500;
 
-            var dbBlogPosts = TestData.GetBlogPosts(start: 0, count: PostCount);
+            var dbBlogPosts = TestData.GetBlogPosts(start: 0, count: PostCount).ToList();
             var dataStorage = GetRavenDbDataStorage(blogPosts: dbBlogPosts);
             var blogSetting = TestData.GetBlogSetting(TestData.BlogKey);
 
@@ -51,7 +51,7 @@ namespace Blaven.Data.RavenDb2.Tests
             var posts = dataStorage.GetPostBases(blogSetting);
 
             // Assert
-            Assert.Equal(PostCount, posts.Count);
+             Assert.Equal(PostCount, posts.Count);
         }
 
         [Fact]

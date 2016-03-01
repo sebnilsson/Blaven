@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Raven.Client;
-using Raven.Client.Linq;
-
 namespace Blaven.Data.RavenDb2
 {
-    public static class RavenQueryableExtensions
+    public static class QueryableExtensions
     {
         private const int PageSize = 1024;
 
-        public static List<T> ToListAll<T>(this IRavenQueryable<T> queryable)
+        public static List<T> ToListAll<T>(this IQueryable<T> queryable)
         {
             if (queryable == null)
             {
@@ -22,7 +19,7 @@ namespace Blaven.Data.RavenDb2
             return listAll;
         }
 
-        private static IEnumerable<T> ToListAllInternal<T>(IRavenQueryable<T> queryable)
+        private static IEnumerable<T> ToListAllInternal<T>(IQueryable<T> queryable)
         {
             List<T> items;
             int i = 0;

@@ -43,7 +43,7 @@ namespace Blaven.BlogSources
                 throw new ArgumentNullException(nameof(appSettings));
             }
 
-            var config = GetValueInternal<TBlogSource>(AppSettingsHelper.PasswordKey, appSettings);
+            var config = GetValueInternal<TBlogSource>(AppSettingsHelper.PasswordKey, appSettings, requireValue: false);
             return config;
         }
 
@@ -55,12 +55,14 @@ namespace Blaven.BlogSources
                 throw new ArgumentNullException(nameof(appSettings));
             }
 
-            var config = GetValueInternal<TBlogSource>(AppSettingsHelper.UsernameKey, appSettings);
+            var config = GetValueInternal<TBlogSource>(AppSettingsHelper.UsernameKey, appSettings, requireValue: false);
             return config;
         }
 
-        internal static string GetValueInternal<TBlogSource>(string key, IDictionary<string, string> appSettings)
-            where TBlogSource : IBlogSource
+        internal static string GetValueInternal<TBlogSource>(
+            string key,
+            IDictionary<string, string> appSettings,
+            bool requireValue = true) where TBlogSource : IBlogSource
         {
             if (key == null)
             {
@@ -73,11 +75,15 @@ namespace Blaven.BlogSources
 
             var type = typeof(TBlogSource);
 
-            string value = GetValue(type, key, appSettings);
+            string value = GetValue(type, key, appSettings, requireValue);
             return value;
         }
 
-        private static string GetValue(Type type, string key, IDictionary<string, string> appSettings)
+        private static string GetValue(
+            Type type,
+            string key,
+            IDictionary<string, string> appSettings,
+            bool requireValue)
         {
             if (type == null)
             {
@@ -96,7 +102,9 @@ namespace Blaven.BlogSources
 
             string appSettingsKey = string.Format(AppSettingsHelper.BlogSourcesKeyFormat, typeName, key);
 
-            string value = AppSettingsHelper.GetValue(appSettingsKey, appSettings);
+            string value = requireValue
+                               ? AppSettingsHelper.GetValue(appSettingsKey, appSettings)
+                               : AppSettingsHelper.TryGetValue(appSettingsKey, appSettings);
             return value;
         }
     }

@@ -22,6 +22,26 @@ namespace Blaven.Data.RavenDb2
 
         public IDocumentStore DocumentStore { get; }
 
+        public DateTime? GetLastPostUpdatedAt(BlogSetting blogSetting)
+        {
+            if (blogSetting == null)
+            {
+                throw new ArgumentNullException(nameof(blogSetting));
+            }
+
+            using (var session = this.DocumentStore.OpenSession())
+            {
+                var lastPost =
+                    session.Query<BlogPostHead, BlogPostsIndex>()
+                        .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                        .Where(x => x.BlogKey == blogSetting.BlogKey)
+                        .OrderByDescending(x => x.UpdatedAt)
+                        .FirstOrDefault();
+
+                return lastPost?.UpdatedAt;
+            }
+        }
+
         public IReadOnlyCollection<BlogPostBase> GetPostBases(BlogSetting blogSetting)
         {
             if (blogSetting == null)
@@ -33,7 +53,7 @@ namespace Blaven.Data.RavenDb2
             {
                 var posts =
                     session.Query<BlogPostBase, BlogPostsIndex>()
-                        .Customize(x => x.WaitForNonStaleResultsAsOfNow())
+                        .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
                         .Where(x => x.BlogKey == blogSetting.BlogKey)
                         .AsProjection<BlogPostBase>()
                         .ToListAll();

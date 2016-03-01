@@ -25,7 +25,7 @@ namespace Blaven.BlogSources.Blogger
             this.apiProvider = apiProvider;
         }
 
-        public override BlogMeta GetMeta(BlogSetting blogSetting, DateTime lastUpdatedAt)
+        public override BlogMeta GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
@@ -46,7 +46,7 @@ namespace Blaven.BlogSources.Blogger
             return blogMeta;
         }
 
-        protected override IEnumerable<BlogPost> GetSourcePosts(BlogSetting blogSetting, DateTime lastUpdatedAt)
+        protected override IEnumerable<BlogPost> GetSourcePosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {

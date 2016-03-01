@@ -5,11 +5,11 @@ namespace Blaven.BlogSources
 {
     public interface IBlogSource
     {
-        BlogMeta GetMeta(BlogSetting blogSetting, DateTime lastUpdatedAt);
+        BlogMeta GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt);
 
         BlogSourceChangeSet GetChanges(
             BlogSetting blogSetting,
-            DateTime lastUpdatedAt,
-            IEnumerable<BlogPostBase> existingPosts);
+            IEnumerable<BlogPostBase> existingPosts,
+            DateTime? lastUpdatedAt);
     }
 }

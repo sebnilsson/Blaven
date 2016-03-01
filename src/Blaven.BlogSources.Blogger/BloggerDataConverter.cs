@@ -46,7 +46,7 @@ namespace Blaven.BlogSources.Blogger
                                {
                                    Author = author,
                                    Content = post.Content,
-                                   Hash = BloggerBlogPostHashUtility.GetHash(post),
+                                   Hash = GetBlogPostHash(post),
                                    PublishedAt = post.Published,
                                    SourceId = post.Id,
                                    SourceUrl = post.Url,
@@ -55,6 +55,17 @@ namespace Blaven.BlogSources.Blogger
                                    UpdatedAt = post.Updated
                                };
             return blogPost;
+        }
+
+        private static string GetBlogPostHash(Post post)
+        {
+            if (post == null)
+            {
+                throw new ArgumentNullException(nameof(post));
+            }
+
+            string hash = post.Updated?.ToUniversalTime().ToString("o") ?? post.ETag;
+            return hash;
         }
     }
 }

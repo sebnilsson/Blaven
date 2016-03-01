@@ -9,7 +9,8 @@ namespace Blaven.BlogSources
         public static BlogSourceChangeSet GetChangeSet(
             string blogKey,
             ICollection<BlogPost> sourcePosts,
-            ICollection<BlogPostBase> dbPosts)
+            ICollection<BlogPostBase> dbPosts,
+            DateTime? lastUpdatedAt)
         {
             if (blogKey == null)
             {
@@ -24,18 +25,22 @@ namespace Blaven.BlogSources
                 throw new ArgumentNullException(nameof(dbPosts));
             }
 
-            var result = new BlogSourceChangeSet(blogKey);
+            var changeSet = new BlogSourceChangeSet(blogKey);
 
-            SyncDeletedPosts(sourcePosts, dbPosts, result);
-            SyncInsertedPosts(sourcePosts, dbPosts, result);
-            SyncModifiedPosts(sourcePosts, dbPosts, result);
+            if (lastUpdatedAt == null || lastUpdatedAt == DateTime.MinValue)
+            {
+                SyncDeletedPosts(sourcePosts, dbPosts, changeSet);
+            }
 
-            return result;
+            SyncInsertedPosts(sourcePosts, dbPosts, changeSet);
+            SyncModifiedPosts(sourcePosts, dbPosts, changeSet);
+
+            return changeSet;
         }
 
         private static void SyncDeletedPosts(
-            ICollection<BlogPost> sourcePosts,
-            ICollection<BlogPostBase> dbPosts,
+            IEnumerable<BlogPost> sourcePosts,
+            IEnumerable<BlogPostBase> dbPosts,
             BlogSourceChangeSet changeSet)
         {
             var sourceIds = sourcePosts.Select(x => x.SourceId).ToList();
@@ -46,8 +51,8 @@ namespace Blaven.BlogSources
         }
 
         private static void SyncInsertedPosts(
-            ICollection<BlogPost> sourcePosts,
-            ICollection<BlogPostBase> dbPosts,
+            IEnumerable<BlogPost> sourcePosts,
+            IEnumerable<BlogPostBase> dbPosts,
             BlogSourceChangeSet changeSet)
         {
             var dbIds = dbPosts.Select(x => x.SourceId).ToList();
@@ -58,8 +63,8 @@ namespace Blaven.BlogSources
         }
 
         private static void SyncModifiedPosts(
-            ICollection<BlogPost> sourcePosts,
-            ICollection<BlogPostBase> dbPosts,
+            IEnumerable<BlogPost> sourcePosts,
+            IEnumerable<BlogPostBase> dbPosts,
             BlogSourceChangeSet changeSet)
         {
             var modifiedPosts =

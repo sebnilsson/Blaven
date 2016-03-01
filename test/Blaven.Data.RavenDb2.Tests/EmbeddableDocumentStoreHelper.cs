@@ -23,7 +23,8 @@ namespace Blaven.Data.RavenDb2.Tests
                                                 DataDirectory = path,
                                                 RunInMemory = true,
                                                 RunInUnreliableYetFastModeThatIsNotSuitableForProduction
-                                                    = true
+                                                    = true,
+                                                MaxPageSize = 1024
                                             },
                                         RunInMemory = true
                                     };

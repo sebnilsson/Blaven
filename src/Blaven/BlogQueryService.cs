@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.Data;
@@ -12,7 +11,7 @@ namespace Blaven
 
         private readonly IRepository repository;
 
-        public BlogQueryService(IRepository repository, IEnumerable<BlogSetting> blogSettings = null)
+        public BlogQueryService(IRepository repository, params BlogSetting[] blogSettings)
         {
             if (repository == null)
             {
@@ -26,7 +25,7 @@ namespace Blaven
 
         public IQueryable<BlogMeta> GetBlogMetas()
         {
-            var meta = this.repository.GetBlogMetas();
+            var meta = this.repository.GetBlogMetas().OrderBy(x => x.Name);
             return meta;
         }
 
@@ -63,7 +62,7 @@ namespace Blaven
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
-            var allArchive = this.repository.ListArchive(ensuredBlogKeys);
+            var allArchive = this.repository.ListArchive(ensuredBlogKeys).OrderByDescending(x => x.Date);
             return allArchive;
         }
 
@@ -71,7 +70,7 @@ namespace Blaven
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
-            var allTags = this.repository.ListTags(ensuredBlogKeys);
+            var allTags = this.repository.ListTags(ensuredBlogKeys).OrderBy(x => x.Name);
             return allTags;
         }
 
@@ -79,7 +78,7 @@ namespace Blaven
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
-            var postHeads = this.repository.ListPostHeads(ensuredBlogKeys);
+            var postHeads = this.repository.ListPostHeads(ensuredBlogKeys).OrderByDescending(x => x.PublishedAt);
             return postHeads;
         }
 
@@ -87,15 +86,16 @@ namespace Blaven
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
-            var posts = this.repository.ListPosts(ensuredBlogKeys);
+            var posts = this.repository.ListPosts(ensuredBlogKeys).OrderByDescending(x => x.PublishedAt);
             return posts;
         }
 
-        public IQueryable<BlogPost> ListPostsByArchive(DateTime date, params string[] blogKeys)
+        public IQueryable<BlogPost> ListPostsByArchive(DateTime archiveDate, params string[] blogKeys)
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
-            var posts = this.repository.ListPostsByArchive(ensuredBlogKeys, date);
+            var posts =
+                this.repository.ListPostsByArchive(ensuredBlogKeys, archiveDate).OrderByDescending(x => x.PublishedAt);
             return posts;
         }
 
@@ -108,7 +108,7 @@ namespace Blaven
 
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
-            var posts = this.repository.ListPostsByTag(ensuredBlogKeys, tagName);
+            var posts = this.repository.ListPostsByTag(ensuredBlogKeys, tagName).OrderByDescending(x => x.PublishedAt);
             return posts;
         }
 
