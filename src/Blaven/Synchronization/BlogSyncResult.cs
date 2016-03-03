@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 
+using Blaven.BlogSources;
+
 namespace Blaven.Synchronization
 {
-    [DebuggerDisplay(
-        "BlogKey={BlogKey}, IsUpdated={IsUpdated}, StartedAt={StartedAt}, Elapsed={Elapsed}, ElapsedMs={ElapsedMs}")]
+    [DebuggerDisplay("BlogKey={BlogKey}, StartedAt={StartedAt}, Elapsed={Elapsed}, ElapsedMs={ElapsedMs}")]
     public class BlogSyncResult
     {
         private readonly Stopwatch stopwatch;
@@ -25,7 +26,9 @@ namespace Blaven.Synchronization
 
         public string BlogKey { get; }
 
-        public bool IsUpdated { get; private set; }
+        public BlogMeta BlogMeta { get; internal set; }
+
+        public BlogSourceChangeSet ChangeSet { get; internal set; }
 
         public TimeSpan Elapsed { get; private set; }
 
@@ -33,10 +36,8 @@ namespace Blaven.Synchronization
 
         public DateTime StartedAt { get; }
 
-        public void HandleDone(bool isUpdated)
+        public void HandleDone()
         {
-            this.IsUpdated = isUpdated;
-
             this.stopwatch.Stop();
 
             this.Elapsed = this.stopwatch.Elapsed;

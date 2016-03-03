@@ -118,9 +118,9 @@ namespace Blaven.Synchronization
                     {
                         var result = new BlogSyncResult(blogKey);
 
-                        this.UpdateBlog(blogKey, now, lastUpdatedAt: null);
+                        this.UpdateBlog(blogKey, now, result, lastUpdatedAt: null);
 
-                        result.HandleDone(isUpdated: true);
+                        result.HandleDone();
 
                         return result;
                     }).ToReadOnlyList();
@@ -167,9 +167,9 @@ namespace Blaven.Synchronization
                     {
                         var result = new BlogSyncResult(blogKey);
 
-                        bool isUpdated = this.TryUpdateBlog(blogKey, now);
+                        this.TryUpdateBlog(blogKey, now, result);
 
-                        result.HandleDone(isUpdated);
+                        result.HandleDone();
 
                         return result;
                     }).ToReadOnlyList();
@@ -198,30 +198,27 @@ namespace Blaven.Synchronization
             return blogSetting;
         }
 
-        private bool TryUpdateBlog(string blogKey, DateTime now)
+        private void TryUpdateBlog(string blogKey, DateTime now, BlogSyncResult result)
         {
-            bool isUpdated = TryUpdateBlogLocker.RunWithLock(
+            TryUpdateBlogLocker.RunWithLock(
                 blogKey.ToLowerInvariant(),
                 () =>
                     {
                         bool shouldUpdate = this.ShouldUpdateInternal(blogKey, now);
                         if (!shouldUpdate)
                         {
-                            return false;
+                            return;
                         }
 
                         var blogSetting = this.GetBlogSetting(blogKey);
 
                         var lastUpdatedAt = this.DataStorage.GetLastPostUpdatedAt(blogSetting);
 
-                        this.UpdateBlog(blogKey, now, lastUpdatedAt);
-
-                        return true;
+                        this.UpdateBlog(blogKey, now, result, lastUpdatedAt);
                     });
-            return isUpdated;
         }
 
-        private void UpdateBlog(string blogKey, DateTime now, DateTime? lastUpdatedAt)
+        private void UpdateBlog(string blogKey, DateTime now, BlogSyncResult result, DateTime? lastUpdatedAt)
         {
             UpdateBlogLocker.RunWithLock(
                 blogKey.ToLowerInvariant(),
@@ -236,7 +233,7 @@ namespace Blaven.Synchronization
 
                             var blogSetting = this.GetBlogSetting(blogKey);
 
-                            this.UpdateBlogData(blogSetting, lastUpdatedAt);
+                            this.UpdateBlogData(blogSetting, lastUpdatedAt, result);
 
                             this.config.DataCacheHandler.OnUpdated(blogKey, now);
                         }
@@ -253,14 +250,20 @@ namespace Blaven.Synchronization
                     });
         }
 
-        private void UpdateBlogData(BlogSetting blogSetting, DateTime? lastUpdatedAt)
+        private void UpdateBlogData(BlogSetting blogSetting, DateTime? lastUpdatedAt, BlogSyncResult result)
         {
             Parallel.Invoke(
-                () => BlogSyncServiceUpdateMetaHelper.Update(blogSetting, lastUpdatedAt, this.config),
-                () => BlogSyncServiceUpdatePostsHelper.Update(blogSetting, lastUpdatedAt, this.config));
-
-            //BlogSyncServiceUpdateMetaHelper.Update(blogSetting, lastUpdatedAt, this.config);
-            //BlogSyncServiceUpdatePostsHelper.Update(blogSetting, lastUpdatedAt, this.config);
+                () =>
+                    {
+                        result.BlogMeta = BlogSyncServiceUpdateMetaHelper.Update(blogSetting, lastUpdatedAt, this.config);
+                    },
+                () =>
+                    {
+                        result.ChangeSet = BlogSyncServiceUpdatePostsHelper.Update(
+                            blogSetting,
+                            lastUpdatedAt,
+                            this.config);
+                    });
         }
 
         private static BlogSyncConfiguration GetConfig(
@@ -283,7 +286,8 @@ namespace Blaven.Synchronization
                 dataCacheHandler: null,
                 slugProvider: null,
                 blavenIdProvider: null,
-                transformersProvider: null, blogSettings: blogSettings ?? Enumerable.Empty<BlogSetting>());
+                transformersProvider: null,
+                blogSettings: blogSettings ?? Enumerable.Empty<BlogSetting>());
             return config;
         }
     }

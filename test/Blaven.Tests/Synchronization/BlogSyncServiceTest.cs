@@ -197,14 +197,26 @@ namespace Blaven.Synchronization.Tests
 
             // Assert
             bool updateBlogKeys1ContainsUpdatedBlogKey =
-                updatedBlogKeys1.Any(x => x.BlogKey == TestData.BlogKey && x.IsUpdated);
+                updatedBlogKeys1.Any(x => x.BlogKey == TestData.BlogKey && ChangeSetHasAnyChange(x.ChangeSet));
             bool updateBlogKeys2ContainsUpdatedBlogKey =
-                updatedBlogKeys2.Any(x => x.BlogKey == TestData.BlogKey && x.IsUpdated);
+                updatedBlogKeys2.Any(x => x.BlogKey == TestData.BlogKey && ChangeSetHasAnyChange(x.ChangeSet));
             bool allTrackersRunOnce = AllTrackers(tracker => tracker.RunCount == 1, service);
 
             Assert.True(updateBlogKeys1ContainsUpdatedBlogKey);
             Assert.False(updateBlogKeys2ContainsUpdatedBlogKey);
             Assert.True(allTrackersRunOnce);
+        }
+
+        private static bool ChangeSetHasAnyChange(BlogSourceChangeSet changeSet)
+        {
+            if (changeSet == null)
+            {
+                return false;
+            }
+
+            bool hasAnyChange = changeSet.DeletedBlogPosts.Any() || changeSet.InsertedBlogPosts.Any()
+                                || changeSet.UpdatedBlogPosts.Any();
+            return hasAnyChange;
         }
 
         [Fact]
@@ -222,9 +234,9 @@ namespace Blaven.Synchronization.Tests
 
             // Assert
             bool updateBlogKeys1ContainsUpdatedBlogKey =
-                updatedBlogKeys1.Any(x => x.BlogKey == TestData.BlogKey && x.IsUpdated);
+                updatedBlogKeys1.Any(x => x.BlogKey == TestData.BlogKey && ChangeSetHasAnyChange(x.ChangeSet));
             bool updateBlogKeys2ContainsUpdatedBlogKey =
-                updatedBlogKeys2.Any(x => x.BlogKey == TestData.BlogKey && x.IsUpdated);
+                updatedBlogKeys2.Any(x => x.BlogKey == TestData.BlogKey && ChangeSetHasAnyChange(x.ChangeSet));
             bool allTrackersRunTwice = AllTrackers(tracker => tracker.RunCount == 2, service);
 
             Assert.True(updateBlogKeys1ContainsUpdatedBlogKey);

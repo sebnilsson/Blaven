@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Google;
-using Google.Apis;
-using Google.Apis.Auth.OAuth2;
 using Google.Apis.Blogger.v3;
 using Google.Apis.Blogger.v3.Data;
 using Google.Apis.Services;
