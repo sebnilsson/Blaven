@@ -17,7 +17,10 @@ namespace Blaven
 
             this.blogSettings = blogSettings.ToReadOnlyList();
 
-            this.BlogKeys = this.blogSettings.Select(x => x.BlogKey).ToReadOnlyList();
+            this.BlogKeys =
+                this.blogSettings.Where(x => x != null && !string.IsNullOrWhiteSpace(x.BlogKey))
+                    .Select(x => x.BlogKey.ToLowerInvariant())
+                    .ToReadOnlyList();
         }
 
         public IReadOnlyList<string> BlogKeys { get; }
@@ -37,12 +40,13 @@ namespace Blaven
                 throw new ArgumentOutOfRangeException(nameof(blogKey), message);
             }
 
-            return blogSettingsBlogKey;
+            return blogSettingsBlogKey.ToLowerInvariant();
         }
 
         public ICollection<string> GetEnsuredBlogKeys(IEnumerable<string> blogKeys)
         {
-            var blogKeyList = blogKeys?.ToList();
+            var blogKeyList =
+                blogKeys?.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.ToLowerInvariant()).ToList();
 
             if (blogKeyList != null && blogKeyList.Any())
             {

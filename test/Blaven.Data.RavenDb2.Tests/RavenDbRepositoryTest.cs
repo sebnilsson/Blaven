@@ -246,6 +246,33 @@ namespace Blaven.Data.RavenDb2.Tests
             Assert.False(anyTagItems);
         }
 
+        [Fact]
+        public void ListTags_DifferentCasingTags_ReturnsGroupedTags()
+        {
+            // Arrange
+            var tagNames = new[] { "Test tag", "test tag", "TEST tag", "test TAG", "TEST TAG" };
+            var dbBlogPosts =
+                tagNames.Select(
+                    (x, i) =>
+                    new BlogPost
+                        {
+                            BlogKey = (i < 2) ? TestData.BlogKey : TestData.BlogKey.ToLowerInvariant(),
+                            BlavenId = TestData.GetBlavenId(i),
+                            PublishedAt = TestData.TestPublishedAt,
+                            Tags = new[] { x }
+                        }).ToList();
+
+            var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
+
+            // Act
+            var tags = repository.ListTags(new[] { TestData.BlogKey }).ToList();
+
+            // Assert
+            var testTagItem = tags.FirstOrDefault(x => x.Name == "Test tag");
+            Assert.NotNull(testTagItem);
+            Assert.Equal(5, testTagItem.Count);
+        }
+
         [Theory]
         [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
         public void ListPostHeads_ExistingBlogKey_ReturnsPostHeads(IEnumerable<BlogPost> dbBlogPosts)

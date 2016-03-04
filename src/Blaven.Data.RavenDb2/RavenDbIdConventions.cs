@@ -13,7 +13,7 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(blogKey));
             }
 
-            string id = blogKey;
+            string id = blogKey.ToLowerInvariant();
             return id;
         }
 
@@ -28,7 +28,7 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(blavenId));
             }
 
-            string id = $"{blogKey}/{blavenId}";
+            string id = $"{blogKey.ToLowerInvariant()}/{blavenId}";
             return id;
         }
 

@@ -30,10 +30,8 @@ namespace Blaven.Data.RavenDb2.Indexes
             this.Index(x => x.Content, Raven.Abstractions.Indexing.FieldIndexing.Analyzed);
         }
 
-        public class Result
+        public class Result : BlogKeyItemBase
         {
-            public string BlogKey { get; set; }
-
             public object[] Content { get; set; }
         }
     }

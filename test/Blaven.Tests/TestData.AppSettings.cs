@@ -39,7 +39,7 @@ namespace Blaven.Tests
                                       },
                                       {
                                           "Blaven.Blogs.BlogKey3",
-                                          String.Empty
+                                          string.Empty
                                       },
                                       {
                                           "Blaven.BlogSources.Blogger.ApiKey",

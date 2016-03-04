@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 
-using Raven.Abstractions.Indexing;
 using Raven.Client.Indexes;
 
 namespace Blaven.Data.RavenDb2.Indexes
@@ -26,8 +25,6 @@ namespace Blaven.Data.RavenDb2.Indexes
                                                  Date = g.Key.Date,
                                                  Count = g.Sum(x => x.Count)
                                              };
-
-            this.Index(x => x.BlogKey, FieldIndexing.Default);
         }
     }
 }

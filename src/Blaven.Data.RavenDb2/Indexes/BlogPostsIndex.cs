@@ -22,8 +22,7 @@ namespace Blaven.Data.RavenDb2.Indexes
                                             Tags = post.Tags,
                                             UpdatedAt = post.UpdatedAt
                                     };
-
-            this.Index(x => x.BlogKey, FieldIndexing.Default);
+            
             this.Index(x => x.SourceId, FieldIndexing.NotAnalyzed);
         }
     }

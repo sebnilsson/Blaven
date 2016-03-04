@@ -4,10 +4,8 @@ using System.Diagnostics;
 namespace Blaven
 {
     [DebuggerDisplay("BlogKey={BlogKey}, SourceId={SourceId}, Name={Name}")]
-    public class BlogMeta
+    public class BlogMeta : BlogKeyItemBase
     {
-        public string BlogKey { get; set; }
-
         public string Description { get; set; }
 
         public string Name { get; set; }

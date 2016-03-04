@@ -7,7 +7,7 @@ namespace Blaven.BlogSources
     [DebuggerDisplay(
         "BlogKey={BlogKey}, Inserted={InsertedBlogPosts.Count}, Updated={UpdatedBlogPosts.Count}, Deleted={DeletedBlogPosts.Count}"
         )]
-    public class BlogSourceChangeSet
+    public class BlogSourceChangeSet : BlogKeyItemBase
     {
         public BlogSourceChangeSet(string blogKey)
         {
@@ -18,8 +18,6 @@ namespace Blaven.BlogSources
 
             this.BlogKey = blogKey;
         }
-
-        public string BlogKey { get; }
 
         public List<BlogPostBase> DeletedBlogPosts { get; } = new List<BlogPostBase>();
 

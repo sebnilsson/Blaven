@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 
-using Raven.Abstractions.Indexing;
 using Raven.Client.Indexes;
 
 namespace Blaven.Data.RavenDb2.Indexes
@@ -16,27 +15,16 @@ namespace Blaven.Data.RavenDb2.Indexes
                                 select new BlogTagItem { BlogKey = post.BlogKey, Name = tagName, Count = 1, };
 
             this.Reduce = results => from result in results
-                                     group result by new { result.BlogKey, result.Name }
+                                     group result by new { result.BlogKey, Name = result.Name.ToLowerInvariant() }
                                      into g
                                      orderby g.Key.Name ascending
                                      select
                                          new BlogTagItem
                                              {
-                                                 BlogKey = g.Key.BlogKey,
-                                                 Name = g.Key.Name,
+                                                 BlogKey = g.Key.BlogKey.ToLowerInvariant(),
+                                                 Name = g.Select(x => x.Name).FirstOrDefault(),
                                                  Count = g.Sum(x => x.Count),
                                              };
-
-            this.Index(x => x.BlogKey, FieldIndexing.Default);
-        }
-
-        public class ReduceResult
-        {
-            public string BlogKey { get; set; }
-
-            public string Tag { get; set; }
-
-            public int Count { get; set; }
         }
     }
 }

@@ -52,6 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AppSettingsHelper.cs" />
+    <Compile Include="BlogKeyItemBase.cs" />
     <Compile Include="PermalinkBlogPostBlavenIdProvider.cs" />
     <Compile Include="SourceIdBlogPostBlavenIdProvider.cs" />
     <Compile Include="BlavenException.cs" />

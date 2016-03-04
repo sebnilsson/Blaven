@@ -6,7 +6,7 @@ using Blaven.BlogSources;
 namespace Blaven.Synchronization
 {
     [DebuggerDisplay("BlogKey={BlogKey}, StartedAt={StartedAt}, Elapsed={Elapsed}, ElapsedMs={ElapsedMs}")]
-    public class BlogSyncResult
+    public class BlogSyncResult : BlogKeyItemBase
     {
         private readonly Stopwatch stopwatch;
 
@@ -23,8 +23,6 @@ namespace Blaven.Synchronization
 
             this.stopwatch = Stopwatch.StartNew();
         }
-
-        public string BlogKey { get; }
 
         public BlogMeta BlogMeta { get; internal set; }
 

@@ -3,10 +3,8 @@
 namespace Blaven
 {
     [DebuggerDisplay("BlogKey={BlogKey}, Name={Name}, Count={Count}")]
-    public class BlogTagItem
+    public class BlogTagItem : BlogKeyItemBase
     {
-        public string BlogKey { get; set; }
-
         public string Name { get; set; }
 
         public int Count { get; set; }
