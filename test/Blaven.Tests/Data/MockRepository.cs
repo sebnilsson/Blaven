@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Blaven.Tests;
 
@@ -87,22 +88,22 @@ namespace Blaven.Data.Tests
             throw new NotImplementedException();
         }
 
-        public BlogMeta GetBlogMeta(string blogKey)
+        public async Task<BlogMeta> GetBlogMeta(string blogKey)
         {
             var meta = this.getBlogMetaFunc?.Invoke(blogKey);
-            return meta;
+            return await Task.FromResult(meta);
         }
 
-        public BlogPost GetPost(string blogKey, string blavenId)
+        public async Task<BlogPost> GetPost(string blogKey, string blavenId)
         {
             var post = this.getPostFunc?.Invoke(blogKey, blavenId);
-            return post;
+            return await Task.FromResult(post);
         }
 
-        public BlogPost GetPostBySourceId(string blogKey, string sourceId)
+        public async Task<BlogPost> GetPostBySourceId(string blogKey, string sourceId)
         {
             var post = this.getPostBySourceIdFunc?.Invoke(blogKey, sourceId);
-            return post;
+            return await Task.FromResult(post);
         }
 
         public IQueryable<BlogArchiveItem> ListArchive(IEnumerable<string> blogKeys)
@@ -137,8 +138,6 @@ namespace Blaven.Data.Tests
 
         public IQueryable<BlogPost> SearchPosts(IEnumerable<string> blogKeys, string search)
         {
-            throw new NotImplementedException();
-
             var posts = this.searchPostsFunc?.Invoke(blogKeys, search);
             return posts;
         }
@@ -177,7 +176,7 @@ namespace Blaven.Data.Tests
                     {
                         Thread.Sleep(funcSleep);
                         var archive = from post in blogPostList
-                                      where post.PublishedAt.HasValue && blogKeys.Contains(post.BlogKey)
+                                      where post.PublishedAt != null && blogKeys.Contains(post.BlogKey)
                                       group post by new { post.PublishedAt.Value.Year, post.PublishedAt.Value.Month }
                                       into g
                                       select

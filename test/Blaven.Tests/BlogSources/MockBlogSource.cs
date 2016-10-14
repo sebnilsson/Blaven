@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Blaven.Tests;
 
@@ -27,7 +28,7 @@ namespace Blaven.BlogSources.Tests
 
         public DelegateTracker<BlogSetting> GetChangesTracker { get; } = new DelegateTracker<BlogSetting>();
 
-        public BlogMeta GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
+        public async Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
@@ -35,10 +36,10 @@ namespace Blaven.BlogSources.Tests
             }
 
             var meta = this.getMetaFunc?.Invoke(blogSetting);
-            return meta;
+            return await Task.FromResult(meta);
         }
 
-        public BlogSourceChangeSet GetChanges(
+        public async Task<BlogSourceChangeSet> GetChanges(
             BlogSetting blogSetting,
             IEnumerable<BlogPostBase> dbPosts,
             DateTime? lastUpdatedAt)
@@ -53,7 +54,7 @@ namespace Blaven.BlogSources.Tests
             }
 
             var changes = this.getChangesFunc?.Invoke(blogSetting, lastUpdatedAt, dbPosts);
-            return changes;
+            return await Task.FromResult(changes);
         }
 
         public static MockBlogSource Create(int getMetaFuncSleep = 100, int getChangesFuncSleep = 100)

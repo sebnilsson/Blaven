@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using Blaven.BlogSources;
 
@@ -7,12 +8,12 @@ namespace Blaven.Data
 {
     public interface IDataStorage
     {
-        DateTime? GetLastPostUpdatedAt(BlogSetting blogSetting);
+        Task<DateTime?> GetLastUpdatedAt(BlogSetting blogSetting);
 
-        IReadOnlyCollection<BlogPostBase> GetPostBases(BlogSetting blogSetting);
+        Task<IReadOnlyCollection<BlogPostBase>> GetPostBases(BlogSetting blogSetting, DateTime? lastUpdatedAt);
 
-        void SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta);
+        Task SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta);
 
-        void SaveChanges(BlogSetting blogSetting, BlogSourceChangeSet changeSet);
+        Task SaveChanges(BlogSetting blogSetting, BlogSourceChangeSet changeSet);
     }
 }

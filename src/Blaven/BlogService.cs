@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.Data;
 
 namespace Blaven
 {
-    public class BlogQueryService
+    public class BlogService
     {
-        private readonly BlogSettingsManager blogSettings;
+        private readonly BlogSettingsHelper blogSettings;
 
         private readonly IRepository repository;
 
-        public BlogQueryService(IRepository repository, params BlogSetting[] blogSettings)
+        public BlogService(IRepository repository, params BlogSetting[] blogSettings)
         {
             if (repository == null)
             {
@@ -20,7 +21,7 @@ namespace Blaven
 
             this.repository = repository;
 
-            this.blogSettings = new BlogSettingsManager(blogSettings ?? Enumerable.Empty<BlogSetting>());
+            this.blogSettings = new BlogSettingsHelper(blogSettings ?? Enumerable.Empty<BlogSetting>());
         }
 
         public IQueryable<BlogMeta> GetBlogMetas()
@@ -29,15 +30,15 @@ namespace Blaven
             return meta;
         }
 
-        public BlogMeta GetBlogMeta(string blogKey = null)
+        public async Task<BlogMeta> GetBlogMeta(string blogKey = null)
         {
             var ensuredBlogKey = this.blogSettings.GetEnsuredBlogKey(blogKey);
 
-            var meta = this.repository.GetBlogMeta(ensuredBlogKey);
+            var meta = await this.repository.GetBlogMeta(ensuredBlogKey);
             return meta;
         }
 
-        public BlogPost GetPost(string blavenId, string blogKey = null)
+        public async Task<BlogPost> GetPost(string blavenId, string blogKey = null)
         {
             if (blavenId == null)
             {
@@ -46,15 +47,15 @@ namespace Blaven
 
             var ensuredBlogKey = this.blogSettings.GetEnsuredBlogKey(blogKey);
 
-            var post = this.repository.GetPost(ensuredBlogKey, blavenId);
+            var post = await this.repository.GetPost(ensuredBlogKey, blavenId);
             return post;
         }
 
-        public BlogPost GetPostBySourceId(string sourceId, string blogKey = null)
+        public async Task<BlogPost> GetPostBySourceId(string sourceId, string blogKey = null)
         {
             var ensuredBlogKey = this.blogSettings.GetEnsuredBlogKey(blogKey);
 
-            var post = this.repository.GetPostBySourceId(ensuredBlogKey, sourceId);
+            var post = await this.repository.GetPostBySourceId(ensuredBlogKey, sourceId);
             return post;
         }
 

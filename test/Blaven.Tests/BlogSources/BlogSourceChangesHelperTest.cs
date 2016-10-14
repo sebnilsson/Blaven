@@ -15,7 +15,7 @@ namespace Blaven.BlogSources.Tests
             var dbPosts = TestData.GetBlogPosts(0, 5).ToList();
             var dbPostList = dbPosts.OfType<BlogPostBase>().ToList();
             var lastUpdatedAt = dbPosts.Select(x => x.UpdatedAt).OrderByDescending(x => x).FirstOrDefault();
-
+            
             // Act
             var changeSet = BlogSourceChangesHelper.GetChangeSet(
                 TestData.BlogKey,

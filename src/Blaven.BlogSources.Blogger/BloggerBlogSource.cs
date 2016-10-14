@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Google.Apis.Blogger.v3.Data;
-
 namespace Blaven.BlogSources.Blogger
 {
     public class BloggerBlogSource : BlogSourceBase

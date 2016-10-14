@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Blaven.Data
 {
@@ -8,7 +9,7 @@ namespace Blaven.Data
         public const int DefaultTimeoutMinutes = 15;
 
         internal readonly Dictionary<string, DateTime> DataUpdatedAt =
-            new Dictionary<string, DateTime>(StringComparer.InvariantCultureIgnoreCase);
+            new Dictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 
         public MemoryDataCacheHandler()
             : this(DefaultTimeoutMinutes)
@@ -29,7 +30,7 @@ namespace Blaven.Data
 
         public int TimeoutMinutes { get; }
 
-        public bool IsUpdated(string blogKey, DateTime now)
+        public Task<bool> IsUpdated(DateTime now, string blogKey)
         {
             if (blogKey == null)
             {
@@ -42,7 +43,7 @@ namespace Blaven.Data
             {
                 if (!this.DataUpdatedAt.ContainsKey(blogKey))
                 {
-                    return false;
+                    return Task.FromResult(false);
                 }
 
                 blogDataUpdated = this.DataUpdatedAt[blogKey];
@@ -51,10 +52,10 @@ namespace Blaven.Data
             var limitAt = now.AddMinutes(-this.TimeoutMinutes);
 
             bool isUpdated = (blogDataUpdated >= limitAt);
-            return isUpdated;
+            return Task.FromResult(isUpdated);
         }
 
-        public void OnUpdated(string blogKey, DateTime now)
+        public Task OnUpdated(DateTime now, string blogKey)
         {
             if (blogKey == null)
             {
@@ -65,6 +66,8 @@ namespace Blaven.Data
             {
                 this.DataUpdatedAt[blogKey] = now;
             }
+
+            return Task.CompletedTask;
         }
     }
 }

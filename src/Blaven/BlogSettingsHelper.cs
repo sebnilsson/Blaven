@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace Blaven
 {
-    internal class BlogSettingsManager
+    internal class BlogSettingsHelper
     {
         private readonly IReadOnlyList<BlogSetting> blogSettings;
 
-        public BlogSettingsManager(IEnumerable<BlogSetting> blogSettings)
+        public BlogSettingsHelper(IEnumerable<BlogSetting> blogSettings)
         {
             if (blogSettings == null)
             {
@@ -18,7 +18,7 @@ namespace Blaven
             this.blogSettings = blogSettings.ToReadOnlyList();
 
             this.BlogKeys =
-                this.blogSettings.Where(x => x != null && !string.IsNullOrWhiteSpace(x.BlogKey))
+                this.blogSettings.Where(x => !string.IsNullOrWhiteSpace(x?.BlogKey))
                     .Select(x => x.BlogKey.ToLowerInvariant())
                     .ToReadOnlyList();
         }

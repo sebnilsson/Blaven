@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Blaven.Data
 {
@@ -8,11 +9,11 @@ namespace Blaven.Data
     {
         IQueryable<BlogMeta> GetBlogMetas();
 
-        BlogMeta GetBlogMeta(string blogKey);
+        Task<BlogMeta> GetBlogMeta(string blogKey);
 
-        BlogPost GetPost(string blogKey, string blavenId);
+        Task<BlogPost> GetPost(string blogKey, string blavenId);
 
-        BlogPost GetPostBySourceId(string blogKey, string sourceId);
+        Task<BlogPost> GetPostBySourceId(string blogKey, string sourceId);
 
         IQueryable<BlogArchiveItem> ListArchive(IEnumerable<string> blogKeys);
 

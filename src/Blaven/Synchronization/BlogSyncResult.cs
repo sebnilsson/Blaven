@@ -24,9 +24,9 @@ namespace Blaven.Synchronization
             this.stopwatch = Stopwatch.StartNew();
         }
 
-        public BlogMeta BlogMeta { get; internal set; }
+        public BlogMeta BlogMeta { get; private set; }
 
-        public BlogSourceChangeSet ChangeSet { get; internal set; }
+        public BlogSourceChangeSet ChangeSet { get; private set; }
 
         public TimeSpan Elapsed { get; private set; }
 
@@ -34,7 +34,13 @@ namespace Blaven.Synchronization
 
         public DateTime StartedAt { get; }
 
-        public void HandleDone()
+        public void OnDataUpdated(BlogMeta blogMeta, BlogSourceChangeSet changeSet)
+        {
+            this.BlogMeta = blogMeta;
+            this.ChangeSet = changeSet;
+        }
+
+        public void OnDone()
         {
             this.stopwatch.Stop();
 

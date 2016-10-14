@@ -7,7 +7,7 @@ namespace Blaven
 {
     public static class HashUtility
     {
-        private static readonly HashAlgorithm Hash = SHA256.Create();
+        private static readonly SHA256 Hash = SHA256.Create(); // HashAlgorithm Hash = SHA256.Create();
 
         public static string GetBase64(params object[] args)
         {
@@ -27,6 +27,7 @@ namespace Blaven
             var argsBuffer = Encoding.UTF8.GetBytes(argsValue);
 
             var hashBytes = Hash.ComputeHash(argsBuffer);
+            //var hashBytes = argsBuffer;
             return hashBytes;
         }
     }

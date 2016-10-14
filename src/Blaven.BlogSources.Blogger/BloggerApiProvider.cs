@@ -2,11 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Google;
-using Google.Apis.Blogger.v3;
-using Google.Apis.Blogger.v3.Data;
-using Google.Apis.Services;
-
 namespace Blaven.BlogSources.Blogger
 {
     public class BloggerApiProvider
@@ -15,34 +10,33 @@ namespace Blaven.BlogSources.Blogger
 
         private const string BloggerApplicationName = "Blaven";
 
-        private readonly BloggerService bloggerService;
+        private readonly string apiKey;
 
         private readonly int postListRequestMaxResults;
 
-        public BloggerApiProvider(BloggerService bloggerService)
-            : this(bloggerService, DefaultPostListRequestMaxResults)
-        {
-        }
-
         internal BloggerApiProvider(string apiKey, int postListRequestMaxResults = DefaultPostListRequestMaxResults)
-            : this(GetBloggerService(apiKey), postListRequestMaxResults)
         {
+            if (apiKey == null)
+            {
+                throw new ArgumentNullException(nameof(apiKey));
+            }
+            if (postListRequestMaxResults <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(postListRequestMaxResults));
+            }
+
+            this.apiKey = apiKey;
+            this.postListRequestMaxResults = postListRequestMaxResults;
         }
 
-        internal BloggerApiProvider(BloggerService bloggerService, int postListRequestMaxResults)
+        internal BloggerApiProvider(int postListRequestMaxResults)
         {
-            if (bloggerService == null)
-            {
-                throw new ArgumentNullException(nameof(bloggerService));
-            }
             if (postListRequestMaxResults < 1)
             {
                 string message = $"Parameter '{postListRequestMaxResults}' must be a postive number.";
                 throw new ArgumentOutOfRangeException(nameof(postListRequestMaxResults), message);
             }
-
-            this.bloggerService = bloggerService;
-            this.postListRequestMaxResults = postListRequestMaxResults;
+            
         }
 
         protected BloggerApiProvider()

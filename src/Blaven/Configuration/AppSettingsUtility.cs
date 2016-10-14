@@ -1,41 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 
-namespace Blaven.BlogSources
+using Blaven.BlogSources;
+
+namespace Blaven.Configuration
 {
-    public static class BlogSourceAppSettingsUtility
+    public static class AppSettingsUtility
     {
-        public static string GetPassword<TBlogSource>() where TBlogSource : IBlogSource
-        {
-            var appSettings = ConfigurationManager.AppSettings.ToDictionaryIgnoreCase();
-
-            var config = GetPasswordInternal<TBlogSource>(appSettings);
-            return config;
-        }
-
-        public static string GetUsername<TBlogSource>() where TBlogSource : IBlogSource
-        {
-            var appSettings = ConfigurationManager.AppSettings.ToDictionaryIgnoreCase();
-
-            var config = GetUsernameInternal<TBlogSource>(appSettings);
-            return config;
-        }
-
-        public static string GetValue<TBlogSource>(string key) where TBlogSource : IBlogSource
-        {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            var appSettings = ConfigurationManager.AppSettings.ToDictionaryIgnoreCase();
-
-            var config = GetValueInternal<TBlogSource>(key, appSettings);
-            return config;
-        }
-
-        internal static string GetPasswordInternal<TBlogSource>(IDictionary<string, string> appSettings)
+        public static string GetPassword<TBlogSource>(IDictionary<string, string> appSettings)
             where TBlogSource : IBlogSource
         {
             if (appSettings == null)
@@ -43,11 +15,11 @@ namespace Blaven.BlogSources
                 throw new ArgumentNullException(nameof(appSettings));
             }
 
-            var config = GetValueInternal<TBlogSource>(AppSettingsHelper.PasswordKey, appSettings, requireValue: false);
+            var config = GetValue<TBlogSource>(AppSettingsHelper.PasswordKey, appSettings, requireValue: false);
             return config;
         }
 
-        internal static string GetUsernameInternal<TBlogSource>(IDictionary<string, string> appSettings)
+        public static string GetUsername<TBlogSource>(IDictionary<string, string> appSettings)
             where TBlogSource : IBlogSource
         {
             if (appSettings == null)
@@ -55,11 +27,11 @@ namespace Blaven.BlogSources
                 throw new ArgumentNullException(nameof(appSettings));
             }
 
-            var config = GetValueInternal<TBlogSource>(AppSettingsHelper.UsernameKey, appSettings, requireValue: false);
+            var config = GetValue<TBlogSource>(AppSettingsHelper.UsernameKey, appSettings, requireValue: false);
             return config;
         }
 
-        internal static string GetValueInternal<TBlogSource>(
+        public static string GetValue<TBlogSource>(
             string key,
             IDictionary<string, string> appSettings,
             bool requireValue = true) where TBlogSource : IBlogSource

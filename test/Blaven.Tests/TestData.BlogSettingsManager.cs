@@ -37,12 +37,12 @@ namespace Blaven.Tests
             return new BlogSetting(blogKey, id, name);
         }
 
-        internal static BlogSettingsManager GetTestBlogSettingsManager()
+        internal static BlogSettingsHelper GetTestBlogSettingsHelper()
         {
             var settings = GetBlogSettings();
 
-            var settingsManager = new BlogSettingsManager(settings);
-            return settingsManager;
+            var settingsHelper = new BlogSettingsHelper(settings);
+            return settingsHelper;
         }
     }
 }

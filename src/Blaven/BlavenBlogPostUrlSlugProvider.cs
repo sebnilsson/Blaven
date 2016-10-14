@@ -38,7 +38,7 @@ namespace Blaven
                 return string.Empty;
             }
 
-            var normalised = value.Normalize(NormalizationForm.FormKD);
+            var normalised = value; //.Normalize(NormalizationForm.FormKD);
 
             const int maxlen = 80;
             int len = normalised.Length;

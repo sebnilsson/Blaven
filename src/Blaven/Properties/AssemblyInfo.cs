@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿//using System.Resources;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -10,17 +11,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Blaven")]
-[assembly: AssemblyCopyright("Copyright © 2012")]
+[assembly: AssemblyCopyright("Copyright © Sebastian Nilsson 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-
-// Setting ComVisible to false makes the types in this assembly not visible 
-// to COM components.  If you need to access a type in this assembly from 
-// COM, set the ComVisible attribute to true on that type.
-[assembly: ComVisible(false)]
-
-// The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("06e4fc2f-c94b-4d33-9b0a-b04e55a2598c")]
+//[assembly: NeutralResourcesLanguage("en")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,7 +26,10 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+
+[assembly: AssemblyVersion("0.5.0.0")] // .NET
+[assembly: AssemblyFileVersion("0.5.0.0")] // Windows Explorer
+[assembly: AssemblyInformationalVersion("0.5.0")] // Nuget
 
 [assembly: InternalsVisibleTo("Blaven.Tests")]
+[assembly: InternalsVisibleTo("Blaven.Tests.Core")]

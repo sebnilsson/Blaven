@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.BlogSources;
 
@@ -7,7 +8,7 @@ namespace Blaven.Synchronization
 {
     internal static class BlogSyncServiceUpdatePostsHelper
     {
-        public static BlogSourceChangeSet Update(
+        public static async Task<BlogSourceChangeSet> Update(
             BlogSetting blogSetting,
             DateTime? lastUpdatedAt,
             BlogSyncConfiguration config)
@@ -21,7 +22,7 @@ namespace Blaven.Synchronization
                 throw new ArgumentNullException(nameof(config));
             }
 
-            var existingPosts = config.DataStorage.GetPostBases(blogSetting);
+            var existingPosts = await config.DataStorage.GetPostBases(blogSetting, lastUpdatedAt);
             if (existingPosts == null)
             {
                 string message =
@@ -29,19 +30,17 @@ namespace Blaven.Synchronization
                 throw new BlogSyncException(message);
             }
 
-            var sourceChanges = config.BlogSource.GetChanges(blogSetting, existingPosts, lastUpdatedAt);
-            if (sourceChanges == null)
+            var changeSet = await config.BlogSource.GetChanges(blogSetting, existingPosts, lastUpdatedAt);
+            if (changeSet == null)
             {
                 string message =
                     $"{nameof(config.BlogSource)} returned a null result from {nameof(config.BlogSource.GetChanges)} for {nameof(blogSetting)}.{nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
                 throw new BlogSyncException(message);
             }
 
-            HandleChanges(blogSetting, sourceChanges, config);
+            HandleChanges(blogSetting, changeSet, config);
 
-            config.DataStorage.SaveChanges(blogSetting, sourceChanges);
-
-            return sourceChanges;
+            return changeSet;
         }
 
         private static void HandleChanges(

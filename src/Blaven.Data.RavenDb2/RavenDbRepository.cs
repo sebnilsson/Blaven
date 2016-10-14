@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.Data.RavenDb2.Indexes;
 using Raven.Client;
@@ -31,7 +32,7 @@ namespace Blaven.Data.RavenDb2
             }
         }
 
-        public BlogMeta GetBlogMeta(string blogKey)
+        public async Task<BlogMeta> GetBlogMeta(string blogKey)
         {
             if (blogKey == null)
             {
@@ -40,14 +41,14 @@ namespace Blaven.Data.RavenDb2
 
             string blogMetaId = RavenDbIdConventions.GetBlogMetaId(blogKey);
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.DocumentStore.OpenAsyncSession())
             {
-                var meta = session.Load<BlogMeta>(blogMetaId);
+                var meta = await session.LoadAsync<BlogMeta>(blogMetaId);
                 return meta;
             }
         }
 
-        public BlogPost GetPost(string blogKey, string blavenId)
+        public async Task<BlogPost> GetPost(string blogKey, string blavenId)
         {
             if (blogKey == null)
             {
@@ -60,14 +61,14 @@ namespace Blaven.Data.RavenDb2
 
             string blogPostId = RavenDbIdConventions.GetBlogPostId(blogKey, blavenId);
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.DocumentStore.OpenAsyncSession())
             {
-                var post = session.Load<BlogPost>(blogPostId);
+                var post = await session.LoadAsync<BlogPost>(blogPostId);
                 return post;
             }
         }
 
-        public BlogPost GetPostBySourceId(string blogKey, string sourceId)
+        public async Task<BlogPost> GetPostBySourceId(string blogKey, string sourceId)
         {
             if (blogKey == null)
             {
@@ -78,7 +79,7 @@ namespace Blaven.Data.RavenDb2
                 throw new ArgumentNullException(nameof(sourceId));
             }
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.DocumentStore.OpenAsyncSession())
             {
                 var post =
                     session.Query<BlogPost, BlogPostsIndex>()

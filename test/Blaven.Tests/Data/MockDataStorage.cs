@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 using Blaven.BlogSources;
 using Blaven.Tests;
@@ -10,9 +11,9 @@ using Blaven.Tests;
 namespace Blaven.Data.Tests
 {
     [DebuggerDisplay(
-        "GetBlogPostsTracker={GetBlogPostsTracker.Events.Count}, "
-        + "SaveBlogMetaTracker={SaveBlogMetaTracker.Events.Count}, "
-        + "SaveChangesTracker={SaveChangesTracker.Events.Count}")]
+         "GetBlogPostsTracker={GetBlogPostsTracker.Events.Count}, "
+         + "SaveBlogMetaTracker={SaveBlogMetaTracker.Events.Count}, "
+         + "SaveChangesTracker={SaveChangesTracker.Events.Count}")]
     public class MockDataStorage : IDataStorage
     {
         private readonly Func<BlogSetting, IReadOnlyCollection<BlogPostBase>> getPostBasesFunc;
@@ -44,27 +45,29 @@ namespace Blaven.Data.Tests
 
         public DelegateTracker<BlogSetting> SaveChangesTracker { get; } = new DelegateTracker<BlogSetting>();
 
-        public DateTime? GetLastPostUpdatedAt(BlogSetting blogSetting)
+        public async Task<DateTime?> GetLastUpdatedAt(BlogSetting blogSetting)
         {
             if (blogSetting == null)
             {
                 throw new ArgumentNullException(nameof(blogSetting));
             }
 
-            return this.getLastPostUpdatedAtFunc?.Invoke(blogSetting);
+            return await Task.FromResult(this.getLastPostUpdatedAtFunc?.Invoke(blogSetting));
         }
 
-        public IReadOnlyCollection<BlogPostBase> GetPostBases(BlogSetting blogSetting)
+        public async Task<IReadOnlyCollection<BlogPostBase>> GetPostBases(
+            BlogSetting blogSetting,
+            DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
                 throw new ArgumentNullException(nameof(blogSetting));
             }
 
-            return this.getPostBasesFunc?.Invoke(blogSetting);
+            return await Task.FromResult(this.getPostBasesFunc?.Invoke(blogSetting));
         }
 
-        public void SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta)
+        public async Task SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta)
         {
             if (blogSetting == null)
             {
@@ -76,9 +79,11 @@ namespace Blaven.Data.Tests
             }
 
             this.saveBlogMetaAction?.Invoke(blogSetting, blogMeta);
+
+            await Task.CompletedTask;
         }
 
-        public void SaveChanges(BlogSetting blogSetting, BlogSourceChangeSet changeSet)
+        public async Task SaveChanges(BlogSetting blogSetting, BlogSourceChangeSet changeSet)
         {
             if (blogSetting == null)
             {
@@ -90,6 +95,8 @@ namespace Blaven.Data.Tests
             }
 
             this.saveChangesAction?.Invoke(blogSetting, changeSet);
+
+            await Task.CompletedTask;
         }
 
         public static MockDataStorage Create(
@@ -99,24 +106,26 @@ namespace Blaven.Data.Tests
             int saveChangesActionSleep = 100)
         {
             var dataStorage = new MockDataStorage(
-                getPostBasesFunc: blogSetting =>
-                    {
-                        Thread.Sleep(getBlogPostsFuncSleep);
-                        return
-                            TestData.GetBlogPostBases(start: 10, count: 100, blogKey: blogSetting.BlogKey)
-                                .ToReadOnlyList();
-                    },
-                getLastPostUpdatedAtFunc: blogSetting =>
-                    {
-                        Thread.Sleep(getLastPostUpdatedAtFuncSleep);
-                        return
-                            TestData.GetBlogPosts(start: 100, count: 10, blogKey: blogSetting.BlogKey)
-                                .Select(x => x.PublishedAt)
-                                .OrderByDescending(x => x)
-                                .FirstOrDefault();
-                    },
-                saveBlogMetaAction: (_, __) => { Thread.Sleep(saveBlogMetaActionSleep); },
-                saveChangesAction: (_, __) => { Thread.Sleep(saveChangesActionSleep); });
+                                  getPostBasesFunc: blogSetting =>
+                                      {
+                                          Thread.Sleep(getBlogPostsFuncSleep);
+                                          return
+                                              TestData.GetBlogPostBases(
+                                                  start: 10,
+                                                  count: 100,
+                                                  blogKey: blogSetting.BlogKey).ToReadOnlyList();
+                                      },
+                                  getLastPostUpdatedAtFunc: blogSetting =>
+                                      {
+                                          Thread.Sleep(getLastPostUpdatedAtFuncSleep);
+                                          return
+                                              TestData.GetBlogPosts(start: 100, count: 10, blogKey: blogSetting.BlogKey)
+                                                  .Select(x => x.PublishedAt)
+                                                  .OrderByDescending(x => x)
+                                                  .FirstOrDefault();
+                                      },
+                                  saveBlogMetaAction: (_, __) => { Thread.Sleep(saveBlogMetaActionSleep); },
+                                  saveChangesAction: (_, __) => { Thread.Sleep(saveChangesActionSleep); });
             return dataStorage;
         }
     }

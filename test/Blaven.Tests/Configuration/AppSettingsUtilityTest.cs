@@ -1,33 +1,34 @@
 ﻿using System.Collections.Generic;
 
+using Blaven.BlogSources.Tests;
 using Blaven.Tests;
 using Xunit;
 
-namespace Blaven.BlogSources.Tests
+namespace Blaven.Configuration.Tests
 {
     public class BlogSourceAppSettingsUtilityTest
     {
         [Fact]
-        public void GetPasswordInternal_PasswordAndMockBlogSource_ReturnsUserName()
+        public void GetPassword_PasswordAndMockBlogSource_ReturnsUserName()
         {
             // Arrange
             var appSettings = TestData.GetAppSettings();
 
             // Act
-            string password = BlogSourceAppSettingsUtility.GetPasswordInternal<MockBlogSource>(appSettings);
+            string password = AppSettingsUtility.GetPassword<MockBlogSource>(appSettings);
 
             // Assert
             Assert.Equal(TestData.AppSettingsTestPassword, password);
         }
 
         [Fact]
-        public void GetUsernameInternal_UsernameAndMockBlogSource_ReturnsUsername()
+        public void GetUsername_UsernameAndMockBlogSource_ReturnsUsername()
         {
             // Arrange
             var appSettings = TestData.GetAppSettings();
 
             // Act
-            string username = BlogSourceAppSettingsUtility.GetUsernameInternal<MockBlogSource>(appSettings);
+            string username = AppSettingsUtility.GetUsername<MockBlogSource>(appSettings);
 
             // Assert
             Assert.Equal(TestData.AppSettingsTestUsername, username);
@@ -41,7 +42,7 @@ namespace Blaven.BlogSources.Tests
 
             // Act & Assert
             Assert.Throws<KeyNotFoundException>(
-                () => BlogSourceAppSettingsUtility.GetValueInternal<MockBlogSource>("NonExistingKey", appSettings));
+                () => AppSettingsUtility.GetValue<MockBlogSource>("NonExistingKey", appSettings));
         }
     }
 }

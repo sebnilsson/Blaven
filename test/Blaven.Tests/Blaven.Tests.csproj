@@ -12,7 +12,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Blaven</RootNamespace>
     <AssemblyName>Blaven.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\..\</SolutionDir>
@@ -49,6 +49,14 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Services.Client" />
+    <Reference Include="System.Security.Cryptography.Algorithms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Algorithms.4.2.0\lib\net46\System.Security.Cryptography.Algorithms.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Security.Cryptography.Primitives, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Security.Cryptography.Primitives.4.0.0\lib\net46\System.Security.Cryptography.Primitives.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
@@ -75,10 +83,10 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppSettingsFactoryTest.cs" />
-    <Compile Include="BlogQueryServiceTest.cs" />
+    <Compile Include="Configuration\AppSettingsConfigServiceTest.cs" />
+    <Compile Include="BlogServiceTest.cs" />
     <Compile Include="BlogSettingsManagerTest.cs" />
-    <Compile Include="BlogSources\BlogSourceAppSettingsUtilityTest.cs" />
+    <Compile Include="Configuration\AppSettingsUtilityTest.cs" />
     <Compile Include="BlogSources\BlogSourceChangesHelperTest.cs" />
     <Compile Include="Data\MockRepository.cs" />
     <Compile Include="DelegateTracker.cs" />
@@ -110,7 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">
-      <Project>{30FB0DDF-B9A6-4D40-A1D8-979A5DF398EA}</Project>
+      <Project>{87aa2b88-6b18-4243-9f07-a890f641ae62}</Project>
       <Name>Blaven</Name>
     </ProjectReference>
   </ItemGroup>

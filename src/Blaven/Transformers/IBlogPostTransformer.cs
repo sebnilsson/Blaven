@@ -1,7 +1,9 @@
-﻿namespace Blaven.Transformers
+﻿using System.Threading.Tasks;
+
+namespace Blaven.Transformers
 {
     public interface IBlogPostTransformer
     {
-        BlogPost Transform(BlogPost blogPost);
+        Task<BlogPost> Transform(BlogPost blogPost);
     }
 }

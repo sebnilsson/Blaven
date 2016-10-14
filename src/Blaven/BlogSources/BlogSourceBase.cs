@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Blaven.BlogSources
 {
     public abstract class BlogSourceBase : IBlogSource
     {
-        public virtual BlogSourceChangeSet GetChanges(
+        public virtual async Task<BlogSourceChangeSet> GetChanges(
             BlogSetting blogSetting,
             IEnumerable<BlogPostBase> dbPosts,
             DateTime? lastUpdatedAt)
@@ -22,18 +23,18 @@ namespace Blaven.BlogSources
 
             var dbBlogPostsList = dbPosts.ToList();
 
-            var sourcePosts = this.GetSourcePosts(blogSetting, lastUpdatedAt).ToList();
+            var sourcePosts = await this.GetSourcePosts(blogSetting, lastUpdatedAt);
 
             var changeSet = BlogSourceChangesHelper.GetChangeSet(
                 blogSetting.BlogKey,
-                sourcePosts,
+                sourcePosts.ToList(),
                 dbBlogPostsList,
                 lastUpdatedAt);
             return changeSet;
         }
 
-        public abstract BlogMeta GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt);
+        public abstract Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt);
 
-        protected abstract IEnumerable<BlogPost> GetSourcePosts(BlogSetting blogSetting, DateTime? lastUpdatedAt);
+        protected abstract Task<IEnumerable<BlogPost>> GetSourcePosts(BlogSetting blogSetting, DateTime? lastUpdatedAt);
     }
 }

@@ -61,7 +61,7 @@ namespace Blaven.Synchronization
 
             var blogSetting =
                 this.BlogSettings.FirstOrDefault(
-                    x => x.BlogKey.Equals(blogKey, StringComparison.InvariantCultureIgnoreCase));
+                    x => x.BlogKey.Equals(blogKey, StringComparison.OrdinalIgnoreCase));
             return blogSetting;
         }
     }

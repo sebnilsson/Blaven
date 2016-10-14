@@ -1,31 +1,33 @@
 ﻿using System;
 using System.Linq;
 
+using Blaven.BlogSources.Tests;
+using Blaven.Configuration;
 using Blaven.Tests;
 using Xunit;
 
-namespace Blaven.BlogSources.Tests
+namespace Blaven.BlogSources.Configuration.Tests
 {
     public class BlogSourceFactoryTest
     {
         [Fact]
-        public void BuildBlogSourceInternal_NullMockBlogSource_FuncContainsUsernameAndPassword()
+        public void BuildBlogSource_NullMockBlogSource_FuncContainsUsernameAndPassword()
         {
             // Arrange
             var appSettings = TestData.GetAppSettings();
+            var service = new AppSettingsConfigService(appSettings);
 
             string username = null;
             string password = null;
 
             // Act
-            AppSettingsFactory.BuildBlogSourceInternal<MockBlogSource>(
+            service.BuildBlogSource<MockBlogSource>(
                 (appSettingUsername, appSettingsPassword) =>
                     {
                         username = appSettingUsername;
                         password = appSettingsPassword;
                         return null;
-                    },
-                appSettings);
+                    });
 
             // Assert
             Assert.Equal(TestData.AppSettingsTestUsername, username);
@@ -33,13 +35,14 @@ namespace Blaven.BlogSources.Tests
         }
 
         [Fact]
-        public void BuildBlogSourceInternal_MockBlogSource_ReturnsNotNullBlogSource()
+        public void BuildBlogSource_MockBlogSource_ReturnsNotNullBlogSource()
         {
             // Arrange
             var appSettings = TestData.GetAppSettings();
+            var service = new AppSettingsConfigService(appSettings);
 
             // Act
-            var blogSource = AppSettingsFactory.BuildBlogSourceInternal((_, __) => MockBlogSource.Create(), appSettings);
+            var blogSource = service.BuildBlogSource((_, __) => MockBlogSource.Create());
 
             // Assert
             Assert.NotNull(blogSource);
@@ -50,12 +53,13 @@ namespace Blaven.BlogSources.Tests
         {
             // Arrange
             var appSettings = TestData.GetAppSettings();
+            var service = new AppSettingsConfigService(appSettings);
 
             string blogKey1 = nameof(TestData.BlogKey1).ToLowerInvariant();
             string blogKey2 = nameof(TestData.BlogKey2).ToLowerInvariant();
 
             // Act
-            var blogSettings = AppSettingsFactory.GetBlogSettingsInternal(appSettings).ToList();
+            var blogSettings = service.GetBlogSettings().ToList();
 
             // Assert
             var blogSetting1 = blogSettings.FirstOrDefault(x => x.BlogKey == blogKey1);
@@ -77,11 +81,12 @@ namespace Blaven.BlogSources.Tests
         {
             // Arrange
             var appSettings = TestData.GetAppSettings();
+            var service = new AppSettingsConfigService(appSettings);
 
             string blogKey3 = nameof(TestData.BlogKey3).ToLowerInvariant();
 
             // Act
-            var blogSettings = AppSettingsFactory.GetBlogSettingsInternal(appSettings).ToList();
+            var blogSettings = service.GetBlogSettings().ToList();
 
             // Assert
             var blogSetting3 = blogSettings.FirstOrDefault(x => x.BlogKey == blogKey3);

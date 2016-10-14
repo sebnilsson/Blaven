@@ -32,7 +32,7 @@ namespace Blaven.Data.Tests
             var cacheHandler = new MemoryDataCacheHandler();
 
             // Act
-            cacheHandler.OnUpdated(TestData.BlogKey, NowFirst);
+            cacheHandler.OnUpdated(NowFirst, TestData.BlogKey);
 
             // Assert
             var dataState = cacheHandler.DataUpdatedAt[TestData.BlogKey];
@@ -47,8 +47,8 @@ namespace Blaven.Data.Tests
             var cacheHandler = new MemoryDataCacheHandler();
 
             // Act
-            cacheHandler.OnUpdated(TestData.BlogKey1, NowFirst);
-            cacheHandler.OnUpdated(TestData.BlogKey2, NowFirst);
+            cacheHandler.OnUpdated(NowFirst, TestData.BlogKey1);
+            cacheHandler.OnUpdated(NowFirst, TestData.BlogKey2);
 
             // Assert
             var dataState1 = cacheHandler.DataUpdatedAt[TestData.BlogKey1];
@@ -65,9 +65,9 @@ namespace Blaven.Data.Tests
             var cacheHandler = new MemoryDataCacheHandler();
 
             // Act
-            cacheHandler.OnUpdated(TestData.BlogKey, NowFirst);
+            cacheHandler.OnUpdated(NowFirst, TestData.BlogKey);
 
-            cacheHandler.OnUpdated(TestData.BlogKey, NowSecond);
+            cacheHandler.OnUpdated(NowSecond, TestData.BlogKey);
 
             // Assert
             var dataState = cacheHandler.DataUpdatedAt[TestData.BlogKey];
@@ -81,11 +81,11 @@ namespace Blaven.Data.Tests
             var cacheHandler = new MemoryDataCacheHandler();
 
             // Act
-            cacheHandler.OnUpdated(TestData.BlogKey1, NowFirst);
-            cacheHandler.OnUpdated(TestData.BlogKey2, NowFirst);
+            cacheHandler.OnUpdated(NowFirst, TestData.BlogKey1);
+            cacheHandler.OnUpdated(NowFirst, TestData.BlogKey2);
 
-            cacheHandler.OnUpdated(TestData.BlogKey1, NowSecond);
-            cacheHandler.OnUpdated(TestData.BlogKey2, NowSecond);
+            cacheHandler.OnUpdated(NowSecond, TestData.BlogKey1);
+            cacheHandler.OnUpdated(NowSecond, TestData.BlogKey2);
 
             // Assert
             var dataState1 = cacheHandler.DataUpdatedAt[TestData.BlogKey1];
@@ -102,10 +102,10 @@ namespace Blaven.Data.Tests
             var cacheHandler = new MemoryDataCacheHandler();
 
             // Act
-            cacheHandler.OnUpdated(TestData.BlogKey1, NowFirst);
-            cacheHandler.OnUpdated(TestData.BlogKey2, NowFirst);
+            cacheHandler.OnUpdated(NowFirst, TestData.BlogKey1);
+            cacheHandler.OnUpdated(NowFirst, TestData.BlogKey2);
 
-            cacheHandler.OnUpdated(TestData.BlogKey2, NowSecond);
+            cacheHandler.OnUpdated(NowSecond, TestData.BlogKey2);
 
             // Assert
             var dataState1 = cacheHandler.DataUpdatedAt[TestData.BlogKey1];
@@ -122,7 +122,7 @@ namespace Blaven.Data.Tests
             var cacheHandler = new MemoryDataCacheHandler();
 
             // Act
-            bool isUpdated = cacheHandler.IsUpdated(TestData.BlogKey, DateTime.MinValue);
+            bool isUpdated = cacheHandler.IsUpdated(DateTime.MinValue, TestData.BlogKey).GetAwaiter().GetResult();
 
             // Assert
             Assert.False(isUpdated);
@@ -138,7 +138,7 @@ namespace Blaven.Data.Tests
             var now = NowFirst.AddMinutes(MemoryDataCacheHandler.DefaultTimeoutMinutes);
 
             // Act
-            bool isUpdated = cacheHandler.IsUpdated(TestData.BlogKey, now);
+            bool isUpdated = cacheHandler.IsUpdated(now, TestData.BlogKey).GetAwaiter().GetResult();
 
             // Assert
             Assert.True(isUpdated);
@@ -154,7 +154,7 @@ namespace Blaven.Data.Tests
             var now = NowFirst.AddMinutes(MemoryDataCacheHandler.DefaultTimeoutMinutes).AddSeconds(1);
 
             // Act
-            bool isUpdated = cacheHandler.IsUpdated(TestData.BlogKey, now);
+            bool isUpdated = cacheHandler.IsUpdated(now, TestData.BlogKey).GetAwaiter().GetResult();
 
             // Assert
             Assert.False(isUpdated);

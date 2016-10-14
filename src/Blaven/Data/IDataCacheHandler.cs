@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Blaven.Data
 {
@@ -6,8 +7,8 @@ namespace Blaven.Data
     {
         int TimeoutMinutes { get; }
 
-        bool IsUpdated(string blogKey, DateTime now);
+        Task<bool> IsUpdated(DateTime now, string blogKey);
 
-        void OnUpdated(string blogKey, DateTime now);
+        Task OnUpdated(DateTime now, string blogKey);
     }
 }

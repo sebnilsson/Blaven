@@ -10,10 +10,10 @@ namespace Blaven.Tests
         public void GetEnsuredBlogKey_NonExistingBlogKey_ReturnsNonExistingBlogKey()
         {
             // Arrange
-            var settingsManager = TestData.GetTestBlogSettingsManager();
+            var settingsHelper = TestData.GetTestBlogSettingsHelper();
 
             // Act
-            var ensuredBlogKey = settingsManager.GetEnsuredBlogKey(TestData.BlogKey);
+            var ensuredBlogKey = settingsHelper.GetEnsuredBlogKey(TestData.BlogKey);
 
             // Assert
             Assert.Equal(TestData.BlogKey, ensuredBlogKey);
@@ -23,10 +23,10 @@ namespace Blaven.Tests
         public void GetEnsuredBlogKey_NullBlogKey_ReturnsFirstBlogSettingsBlogKey()
         {
             // Arrange
-            var settingsManager = TestData.GetTestBlogSettingsManager();
+            var settingsHelper = TestData.GetTestBlogSettingsHelper();
 
             // Act
-            var ensuredBlogKey = settingsManager.GetEnsuredBlogKey(blogKey: null);
+            var ensuredBlogKey = settingsHelper.GetEnsuredBlogKey(blogKey: null);
 
             // Assert
             var firstBlogSetting = TestData.GetBlogSettings().FirstOrDefault();
@@ -40,11 +40,11 @@ namespace Blaven.Tests
         public void GetEnsuredBlogKeys_NonExistingBlogKey_ReturnsNonExistingBlogKey()
         {
             // Arrange
-            var settingsManager = TestData.GetTestBlogSettingsManager();
+            var settingsHelper = TestData.GetTestBlogSettingsHelper();
             var blogKeys = new[] { TestData.BlogKey };
 
             // Act
-            var ensuredBlogKeys = settingsManager.GetEnsuredBlogKeys(blogKeys);
+            var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys);
 
             // Assert
             bool ensuredBlogKeysSequenceEqualsBlogKeys = ensuredBlogKeys.SequenceEqual(blogKeys);
@@ -55,10 +55,10 @@ namespace Blaven.Tests
         public void GetEnsuredBlogKeys_EmptyBlogKeys_ReturnsAllBlogSettingsBlogKeys()
         {
             // Arrange
-            var settingsManager = TestData.GetTestBlogSettingsManager();
+            var settingsHelper = TestData.GetTestBlogSettingsHelper();
 
             // Act
-            var ensuredBlogKeys = settingsManager.GetEnsuredBlogKeys(blogKeys: Enumerable.Empty<string>());
+            var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys: Enumerable.Empty<string>());
 
             // Assert
             var blogSettingsBlogKeys = TestData.GetBlogSettings().Select(x => x.BlogKey);
@@ -71,10 +71,10 @@ namespace Blaven.Tests
         public void GetEnsuredBlogKeys_NullBlogKeys_ReturnsAllBlogSettingsBlogKeys()
         {
             // Arrange
-            var settingsManager = TestData.GetTestBlogSettingsManager();
+            var settingsHelper = TestData.GetTestBlogSettingsHelper();
 
             // Act
-            var ensuredBlogKeys = settingsManager.GetEnsuredBlogKeys(blogKeys: null);
+            var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys: null);
 
             // Assert
             var blogSettingsBlogKeys = TestData.GetBlogSettings().Select(x => x.BlogKey);
