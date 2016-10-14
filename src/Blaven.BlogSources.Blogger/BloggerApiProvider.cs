@@ -1,166 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+
+using Newtonsoft.Json;
 
 namespace Blaven.BlogSources.Blogger
 {
-    public class BloggerApiProvider
+    public class BloggerApiProvider : IBloggerApiProvider
     {
         public const int DefaultPostListRequestMaxResults = 500;
 
-        private const string BloggerApplicationName = "Blaven";
+        private readonly BloggerApiUrlHelper apiUrlHelper;
 
-        private readonly string apiKey;
-
-        private readonly int postListRequestMaxResults;
-
-        internal BloggerApiProvider(string apiKey, int postListRequestMaxResults = DefaultPostListRequestMaxResults)
+        public BloggerApiProvider(string apiKey)
         {
             if (apiKey == null)
             {
                 throw new ArgumentNullException(nameof(apiKey));
             }
-            if (postListRequestMaxResults <= 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(postListRequestMaxResults));
-            }
 
-            this.apiKey = apiKey;
-            this.postListRequestMaxResults = postListRequestMaxResults;
+            this.apiUrlHelper = new BloggerApiUrlHelper(apiKey);
         }
 
-        internal BloggerApiProvider(int postListRequestMaxResults)
-        {
-            if (postListRequestMaxResults < 1)
-            {
-                string message = $"Parameter '{postListRequestMaxResults}' must be a postive number.";
-                throw new ArgumentOutOfRangeException(nameof(postListRequestMaxResults), message);
-            }
-            
-        }
+        internal int PostListRequestMaxResults { get; set; } = DefaultPostListRequestMaxResults;
 
-        protected BloggerApiProvider()
-        {
-        }
-
-        public virtual Blog GetBlog(string blogId)
+        public async Task<BloggerBlogData> GetBlog(string blogId)
         {
             if (blogId == null)
             {
                 throw new ArgumentNullException(nameof(blogId));
             }
 
-            var request = this.bloggerService.Blogs.Get(blogId);
+            string blogUrl = this.apiUrlHelper.GetBlogUrl(blogId);
 
-            try
-            {
-                var blog = request.Execute();
-                return blog;
-            }
-            catch (GoogleApiException ex)
-            {
-                string message =
-                    $"Execution failed for {nameof(this.bloggerService.Blogs)}.{nameof(this.bloggerService.Blogs.Get)} with Blog ID '{blogId}'.";
-                throw new BloggerApiRequestExecuteException(message, ex);
-            }
+            var blog = await GetHttpJsonContent<BloggerBlogData>(blogUrl);
+            return blog;
         }
 
-        public virtual IEnumerable<Post> GetPosts(string blogId, DateTime? lastUpdatedAt)
+        public async Task<IReadOnlyList<BloggerPostData>> GetPosts(string blogId, DateTime? lastUpdatedAt)
         {
             if (blogId == null)
             {
                 throw new ArgumentNullException(nameof(blogId));
             }
 
-            var postListRequest = this.GetPostListRequest(blogId);
+            var posts = new List<BloggerPostData>();
 
-            if (lastUpdatedAt != null && lastUpdatedAt > DateTime.MinValue)
+            BloggerPostsData postsData = null;
+
+            while (true)
             {
-                postListRequest.StartDate = lastUpdatedAt;
-            }
+                string url = this.apiUrlHelper.GetPostsUrl(
+                    blogId,
+                    lastUpdatedAt,
+                    postsData?.NextPageToken,
+                    this.PostListRequestMaxResults);
 
-            try
-            {
-                var posts = GetPostListRequestAllPosts(postListRequest);
-                return posts;
-            }
-            catch (GoogleApiException ex)
-            {
-                string message =
-                    $"Execution failed for {nameof(this.bloggerService.Posts)}.{nameof(this.bloggerService.Posts.List)} with Blog ID '{blogId}'.";
-                throw new BloggerApiRequestExecuteException(message, ex);
-            }
-        }
+                postsData = await GetHttpJsonContent<BloggerPostsData>(url);
 
-        //public virtual IEnumerable<Post> GetPostsSlim(string blogId)
-        //{
-        //    if (blogId == null)
-        //    {
-        //        throw new ArgumentNullException(nameof(blogId));
-        //    }
-
-        //    var postListRequest = this.GetPostListRequestSlim(blogId);
-        //    var posts = GetPostListRequestAllPosts(postListRequest);
-        //    return posts;
-        //}
-
-        private PostsResource.ListRequest GetPostListRequest(string blogId)
-        {
-            var postListRequest = this.bloggerService.Posts.List(blogId);
-            postListRequest.Fields = "nextPageToken,items(id,published,updated,url,title,content,author,labels)";
-            postListRequest.FetchImages = false;
-            postListRequest.PrettyPrint = false;
-            postListRequest.MaxResults = this.postListRequestMaxResults;
-            //postListRequest.OrderBy = PostsResource.ListRequest.OrderByEnum.Updated;
-
-            return postListRequest;
-        }
-
-        //private PostsResource.ListRequest GetPostListRequestSlim(string blogId)
-        //{
-        //    var postListRequest = this.GetPostListRequest(blogId);
-        //    postListRequest.Fields = "items(id,updated)";
-
-        //    return postListRequest;
-        //}
-
-        private static IEnumerable<Post> GetPostListRequestAllPosts(PostsResource.ListRequest postListRequest)
-        {
-            var posts = postListRequest.Execute();
-
-            foreach (var post in posts.Items ?? Enumerable.Empty<Post>())
-            {
-                yield return post;
-            }
-
-            while (!string.IsNullOrWhiteSpace(posts.NextPageToken))
-            {
-                postListRequest.PageToken = posts.NextPageToken;
-
-                posts = postListRequest.Execute();
-
-                foreach (var post in posts.Items ?? Enumerable.Empty<Post>())
+                if (postsData?.Items == null || !postsData.Items.Any())
                 {
-                    yield return post;
+                    break;
+                }
+
+                posts.AddRange(postsData.Items);
+
+                if (string.IsNullOrWhiteSpace(postsData?.NextPageToken))
+                {
+                    break;
                 }
             }
+
+            return posts.ToReadOnlyList();
         }
 
-        internal static BloggerService GetBloggerService(string apiKey)
+        private static async Task<T> GetHttpJsonContent<T>(string url)
         {
-            if (apiKey == null)
+            using (var client = new HttpClient())
+            using (var response = await client.GetAsync(url))
             {
-                throw new ArgumentNullException(nameof(apiKey));
-            }
-            
-            var initializer = new BaseClientService.Initializer
-                                  {
-                                      ApiKey = apiKey,
-                                      ApplicationName = BloggerApplicationName
-                                  };
+                response.EnsureSuccessStatusCode();
 
-            var service = new BloggerService(initializer);
-            return service;
+                string content = await response.Content.ReadAsStringAsync();
+
+                var result = JsonConvert.DeserializeObject<T>(content);
+                return result;
+            }
         }
     }
 }

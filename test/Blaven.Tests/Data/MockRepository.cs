@@ -176,8 +176,9 @@ namespace Blaven.Data.Tests
                     {
                         Thread.Sleep(funcSleep);
                         var archive = from post in blogPostList
-                                      where post.PublishedAt != null && blogKeys.Contains(post.BlogKey)
-                                      group post by new { post.PublishedAt.Value.Year, post.PublishedAt.Value.Month }
+                                      let pubishedAt = post.PublishedAt
+                                      where pubishedAt != null && blogKeys.Contains(post.BlogKey)
+                                      group post by new { pubishedAt.Value.Year, pubishedAt.Value.Month }
                                       into g
                                       select
                                           new BlogArchiveItem
@@ -230,6 +231,7 @@ namespace Blaven.Data.Tests
                                 && x.Tags.Contains(tagName, StringComparer.InvariantCultureIgnoreCase));
                         return posts.AsQueryable();
                     });
+
             return blogSource;
         }
     }

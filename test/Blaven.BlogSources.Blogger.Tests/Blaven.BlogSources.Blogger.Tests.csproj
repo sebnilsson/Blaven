@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Blaven.BlogSources.Blogger</RootNamespace>
     <AssemblyName>Blaven.BlogSources.Blogger.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -21,6 +21,7 @@
     <RestorePackages>true</RestorePackages>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -93,7 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Blaven.BlogSources.Blogger\Blaven.BlogSources.Blogger.csproj">
-      <Project>{9d0b9bf3-fc5f-48a7-8f54-553d97c88c8f}</Project>
+      <Project>{2cfae5bb-82df-4710-9e9d-0910176a621d}</Project>
       <Name>Blaven.BlogSources.Blogger</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">

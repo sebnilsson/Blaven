@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Linq;
 
-using Google.Apis.Blogger.v3.Data;
-
 namespace Blaven.BlogSources.Blogger
 {
     public static class BloggerDataConverter
     {
-        public static BlogMeta ConvertMeta(Blog blog)
+        public static BlogMeta ConvertMeta(BloggerBlogData blog)
         {
             if (blog == null)
             {
@@ -26,7 +24,7 @@ namespace Blaven.BlogSources.Blogger
             return blogMeta;
         }
 
-        public static BlogPost ConvertPost(Post post)
+        public static BlogPost ConvertPost(BloggerPostData post)
         {
             if (post == null)
             {
@@ -50,14 +48,14 @@ namespace Blaven.BlogSources.Blogger
                                    PublishedAt = post.Published,
                                    SourceId = post.Id,
                                    SourceUrl = post.Url,
-                                   Tags = post.Labels?.ToList() ?? Enumerable.Empty<string>(),
+                                   Tags = post.Labels ?? Enumerable.Empty<string>(),
                                    Title = post.Title,
                                    UpdatedAt = post.Updated
                                };
             return blogPost;
         }
 
-        private static string GetBlogPostHash(Post post)
+        private static string GetBlogPostHash(BloggerPostData post)
         {
             if (post == null)
             {

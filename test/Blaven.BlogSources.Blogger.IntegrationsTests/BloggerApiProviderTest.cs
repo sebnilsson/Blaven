@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Xunit;
 
@@ -8,29 +9,57 @@ namespace Blaven.BlogSources.Blogger
 {
     public class BloggerApiProviderTest
     {
+
+
+        [Fact]
+        public async Task GetBlog_BloggerBlogContainsData_ReturnsWithAllFields()
+        {
+            // Arrange
+            var bloggerApiProvider = GetTestBloggerApiProvider();
+            var blogSetting = GetTestBlogSetting();
+            
+            // Act
+            var blog = await bloggerApiProvider.GetBlog(blogSetting.Id);
+
+            // Assert
+            Assert.NotNull(blog);
+            Assert.NotNull(blog.Description);
+            Assert.NotNull(blog.Id);
+            Assert.NotNull(blog.Name);
+            Assert.NotNull(blog.Published);
+            Assert.NotNull(blog.Updated);
+            Assert.NotNull(blog.Url);
+        }
+
         [Theory]
         [MemberData(nameof(AfterLastUpdatedAtData))]
         [MemberData(nameof(ForceUpdateData))]
-        public void GetPosts_BloggerBlogContainsData_ReturnsAllPostsFromAllPages(
+        public async Task GetPosts_BloggerBlogContainsData_ReturnsAllPostsFromAllPages(
             DateTime lastUpdatedAt,
             int expectedPostCount)
         {
+            // Arrange
             var bloggerApiProvider = GetTestBloggerApiProvider(postListRequestMaxResults: 5);
-            var blogSettings = GetTestBlogSetting();
+            var blogSetting = GetTestBlogSetting();
 
-            var posts = bloggerApiProvider.GetPosts(blogSettings.Id, lastUpdatedAt).ToList();
+            // Act
+            var posts = await bloggerApiProvider.GetPosts(blogSetting.Id, lastUpdatedAt);
 
+            // Assert
             Assert.Equal(expectedPostCount, posts.Count);
         }
 
         [Fact]
-        public void GetPosts_BloggerBlogContainsData_ReturnsAllPostFields()
+        public async Task GetPosts_BloggerBlogContainsData_ReturnsPostWithAllFields()
         {
+            // Arrange
             var bloggerApiProvider = GetTestBloggerApiProvider(postListRequestMaxResults: 2);
-            var blogSettings = GetTestBlogSetting();
+            var blogSetting = GetTestBlogSetting();
 
-            var posts = bloggerApiProvider.GetPosts(blogSettings.Id, DateTime.MinValue).Take(2).ToList();
+            // Act
+            var posts = await bloggerApiProvider.GetPosts(blogSetting.Id, DateTime.MinValue);
 
+            // Assert
             var firstPost = posts.FirstOrDefault();
 
             Assert.NotNull(firstPost);
@@ -71,7 +100,11 @@ namespace Blaven.BlogSources.Blogger
         {
             string apiKey = AppSettingsHelper.GetApiKey();
 
-            var bloggerApiProvider = new BloggerApiProvider(apiKey, postListRequestMaxResults);
+            var bloggerApiProvider = new BloggerApiProvider(apiKey)
+                                         {
+                                             PostListRequestMaxResults = postListRequestMaxResults
+                                         };
+
             return bloggerApiProvider;
         }
 

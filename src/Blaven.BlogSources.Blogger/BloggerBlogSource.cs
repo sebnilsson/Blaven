@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Blaven.BlogSources.Blogger
 {
     public class BloggerBlogSource : BlogSourceBase
     {
-        private readonly BloggerApiProvider apiProvider;
+        private readonly IBloggerApiProvider apiProvider;
 
         public BloggerBlogSource(string apiKey)
             : this(GetBloggerApiProvider(apiKey))
         {
         }
 
-        internal BloggerBlogSource(BloggerApiProvider apiProvider)
+        internal BloggerBlogSource(IBloggerApiProvider apiProvider)
         {
             if (apiProvider == null)
             {
@@ -23,14 +24,14 @@ namespace Blaven.BlogSources.Blogger
             this.apiProvider = apiProvider;
         }
 
-        public override BlogMeta GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
+        public override async Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
                 throw new ArgumentNullException(nameof(blogSetting));
             }
 
-            var blog = this.apiProvider.GetBlog(blogSetting.Id);
+            var blog = await this.apiProvider.GetBlog(blogSetting.Id);
             if (blog == null)
             {
                 string message =
@@ -44,14 +45,16 @@ namespace Blaven.BlogSources.Blogger
             return blogMeta;
         }
 
-        protected override IEnumerable<BlogPost> GetSourcePosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
+        protected override async Task<IReadOnlyList<BlogPost>> GetSourcePosts(
+            BlogSetting blogSetting,
+            DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
                 throw new ArgumentNullException(nameof(blogSetting));
             }
 
-            var posts = this.apiProvider.GetPosts(blogSetting.Id, lastUpdatedAt);
+            var posts = await this.apiProvider.GetPosts(blogSetting.Id, lastUpdatedAt);
             if (posts == null)
             {
                 string message =
@@ -59,22 +62,16 @@ namespace Blaven.BlogSources.Blogger
                 throw new BloggerBlogSourceException(message);
             }
 
-            var blogPosts = posts.Where(x => x != null).Select(x => GetBlogPost(x, blogSetting));
+            var blogPosts = posts.Where(x => x != null).Select(x => GetBlogPost(x, blogSetting)).ToReadOnlyList();
             return blogPosts;
         }
 
-        private static BlogPost GetBlogPost(Post post, BlogSetting blogSetting)
+        private static BlogPost GetBlogPost(BloggerPostData post, BlogSetting blogSetting)
         {
             var blogPost = BloggerDataConverter.ConvertPost(post);
             blogPost.BlogKey = blogSetting.BlogKey;
 
             return blogPost;
-        }
-
-        public static BloggerBlogSource CreateFromAppSettings()
-        {
-            var bloggerBlogSource = BloggerBlogSourceAppSettingsHelper.CreateFromAppSettings();
-            return bloggerBlogSource;
         }
 
         private static BloggerApiProvider GetBloggerApiProvider(string apiKey)

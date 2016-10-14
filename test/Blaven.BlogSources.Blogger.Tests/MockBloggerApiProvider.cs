@@ -2,30 +2,30 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.Tests;
-using Google.Apis.Blogger.v3.Data;
 
 namespace Blaven.BlogSources.Blogger.Tests
 {
     [DebuggerDisplay(
-        "GetBlogPostsTracker={GetBlogTracker.Events.Count}, " + "SaveBlogMetaTracker={GetPostsTracker.Events.Count}, "
-        + "SaveChangesTracker={GetPostsSlimTracker.Events.Count}")]
-    public class MockBloggerApiProvider : BloggerApiProvider
+         "GetBlogPostsTracker={GetBlogTracker.Events.Count}, " + "SaveBlogMetaTracker={GetPostsTracker.Events.Count}, "
+         + "SaveChangesTracker={GetPostsSlimTracker.Events.Count}")]
+    public class MockBloggerApiProvider : IBloggerApiProvider
     {
-        private readonly Func<string, Blog> getBlogFunc;
+        private readonly Func<string, BloggerBlogData> getBlogFunc;
 
-        private readonly Func<string, IEnumerable<Post>> getPostsFunc;
+        private readonly Func<string, IEnumerable<BloggerPostData>> getPostsFunc;
 
         public MockBloggerApiProvider(
-            Func<string, Blog> getBlogFunc = null,
-            Func<string, IEnumerable<Post>> getPostsFunc = null)
+            Func<string, BloggerBlogData> getBlogFunc = null,
+            Func<string, IEnumerable<BloggerPostData>> getPostsFunc = null)
         {
             this.getBlogFunc = (getBlogFunc ?? (_ => null)).WithTracking(this.GetBlogTracker);
             this.getPostsFunc = (getPostsFunc ?? (_ => null)).WithTracking(this.GetPostsTracker);
         }
 
-        public override Blog GetBlog(string blogId)
+        public async Task<BloggerBlogData> GetBlog(string blogId)
         {
             if (blogId == null)
             {
@@ -33,12 +33,12 @@ namespace Blaven.BlogSources.Blogger.Tests
             }
 
             var blog = this.getBlogFunc?.Invoke(blogId);
-            return blog;
+            return await Task.FromResult(blog);
         }
 
         public DelegateTracker<string> GetBlogTracker { get; } = new DelegateTracker<string>();
 
-        public override IEnumerable<Post> GetPosts(string blogId, DateTime? lastUpdatedAt)
+        public async Task<IReadOnlyList<BloggerPostData>> GetPosts(string blogId, DateTime? lastUpdatedAt)
         {
             if (blogId == null)
             {
@@ -52,7 +52,7 @@ namespace Blaven.BlogSources.Blogger.Tests
                 posts = posts?.Where(x => x.Updated > lastUpdatedAt);
             }
 
-            return posts;
+            return await Task.FromResult(posts.ToReadOnlyList());
         }
 
         public DelegateTracker<string> GetPostsTracker { get; } = new DelegateTracker<string>();

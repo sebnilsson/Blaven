@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.Tests;
-using Google.Apis.Blogger.v3.Data;
 
 namespace Blaven.BlogSources.Blogger.Tests
 {
@@ -43,10 +42,10 @@ namespace Blaven.BlogSources.Blogger.Tests
 
         public const string PostUrl = "TestPostUrl";
 
-        public static Blog GetBlog()
+        public static BloggerBlogData GetBlog()
         {
-            var blog = new Blog
-                           {
+            var blog = new BloggerBlogData
+            {
                                Description = BlogDescription,
                                Name = BlogName,
                                Id = BlogId,
@@ -57,64 +56,75 @@ namespace Blaven.BlogSources.Blogger.Tests
             return blog;
         }
 
-        public static Post GetPost(
+        public static BloggerPostData GetPost(
             int index,
             int tagCount = TestData.DefaultTagCount,
             string blogKey = TestData.BlogKey)
         {
-            var authorImage = new Post.AuthorData.ImageData
+            var authorImage = new BloggerPostData.AuthorData.ImageData
                                   {
                                       Url =
                                           TestData.GetTestString(
-                                              $"{nameof(Post)}.{nameof(Post.AuthorData)}.{nameof(Post.AuthorData.ImageData)}.{nameof(Post.AuthorData.ImageData.Url)}",
+                                              $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.AuthorData)}.{nameof(BloggerPostData.AuthorData.ImageData)}.{nameof(BloggerPostData.AuthorData.ImageData.Url)}",
                                               blogKey,
                                               index)
                                   };
-            var author = new Post.AuthorData
+            var author = new BloggerPostData.AuthorData
                              {
                                  Id =
                                      TestData.GetTestString(
-                                         $"{nameof(Post)}.{nameof(Post.AuthorData)}.{nameof(Post.AuthorData.Id)}",
+                                         $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.AuthorData)}.{nameof(BloggerPostData.AuthorData.Id)}",
                                          blogKey,
                                          index),
                                  Image = authorImage,
                                  DisplayName =
                                      TestData.GetTestString(
-                                         $"{nameof(Post)}.{nameof(Post.AuthorData)}.{nameof(Post.AuthorData.DisplayName)}",
+                                         $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.AuthorData)}.{nameof(BloggerPostData.AuthorData.DisplayName)}",
                                          blogKey,
                                          index),
                                  Url =
                                      TestData.GetTestString(
-                                         $"{nameof(Post)}.{nameof(Post.AuthorData)}.{nameof(Post.AuthorData.Url)}",
+                                         $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.AuthorData)}.{nameof(BloggerPostData.AuthorData.Url)}",
                                          blogKey,
                                          index)
                              };
 
-            var post = new Post
+            var post = new BloggerPostData
                            {
                                Author = author,
                                Content =
-                                   TestData.GetTestString($"{nameof(Post)}.{nameof(Post.Content)}", blogKey, index),
+                                   TestData.GetTestString(
+                                       $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.Content)}",
+                                       blogKey,
+                                       index),
                                Id = TestData.GetPostSourceId(index, blogKey),
                                Labels = TestData.GetPostTags(index, tagCount).ToList(),
                                Published = PostPublishedAt.AddDays(index),
-                               Title = TestData.GetTestString($"{nameof(Post)}.{nameof(Post.Title)}", blogKey, index),
-                               Url = TestData.GetTestString($"{nameof(Post)}.{nameof(Post.Url)}", blogKey, index),
+                               Title =
+                                   TestData.GetTestString(
+                                       $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.Title)}",
+                                       blogKey,
+                                       index),
+                               Url =
+                                   TestData.GetTestString(
+                                       $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.Url)}",
+                                       blogKey,
+                                       index),
                                Updated = PostUpdatedAt.AddDays(index)
                            };
             return post;
         }
 
-        public static IEnumerable<Post> GetPosts(int start, int count, string blogKey = TestData.BlogKey)
+        public static IEnumerable<BloggerPostData> GetPosts(int start, int count, string blogKey = TestData.BlogKey)
         {
             var posts = Enumerable.Range(start, count).Select(x => GetPost(x, blogKey: blogKey)).ToList();
             return posts;
         }
 
-        public static IEnumerable<Post> GetPosts()
+        public static IEnumerable<BloggerPostData> GetPosts()
         {
-            var authorImage = new Post.AuthorData.ImageData { Url = AuthorImageUrl };
-            var author = new Post.AuthorData
+            var authorImage = new BloggerPostData.AuthorData.ImageData { Url = AuthorImageUrl };
+            var author = new BloggerPostData.AuthorData
                              {
                                  Id = AuthorId,
                                  Image = authorImage,
@@ -122,7 +132,7 @@ namespace Blaven.BlogSources.Blogger.Tests
                                  Url = AuthorUrl
                              };
 
-            var post = new Post
+            var post = new BloggerPostData
                            {
                                Author = author,
                                Content = PostContent,

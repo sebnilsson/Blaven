@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Blaven
 {
-    internal static class EnumerableExtensions
+    public static class EnumerableExtensions
     {
         public static IEnumerable<TSource> Distinct<TKey, TSource>(
             this IEnumerable<TSource> source,

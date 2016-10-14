@@ -35,6 +35,6 @@ namespace Blaven.BlogSources
 
         public abstract Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt);
 
-        protected abstract Task<IEnumerable<BlogPost>> GetSourcePosts(BlogSetting blogSetting, DateTime? lastUpdatedAt);
+        protected abstract Task<IReadOnlyList<BlogPost>> GetSourcePosts(BlogSetting blogSetting, DateTime? lastUpdatedAt);
     }
 }

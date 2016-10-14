@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+#if NET_45
 using System.Configuration;
+#endif
 
 namespace Blaven.BlogSources.Blogger
 {
@@ -8,6 +10,7 @@ namespace Blaven.BlogSources.Blogger
     {
         public const string ApiKeyAppSettingsKey = "Blaven.BlogSources.Blogger.ApiKey";
 
+#if NET_45
         public static BloggerBlogSource CreateFromAppSettings()
         {
             var appSettings = ConfigurationManager.AppSettings.ToDictionaryIgnoreCase();
@@ -15,8 +18,9 @@ namespace Blaven.BlogSources.Blogger
             var bloggerBlogSource = CreateFromAppSettingsInternal(appSettings);
             return bloggerBlogSource;
         }
+#endif
 
-        internal static BloggerBlogSource CreateFromAppSettingsInternal(IDictionary<string, string> appSettings)
+        public static BloggerBlogSource CreateFromAppSettingsInternal(IDictionary<string, string> appSettings)
         {
             if (appSettings == null)
             {
