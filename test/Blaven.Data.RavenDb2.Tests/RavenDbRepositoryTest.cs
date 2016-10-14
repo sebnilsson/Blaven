@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.Tests;
 using Xunit;
@@ -35,14 +36,14 @@ namespace Blaven.Data.RavenDb2.Tests
         [InlineData(TestData.BlogKey1)]
         [InlineData(TestData.BlogKey2)]
         [InlineData(TestData.BlogKey3)]
-        public void GetBlogMeta_ExistingBlogKey_ReturnsBlogMeta(string blogKey)
+        public async Task GetBlogMeta_ExistingBlogKey_ReturnsBlogMeta(string blogKey)
         {
             // Arrange
             var dbBlogMetas = GetBlogMetas();
             var repository = GetRavenDbRepository(blogMetas: dbBlogMetas);
 
             // Act
-            var blogMeta = repository.GetBlogMeta(blogKey);
+            var blogMeta = await repository.GetBlogMeta(blogKey);
 
             // Assert
             Assert.Equal(blogKey, blogMeta.BlogKey);
@@ -64,13 +65,13 @@ namespace Blaven.Data.RavenDb2.Tests
 
         [Theory]
         [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
-        public void GetPost_ExistingBlavenId_ReturnsPost(IEnumerable<BlogPost> dbBlogPosts)
+        public async Task GetPost_ExistingBlavenId_ReturnsPost(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var post = repository.GetPost(TestData.BlogKey, TestData.BlavenId2);
+            var post = await repository.GetPost(TestData.BlogKey, TestData.BlavenId2);
 
             // Assert
             bool hasBlogPostFieldValues = HasBlogPostAllFieldValues(post);
@@ -125,7 +126,7 @@ namespace Blaven.Data.RavenDb2.Tests
 
         [Theory]
         [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
-        public void GetPostBySourceId_ExistingBlogKeyAndSourceId_ReturnsBlogPost(IEnumerable<BlogPost> dbBlogPosts)
+        public async Task GetPostBySourceId_ExistingBlogKeyAndSourceId_ReturnsBlogPost(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
@@ -133,7 +134,7 @@ namespace Blaven.Data.RavenDb2.Tests
             string sourceId = TestData.GetPostSourceId(0);
 
             // Act
-            var post = repository.GetPostBySourceId(TestData.BlogKey, sourceId);
+            var post = await repository.GetPostBySourceId(TestData.BlogKey, sourceId);
 
             // Assert
             Assert.Equal(sourceId, post.SourceId);

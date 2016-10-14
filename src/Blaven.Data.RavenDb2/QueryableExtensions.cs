@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+
+using Raven.Client;
 
 namespace Blaven.Data.RavenDb2
 {
@@ -8,35 +11,42 @@ namespace Blaven.Data.RavenDb2
     {
         private const int PageSize = 1024;
 
-        public static List<T> ToListAll<T>(this IQueryable<T> queryable)
+        public static IReadOnlyList<T> ToListAll<T>(this IQueryable<T> queryable)
         {
             if (queryable == null)
             {
                 throw new ArgumentNullException(nameof(queryable));
             }
 
-            var listAll = ToListAllInternal(queryable).ToList();
-            return listAll;
+            var result = queryable.ToListAllAsync().GetAwaiter().GetResult();
+            return result;
         }
 
-        private static IEnumerable<T> ToListAllInternal<T>(IQueryable<T> queryable)
+        public static async Task<IReadOnlyList<T>> ToListAllAsync<T>(this IQueryable<T> queryable)
         {
-            List<T> items;
+            if (queryable == null)
+            {
+                throw new ArgumentNullException(nameof(queryable));
+            }
+
+            var result = new List<T>();
+
+            IList<T> items;
             int i = 0;
 
             do
             {
                 int skipCount = PagingUtility.GetSkip(PageSize, i);
 
-                items = queryable.Skip(skipCount).Take(PageSize).ToList();
-                foreach (var item in items)
-                {
-                    yield return item;
-                }
+                items = await queryable.Skip(skipCount).Take(PageSize).ToListAsync();
+
+                result.AddRange(items);
 
                 i++;
             }
             while (items.Count == PageSize);
+
+            return result;
         }
     }
 }

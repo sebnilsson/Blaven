@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Blaven.Tests;
 using Xunit;
@@ -21,7 +23,7 @@ namespace Blaven.Data.RavenDb2.Tests
                     };
 
         [Fact]
-        public void GetPostBases_SettingWithBlogKey2_ReturnsOnlyBlogKey2Posts()
+        public async Task GetPostBases_SettingWithBlogKey2_ReturnsOnlyBlogKey2Posts()
         {
             // Arrange
             var dbBlogPosts1 = TestData.GetBlogPosts(start: 0, count: 2, blogKey: TestData.BlogKey1);
@@ -30,7 +32,7 @@ namespace Blaven.Data.RavenDb2.Tests
             var blogSetting2 = TestData.GetBlogSetting(TestData.BlogKey2);
 
             // Act
-            var posts = dataStorage.GetPostBases(blogSetting2);
+            var posts = await dataStorage.GetPostBases(blogSetting2);
 
             // Assert
             bool allPostsHasBlogKey2 = posts.Any() && posts.All(x => x.BlogKey == TestData.BlogKey2);
@@ -38,7 +40,7 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Fact]
-        public void GetPostBases_PostCountMoreThanRavenDbPageCount_ReturnsAllPosts()
+        public async Task GetPostBases_PostCountMoreThanRavenDbPageCount_ReturnsAllPosts()
         {
             // Arrange
             const int PostCount = 2500;
@@ -48,7 +50,7 @@ namespace Blaven.Data.RavenDb2.Tests
             var blogSetting = TestData.GetBlogSetting(TestData.BlogKey);
 
             // Act
-            var posts = dataStorage.GetPostBases(blogSetting);
+            var posts = await dataStorage.GetPostBases(blogSetting);
 
             // Assert
              Assert.Equal(PostCount, posts.Count);

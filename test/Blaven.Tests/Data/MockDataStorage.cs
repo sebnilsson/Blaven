@@ -16,7 +16,7 @@ namespace Blaven.Data.Tests
          + "SaveChangesTracker={SaveChangesTracker.Events.Count}")]
     public class MockDataStorage : IDataStorage
     {
-        private readonly Func<BlogSetting, IReadOnlyCollection<BlogPostBase>> getPostBasesFunc;
+        private readonly Func<BlogSetting, IReadOnlyList<BlogPostBase>> getPostBasesFunc;
 
         private readonly Func<BlogSetting, DateTime?> getLastPostUpdatedAtFunc;
 
@@ -25,7 +25,7 @@ namespace Blaven.Data.Tests
         private readonly Action<BlogSetting, BlogSourceChangeSet> saveChangesAction;
 
         public MockDataStorage(
-            Func<BlogSetting, IReadOnlyCollection<BlogPostBase>> getPostBasesFunc = null,
+            Func<BlogSetting, IReadOnlyList<BlogPostBase>> getPostBasesFunc = null,
             Action<BlogSetting, BlogMeta> saveBlogMetaAction = null,
             Action<BlogSetting, BlogSourceChangeSet> saveChangesAction = null,
             Func<BlogSetting, DateTime?> getLastPostUpdatedAtFunc = null)
@@ -55,7 +55,7 @@ namespace Blaven.Data.Tests
             return await Task.FromResult(this.getLastPostUpdatedAtFunc?.Invoke(blogSetting));
         }
 
-        public async Task<IReadOnlyCollection<BlogPostBase>> GetPostBases(
+        public async Task<IReadOnlyList<BlogPostBase>> GetPostBases(
             BlogSetting blogSetting,
             DateTime? lastUpdatedAt)
         {
