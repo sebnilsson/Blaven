@@ -9,15 +9,13 @@ namespace Blaven.BlogSources.Blogger
 {
     public class BloggerApiProviderTest
     {
-
-
         [Fact]
         public async Task GetBlog_BloggerBlogContainsData_ReturnsWithAllFields()
         {
             // Arrange
             var bloggerApiProvider = GetTestBloggerApiProvider();
             var blogSetting = GetTestBlogSetting();
-            
+
             // Act
             var blog = await bloggerApiProvider.GetBlog(blogSetting.Id);
 

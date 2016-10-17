@@ -95,7 +95,7 @@
     <Compile Include="BlogServiceTest.cs" />
     <Compile Include="BlogSettingsManagerTest.cs" />
     <Compile Include="Configuration\AppSettingsUtilityTest.cs" />
-    <Compile Include="BlogSources\BlogSourceChangesHelperTest.cs" />
+    <Compile Include="Synchronization\BlogSyncChangeSetHelperTest.cs" />
     <Compile Include="Data\MockRepository.cs" />
     <Compile Include="DelegateTracker.cs" />
     <Compile Include="ActionExtensions.cs" />

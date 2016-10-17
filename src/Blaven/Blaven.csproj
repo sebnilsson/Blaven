@@ -51,19 +51,17 @@
     <Compile Include="BlogService.cs" />
     <Compile Include="BlogSetting.cs" />
     <Compile Include="BlogSettingsHelper.cs" />
-    <Compile Include="BlogSources\BlogSourceBase.cs" />
-    <Compile Include="BlogSources\BlogSourceChangeSet.cs" />
-    <Compile Include="BlogSources\BlogSourceChangesHelper.cs" />
+    <Compile Include="Data\IDataCacheHandler.cs" />
+    <Compile Include="Synchronization\BlogSourceChangeSet.cs" />
+    <Compile Include="Synchronization\BlogSyncChangeSetHelper.cs" />
     <Compile Include="BlogSources\IBlogSource.cs" />
     <Compile Include="BlogTagItem.cs" />
     <Compile Include="Configuration\AppSettingsConfigService.cs" />
     <Compile Include="Configuration\AppSettingsUtility.cs" />
-    <Compile Include="Data\IDataCacheHandler.cs" />
     <Compile Include="Data\IDataStorage.cs" />
     <Compile Include="Data\IRepository.cs" />
     <Compile Include="Data\MemoryDataCacheHandler.cs" />
     <Compile Include="EnumerableExtensions.cs" />
-    <Compile Include="HashUtility.cs" />
     <Compile Include="IBlogPostBlavenIdProvider.cs" />
     <Compile Include="IBlogPostUrlSlugProvider.cs" />
     <Compile Include="KeyLocker.cs" />
@@ -72,19 +70,22 @@
     <Compile Include="PermalinkBlogPostBlavenIdProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceIdBlogPostBlavenIdProvider.cs" />
+    <Compile Include="Synchronization\BlogSyncBlogSourceResultException.cs" />
+    <Compile Include="Synchronization\BlogSyncBlogSourceException.cs" />
     <Compile Include="Synchronization\BlogSyncConfiguration.cs" />
     <Compile Include="Synchronization\BlogSyncConfigurationDefaults.cs" />
+    <Compile Include="Synchronization\BlogSyncDataStorageResultException.cs" />
+    <Compile Include="Synchronization\BlogSyncDataStorageException.cs" />
     <Compile Include="Synchronization\BlogSyncException.cs" />
     <Compile Include="Synchronization\BlogSyncResult.cs" />
     <Compile Include="Synchronization\BlogSyncService.cs" />
-    <Compile Include="Synchronization\BlogSyncServiceUpdateMetaHelper.cs" />
-    <Compile Include="Synchronization\BlogSyncServiceUpdatePostsHelper.cs" />
+    <Compile Include="Synchronization\BlogSyncServiceMetaHelper.cs" />
+    <Compile Include="Synchronization\BlogSyncServicePostsHelper.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="Transformers\BlogTransformersProvider.cs" />
     <Compile Include="Transformers\IBlogPostTransformer.cs" />
     <Compile Include="Transformers\PhraseTagsTransformer.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

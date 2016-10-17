@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Blaven.BlogSources.Blogger
 {
-    public class BloggerBlogSource : BlogSourceBase
+    public class BloggerBlogSource : IBlogSource
     {
         private readonly IBloggerApiProvider apiProvider;
 
@@ -24,7 +24,7 @@ namespace Blaven.BlogSources.Blogger
             this.apiProvider = apiProvider;
         }
 
-        public override async Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
+        public async Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
@@ -45,8 +45,9 @@ namespace Blaven.BlogSources.Blogger
             return blogMeta;
         }
 
-        protected override async Task<IReadOnlyList<BlogPost>> GetSourcePosts(
+        public async Task<IReadOnlyList<BlogPost>> GetBlogPosts(
             BlogSetting blogSetting,
+            IEnumerable<BlogPostBase> dataStoragePosts,
             DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)

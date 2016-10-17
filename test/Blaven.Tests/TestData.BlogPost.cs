@@ -23,7 +23,7 @@ namespace Blaven.Tests
         public static string GetBlavenId(int index, string blogKey = BlogKey)
         {
             var blogPost = GetBlogPost(blogKey, index);
-            
+
             return blogPost.BlavenId;
         }
 
@@ -68,12 +68,11 @@ namespace Blaven.Tests
                                    Content =
                                        GetTestString(nameof(BlogPost.Content), blogKey, index, isUpdate)
                                        + $"{Environment.NewLine}More content",
-                                   Hash = HashUtility.GetBase64(blogKey, index),
+                                   Hash = $"HASH_{blogKey}_{index}",
                                    ImageUrl = GetTestString(nameof(BlogPost.ImageUrl), blogKey, index, isUpdate),
                                    PublishedAt = TestPublishedAt.AddDays(index),
                                    SourceId = GetPostSourceId(index, blogKey),
-                                   SourceUrl =
-                                       GetTestString(nameof(BlogPost.SourceUrl), blogKey, index, isUpdate),
+                                   SourceUrl = GetTestString(nameof(BlogPost.SourceUrl), blogKey, index, isUpdate),
                                    Summary = GetTestString(nameof(BlogPost.Summary), blogKey, index, isUpdate),
                                    Tags = GetPostTags(index, tagCount).ToList(),
                                    Title = GetTestString(nameof(BlogPost.Title), blogKey, index, isUpdate),

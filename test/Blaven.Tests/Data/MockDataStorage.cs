@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Blaven.BlogSources;
+using Blaven.Synchronization;
 using Blaven.Tests;
 
 namespace Blaven.Data.Tests

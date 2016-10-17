@@ -46,24 +46,24 @@ namespace Blaven.BlogSources.Blogger.Tests
             var dbPosts = Enumerable.Empty<BlogPostBase>();
 
             // Act
-            var changes = await bloggerBlogSource.GetChanges(blogSetting, dbPosts, TestLastUpdatedAt);
+            var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dbPosts, TestLastUpdatedAt);
 
             // Assert
-            var inserted = changes.InsertedBlogPosts.FirstOrDefault();
+            var post = blogPosts.FirstOrDefault();
 
-            Assert.NotNull(inserted);
-            Assert.Equal(blogSetting.BlogKey, inserted.BlogKey);
-            Assert.Equal(BloggerTestData.AuthorId, inserted.Author.SourceId);
-            Assert.Equal(BloggerTestData.AuthorImageUrl, inserted.Author.ImageUrl);
-            Assert.Equal(BloggerTestData.AuthorDisplayName, inserted.Author.Name);
-            Assert.Equal(BloggerTestData.AuthorUrl, inserted.Author.Url);
-            Assert.Equal(BloggerTestData.PostContent, inserted.Content);
-            Assert.Equal(BloggerTestData.PostId, inserted.SourceId);
-            Assert.Equal(BloggerTestData.PostTitle, inserted.Title);
-            Assert.Equal(BloggerTestData.PostUrl, inserted.SourceUrl);
-            Assert.Equal(BloggerTestData.PostPublishedAt, inserted.PublishedAt);
+            Assert.NotNull(post);
+            Assert.Equal(blogSetting.BlogKey, post.BlogKey);
+            Assert.Equal(BloggerTestData.AuthorId, post.Author.SourceId);
+            Assert.Equal(BloggerTestData.AuthorImageUrl, post.Author.ImageUrl);
+            Assert.Equal(BloggerTestData.AuthorDisplayName, post.Author.Name);
+            Assert.Equal(BloggerTestData.AuthorUrl, post.Author.Url);
+            Assert.Equal(BloggerTestData.PostContent, post.Content);
+            Assert.Equal(BloggerTestData.PostId, post.SourceId);
+            Assert.Equal(BloggerTestData.PostTitle, post.Title);
+            Assert.Equal(BloggerTestData.PostUrl, post.SourceUrl);
+            Assert.Equal(BloggerTestData.PostPublishedAt, post.PublishedAt);
             bool tagsAreSequenceEquals =
-                BloggerTestData.PostTags.OrderBy(x => x).SequenceEqual(inserted.Tags.OrderBy(x => x));
+                BloggerTestData.PostTags.OrderBy(x => x).SequenceEqual(post.Tags.OrderBy(x => x));
             Assert.True(tagsAreSequenceEquals);
         }
 
@@ -76,10 +76,10 @@ namespace Blaven.BlogSources.Blogger.Tests
             var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 3));
 
             // Act
-            var changes = await GetTestBlogSourceChangeSet(bloggerBlogSource, dbPosts);
+            var blogPosts = await GetTestBlogPosts(bloggerBlogSource, dbPosts);
 
             // Assert
-            Assert.Equal(2, changes.InsertedBlogPosts.Count);
+            Assert.Equal(2, blogPosts.Count);
         }
 
         [Fact]
@@ -91,10 +91,10 @@ namespace Blaven.BlogSources.Blogger.Tests
             var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 1));
 
             // Act
-            var changes = await GetTestBlogSourceChangeSet(bloggerBlogSource, dbPosts);
+            var blogPosts = await GetTestBlogPosts(bloggerBlogSource, dbPosts);
 
             // Assert
-            Assert.Equal(2, changes.DeletedBlogPosts.Count);
+            Assert.Equal(2, blogPosts.Count);
         }
 
         [Fact]
@@ -106,10 +106,10 @@ namespace Blaven.BlogSources.Blogger.Tests
             var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => GetTestModifiedPosts(0, 2));
 
             // Act
-            var changes = await GetTestBlogSourceChangeSet(bloggerBlogSource, dbPosts);
+            var blogPosts = await GetTestBlogPosts(bloggerBlogSource, dbPosts);
 
             // Assert
-            Assert.Equal(2, changes.UpdatedBlogPosts.Count);
+            Assert.Equal(2, blogPosts.Count);
         }
 
         private static IEnumerable<BloggerPostData> GetTestModifiedPosts(int start, int count, string blogKey = TestData.BlogKey)
@@ -127,15 +127,15 @@ namespace Blaven.BlogSources.Blogger.Tests
             }
         }
 
-        private static async Task<BlogSourceChangeSet> GetTestBlogSourceChangeSet(
+        private static async Task<IReadOnlyList<BlogPost>> GetTestBlogPosts(
             IBlogSource bloggerBlogSource,
             IEnumerable<BlogPostBase> dbPosts,
             DateTime? lastUpdatedAt = null)
         {
             var blogSetting = GetTestBlogSetting();
 
-            var changes = await bloggerBlogSource.GetChanges(blogSetting, dbPosts, lastUpdatedAt);
-            return changes;
+            var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dbPosts, lastUpdatedAt);
+            return blogPosts;
         }
 
         private static IEnumerable<BlogPostBase> GetTestBlogPosts(

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.BlogSources;
+using Blaven.Synchronization;
 
 namespace Blaven.Tests
 {
@@ -25,6 +25,17 @@ namespace Blaven.Tests
             updatedBlogPostList.ForEach(x => changeSet.UpdatedBlogPosts.Add(x));
 
             return changeSet;
+        }
+
+        public static IReadOnlyList<BlogPost> GetBlogPosts(string blogKey = null, int blogPostsCount = 11)
+        {
+            blogKey = blogKey ?? BlogKey;
+
+            var blogPosts =
+                Enumerable.Range(0, blogPostsCount)
+                    .Select(i => GetBlogPost(blogKey, i, isUpdate: (i % 2 == 0)))
+                    .ToList();
+            return blogPosts;
         }
 
         public static BlogSourceChangeSet GetBlogSourceChangeSet(

@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Blaven.BlogSources
+namespace Blaven.Synchronization
 {
-    internal static class BlogSourceChangesHelper
+    internal static class BlogSyncChangeSetHelper
     {
         public static BlogSourceChangeSet GetChangeSet(
             string blogKey,
-            ICollection<BlogPost> sourcePosts,
-            ICollection<BlogPostBase> dbPosts,
-            DateTime? lastUpdatedAt)
+            IReadOnlyList<BlogPost> sourcePosts,
+            IReadOnlyList<BlogPostBase> dataStoragePosts)
         {
             if (blogKey == null)
             {
@@ -20,43 +19,50 @@ namespace Blaven.BlogSources
             {
                 throw new ArgumentNullException(nameof(sourcePosts));
             }
-            if (dbPosts == null)
+            if (dataStoragePosts == null)
             {
-                throw new ArgumentNullException(nameof(dbPosts));
+                throw new ArgumentNullException(nameof(dataStoragePosts));
             }
+
+            var cleanSourcePosts =
+                sourcePosts.Where(x => x != null)
+                    .OrderByDescending(x => x.UpdatedAt)
+                    .GroupBy(x => x.SourceId)
+                    .Select(x => x.First())
+                    .ToReadOnlyList();
+
+            var cleanDataStoragePosts =
+                dataStoragePosts.Where(x => x != null).GroupBy(x => x.SourceId).Select(x => x.First()).ToReadOnlyList();
 
             var changeSet = new BlogSourceChangeSet(blogKey);
 
-            if (lastUpdatedAt == null || lastUpdatedAt == DateTime.MinValue)
-            {
-                SyncDeletedPosts(sourcePosts, dbPosts, changeSet);
-            }
+            SyncDeletedPosts(cleanSourcePosts, cleanDataStoragePosts, changeSet);
 
-            SyncInsertedPosts(sourcePosts, dbPosts, changeSet);
+            SyncInsertedPosts(cleanSourcePosts, cleanDataStoragePosts, changeSet);
 
-            SyncModifiedPosts(sourcePosts, dbPosts, changeSet, lastUpdatedAt);
+            SyncModifiedPosts(cleanSourcePosts, cleanDataStoragePosts, changeSet);
 
             return changeSet;
         }
 
         private static void SyncDeletedPosts(
             IEnumerable<BlogPost> sourcePosts,
-            IEnumerable<BlogPostBase> dbPosts,
+            IEnumerable<BlogPostBase> dataStoragePosts,
             BlogSourceChangeSet changeSet)
         {
             var sourceIds = sourcePosts.Select(x => x.SourceId).ToList();
 
-            var deletedPosts = dbPosts.Where(post => !sourceIds.Contains(post.SourceId)).ToList();
+            var deletedPosts = dataStoragePosts.Where(post => !sourceIds.Contains(post.SourceId)).ToList();
 
             changeSet.DeletedBlogPosts.AddRange(deletedPosts);
         }
 
         private static void SyncInsertedPosts(
             IEnumerable<BlogPost> sourcePosts,
-            IEnumerable<BlogPostBase> dbPosts,
+            IEnumerable<BlogPostBase> dataStoragePosts,
             BlogSourceChangeSet changeSet)
         {
-            var dbIds = dbPosts.Select(x => x.SourceId).ToList();
+            var dbIds = dataStoragePosts.Select(x => x.SourceId).ToList();
 
             var insertedPosts = sourcePosts.Where(post => !dbIds.Contains(post.SourceId)).Distinct().ToList();
 
@@ -65,12 +71,11 @@ namespace Blaven.BlogSources
 
         private static void SyncModifiedPosts(
             IEnumerable<BlogPost> sourcePosts,
-            IEnumerable<BlogPostBase> dbPosts,
-            BlogSourceChangeSet changeSet,
-            DateTime? lastUpdatedAt)
+            IEnumerable<BlogPostBase> dataStoragePosts,
+            BlogSourceChangeSet changeSet)
         {
             var modifiedPosts =
-                dbPosts.Join(
+                dataStoragePosts.Join(
                     sourcePosts,
                     dbPost => dbPost.SourceId,
                     sourcePost => sourcePost.SourceId,
@@ -81,7 +86,7 @@ namespace Blaven.BlogSources
                 var dbPost = modifiedPost.DbPost;
                 var sourcePost = modifiedPost.SourcePost;
 
-                bool isModified = (lastUpdatedAt == null) || (dbPost.Hash != sourcePost.Hash);
+                bool isModified = (dbPost.Hash != sourcePost.Hash);
                 if (isModified)
                 {
                     changeSet.UpdatedBlogPosts.Add(sourcePost);

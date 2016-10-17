@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Blaven.BlogSources;
+using Blaven.Synchronization;
 
 namespace Blaven.Data
 {

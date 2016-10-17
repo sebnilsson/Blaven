@@ -10,9 +10,6 @@ namespace Blaven.Synchronization
 {
     public class BlogSyncService
     {
-        private static readonly ICollection<string> IsUpdatingBlogKeys =
-            new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-
         private static readonly KeyLocker UpdateBlogLocker = new KeyLocker();
 
         private readonly BlogSettingsHelper blogSettings;
@@ -49,21 +46,6 @@ namespace Blaven.Synchronization
 
             bool isUpdated = await this.IsUpdatedInternal(now, ensuredBlogKey);
             return isUpdated;
-        }
-
-        public async Task<bool> ShouldUpdate(string blogKey)
-        {
-            if (blogKey == null)
-            {
-                throw new ArgumentNullException(nameof(blogKey));
-            }
-
-            var ensuredBlogKey = this.blogSettings.GetEnsuredBlogKey(blogKey);
-
-            var now = DateTime.Now;
-
-            bool shouldUpdate = await this.ShouldUpdateInternal(now, ensuredBlogKey);
-            return shouldUpdate;
         }
 
         public async Task<IReadOnlyList<BlogSyncResult>> Update(params string[] blogKeys)
@@ -108,23 +90,6 @@ namespace Blaven.Synchronization
             return isUpdated;
         }
 
-        internal async Task<bool> ShouldUpdateInternal(DateTime now, string blogKey)
-        {
-            if (blogKey == null)
-            {
-                throw new ArgumentNullException(nameof(blogKey));
-            }
-
-            bool isUpdating = IsUpdating(blogKey);
-            if (isUpdating)
-            {
-                return false;
-            }
-
-            bool isUpdated = await this.IsUpdatedInternal(now, blogKey);
-            return !isUpdated;
-        }
-
         internal async Task<IReadOnlyList<BlogSyncResult>> UpdateAllInternal(DateTime now, params string[] blogKeys)
         {
             if (blogKeys == null)
@@ -152,15 +117,6 @@ namespace Blaven.Synchronization
             await Task.WhenAll(resultTasks);
 
             return resultTasks.Select(x => x.Result).ToReadOnlyList();
-        }
-
-        private static bool IsUpdating(string blogKey)
-        {
-            lock (IsUpdatingBlogKeys)
-            {
-                bool isRunning = IsUpdatingBlogKeys.Contains(blogKey);
-                return isRunning;
-            }
         }
 
         private BlogSetting GetBlogSetting(string blogKey)
@@ -193,19 +149,14 @@ namespace Blaven.Synchronization
 
             try
             {
-                bool shouldUpdate = forceShouldUpdate || await this.ShouldUpdateInternal(now, blogKey);
-                if (!shouldUpdate)
-                {
-                    return result;
-                }
-
                 var blogSetting = this.GetBlogSetting(blogKey);
 
                 var lastUpdatedAt = await this.Config.DataStorage.GetLastUpdatedAt(blogSetting);
 
-                lock (IsUpdatingBlogKeys)
+                bool isUpdated = !forceShouldUpdate && !(await this.IsUpdatedInternal(now, blogKey));
+                if (isUpdated)
                 {
-                    IsUpdatingBlogKeys.Add(blogKey);
+                    return result;
                 }
 
                 await this.UpdateBlogData(blogSetting, lastUpdatedAt, result);
@@ -216,22 +167,14 @@ namespace Blaven.Synchronization
             }
             finally
             {
-                lock (IsUpdatingBlogKeys)
-                {
-                    if (IsUpdatingBlogKeys.Contains(blogKey))
-                    {
-                        IsUpdatingBlogKeys.Remove(blogKey);
-                    }
-                }
-
                 result.OnDone();
             }
         }
 
         private async Task UpdateBlogData(BlogSetting blogSetting, DateTime? lastUpdatedAt, BlogSyncResult result)
         {
-            var updateMetaTask = BlogSyncServiceUpdateMetaHelper.Update(blogSetting, lastUpdatedAt, this.Config);
-            var updatePostsTask = BlogSyncServiceUpdatePostsHelper.Update(blogSetting, lastUpdatedAt, this.Config);
+            var updateMetaTask = BlogSyncServiceMetaHelper.Update(blogSetting, lastUpdatedAt, this.Config);
+            var updatePostsTask = BlogSyncServicePostsHelper.Update(blogSetting, lastUpdatedAt, this.Config);
 
             await Task.WhenAll(updateMetaTask, updatePostsTask);
 
