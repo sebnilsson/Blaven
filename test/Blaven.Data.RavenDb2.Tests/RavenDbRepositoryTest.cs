@@ -26,8 +26,8 @@ namespace Blaven.Data.RavenDb2.Tests
             bool hasBlogMetasAllFieldValues =
                 blogMetas.All(
                     x =>
-                    x.BlogKey != null && x.Description != null && x.Name != null && x.PublishedAt != null
-                    && x.SourceId != null && x.UpdatedAt != null && x.Url != null);
+                        x.BlogKey != null && x.Description != null && x.Name != null && x.PublishedAt != null
+                        && x.SourceId != null && x.UpdatedAt != null && x.Url != null);
 
             Assert.True(hasBlogMetasAllFieldValues);
         }
@@ -50,14 +50,14 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Fact]
-        public void GetBlogMeta_NonExistingBlogKey_ReturnsNull()
+        public async Task GetBlogMeta_NonExistingBlogKey_ReturnsNull()
         {
             // Arrange
             var dbBlogMetas = GetBlogMetas();
             var repository = GetRavenDbRepository(blogMetas: dbBlogMetas);
 
             // Act
-            var blogMeta = repository.GetBlogMeta("NON_EXISTING_BLOG_KEY");
+            var blogMeta = await repository.GetBlogMeta("NON_EXISTING_BLOG_KEY");
 
             // Assert
             Assert.Null(blogMeta);
@@ -83,13 +83,13 @@ namespace Blaven.Data.RavenDb2.Tests
 
         [Theory]
         [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
-        public void GetPost_ExistingBlavenIdAndNonExistingBlogKey_ReturnsNull(IEnumerable<BlogPost> dbBlogPosts)
+        public async Task GetPost_ExistingBlavenIdAndNonExistingBlogKey_ReturnsNull(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var post = repository.GetPost("NON_EXISTING_BLOG_KEY", TestData.BlavenId2);
+            var post = await repository.GetPost("NON_EXISTING_BLOG_KEY", TestData.BlavenId2);
 
             // Assert
             Assert.Null(post);
@@ -97,13 +97,13 @@ namespace Blaven.Data.RavenDb2.Tests
 
         [Theory]
         [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
-        public void GetPost_NonExistingBlavenId_ReturnsNull(IEnumerable<BlogPost> dbBlogPosts)
+        public async Task GetPost_NonExistingBlavenId_ReturnsNull(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var post = repository.GetPost(TestData.BlogKey, "NON_EXISTING_BLAVEN_ID");
+            var post = await repository.GetPost(TestData.BlogKey, "NON_EXISTING_BLAVEN_ID");
 
             // Assert
             Assert.Null(post);
@@ -111,14 +111,14 @@ namespace Blaven.Data.RavenDb2.Tests
 
         [Theory]
         [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
-        public void GetPostBySourceId_ExistingBlogKeyAndNotExistingSourceId_ReturnsNull(
+        public async Task GetPostBySourceId_ExistingBlogKeyAndNotExistingSourceId_ReturnsNull(
             IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var post = repository.GetPostBySourceId(TestData.BlogKey, "NON_EXISTING_SOURCE_ID");
+            var post = await repository.GetPostBySourceId(TestData.BlogKey, "NON_EXISTING_SOURCE_ID");
 
             // Assert
             Assert.Null(post);
@@ -126,7 +126,8 @@ namespace Blaven.Data.RavenDb2.Tests
 
         [Theory]
         [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
-        public async Task GetPostBySourceId_ExistingBlogKeyAndSourceId_ReturnsBlogPost(IEnumerable<BlogPost> dbBlogPosts)
+        public async Task GetPostBySourceId_ExistingBlogKeyAndSourceId_ReturnsBlogPost(
+            IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
@@ -142,7 +143,8 @@ namespace Blaven.Data.RavenDb2.Tests
 
         [Theory]
         [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
-        public void GetPostBySourceId_ExistingBlogKeyAndUpperCaseSourceId_ReturnsNull(IEnumerable<BlogPost> dbBlogPosts)
+        public async Task GetPostBySourceId_ExistingBlogKeyAndUpperCaseSourceId_ReturnsNull(
+            IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
@@ -150,7 +152,7 @@ namespace Blaven.Data.RavenDb2.Tests
             string upperCaseSourceId = TestData.GetPostSourceId(0).ToUpperInvariant();
 
             // Act
-            var post = repository.GetPostBySourceId(TestData.BlogKey, upperCaseSourceId);
+            var post = await repository.GetPostBySourceId(TestData.BlogKey, upperCaseSourceId);
 
             // Assert
             Assert.Null(post);
@@ -158,7 +160,7 @@ namespace Blaven.Data.RavenDb2.Tests
 
         [Theory]
         [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
-        public void GetPostBySourceId_ExistingSourceIdAndNonExistingBlogKey_ReturnsNull(
+        public async Task GetPostBySourceId_ExistingSourceIdAndNonExistingBlogKey_ReturnsNull(
             IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
@@ -167,7 +169,7 @@ namespace Blaven.Data.RavenDb2.Tests
             string sourceId = TestData.GetPostSourceId(0);
 
             // Act
-            var post = repository.GetPostBySourceId("NON_EXISTING_BLOG_KEY", sourceId);
+            var post = await repository.GetPostBySourceId("NON_EXISTING_BLOG_KEY", sourceId);
 
             // Assert
             Assert.Null(post);
@@ -255,13 +257,13 @@ namespace Blaven.Data.RavenDb2.Tests
             var dbBlogPosts =
                 tagNames.Select(
                     (x, i) =>
-                    new BlogPost
-                        {
-                            BlogKey = (i < 2) ? TestData.BlogKey : TestData.BlogKey.ToLowerInvariant(),
-                            BlavenId = TestData.GetBlavenId(i),
-                            PublishedAt = TestData.TestPublishedAt,
-                            Tags = new[] { x }
-                        }).ToList();
+                        new BlogPost
+                            {
+                                BlogKey = (i < 2) ? TestData.BlogKey : TestData.BlogKey.ToLowerInvariant(),
+                                BlavenId = TestData.GetBlavenId(i),
+                                PublishedAt = TestData.TestPublishedAt,
+                                Tags = new[] { x }
+                            }).ToList();
 
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 

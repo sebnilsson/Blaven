@@ -82,9 +82,9 @@ namespace Blaven.Data.RavenDb2
             using (var session = this.DocumentStore.OpenAsyncSession())
             {
                 var post =
-                    session.Query<BlogPost, BlogPostsIndex>()
+                    await session.Query<BlogPost, BlogPostsIndex>()
                         .OrderBy(x => x.PublishedAt)
-                        .FirstOrDefault(x => x.BlogKey == blogKey && x.SourceId == sourceId);
+                        .FirstOrDefaultAsync(x => x.BlogKey == blogKey && x.SourceId == sourceId);
                 return post;
             }
         }
