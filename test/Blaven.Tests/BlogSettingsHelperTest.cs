@@ -4,32 +4,32 @@ using Xunit;
 
 namespace Blaven.Tests
 {
-    public class BlogSettingsManagerTest
+    public class BlogSettingsHelperTest
     {
         [Fact]
         public void GetEnsuredBlogKey_NonExistingBlogKey_ReturnsNonExistingBlogKey()
         {
             // Arrange
-            var settingsHelper = TestData.GetTestBlogSettingsHelper();
+            var settingsHelper = GetTestBlogSettingsHelper();
 
             // Act
-            var ensuredBlogKey = settingsHelper.GetEnsuredBlogKey(TestData.BlogKey);
+            var ensuredBlogKey = settingsHelper.GetEnsuredBlogKey(BlogMetaTestData.BlogKey);
 
             // Assert
-            Assert.Equal(TestData.BlogKey, ensuredBlogKey);
+            Assert.Equal(BlogMetaTestData.BlogKey, ensuredBlogKey);
         }
 
         [Fact]
         public void GetEnsuredBlogKey_NullBlogKey_ReturnsFirstBlogSettingsBlogKey()
         {
             // Arrange
-            var settingsHelper = TestData.GetTestBlogSettingsHelper();
+            var settingsHelper = GetTestBlogSettingsHelper();
 
             // Act
             var ensuredBlogKey = settingsHelper.GetEnsuredBlogKey(blogKey: null);
 
             // Assert
-            var firstBlogSetting = TestData.GetBlogSettings().FirstOrDefault();
+            var firstBlogSetting = BlogSettingTestData.CreateCollection().FirstOrDefault();
 
             Assert.NotNull(ensuredBlogKey);
             Assert.NotNull(firstBlogSetting);
@@ -40,8 +40,8 @@ namespace Blaven.Tests
         public void GetEnsuredBlogKeys_NonExistingBlogKey_ReturnsNonExistingBlogKey()
         {
             // Arrange
-            var settingsHelper = TestData.GetTestBlogSettingsHelper();
-            var blogKeys = new[] { TestData.BlogKey };
+            var settingsHelper = GetTestBlogSettingsHelper();
+            var blogKeys = new[] { BlogMetaTestData.BlogKey };
 
             // Act
             var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys);
@@ -55,13 +55,13 @@ namespace Blaven.Tests
         public void GetEnsuredBlogKeys_EmptyBlogKeys_ReturnsAllBlogSettingsBlogKeys()
         {
             // Arrange
-            var settingsHelper = TestData.GetTestBlogSettingsHelper();
+            var settingsHelper = GetTestBlogSettingsHelper();
 
             // Act
             var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys: Enumerable.Empty<string>());
 
             // Assert
-            var blogSettingsBlogKeys = TestData.GetBlogSettings().Select(x => x.BlogKey);
+            var blogSettingsBlogKeys = BlogSettingTestData.CreateCollection().Select(x => x.BlogKey);
 
             bool ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys = ensuredBlogKeys.SequenceEqual(blogSettingsBlogKeys);
             Assert.True(ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys);
@@ -71,16 +71,24 @@ namespace Blaven.Tests
         public void GetEnsuredBlogKeys_NullBlogKeys_ReturnsAllBlogSettingsBlogKeys()
         {
             // Arrange
-            var settingsHelper = TestData.GetTestBlogSettingsHelper();
+            var settingsHelper = GetTestBlogSettingsHelper();
 
             // Act
             var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys: null);
 
             // Assert
-            var blogSettingsBlogKeys = TestData.GetBlogSettings().Select(x => x.BlogKey);
+            var blogSettingsBlogKeys = BlogSettingTestData.CreateCollection().Select(x => x.BlogKey);
 
             bool ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys = ensuredBlogKeys.SequenceEqual(blogSettingsBlogKeys);
             Assert.True(ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys);
+        }
+
+        private static BlogSettingsHelper GetTestBlogSettingsHelper()
+        {
+            var settings = BlogSettingTestData.CreateCollection();
+
+            var helper = new BlogSettingsHelper(settings);
+            return helper;
         }
     }
 }

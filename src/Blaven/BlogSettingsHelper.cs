@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Blaven
 {
-    internal class BlogSettingsHelper
+    public class BlogSettingsHelper
     {
         private readonly IReadOnlyList<BlogSetting> blogSettings;
 
@@ -25,6 +25,24 @@ namespace Blaven
 
         public IReadOnlyList<string> BlogKeys { get; }
 
+        public BlogSetting GetBlogSetting(string blogKey)
+        {
+            if (blogKey == null)
+            {
+                throw new ArgumentNullException(nameof(blogKey));
+            }
+
+            var blogSetting =
+                this.blogSettings.FirstOrDefault(x => x.BlogKey.Equals(blogKey, StringComparison.OrdinalIgnoreCase));
+            if (blogSetting == null)
+            {
+                string message = $"Settings did not contain any item with key '{blogKey}'.";
+                throw new KeyNotFoundException(message);
+            }
+
+            return blogSetting;
+        }
+
         public string GetEnsuredBlogKey(string blogKey)
         {
             if (blogKey != null)
@@ -35,9 +53,8 @@ namespace Blaven
             string blogSettingsBlogKey = this.BlogKeys.FirstOrDefault();
             if (blogSettingsBlogKey == null)
             {
-                string message =
-                    $"Param '{nameof(blogKey)}' was null and no default value found in provided '{nameof(this.blogSettings)}'.";
-                throw new ArgumentOutOfRangeException(nameof(blogKey), message);
+                string message = $"No default item found in {nameof(this.BlogKeys)}.";
+                throw new KeyNotFoundException(message);
             }
 
             return blogSettingsBlogKey.ToLowerInvariant();
@@ -56,9 +73,8 @@ namespace Blaven
             var blogSettingsBlogKeys = this.BlogKeys.ToList();
             if (!blogSettingsBlogKeys.Any())
             {
-                string message =
-                    $"Param '{nameof(blogKeys)}' was null and no default values found in provided '{nameof(this.blogSettings)}'.";
-                throw new ArgumentOutOfRangeException(nameof(blogKeys), message);
+                string message = $"No default items found in {nameof(this.BlogKeys)}.";
+                throw new KeyNotFoundException(message);
             }
 
             return blogSettingsBlogKeys;

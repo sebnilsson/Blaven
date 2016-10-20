@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 
-using Blaven.BlogSources;
-
 namespace Blaven.Synchronization
 {
     [DebuggerDisplay("BlogKey={BlogKey}, StartedAt={StartedAt}, Elapsed={Elapsed}, ElapsedMs={ElapsedMs}")]

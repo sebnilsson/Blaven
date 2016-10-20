@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Blaven.Synchronization;
 using Blaven.Tests;
 
 namespace Blaven.BlogSources.Tests
@@ -64,12 +63,12 @@ namespace Blaven.BlogSources.Tests
                                  getMetaFunc: blogSetting =>
                                      {
                                          Thread.Sleep(getMetaFuncSleep);
-                                         return TestData.GetBlogMeta(blogSetting.BlogKey);
+                                         return BlogMetaTestData.Create(blogSetting.BlogKey);
                                      },
                                  getBlogPosts: (blogSetting, __, ___) =>
                                      {
                                          Thread.Sleep(getChangesFuncSleep);
-                                         return TestData.GetBlogPosts(blogSetting.BlogKey);
+                                         return BlogPostTestData.CreateCollection(blogSetting.BlogKey);
                                      });
             return blogSource;
         }

@@ -33,9 +33,9 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [InlineData(TestData.BlogKey1)]
-        [InlineData(TestData.BlogKey2)]
-        [InlineData(TestData.BlogKey3)]
+        [InlineData(BlogMetaTestData.BlogKey1)]
+        [InlineData(BlogMetaTestData.BlogKey2)]
+        [InlineData(BlogMetaTestData.BlogKey3)]
         public async Task GetBlogMeta_ExistingBlogKey_ReturnsBlogMeta(string blogKey)
         {
             // Arrange
@@ -64,53 +64,57 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public async Task GetPost_ExistingBlavenId_ReturnsPost(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var post = await repository.GetPost(TestData.BlogKey, TestData.BlavenId2);
+            var post = await repository.GetPost(BlogMetaTestData.BlogKey, BlogPostTestData.BlavenId2);
 
             // Assert
             bool hasBlogPostFieldValues = HasBlogPostAllFieldValues(post);
 
-            Assert.Equal(TestData.BlogKey, post.BlogKey);
-            Assert.Equal(TestData.BlavenId2, post.BlavenId);
+            Assert.Equal(BlogMetaTestData.BlogKey, post.BlogKey);
+            Assert.Equal(BlogPostTestData.BlavenId2, post.BlavenId);
             Assert.True(hasBlogPostFieldValues);
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public async Task GetPost_ExistingBlavenIdAndNonExistingBlogKey_ReturnsNull(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var post = await repository.GetPost("NON_EXISTING_BLOG_KEY", TestData.BlavenId2);
+            var post = await repository.GetPost("NON_EXISTING_BLOG_KEY", BlogPostTestData.BlavenId2);
 
             // Assert
             Assert.Null(post);
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public async Task GetPost_NonExistingBlavenId_ReturnsNull(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var post = await repository.GetPost(TestData.BlogKey, "NON_EXISTING_BLAVEN_ID");
+            var post = await repository.GetPost(BlogMetaTestData.BlogKey, "NON_EXISTING_BLAVEN_ID");
 
             // Assert
             Assert.Null(post);
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public async Task GetPostBySourceId_ExistingBlogKeyAndNotExistingSourceId_ReturnsNull(
             IEnumerable<BlogPost> dbBlogPosts)
         {
@@ -118,55 +122,58 @@ namespace Blaven.Data.RavenDb2.Tests
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var post = await repository.GetPostBySourceId(TestData.BlogKey, "NON_EXISTING_SOURCE_ID");
+            var post = await repository.GetPostBySourceId(BlogMetaTestData.BlogKey, "NON_EXISTING_SOURCE_ID");
 
             // Assert
             Assert.Null(post);
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public async Task GetPostBySourceId_ExistingBlogKeyAndSourceId_ReturnsBlogPost(
             IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            string sourceId = TestData.GetPostSourceId(0);
+            string sourceId = BlogPostTestData.CreatePostSourceId(0);
 
             // Act
-            var post = await repository.GetPostBySourceId(TestData.BlogKey, sourceId);
+            var post = await repository.GetPostBySourceId(BlogMetaTestData.BlogKey, sourceId);
 
             // Assert
             Assert.Equal(sourceId, post.SourceId);
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public async Task GetPostBySourceId_ExistingBlogKeyAndUpperCaseSourceId_ReturnsNull(
             IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            string upperCaseSourceId = TestData.GetPostSourceId(0).ToUpperInvariant();
+            string upperCaseSourceId = BlogPostTestData.CreatePostSourceId(0).ToUpperInvariant();
 
             // Act
-            var post = await repository.GetPostBySourceId(TestData.BlogKey, upperCaseSourceId);
+            var post = await repository.GetPostBySourceId(BlogMetaTestData.BlogKey, upperCaseSourceId);
 
             // Assert
             Assert.Null(post);
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public async Task GetPostBySourceId_ExistingSourceIdAndNonExistingBlogKey_ReturnsNull(
             IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            string sourceId = TestData.GetPostSourceId(0);
+            string sourceId = BlogPostTestData.CreatePostSourceId(0);
 
             // Act
             var post = await repository.GetPostBySourceId("NON_EXISTING_BLOG_KEY", sourceId);
@@ -176,19 +183,20 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListArchive_ExistingBlogKey_ReturnsArchive(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var archiveQuery = repository.ListArchive(new[] { TestData.BlogKey });
+            var archiveQuery = repository.ListArchive(new[] { BlogMetaTestData.BlogKey });
 
             var archive = archiveQuery.Skip(0).Take(100).ToList();
 
             // Assert
-            bool allArchiveItemsMatchBlogKey = archive.Any() && archive.All(x => x.BlogKey == TestData.BlogKey);
+            bool allArchiveItemsMatchBlogKey = archive.Any() && archive.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allTagItemsHasDate = archive.All(x => x.Date > DateTime.MinValue);
             bool allTagItemsHasCount = archive.All(x => x.Count > 0);
 
@@ -198,7 +206,8 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListArchive_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
@@ -213,19 +222,20 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListTags_ExistingBlogKey_ReturnsListTags(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var tagsQuery = repository.ListTags(new[] { TestData.BlogKey });
+            var tagsQuery = repository.ListTags(new[] { BlogMetaTestData.BlogKey });
 
             var tags = tagsQuery.Skip(0).Take(100).ToList();
 
             // Assert
-            bool allTagItemsMatchBlogKey = tags.Any() && tags.All(x => x.BlogKey == TestData.BlogKey);
+            bool allTagItemsMatchBlogKey = tags.Any() && tags.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allTagItemsHasNames = tags.All(x => !string.IsNullOrWhiteSpace(x.Name));
             bool allTagItemsHasCount = tags.All(x => x.Count > 0);
 
@@ -235,7 +245,8 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListTags_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
@@ -259,16 +270,16 @@ namespace Blaven.Data.RavenDb2.Tests
                     (x, i) =>
                         new BlogPost
                             {
-                                BlogKey = (i < 2) ? TestData.BlogKey : TestData.BlogKey.ToLowerInvariant(),
-                                BlavenId = TestData.GetBlavenId(i),
-                                PublishedAt = TestData.TestPublishedAt,
+                                BlogKey = (i < 2) ? BlogMetaTestData.BlogKey : BlogMetaTestData.BlogKey.ToLowerInvariant(),
+                                BlavenId = BlogPostTestData.CreateBlavenId(i),
+                                PublishedAt = BlogPostTestData.TestPublishedAt,
                                 Tags = new[] { x }
                             }).ToList();
 
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var tags = repository.ListTags(new[] { TestData.BlogKey }).ToList();
+            var tags = repository.ListTags(new[] { BlogMetaTestData.BlogKey }).ToList();
 
             // Assert
             var testTagItem = tags.FirstOrDefault(x => x.Name == "Test tag");
@@ -277,19 +288,20 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPostHeads_ExistingBlogKey_ReturnsPostHeads(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var postHeadsQuery = repository.ListPostHeads(new[] { TestData.BlogKey });
+            var postHeadsQuery = repository.ListPostHeads(new[] { BlogMetaTestData.BlogKey });
 
             var postHeads = postHeadsQuery.Skip(0).Take(100).ToList();
 
             // Assert
-            bool allPostHeadsMatchBlogKey = postHeads.Any() && postHeads.All(x => x.BlogKey == TestData.BlogKey);
+            bool allPostHeadsMatchBlogKey = postHeads.Any() && postHeads.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = postHeads.All(HasBlogPostHeadAllFieldValues);
 
             Assert.True(allPostHeadsMatchBlogKey);
@@ -297,7 +309,8 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPostHeads_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
@@ -312,19 +325,20 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPosts_ExistingBlogKey_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var postQuery = repository.ListPosts(new[] { TestData.BlogKey });
+            var postQuery = repository.ListPosts(new[] { BlogMetaTestData.BlogKey });
 
             var posts = postQuery.Skip(0).Take(100).ToList();
 
             // Assert
-            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == TestData.BlogKey);
+            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
 
             Assert.True(allPostsMatchBlogKey);
@@ -332,7 +346,8 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPosts_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
@@ -347,21 +362,22 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPostsByArchive_ExistingBlogKey_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            var archiveDate = TestData.TestPublishedAt;
+            var archiveDate = BlogPostTestData.TestPublishedAt;
 
             // Act
-            var postQuery = repository.ListPostsByArchive(new[] { TestData.BlogKey }, archiveDate);
+            var postQuery = repository.ListPostsByArchive(new[] { BlogMetaTestData.BlogKey }, archiveDate);
 
             var posts = postQuery.Skip(0).Take(100).ToList();
 
             // Assert
-            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == TestData.BlogKey);
+            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
             bool allPostsMatchDate =
                 posts.All(
@@ -373,17 +389,19 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPostsByArchive_ExistingBlogKeyAndNonExistingArchiveDate_ReturnsEmpty(
             IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            var nonExistingArchiveDate = TestData.TestPublishedAt.AddYears(-1);
+            var nonExistingArchiveDate = BlogPostTestData.TestPublishedAt.AddYears(-1);
 
             // Act
-            var archive = repository.ListPostsByArchive(new[] { TestData.BlogKey }, nonExistingArchiveDate).ToList();
+            var archive =
+                repository.ListPostsByArchive(new[] { BlogMetaTestData.BlogKey }, nonExistingArchiveDate).ToList();
 
             // Assert
             bool anyArchiveItems = archive.Any();
@@ -391,13 +409,14 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPostsByArchive_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            var archiveDate = TestData.TestPublishedAt;
+            var archiveDate = BlogPostTestData.TestPublishedAt;
 
             // Act
             var archive = repository.ListPostsByArchive(new[] { "NON_EXISTING_BLOG_KEY" }, archiveDate).ToList();
@@ -408,21 +427,22 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPostsByTag_ExistingBlogKey_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            var tag = TestData.GetPostTag(1);
+            var tag = BlogPostTestData.CreatePostTag(1);
 
             // Act
-            var postQuery = repository.ListPostsByTag(new[] { TestData.BlogKey }, tag);
+            var postQuery = repository.ListPostsByTag(new[] { BlogMetaTestData.BlogKey }, tag);
 
             var posts = postQuery.Skip(0).Take(100).ToList();
 
             // Assert
-            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == TestData.BlogKey);
+            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
             bool allPostsContainsTag = posts.All(x => x.Tags.Contains(tag));
 
@@ -432,14 +452,15 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPostsByTag_ExistingBlogKeyAndNonExistingTag_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
             // Act
-            var archive = repository.ListPostsByTag(new[] { TestData.BlogKey }, "NON_EXISTING_TAG").ToList();
+            var archive = repository.ListPostsByTag(new[] { BlogMetaTestData.BlogKey }, "NON_EXISTING_TAG").ToList();
 
             // Assert
             bool anyArchiveItems = archive.Any();
@@ -447,13 +468,14 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void ListPostsByTag_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            var tag = TestData.GetPostTag(1);
+            var tag = BlogPostTestData.CreatePostTag(1);
 
             // Act
             var posts = repository.ListPostsByTag(new[] { "NON_EXISTING_BLOG_KEY" }, tag).ToList();
@@ -464,19 +486,20 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void SearchPosts_ExistingBlogKeyAndContent_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            string postContent = TestData.GetBlogPost(TestData.BlogKey).Content;
+            string postContent = BlogPostTestData.Create(BlogMetaTestData.BlogKey).Content;
 
             // Act
-            var posts = repository.SearchPosts(new[] { TestData.BlogKey }, postContent).ToList();
+            var posts = repository.SearchPosts(new[] { BlogMetaTestData.BlogKey }, postContent).ToList();
 
             // Assert
-            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == TestData.BlogKey);
+            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
             bool allPostsContainsTitle = posts.All(x => x.Content == postContent);
 
@@ -486,21 +509,22 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void SearchPosts_ExistingBlogKeyAndTag_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            var tag = TestData.GetPostTag(1);
+            var tag = BlogPostTestData.CreatePostTag(1);
 
             // Act
-            var postQuery = repository.SearchPosts(new[] { TestData.BlogKey }, tag);
+            var postQuery = repository.SearchPosts(new[] { BlogMetaTestData.BlogKey }, tag);
 
             var posts = postQuery.Skip(0).Take(100).ToList();
 
             // Assert
-            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == TestData.BlogKey);
+            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
             bool allPostsContainsTag = posts.All(x => x.Tags.Contains(tag));
 
@@ -510,19 +534,20 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void SearchPosts_ExistingBlogKeyAndTitle_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            string postTitle = TestData.GetBlogPost(TestData.BlogKey).Title;
+            string postTitle = BlogPostTestData.Create(BlogMetaTestData.BlogKey).Title;
 
             // Act
-            var posts = repository.SearchPosts(new[] { TestData.BlogKey }, postTitle).ToList();
+            var posts = repository.SearchPosts(new[] { BlogMetaTestData.BlogKey }, postTitle).ToList();
 
             // Assert
-            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == TestData.BlogKey);
+            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
             bool allPostsContainsTitle = posts.All(x => x.Title == postTitle);
 
@@ -532,7 +557,8 @@ namespace Blaven.Data.RavenDb2.Tests
         }
 
         [Theory]
-        [MemberData(nameof(TestData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5, MemberType = typeof(TestData))]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public void SearchPosts_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
@@ -548,9 +574,9 @@ namespace Blaven.Data.RavenDb2.Tests
 
         public static IEnumerable<BlogMeta> GetBlogMetas()
         {
-            yield return TestData.GetBlogMeta(TestData.BlogKey1);
-            yield return TestData.GetBlogMeta(TestData.BlogKey2);
-            yield return TestData.GetBlogMeta(TestData.BlogKey3);
+            yield return BlogMetaTestData.Create(BlogMetaTestData.BlogKey1);
+            yield return BlogMetaTestData.Create(BlogMetaTestData.BlogKey2);
+            yield return BlogMetaTestData.Create(BlogMetaTestData.BlogKey3);
         }
 
         private static RavenDbRepository GetRavenDbRepository(

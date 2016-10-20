@@ -32,4 +32,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersion("0.5.0")] // Nuget
 
 [assembly: InternalsVisibleTo("Blaven.Tests")]
-[assembly: InternalsVisibleTo("Blaven.Tests.Core")]
+[assembly: InternalsVisibleTo("Blaven.Testing")]

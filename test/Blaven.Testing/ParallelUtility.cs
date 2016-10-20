@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace Blaven.Tests
 {
-    public static class TestUtility
+    public static class ParallelUtility
     {
-        public const int ParallelUsersCount = 5;
+        public const int DefaultParallelUsersCount = 5;
 
-        public static void RunParallelUsers(Action action, int userCount = ParallelUsersCount)
+        public static void RunParallelUsers(Action action, int userCount = DefaultParallelUsersCount)
         {
             Parallel.For(
                 0,

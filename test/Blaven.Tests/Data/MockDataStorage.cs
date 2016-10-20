@@ -55,9 +55,7 @@ namespace Blaven.Data.Tests
             return await Task.FromResult(this.getLastPostUpdatedAtFunc?.Invoke(blogSetting));
         }
 
-        public async Task<IReadOnlyList<BlogPostBase>> GetPostBases(
-            BlogSetting blogSetting,
-            DateTime? lastUpdatedAt)
+        public async Task<IReadOnlyList<BlogPostBase>> GetPostBases(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {
@@ -110,7 +108,7 @@ namespace Blaven.Data.Tests
                                       {
                                           Thread.Sleep(getBlogPostsFuncSleep);
                                           return
-                                              TestData.GetBlogPostBases(
+                                              BlogPostBaseTestData.CreateCollection(
                                                   start: 10,
                                                   count: 100,
                                                   blogKey: blogSetting.BlogKey).ToReadOnlyList();
@@ -119,7 +117,10 @@ namespace Blaven.Data.Tests
                                       {
                                           Thread.Sleep(getLastPostUpdatedAtFuncSleep);
                                           return
-                                              TestData.GetBlogPosts(start: 100, count: 10, blogKey: blogSetting.BlogKey)
+                                              BlogPostTestData.CreateCollection(
+                                                      start: 100,
+                                                      count: 10,
+                                                      blogKey: blogSetting.BlogKey)
                                                   .Select(x => x.PublishedAt)
                                                   .OrderByDescending(x => x)
                                                   .FirstOrDefault();

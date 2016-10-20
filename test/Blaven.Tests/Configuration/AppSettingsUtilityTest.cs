@@ -12,33 +12,33 @@ namespace Blaven.Configuration.Tests
         public void GetPassword_PasswordAndMockBlogSource_ReturnsUserName()
         {
             // Arrange
-            var appSettings = TestData.GetAppSettings();
+            var appSettings = AppSettingTestData.CreateDictionary();
 
             // Act
             string password = AppSettingsUtility.GetPassword<MockBlogSource>(appSettings);
 
             // Assert
-            Assert.Equal(TestData.AppSettingsTestPassword, password);
+            Assert.Equal(AppSettingTestData.AppSettingsTestPassword, password);
         }
 
         [Fact]
         public void GetUsername_UsernameAndMockBlogSource_ReturnsUsername()
         {
             // Arrange
-            var appSettings = TestData.GetAppSettings();
+            var appSettings = AppSettingTestData.CreateDictionary();
 
             // Act
             string username = AppSettingsUtility.GetUsername<MockBlogSource>(appSettings);
 
             // Assert
-            Assert.Equal(TestData.AppSettingsTestUsername, username);
+            Assert.Equal(AppSettingTestData.AppSettingsTestUsername, username);
         }
 
         [Fact]
         public void GetValueInternal_NonExistingKeyAndMockBlogSource_Throws()
         {
             // Arrange
-            var appSettings = TestData.GetAppSettings();
+            var appSettings = AppSettingTestData.CreateDictionary();
 
             // Act & Assert
             Assert.Throws<KeyNotFoundException>(

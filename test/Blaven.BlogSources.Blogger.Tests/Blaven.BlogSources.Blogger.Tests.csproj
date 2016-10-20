@@ -73,11 +73,7 @@
         <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
       </ItemGroup>
     </When>
-    <Otherwise>
-      <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
-      </ItemGroup>
-    </Otherwise>
+    <Otherwise />
   </Choose>
   <ItemGroup>
     <Compile Include="BloggerBlogSourceAppSettingsHelperTest.cs" />
@@ -101,9 +97,9 @@
       <Project>{30fb0ddf-b9a6-4d40-a1d8-979a5df398ea}</Project>
       <Name>Blaven</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Blaven.Tests\Blaven.Tests.csproj">
-      <Project>{1644fbd1-085d-40e1-8b1f-cfce1fc059ae}</Project>
-      <Name>Blaven.Tests</Name>
+    <ProjectReference Include="..\Blaven.Testing\Blaven.Testing.csproj">
+      <Project>{87fbf4e8-fbc4-44d4-969a-785c892aee30}</Project>
+      <Name>Blaven.Testing</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

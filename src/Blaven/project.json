@@ -18,12 +18,6 @@
       }
     }
   },
-
-  "dependencies": {
-    "NETStandard.Library": "1.6.0",
-    "System.Linq.Queryable": "4.0.1"
-  },
-
   "frameworks": {
     "netstandard1.3": {
       "buildOptions": {
@@ -31,6 +25,14 @@
           "NETSTANDARD1_3",
           "PORTABLE"
         ]
+      },
+      "dependencies": {
+        "System.Collections.Concurrent": "4.0.12",
+        "System.Diagnostics.Debug": "4.0.11",
+        "System.Globalization.Extensions": "4.0.1",
+        "System.Linq.Queryable": "4.0.1",
+        "System.Text.RegularExpressions": "4.1.0",
+        "System.Threading": "4.0.11"
       }
     }
   }

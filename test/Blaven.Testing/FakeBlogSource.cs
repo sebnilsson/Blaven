@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+using Blaven.BlogSources;
+
+namespace Blaven.Tests
+{
+    public class FakeBlogSource : IBlogSource
+    {
+        private readonly ICollection<BlogMeta> blogMetas;
+
+        private readonly ICollection<BlogPost> blogPosts;
+
+        public FakeBlogSource(IEnumerable<BlogPost> blogPosts = null, params BlogMeta[] blogMetas)
+        {
+            this.blogPosts = (blogPosts ?? Enumerable.Empty<BlogPost>()).ToList();
+            this.blogMetas = (blogMetas ?? Enumerable.Empty<BlogMeta>()).ToList();
+        }
+
+        public Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
+        {
+            var blogMeta = this.blogMetas.SingleOrDefault(x => x.BlogKey == blogSetting.BlogKey);
+            return Task.FromResult(blogMeta);
+        }
+
+        public Task<IReadOnlyList<BlogPost>> GetBlogPosts(
+            BlogSetting blogSetting,
+            IEnumerable<BlogPostBase> dataStoragePosts,
+            DateTime? lastUpdatedAt)
+        {
+            var posts =
+                this.blogPosts.Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
+                    .ToReadOnlyList();
+            return Task.FromResult(posts);
+        }
+    }
+}

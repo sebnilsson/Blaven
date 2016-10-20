@@ -24,7 +24,10 @@ namespace Blaven.Transformers
                 throw new ArgumentNullException(nameof(blogPost));
             }
 
-            this.Transformers.ForEach(transformer => transformer.Transform(blogPost));
+            foreach (var transformer in this.Transformers)
+            {
+                transformer.Transform(blogPost);
+            }
 
             return blogPost;
         }

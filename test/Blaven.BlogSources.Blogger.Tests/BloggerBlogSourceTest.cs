@@ -112,7 +112,10 @@ namespace Blaven.BlogSources.Blogger.Tests
             Assert.Equal(2, blogPosts.Count);
         }
 
-        private static IEnumerable<BloggerPostData> GetTestModifiedPosts(int start, int count, string blogKey = TestData.BlogKey)
+        private static IEnumerable<BloggerPostData> GetTestModifiedPosts(
+            int start,
+            int count,
+            string blogKey = BlogMetaTestData.BlogKey)
         {
             var posts = BloggerTestData.GetPosts(start, count, blogKey).Where(x => x.Updated.HasValue);
 
@@ -141,7 +144,7 @@ namespace Blaven.BlogSources.Blogger.Tests
         private static IEnumerable<BlogPostBase> GetTestBlogPosts(
             int start,
             int count,
-            string blogKey = TestData.BlogKey)
+            string blogKey = BlogMetaTestData.BlogKey)
         {
             var posts = BloggerTestData.GetPosts(start, count, blogKey);
 
@@ -161,7 +164,7 @@ namespace Blaven.BlogSources.Blogger.Tests
 
         private static BlogSetting GetTestBlogSetting()
         {
-            var blogSettings = new BlogSetting(TestData.BlogKey, TestBlogId, TestBlogName);
+            var blogSettings = new BlogSetting(BlogMetaTestData.BlogKey, TestBlogId, TestBlogName);
             return blogSettings;
         }
     }

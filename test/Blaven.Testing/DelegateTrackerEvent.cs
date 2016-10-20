@@ -11,7 +11,7 @@ namespace Blaven.Tests
         {
         }
 
-        internal DelegateTrackerEvent(TKey key, int threadId, DateTime startedAt, DateTime? endedAt)
+        public DelegateTrackerEvent(TKey key, int threadId, DateTime startedAt, DateTime? endedAt)
         {
             this.Key = key;
             this.ThreadId = threadId;

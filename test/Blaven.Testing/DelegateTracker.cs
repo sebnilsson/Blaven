@@ -16,7 +16,7 @@ namespace Blaven.Tests
         {
         }
 
-        internal DelegateTracker(IEnumerable<DelegateTrackerEvent<TKey>> events)
+        public DelegateTracker(IEnumerable<DelegateTrackerEvent<TKey>> events)
         {
             events = (events ?? Enumerable.Empty<DelegateTrackerEvent<TKey>>()).Where(x => x != null);
 

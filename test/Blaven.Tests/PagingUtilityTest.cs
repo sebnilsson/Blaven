@@ -13,8 +13,8 @@ namespace Blaven.Tests
         public void GetPaged_PageIndexZero_ShouldReturnFirstPage(int pageSize)
         {
             // Arrange
-            var firstPageBlogPosts = TestData.GetBlogPosts(0, pageSize).ToList();
-            var secondPageBlogPosts = TestData.GetBlogPosts(pageSize, pageSize);
+            var firstPageBlogPosts = BlogPostTestData.CreateCollection(0, pageSize).ToList();
+            var secondPageBlogPosts = BlogPostTestData.CreateCollection(pageSize, pageSize);
             var allBlogPosts = firstPageBlogPosts.Concat(secondPageBlogPosts);
 
             // Act
@@ -34,8 +34,8 @@ namespace Blaven.Tests
         public void GetPaged_PageIndexOne_ShouldReturnSecondPage(int pageSize)
         {
             // Arrange
-            var firstPageBlogPosts = TestData.GetBlogPosts(0, pageSize);
-            var secondPageBlogPosts = TestData.GetBlogPosts(pageSize, pageSize).ToList();
+            var firstPageBlogPosts = BlogPostTestData.CreateCollection(0, pageSize);
+            var secondPageBlogPosts = BlogPostTestData.CreateCollection(pageSize, pageSize).ToList();
             var allBlogPosts = firstPageBlogPosts.Concat(secondPageBlogPosts);
 
             // Act

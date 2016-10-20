@@ -58,13 +58,13 @@ namespace Blaven.BlogSources.Blogger.Tests
 
         public static BloggerPostData GetPost(
             int index,
-            int tagCount = TestData.DefaultTagCount,
-            string blogKey = TestData.BlogKey)
+            int tagCount = BlogPostTestData.DefaultTagCount,
+            string blogKey = BlogMetaTestData.BlogKey)
         {
             var authorImage = new BloggerPostData.AuthorData.ImageData
                                   {
                                       Url =
-                                          TestData.GetTestString(
+                                          TestUtility.GetTestString(
                                               $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.AuthorData)}.{nameof(BloggerPostData.AuthorData.ImageData)}.{nameof(BloggerPostData.AuthorData.ImageData.Url)}",
                                               blogKey,
                                               index)
@@ -72,18 +72,18 @@ namespace Blaven.BlogSources.Blogger.Tests
             var author = new BloggerPostData.AuthorData
                              {
                                  Id =
-                                     TestData.GetTestString(
+                                     TestUtility.GetTestString(
                                          $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.AuthorData)}.{nameof(BloggerPostData.AuthorData.Id)}",
                                          blogKey,
                                          index),
                                  Image = authorImage,
                                  DisplayName =
-                                     TestData.GetTestString(
+                                     TestUtility.GetTestString(
                                          $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.AuthorData)}.{nameof(BloggerPostData.AuthorData.DisplayName)}",
                                          blogKey,
                                          index),
                                  Url =
-                                     TestData.GetTestString(
+                                     TestUtility.GetTestString(
                                          $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.AuthorData)}.{nameof(BloggerPostData.AuthorData.Url)}",
                                          blogKey,
                                          index)
@@ -93,20 +93,20 @@ namespace Blaven.BlogSources.Blogger.Tests
                            {
                                Author = author,
                                Content =
-                                   TestData.GetTestString(
+                                   TestUtility.GetTestString(
                                        $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.Content)}",
                                        blogKey,
                                        index),
-                               Id = TestData.GetPostSourceId(index, blogKey),
-                               Labels = TestData.GetPostTags(index, tagCount).ToList(),
+                               Id = BlogPostTestData.CreatePostSourceId(index, blogKey),
+                               Labels = BlogPostTestData.CreatePostTags(index, tagCount).ToList(),
                                Published = PostPublishedAt.AddDays(index),
                                Title =
-                                   TestData.GetTestString(
+                                   TestUtility.GetTestString(
                                        $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.Title)}",
                                        blogKey,
                                        index),
                                Url =
-                                   TestData.GetTestString(
+                                   TestUtility.GetTestString(
                                        $"{nameof(BloggerPostData)}.{nameof(BloggerPostData.Url)}",
                                        blogKey,
                                        index),
@@ -115,7 +115,7 @@ namespace Blaven.BlogSources.Blogger.Tests
             return post;
         }
 
-        public static IEnumerable<BloggerPostData> GetPosts(int start, int count, string blogKey = TestData.BlogKey)
+        public static IEnumerable<BloggerPostData> GetPosts(int start, int count, string blogKey = BlogMetaTestData.BlogKey)
         {
             var posts = Enumerable.Range(start, count).Select(x => GetPost(x, blogKey: blogKey)).ToList();
             return posts;

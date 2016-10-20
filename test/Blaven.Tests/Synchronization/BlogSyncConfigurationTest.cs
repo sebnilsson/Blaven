@@ -46,21 +46,6 @@ namespace Blaven.Synchronization.Tests
         }
 
         [Fact]
-        public void DataCacheHandler_CtorNullArgument_ReturnsDefaultType()
-        {
-            // Arrange
-            var blogSource = new MockBlogSource();
-            var dataStorage = new MockDataStorage();
-
-            // Act
-            var config = GetTestBlogSyncConfiguration(blogSource, dataStorage);
-
-            // Assert
-            Assert.NotNull(config.DataCacheHandler);
-            Assert.IsType<MemoryDataCacheHandler>(config.DataCacheHandler);
-        }
-
-        [Fact]
         public void SlugProvider_CtorNullArgument_ReturnsDefaultType()
         {
             // Arrange
@@ -79,7 +64,7 @@ namespace Blaven.Synchronization.Tests
             IBlogSource blogSource = null,
             IDataStorage dataStorage = null)
         {
-            var config = new BlogSyncConfiguration(blogSource, dataStorage, null, null, null, null, null);
+            var config = new BlogSyncConfiguration(blogSource, dataStorage, null, null, null, null);
             return config;
         }
     }

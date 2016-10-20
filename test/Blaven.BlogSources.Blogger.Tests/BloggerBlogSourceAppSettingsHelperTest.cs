@@ -11,7 +11,7 @@ namespace Blaven.BlogSources.Blogger.Tests
         public void CreateFromAppSettingsInternal_AppSettingsContainingApiKey_ReturnsBloggerBlogSource()
         {
             // Arrange
-            var appSettings = TestData.GetAppSettings();
+            var appSettings = AppSettingTestData.CreateDictionary();
 
             // Act
             var bloggerBlogSource = BloggerBlogSourceAppSettingsHelper.CreateFromAppSettingsInternal(appSettings);

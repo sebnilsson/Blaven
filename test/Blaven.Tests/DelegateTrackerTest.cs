@@ -20,10 +20,10 @@ namespace Blaven.Tests
             var tracking = GetTestDelegateTrackingWithEvents(action);
 
             // Act
-            action(TestData.BlogKey1);
+            action(BlogMetaTestData.BlogKey1);
 
             // Assert
-            int collisionCount = tracking.KeyCollisionCount[TestData.BlogKey1];
+            int collisionCount = tracking.KeyCollisionCount[BlogMetaTestData.BlogKey1];
 
             Assert.Equal(2, collisionCount);
         }
@@ -36,10 +36,10 @@ namespace Blaven.Tests
             var tracking = GetTestDelegateTrackingWithEvents(action);
 
             // Act
-            action(TestData.BlogKey1);
+            action(BlogMetaTestData.BlogKey1);
 
             // Assert
-            int runCount = tracking.KeyRunCount[TestData.BlogKey1];
+            int runCount = tracking.KeyRunCount[BlogMetaTestData.BlogKey1];
 
             Assert.Equal(3, runCount);
         }
@@ -52,10 +52,10 @@ namespace Blaven.Tests
             var tracking = GetTestDelegateTrackingWithEvents(action);
 
             // Act
-            action(TestData.BlogKey1);
+            action(BlogMetaTestData.BlogKey1);
 
             // Assert
-            int runOtherCount = tracking.KeyRunOtherCount[TestData.BlogKey1];
+            int runOtherCount = tracking.KeyRunOtherCount[BlogMetaTestData.BlogKey1];
 
             Assert.Equal(2, runOtherCount);
         }
@@ -68,7 +68,7 @@ namespace Blaven.Tests
             var tracking = GetTestDelegateTrackingWithEvents(action);
 
             // Act
-            action(TestData.BlogKey1);
+            action(BlogMetaTestData.BlogKey1);
 
             // Assert
             Assert.Equal(tracking.Events.Count, tracking.RunCount);
@@ -86,37 +86,37 @@ namespace Blaven.Tests
                 new[]
                     {
                         new DelegateTrackerEvent<string>(
-                            TestData.BlogKey1,
+                            BlogMetaTestData.BlogKey1,
                             TestThreadId1,
                             startedAt: GetTestDateTime(10, 0, 0),
                             endedAt: GetTestDateTime(10, 0, 10)),
                         new DelegateTrackerEvent<string>(
-                            TestData.BlogKey1,
+                            BlogMetaTestData.BlogKey1,
                             TestThreadId2,
                             startedAt: GetTestDateTime(10, 0, 1),
                             endedAt: GetTestDateTime(10, 0, 8)),
                         new DelegateTrackerEvent<string>(
-                            TestData.BlogKey1,
+                            BlogMetaTestData.BlogKey1,
                             TestThreadId1,
                             startedAt: GetTestDateTime(10, 0, 2),
                             endedAt: GetTestDateTime(10, 0, 7)),
                         new DelegateTrackerEvent<string>(
-                            TestData.BlogKey2,
+                            BlogMetaTestData.BlogKey2,
                             TestThreadId2,
                             startedAt: GetTestDateTime(10, 0, 0),
                             endedAt: GetTestDateTime(10, 0, 10)),
                         new DelegateTrackerEvent<string>(
-                            TestData.BlogKey2,
+                            BlogMetaTestData.BlogKey2,
                             TestThreadId1,
                             startedAt: GetTestDateTime(10, 0, 3),
                             endedAt: GetTestDateTime(10, 0, 6)),
                         new DelegateTrackerEvent<string>(
-                            TestData.BlogKey2,
+                            BlogMetaTestData.BlogKey2,
                             TestThreadId2,
                             startedAt: GetTestDateTime(11, 0, 0),
                             endedAt: GetTestDateTime(11, 0, 10)),
                         new DelegateTrackerEvent<string>(
-                            TestData.BlogKey2,
+                            BlogMetaTestData.BlogKey2,
                             TestThreadId1,
                             startedAt: GetTestDateTime(12, 0, 3),
                             endedAt: GetTestDateTime(12, 0, 6))

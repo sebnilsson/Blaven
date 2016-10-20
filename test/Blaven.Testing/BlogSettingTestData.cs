@@ -1,9 +1,8 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Blaven.Tests
 {
-    public static partial class TestData
+    public static class BlogSettingTestData
     {
         public const string BlogSettingsId1 = "TestSettingsId 1";
 
@@ -17,32 +16,24 @@ namespace Blaven.Tests
 
         public const string BlogSettingsName3 = "TestSettingsName 3";
 
-        public static IEnumerable<BlogSetting> GetBlogSettings()
+        public static IEnumerable<BlogSetting> CreateCollection()
         {
-            var setting1 = new BlogSetting(BlogKey1, BlogSettingsId1, BlogSettingsName1);
+            var setting1 = new BlogSetting(BlogMetaTestData.BlogKey1, BlogSettingsId1, BlogSettingsName1);
             yield return setting1;
 
-            var setting2 = new BlogSetting(BlogKey2, BlogSettingsId2, BlogSettingsName2);
+            var setting2 = new BlogSetting(BlogMetaTestData.BlogKey2, BlogSettingsId2, BlogSettingsName2);
             yield return setting2;
 
-            var setting3 = new BlogSetting(BlogKey3, BlogSettingsId3, BlogSettingsName3);
+            var setting3 = new BlogSetting(BlogMetaTestData.BlogKey3, BlogSettingsId3, BlogSettingsName3);
             yield return setting3;
         }
 
-        public static BlogSetting GetBlogSetting(string blogKey, string id = null, string name = null)
+        public static BlogSetting Create(string blogKey, string id = null, string name = null)
         {
             id = !string.IsNullOrWhiteSpace(id) ? id : $"{blogKey}Id";
             name = !string.IsNullOrWhiteSpace(name) ? name : $"{blogKey}Name";
 
             return new BlogSetting(blogKey, id, name);
-        }
-
-        internal static BlogSettingsHelper GetTestBlogSettingsHelper()
-        {
-            var settings = GetBlogSettings();
-
-            var settingsHelper = new BlogSettingsHelper(settings);
-            return settingsHelper;
         }
     }
 }

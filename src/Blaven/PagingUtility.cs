@@ -45,8 +45,7 @@ namespace Blaven
             }
 
             paged = paged.Take(pageSize);
-
-            //var paged = source.Skip(skip).Take(pageSize);
+            
             return paged;
         }
     }

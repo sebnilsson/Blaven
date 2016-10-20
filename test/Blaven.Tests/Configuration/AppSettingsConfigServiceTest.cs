@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 using Blaven.BlogSources.Tests;
 using Blaven.Configuration;
@@ -14,7 +13,7 @@ namespace Blaven.BlogSources.Configuration.Tests
         public void BuildBlogSource_NullMockBlogSource_FuncContainsUsernameAndPassword()
         {
             // Arrange
-            var appSettings = TestData.GetAppSettings();
+            var appSettings = AppSettingTestData.CreateDictionary();
             var service = new AppSettingsConfigService(appSettings);
 
             string username = null;
@@ -30,15 +29,15 @@ namespace Blaven.BlogSources.Configuration.Tests
                     });
 
             // Assert
-            Assert.Equal(TestData.AppSettingsTestUsername, username);
-            Assert.Equal(TestData.AppSettingsTestPassword, password);
+            Assert.Equal(AppSettingTestData.AppSettingsTestUsername, username);
+            Assert.Equal(AppSettingTestData.AppSettingsTestPassword, password);
         }
 
         [Fact]
         public void BuildBlogSource_MockBlogSource_ReturnsNotNullBlogSource()
         {
             // Arrange
-            var appSettings = TestData.GetAppSettings();
+            var appSettings = AppSettingTestData.CreateDictionary();
             var service = new AppSettingsConfigService(appSettings);
 
             // Act
@@ -52,11 +51,11 @@ namespace Blaven.BlogSources.Configuration.Tests
         public void GetBlogSettingsInternal_AppSettingsContainingSettings_ReturnsBlogSettings()
         {
             // Arrange
-            var appSettings = TestData.GetAppSettings();
+            var appSettings = AppSettingTestData.CreateDictionary();
             var service = new AppSettingsConfigService(appSettings);
 
-            string blogKey1 = nameof(TestData.BlogKey1).ToLowerInvariant();
-            string blogKey2 = nameof(TestData.BlogKey2).ToLowerInvariant();
+            string blogKey1 = nameof(BlogMetaTestData.BlogKey1).ToLowerInvariant();
+            string blogKey2 = nameof(BlogMetaTestData.BlogKey2).ToLowerInvariant();
 
             // Act
             var blogSettings = service.GetBlogSettings().ToList();
@@ -67,23 +66,23 @@ namespace Blaven.BlogSources.Configuration.Tests
 
             Assert.NotNull(blogSetting1);
             Assert.Equal(blogKey1, blogSetting1.BlogKey);
-            Assert.Equal($"{nameof(TestData.BlogKey1)}Id", blogSetting1.Id);
-            Assert.Equal($"{nameof(TestData.BlogKey1)}Name", blogSetting1.Name);
+            Assert.Equal($"{nameof(BlogMetaTestData.BlogKey1)}Id", blogSetting1.Id);
+            Assert.Equal($"{nameof(BlogMetaTestData.BlogKey1)}Name", blogSetting1.Name);
 
             Assert.NotNull(blogSetting2);
             Assert.Equal(blogKey2, blogSetting2.BlogKey);
-            Assert.Equal($"{nameof(TestData.BlogKey2)}Id", blogSetting2.Id);
-            Assert.Equal($"{nameof(TestData.BlogKey2)}Name", blogSetting2.Name);
+            Assert.Equal($"{nameof(BlogMetaTestData.BlogKey2)}Id", blogSetting2.Id);
+            Assert.Equal($"{nameof(BlogMetaTestData.BlogKey2)}Name", blogSetting2.Name);
         }
 
         [Fact]
         public void GetBlogSettingsInternal_AppSettingsContainingSettings_ReturnsBlogSettingsWithoutIdOrName()
         {
             // Arrange
-            var appSettings = TestData.GetAppSettings();
+            var appSettings = AppSettingTestData.CreateDictionary();
             var service = new AppSettingsConfigService(appSettings);
 
-            string blogKey3 = nameof(TestData.BlogKey3).ToLowerInvariant();
+            string blogKey3 = nameof(BlogMetaTestData.BlogKey3).ToLowerInvariant();
 
             // Act
             var blogSettings = service.GetBlogSettings().ToList();

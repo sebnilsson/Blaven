@@ -10,7 +10,7 @@ namespace Blaven.BlogSources.Blogger
         private readonly IBloggerApiProvider apiProvider;
 
         public BloggerBlogSource(string apiKey)
-            : this(GetBloggerApiProvider(apiKey))
+            : this(new BloggerApiProvider(apiKey))
         {
         }
 
@@ -73,17 +73,6 @@ namespace Blaven.BlogSources.Blogger
             blogPost.BlogKey = blogSetting.BlogKey;
 
             return blogPost;
-        }
-
-        private static BloggerApiProvider GetBloggerApiProvider(string apiKey)
-        {
-            if (apiKey == null)
-            {
-                throw new ArgumentNullException(nameof(apiKey));
-            }
-
-            var apiProvider = new BloggerApiProvider(apiKey);
-            return apiProvider;
         }
     }
 }

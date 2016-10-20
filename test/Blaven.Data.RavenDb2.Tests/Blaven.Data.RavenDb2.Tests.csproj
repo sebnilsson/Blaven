@@ -118,6 +118,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlogPostTheoryData.cs" />
     <Compile Include="DocumentStoreExtensions.cs" />
     <Compile Include="EmbeddableDocumentStoreHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -131,8 +132,12 @@
       <Name>Blaven.Data.RavenDb2</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">
-      <Project>{30fb0ddf-b9a6-4d40-a1d8-979a5df398ea}</Project>
+      <Project>{87aa2b88-6b18-4243-9f07-a890f641ae62}</Project>
       <Name>Blaven</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Blaven.Testing\Blaven.Testing.csproj">
+      <Project>{87fbf4e8-fbc4-44d4-969a-785c892aee30}</Project>
+      <Name>Blaven.Testing</Name>
     </ProjectReference>
     <ProjectReference Include="..\Blaven.Tests\Blaven.Tests.csproj">
       <Project>{1644fbd1-085d-40e1-8b1f-cfce1fc059ae}</Project>
