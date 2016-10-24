@@ -19,7 +19,7 @@ namespace Blaven.Synchronization
             this.config = config;
         }
 
-        public async Task<BlogSourceChangeSet> Update(BlogSetting blogSetting, DateTime? lastUpdatedAt)
+        public async Task<BlogSyncChangeSet> Update(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             var dataStoragePosts = await this.GetDataStoragePosts(blogSetting, lastUpdatedAt);
 
@@ -103,7 +103,7 @@ namespace Blaven.Synchronization
             return sourcePosts;
         }
 
-        private void HandleChanges(string blogKey, BlogSourceChangeSet changeSet)
+        private void HandleChanges(string blogKey, BlogSyncChangeSet changeSet)
         {
             var posts = changeSet.InsertedBlogPosts.Concat(changeSet.UpdatedBlogPosts).ToList();
 

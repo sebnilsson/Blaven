@@ -14,7 +14,7 @@ namespace Blaven.Tests
         public void ctor_NullBlogSettings_ShouldNotThrow()
         {
             // Arrange
-            var repository = new MockRepository();
+            var repository = new FakeRepository();
 
             // Act
             var service = new BlogService(repository, blogSettings: null);
@@ -34,8 +34,15 @@ namespace Blaven.Tests
         public async Task GetBlogMeta_ExistingBlogKey_ReturnsBlogMeta()
         {
             // Arrange
-            var blogMetas = new[] { new BlogMeta { BlogKey = BlogMetaTestData.BlogKey, Name = BlogMetaTestData.BlogMetaName } };
-            var service = GetBlogService(blogMetas: blogMetas);
+            var blogMetas = new[]
+                                {
+                                    new BlogMeta
+                                        {
+                                            BlogKey = BlogMetaTestData.BlogKey,
+                                            Name = BlogMetaTestData.BlogMetaName
+                                        }
+                                };
+            var service = BlogServiceTestFactory.Create(blogMetas: blogMetas);
 
             // Act
             var meta = await service.GetBlogMeta(BlogMetaTestData.BlogKey);
@@ -49,26 +56,36 @@ namespace Blaven.Tests
         public async Task GetBlogMeta_EmptyExistingBlogKey_ReturnsFirstBlogMeta()
         {
             // Arrange
-            var blogMetas = new[]
-                                {
-                                    new BlogMeta { BlogKey = BlogMetaTestData.BlogKey1, Name = BlogMetaTestData.BlogMetaName },
-                                    new BlogMeta { BlogKey = BlogMetaTestData.BlogKey2, Name = $"{BlogMetaTestData.BlogMetaName}_Name" }
-                                };
-            var service = GetBlogService(blogMetas: blogMetas);
+            string blogMetaName2 = $"{BlogMetaTestData.BlogMetaName}_2";
+
+            var service =
+                BlogServiceTestFactory.Create(
+                    blogMetas:
+                    new[]
+                        {
+                            new BlogMeta { BlogKey = BlogMetaTestData.BlogKey2, Name = blogMetaName2 },
+                            new BlogMeta { BlogKey = BlogMetaTestData.BlogKey1, Name = BlogMetaTestData.BlogMetaName }
+                        },
+                    blogSettings:
+                    new[]
+                        {
+                            BlogSettingTestData.Create(BlogMetaTestData.BlogKey2),
+                            BlogSettingTestData.Create(BlogMetaTestData.BlogKey1)
+                        });
 
             // Act
             var meta = await service.GetBlogMeta();
 
             // Assert
-            Assert.Equal(BlogMetaTestData.BlogKeys.First(), meta.BlogKey);
-            Assert.Equal(BlogMetaTestData.BlogMetaName, meta.Name);
+            Assert.Equal(BlogMetaTestData.BlogKey2, meta.BlogKey);
+            Assert.Equal(blogMetaName2, meta.Name);
         }
 
         [Fact]
         public async Task GetBlogMeta_NonExistingBlogKey_ReturnsNull()
         {
             // Arrange
-            var service = GetBlogService();
+            var service = BlogServiceTestFactory.Create();
 
             // Act
             var meta = await service.GetBlogMeta($"NonExisting_{BlogMetaTestData.BlogKey}");
@@ -82,7 +99,7 @@ namespace Blaven.Tests
         {
             // Arrange
             var mockBlogPost = BlogPostTestData.Create(BlogMetaTestData.BlogKey);
-            var service = GetBlogService(blogPosts: new[] { mockBlogPost });
+            var service = BlogServiceTestFactory.Create(blogPosts: new[] { mockBlogPost });
 
             // Act
             var post = await service.GetPost(mockBlogPost.BlavenId, BlogMetaTestData.BlogKey);
@@ -96,7 +113,7 @@ namespace Blaven.Tests
         public async Task GetPost_NonExistingBlogKey_ReturnsNull()
         {
             // Arrange
-            var service = GetBlogService();
+            var service = BlogServiceTestFactory.Create();
 
             // Act
             var post = await service.GetPost($"NonExisting_{BlogMetaTestData.BlogKey}", string.Empty);
@@ -110,7 +127,7 @@ namespace Blaven.Tests
         {
             // Arrange
             var mockBlogPost = BlogPostTestData.Create(BlogMetaTestData.BlogKey);
-            var service = GetBlogService(blogPosts: new[] { mockBlogPost });
+            var service = BlogServiceTestFactory.Create(blogPosts: new[] { mockBlogPost });
 
             // Act
             var post = await service.GetPostBySourceId(mockBlogPost.SourceId, BlogMetaTestData.BlogKey);
@@ -124,7 +141,7 @@ namespace Blaven.Tests
         public async Task GetPostBySourceId_NonExistingBlogKey_ReturnsNull()
         {
             // Arrange
-            var service = GetBlogService();
+            var service = BlogServiceTestFactory.Create();
 
             // Act
             var post = await service.GetPostBySourceId($"NonExisting_{BlogMetaTestData.BlogKey}", string.Empty);
@@ -138,7 +155,7 @@ namespace Blaven.Tests
         {
             // Arrange
             var mockBlogPosts = BlogPostTestData.CreateCollection(0, 5, BlogMetaTestData.BlogKey).ToList();
-            var service = GetBlogService(mockBlogPosts);
+            var service = BlogServiceTestFactory.Create(mockBlogPosts);
 
             // Act
             var archive = service.ListArchive(BlogMetaTestData.BlogKey).ToList();
@@ -157,7 +174,7 @@ namespace Blaven.Tests
             var mockBlogPosts2 = BlogPostTestData.CreateCollection(35, 5, BlogMetaTestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
-            var service = GetBlogService(allMockBlogPosts);
+            var service = BlogServiceTestFactory.Create(allMockBlogPosts);
 
             // Act
             var archive = service.ListArchive(BlogMetaTestData.BlogKey2).ToList();
@@ -179,7 +196,7 @@ namespace Blaven.Tests
             var mockBlogPosts2 = BlogPostTestData.CreateCollection(35, 5, BlogMetaTestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
-            var service = GetBlogService(allMockBlogPosts);
+            var service = BlogServiceTestFactory.Create(allMockBlogPosts);
 
             // Act
             var archive = service.ListArchive(BlogMetaTestData.BlogKey1, BlogMetaTestData.BlogKey2).ToList();
@@ -199,7 +216,7 @@ namespace Blaven.Tests
         public void ListArchive_NonExistingBlogKeys_ReturnsNull()
         {
             // Arrange
-            var service = GetBlogService();
+            var service = BlogServiceTestFactory.Create();
 
             // Act
             var archive = service.ListArchive($"NonExisting_{BlogMetaTestData.BlogKey}");
@@ -213,7 +230,7 @@ namespace Blaven.Tests
         {
             // Arrange
             var mockBlogPosts = BlogPostTestData.CreateCollection(0, 5, BlogMetaTestData.BlogKey).ToList();
-            var service = GetBlogService(mockBlogPosts);
+            var service = BlogServiceTestFactory.Create(mockBlogPosts);
 
             // Act
             var tags = service.ListTags(BlogMetaTestData.BlogKey).ToList();
@@ -232,7 +249,7 @@ namespace Blaven.Tests
             var mockBlogPosts2 = BlogPostTestData.CreateCollection(5, 5, BlogMetaTestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
-            var service = GetBlogService(allMockBlogPosts);
+            var service = BlogServiceTestFactory.Create(allMockBlogPosts);
 
             // Act
             var tags = service.ListTags(BlogMetaTestData.BlogKey1).ToList();
@@ -254,7 +271,7 @@ namespace Blaven.Tests
             var mockBlogPosts2 = BlogPostTestData.CreateCollection(5, 5, BlogMetaTestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
-            var service = GetBlogService(allMockBlogPosts);
+            var service = BlogServiceTestFactory.Create(allMockBlogPosts);
 
             // Act
             var tags = service.ListTags(BlogMetaTestData.BlogKey1, BlogMetaTestData.BlogKey2).ToList();
@@ -274,7 +291,7 @@ namespace Blaven.Tests
         public void ListTags_NonExistingBlogKeys_ReturnsNull()
         {
             // Arrange
-            var service = GetBlogService();
+            var service = BlogServiceTestFactory.Create();
 
             // Act
             var tags = service.ListTags($"NonExisting_{BlogMetaTestData.BlogKey}");
@@ -288,7 +305,7 @@ namespace Blaven.Tests
         {
             // Arrange
             var mockBlogPosts = BlogPostTestData.CreateCollection(0, 5, BlogMetaTestData.BlogKey).ToList();
-            var service = GetBlogService(mockBlogPosts);
+            var service = BlogServiceTestFactory.Create(mockBlogPosts);
 
             // Act
             var postHeads = service.ListPostHeads(BlogMetaTestData.BlogKey).ToList();
@@ -307,7 +324,7 @@ namespace Blaven.Tests
             var mockBlogPosts2 = BlogPostTestData.CreateCollection(5, 5, BlogMetaTestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
-            var service = GetBlogService(allMockBlogPosts);
+            var service = BlogServiceTestFactory.Create(allMockBlogPosts);
 
             // Act
             var postHeads = service.ListPostHeads(BlogMetaTestData.BlogKey1).ToList();
@@ -326,7 +343,7 @@ namespace Blaven.Tests
             var mockBlogPosts2 = BlogPostTestData.CreateCollection(5, 5, BlogMetaTestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
-            var service = GetBlogService(allMockBlogPosts);
+            var service = BlogServiceTestFactory.Create(allMockBlogPosts);
 
             // Act
             var postHeads = service.ListPostHeads(BlogMetaTestData.BlogKey1, BlogMetaTestData.BlogKey2).ToList();
@@ -341,7 +358,7 @@ namespace Blaven.Tests
         public void ListPostHeads_NonExistingBlogKeys_ReturnsNull()
         {
             // Arrange
-            var service = GetBlogService();
+            var service = BlogServiceTestFactory.Create();
 
             // Act
             var postHeads = service.ListPostHeads($"NonExisting_{BlogMetaTestData.BlogKey}");
@@ -355,7 +372,7 @@ namespace Blaven.Tests
         {
             // Arrange
             var mockBlogPosts = BlogPostTestData.CreateCollection(0, 5, BlogMetaTestData.BlogKey).ToList();
-            var service = GetBlogService(mockBlogPosts);
+            var service = BlogServiceTestFactory.Create(mockBlogPosts);
 
             // Act
             var posts = service.ListPosts(BlogMetaTestData.BlogKey).ToList();
@@ -374,7 +391,7 @@ namespace Blaven.Tests
             var mockBlogPosts2 = BlogPostTestData.CreateCollection(5, 5, BlogMetaTestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
-            var service = GetBlogService(allMockBlogPosts);
+            var service = BlogServiceTestFactory.Create(allMockBlogPosts);
 
             // Act
             var posts = service.ListPosts(BlogMetaTestData.BlogKey1).ToList();
@@ -393,7 +410,7 @@ namespace Blaven.Tests
             var mockBlogPosts2 = BlogPostTestData.CreateCollection(5, 5, BlogMetaTestData.BlogKey2).ToList();
             var allMockBlogPosts = mockBlogPosts1.Concat(mockBlogPosts2).ToList();
 
-            var service = GetBlogService(allMockBlogPosts);
+            var service = BlogServiceTestFactory.Create(allMockBlogPosts);
 
             // Act
             var posts = service.ListPosts(BlogMetaTestData.BlogKey1, BlogMetaTestData.BlogKey2).ToList();
@@ -408,7 +425,7 @@ namespace Blaven.Tests
         public void ListPosts_NonExistingBlogKeys_ReturnsNull()
         {
             // Arrange
-            var service = GetBlogService();
+            var service = BlogServiceTestFactory.Create();
 
             // Act
             var posts = service.ListPosts($"NonExisting_{BlogMetaTestData.BlogKey}");
@@ -430,26 +447,10 @@ namespace Blaven.Tests
             bool archiveAllContainsBlogPosts =
                 blogPosts.All(
                     p =>
-                    p.PublishedAt.HasValue
-                    && archive.Any(
-                        a => p.PublishedAt.Value.Year == a.Date.Year && p.PublishedAt.Value.Month == a.Date.Month));
+                        p.PublishedAt.HasValue
+                        && archive.Any(
+                            a => p.PublishedAt.Value.Year == a.Date.Year && p.PublishedAt.Value.Month == a.Date.Month));
             return archiveAllContainsBlogPosts;
-        }
-
-        private static BlogService GetBlogService(
-            IEnumerable<BlogPost> blogPosts = null,
-            IEnumerable<BlogMeta> blogMetas = null,
-            IEnumerable<string> blogSettingBlogKeys = null,
-            int funcSleep = 100)
-        {
-            var blogSettings =
-                (blogSettingBlogKeys ?? BlogMetaTestData.BlogKeys).Select(x => new BlogSetting(x, $"{x}_Id", $"{x}_Name"))
-                    .ToArray();
-
-            var repository = MockRepository.Create(blogPosts, blogMetas, funcSleep);
-
-            var service = new BlogService(repository, blogSettings);
-            return service;
         }
 
         private static bool GetPostHeadsAllContainsBlogs(
@@ -465,9 +466,10 @@ namespace Blaven.Tests
             bool postHeadsAllContainsBlogPosts =
                 blogPosts.All(
                     p =>
-                    postHeads.Any(
-                        h =>
-                        h.BlogKey == p.BlogKey && h.BlavenId == p.BlavenId && h.Hash == p.Hash && h.Title == p.Title));
+                        postHeads.Any(
+                            h =>
+                                h.BlogKey == p.BlogKey && h.BlavenId == p.BlavenId && h.Hash == p.Hash
+                                && h.Title == p.Title));
             return postHeadsAllContainsBlogPosts;
         }
 
@@ -484,10 +486,10 @@ namespace Blaven.Tests
             bool postHeadsAllContainsBlogPosts =
                 blogPosts2.All(
                     p2 =>
-                    blogPosts1.Any(
-                        p1 =>
-                        p1.BlogKey == p2.BlogKey && p1.BlavenId == p2.BlavenId && p1.Hash == p2.Hash
-                        && p1.Title == p2.Title));
+                        blogPosts1.Any(
+                            p1 =>
+                                p1.BlogKey == p2.BlogKey && p1.BlavenId == p2.BlavenId && p1.Hash == p2.Hash
+                                && p1.Title == p2.Title));
             return postHeadsAllContainsBlogPosts;
         }
 

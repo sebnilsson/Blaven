@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Blaven.Data;
 using Blaven.Synchronization;
 
-namespace Blaven.Tests
+namespace Blaven.Data.Tests
 {
     public class FakeDataStorage : IDataStorage
     {
@@ -17,9 +16,20 @@ namespace Blaven.Tests
             this.blogPosts = (blogPosts ?? Enumerable.Empty<BlogPost>()).ToList();
         }
 
+        public event EventHandler<string> OnGetLastUpdatedAtRun;
+
+        public event EventHandler<string> OnGetPostBasesRun;
+
+        public event EventHandler<string> OnSaveBlogMetaRun;
+
+        public event EventHandler<string> OnSaveChangesRun;
+
         public Task<DateTime?> GetLastUpdatedAt(BlogSetting blogSetting)
         {
             var lastUpdatedAt = this.blogPosts.Select(x => x.UpdatedAt).OrderByDescending(x => x).FirstOrDefault();
+
+            this.OnGetLastUpdatedAtRun?.Invoke(this, blogSetting.BlogKey);
+
             return Task.FromResult(lastUpdatedAt);
         }
 
@@ -29,16 +39,23 @@ namespace Blaven.Tests
                 this.blogPosts.Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
                     .Cast<BlogPostBase>()
                     .ToReadOnlyList();
+
+            this.OnGetPostBasesRun?.Invoke(this, blogSetting.BlogKey);
+
             return Task.FromResult(posts);
         }
 
         public Task SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta)
         {
+            this.OnSaveBlogMetaRun?.Invoke(this, blogSetting.BlogKey);
+
             return Task.CompletedTask;
         }
 
-        public Task SaveChanges(BlogSetting blogSetting, BlogSourceChangeSet changeSet)
+        public Task SaveChanges(BlogSetting blogSetting, BlogSyncChangeSet changeSet)
         {
+            this.OnSaveChangesRun?.Invoke(this, blogSetting.BlogKey);
+
             return Task.CompletedTask;
         }
     }

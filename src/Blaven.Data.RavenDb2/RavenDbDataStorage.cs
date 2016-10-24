@@ -98,7 +98,7 @@ namespace Blaven.Data.RavenDb2
             }
         }
 
-        public async Task SaveChanges(BlogSetting blogSetting, BlogSourceChangeSet changeSet)
+        public async Task SaveChanges(BlogSetting blogSetting, BlogSyncChangeSet changeSet)
         {
             if (blogSetting == null)
             {

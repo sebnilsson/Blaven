@@ -24,7 +24,7 @@ namespace Blaven.Synchronization
 
         public BlogMeta BlogMeta { get; private set; }
 
-        public BlogSourceChangeSet ChangeSet { get; private set; }
+        public BlogSyncChangeSet ChangeSet { get; private set; }
 
         public TimeSpan Elapsed { get; private set; }
 
@@ -32,7 +32,7 @@ namespace Blaven.Synchronization
 
         public DateTime StartedAt { get; }
 
-        public void OnDataUpdated(BlogMeta blogMeta, BlogSourceChangeSet changeSet)
+        public void OnDataUpdated(BlogMeta blogMeta, BlogSyncChangeSet changeSet)
         {
             this.BlogMeta = blogMeta;
             this.ChangeSet = changeSet;

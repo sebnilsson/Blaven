@@ -14,7 +14,7 @@ namespace Blaven.Synchronization.Tests
         public void Ctor_BlogSourceNullArgument_ThrowsArgumentNullException()
         {
             // Arrange
-            var dataStorage = new MockDataStorage();
+            var dataStorage = new FakeDataStorage();
             
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => GetTestBlogSyncConfiguration(null, dataStorage));
@@ -24,7 +24,7 @@ namespace Blaven.Synchronization.Tests
         public void Ctor_DataStorageNullArgument_ThrowsArgumentNullException()
         {
             // Arrange
-            var blogSource = new MockBlogSource();
+            var blogSource = new FakeBlogSource();
 
             // Act & Assert
             Assert.Throws<ArgumentNullException>(() => GetTestBlogSyncConfiguration(blogSource));
@@ -34,8 +34,8 @@ namespace Blaven.Synchronization.Tests
         public void BlavenIdProvider_CtorNullArgument_ReturnsDefaultType()
         {
             // Arrange
-            var blogSource = new MockBlogSource();
-            var dataStorage = new MockDataStorage();
+            var blogSource = new FakeBlogSource();
+            var dataStorage = new FakeDataStorage();
 
             // Act
             var config = GetTestBlogSyncConfiguration(blogSource, dataStorage);
@@ -49,8 +49,8 @@ namespace Blaven.Synchronization.Tests
         public void SlugProvider_CtorNullArgument_ReturnsDefaultType()
         {
             // Arrange
-            var blogSource = new MockBlogSource();
-            var dataStorage = new MockDataStorage();
+            var blogSource = new FakeBlogSource();
+            var dataStorage = new FakeDataStorage();
 
             // Act
             var config = GetTestBlogSyncConfiguration(blogSource, dataStorage);

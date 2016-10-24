@@ -6,7 +6,7 @@ namespace Blaven.Synchronization
 {
     internal static class BlogSyncChangeSetHelper
     {
-        public static BlogSourceChangeSet GetChangeSet(
+        public static BlogSyncChangeSet GetChangeSet(
             string blogKey,
             IReadOnlyList<BlogPost> sourcePosts,
             IReadOnlyList<BlogPostBase> dataStoragePosts)
@@ -34,7 +34,7 @@ namespace Blaven.Synchronization
             var cleanDataStoragePosts =
                 dataStoragePosts.Where(x => x != null).GroupBy(x => x.SourceId).Select(x => x.First()).ToReadOnlyList();
 
-            var changeSet = new BlogSourceChangeSet(blogKey);
+            var changeSet = new BlogSyncChangeSet(blogKey);
 
             SyncDeletedPosts(cleanSourcePosts, cleanDataStoragePosts, changeSet);
 
@@ -48,7 +48,7 @@ namespace Blaven.Synchronization
         private static void SyncDeletedPosts(
             IEnumerable<BlogPost> sourcePosts,
             IEnumerable<BlogPostBase> dataStoragePosts,
-            BlogSourceChangeSet changeSet)
+            BlogSyncChangeSet changeSet)
         {
             var sourceIds = sourcePosts.Select(x => x.SourceId).ToList();
 
@@ -60,7 +60,7 @@ namespace Blaven.Synchronization
         private static void SyncInsertedPosts(
             IEnumerable<BlogPost> sourcePosts,
             IEnumerable<BlogPostBase> dataStoragePosts,
-            BlogSourceChangeSet changeSet)
+            BlogSyncChangeSet changeSet)
         {
             var dbIds = dataStoragePosts.Select(x => x.SourceId).ToList();
 
@@ -72,7 +72,7 @@ namespace Blaven.Synchronization
         private static void SyncModifiedPosts(
             IEnumerable<BlogPost> sourcePosts,
             IEnumerable<BlogPostBase> dataStoragePosts,
-            BlogSourceChangeSet changeSet)
+            BlogSyncChangeSet changeSet)
         {
             var modifiedPosts =
                 dataStoragePosts.Join(

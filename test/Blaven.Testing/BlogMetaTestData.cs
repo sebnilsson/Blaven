@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Blaven.Tests
@@ -28,16 +29,24 @@ namespace Blaven.Tests
         public static BlogMeta Create(string blogKey = null)
         {
             var meta = new BlogMeta
-            {
-                BlogKey = blogKey ?? BlogKey,
-                Description = BlogMetaDescription,
-                Name = BlogMetaName,
-                PublishedAt = BlogMetaPublishedAt,
-                SourceId = BlogMetaSourceId,
-                UpdatedAt = BlogMetaUpdatedAt,
-                Url = "http://testurl.com/testar/test.html"
-            };
+                           {
+                               BlogKey = blogKey ?? BlogKey,
+                               Description = BlogMetaDescription,
+                               Name = BlogMetaName,
+                               PublishedAt = BlogMetaPublishedAt,
+                               SourceId = BlogMetaSourceId,
+                               UpdatedAt = BlogMetaUpdatedAt,
+                               Url = "http://testurl.com/testar/test.html"
+                           };
             return meta;
+        }
+
+        public static IReadOnlyList<BlogMeta> CreateCollection(params string[] blogKeys)
+        {
+            var keys = (blogKeys != null && blogKeys.Any()) ? blogKeys : new[] { BlogKey }.Concat(BlogKeys);
+
+            var metas = keys.Select(Create).ToReadOnlyList();
+            return metas;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Blaven.BlogSources.Configuration.Tests
             string password = null;
 
             // Act
-            service.BuildBlogSource<MockBlogSource>(
+            service.BuildBlogSource<FakeBlogSource>(
                 (appSettingUsername, appSettingsPassword) =>
                     {
                         username = appSettingUsername;
@@ -41,7 +41,7 @@ namespace Blaven.BlogSources.Configuration.Tests
             var service = new AppSettingsConfigService(appSettings);
 
             // Act
-            var blogSource = service.BuildBlogSource((_, __) => MockBlogSource.Create());
+            var blogSource = service.BuildBlogSource((_, __) => new FakeBlogSource());
 
             // Assert
             Assert.NotNull(blogSource);

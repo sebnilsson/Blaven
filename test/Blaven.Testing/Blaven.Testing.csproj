@@ -40,6 +40,10 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Globalization.Extensions, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Globalization.Extensions.4.0.1\lib\net46\System.Globalization.Extensions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -48,21 +52,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ActionExtensions.cs" />
     <Compile Include="AppSettingTestData.cs" />
     <Compile Include="BlogMetaTestData.cs" />
     <Compile Include="BlogPostBaseTestData.cs" />
     <Compile Include="BlogPostTestData.cs" />
+    <Compile Include="BlogServiceTestFactory.cs" />
     <Compile Include="BlogSettingTestData.cs" />
-    <Compile Include="BlogSourceChangeSetTestData.cs" />
-    <Compile Include="DelegateTracker.cs" />
-    <Compile Include="DelegateTrackerEvent.cs" />
-    <Compile Include="FakeDataStorage.cs" />
-    <Compile Include="FuncExtensions.cs" />
+    <Compile Include="BlogSyncChangeSetTestData.cs" />
+    <Compile Include="Data\FakeRepository.cs" />
+    <Compile Include="Data\FakeDataStorage.cs" />
+    <Compile Include="EventObserver.cs" />
     <Compile Include="ParallelUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="FakeBlogSource.cs" />
-    <Compile Include="BlogSyncServiceTestFactory.cs" />
+    <Compile Include="BlogSources\FakeBlogSource.cs" />
+    <Compile Include="Synchronization\BlogSyncServiceTestFactory.cs" />
     <Compile Include="TestUtility.cs" />
   </ItemGroup>
   <ItemGroup>

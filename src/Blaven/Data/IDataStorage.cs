@@ -14,6 +14,6 @@ namespace Blaven.Data
 
         Task SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta);
 
-        Task SaveChanges(BlogSetting blogSetting, BlogSourceChangeSet changeSet);
+        Task SaveChanges(BlogSetting blogSetting, BlogSyncChangeSet changeSet);
     }
 }

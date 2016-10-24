@@ -21,8 +21,8 @@ namespace Blaven.BlogSources.Blogger.Tests
             Func<string, BloggerBlogData> getBlogFunc = null,
             Func<string, IEnumerable<BloggerPostData>> getPostsFunc = null)
         {
-            this.getBlogFunc = (getBlogFunc ?? (_ => null)).WithTracking(this.GetBlogTracker);
-            this.getPostsFunc = (getPostsFunc ?? (_ => null)).WithTracking(this.GetPostsTracker);
+            this.getBlogFunc = (getBlogFunc ?? (_ => null));
+            this.getPostsFunc = (getPostsFunc ?? (_ => null));
         }
 
         public async Task<BloggerBlogData> GetBlog(string blogId)
@@ -36,7 +36,7 @@ namespace Blaven.BlogSources.Blogger.Tests
             return await Task.FromResult(blog);
         }
 
-        public DelegateTracker<string> GetBlogTracker { get; } = new DelegateTracker<string>();
+        //public DelegateTracker<string> GetBlogTracker { get; } = new DelegateTracker<string>();
 
         public async Task<IReadOnlyList<BloggerPostData>> GetPosts(string blogId, DateTime? lastUpdatedAt)
         {
@@ -55,8 +55,8 @@ namespace Blaven.BlogSources.Blogger.Tests
             return await Task.FromResult(posts.ToReadOnlyList());
         }
 
-        public DelegateTracker<string> GetPostsTracker { get; } = new DelegateTracker<string>();
+        //public DelegateTracker<string> GetPostsTracker { get; } = new DelegateTracker<string>();
 
-        public DelegateTracker<string> GetPostsSlimTracker { get; } = new DelegateTracker<string>();
+        //public DelegateTracker<string> GetPostsSlimTracker { get; } = new DelegateTracker<string>();
     }
 }

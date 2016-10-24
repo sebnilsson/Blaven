@@ -87,19 +87,19 @@ namespace Blaven.Tests
             return blogPost;
         }
 
-        public static IEnumerable<BlogPost> CreateCollection(
+        public static IReadOnlyList<BlogPost> CreateCollection(
             int start,
             int count,
             string blogKey = BlogMetaTestData.BlogKey)
         {
-            var posts = Enumerable.Range(start, count).Select(x => Create(blogKey, x));
+            var posts = Enumerable.Range(start, count).Select(x => Create(blogKey, x)).ToReadOnlyList();
             return posts;
         }
 
-        public static IReadOnlyList<BlogPost> CreateCollection(string blogKey = null, int blogPostsCount = 11)
+        public static IReadOnlyList<BlogPost> CreateCollection(
+            string blogKey = BlogMetaTestData.BlogKey,
+            int blogPostsCount = 11)
         {
-            blogKey = blogKey ?? BlogMetaTestData.BlogKey;
-
             var blogPosts =
                 Enumerable.Range(0, blogPostsCount).Select(i => Create(blogKey, i, isUpdate: (i % 2 == 0))).ToList();
             return blogPosts;

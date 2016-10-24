@@ -2,10 +2,12 @@
 using System.Linq;
 
 using Blaven.BlogSources;
+using Blaven.BlogSources.Tests;
 using Blaven.Data;
-using Blaven.Synchronization;
+using Blaven.Data.Tests;
+using Blaven.Tests;
 
-namespace Blaven.Tests
+namespace Blaven.Synchronization.Tests
 {
     public static class BlogSyncServiceTestFactory
     {
@@ -16,7 +18,7 @@ namespace Blaven.Tests
         {
             blogSource = blogSource ?? new FakeBlogSource();
             dataStorage = dataStorage ?? new FakeDataStorage();
-            blogSettings = blogSettings ?? Enumerable.Empty<BlogSetting>();
+            blogSettings = blogSettings ?? BlogSettingTestData.CreateCollection();
 
             var service = new BlogSyncService(blogSource, dataStorage, blogSettings.ToArray());
             return service;

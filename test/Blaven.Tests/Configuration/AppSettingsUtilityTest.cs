@@ -15,7 +15,7 @@ namespace Blaven.Configuration.Tests
             var appSettings = AppSettingTestData.CreateDictionary();
 
             // Act
-            string password = AppSettingsUtility.GetPassword<MockBlogSource>(appSettings);
+            string password = AppSettingsUtility.GetPassword<FakeBlogSource>(appSettings);
 
             // Assert
             Assert.Equal(AppSettingTestData.AppSettingsTestPassword, password);
@@ -28,7 +28,7 @@ namespace Blaven.Configuration.Tests
             var appSettings = AppSettingTestData.CreateDictionary();
 
             // Act
-            string username = AppSettingsUtility.GetUsername<MockBlogSource>(appSettings);
+            string username = AppSettingsUtility.GetUsername<FakeBlogSource>(appSettings);
 
             // Assert
             Assert.Equal(AppSettingTestData.AppSettingsTestUsername, username);
@@ -42,7 +42,7 @@ namespace Blaven.Configuration.Tests
 
             // Act & Assert
             Assert.Throws<KeyNotFoundException>(
-                () => AppSettingsUtility.GetValue<MockBlogSource>("NonExistingKey", appSettings));
+                () => AppSettingsUtility.GetValue<FakeBlogSource>("NonExistingKey", appSettings));
         }
     }
 }

@@ -10,15 +10,20 @@ namespace Blaven.Tests
 
         public static void RunParallelUsers(Action action, int userCount = DefaultParallelUsersCount)
         {
+            RunParallelUsers(_ => action(), userCount);
+        }
+
+        public static void RunParallelUsers(Action<int> action, int userCount = DefaultParallelUsersCount)
+        {
             Parallel.For(
                 0,
                 userCount,
-                _ =>
+                i =>
                     {
                         int randomSleep = GetRandomSleep();
                         Thread.Sleep(randomSleep);
 
-                        action();
+                        action(i);
                     });
         }
 

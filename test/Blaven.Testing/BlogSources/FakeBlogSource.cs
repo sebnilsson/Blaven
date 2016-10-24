@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Blaven.BlogSources;
-
-namespace Blaven.Tests
+namespace Blaven.BlogSources.Tests
 {
     public class FakeBlogSource : IBlogSource
     {
@@ -13,15 +11,22 @@ namespace Blaven.Tests
 
         private readonly ICollection<BlogPost> blogPosts;
 
-        public FakeBlogSource(IEnumerable<BlogPost> blogPosts = null, params BlogMeta[] blogMetas)
+        public FakeBlogSource(IEnumerable<BlogPost> blogPosts = null, IEnumerable<BlogMeta> blogMetas = null)
         {
             this.blogPosts = (blogPosts ?? Enumerable.Empty<BlogPost>()).ToList();
             this.blogMetas = (blogMetas ?? Enumerable.Empty<BlogMeta>()).ToList();
         }
 
+        public event EventHandler<string> OnGetaMetaRun;
+
+        public event EventHandler<string> OnGetBlogPostsRun;
+
         public Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             var blogMeta = this.blogMetas.SingleOrDefault(x => x.BlogKey == blogSetting.BlogKey);
+
+            this.OnGetaMetaRun?.Invoke(this, blogSetting.BlogKey);
+
             return Task.FromResult(blogMeta);
         }
 
@@ -33,6 +38,9 @@ namespace Blaven.Tests
             var posts =
                 this.blogPosts.Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
                     .ToReadOnlyList();
+
+            this.OnGetBlogPostsRun?.Invoke(this, blogSetting.BlogKey);
+
             return Task.FromResult(posts);
         }
     }

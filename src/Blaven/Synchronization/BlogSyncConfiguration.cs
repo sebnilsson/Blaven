@@ -48,9 +48,7 @@ namespace Blaven.Synchronization
 
         public BlogTransformersProvider TransformersProvider { get; private set; }
 
-        
-
-        public static BlogSyncConfiguration Create(
+        internal static BlogSyncConfiguration Create(
             IBlogSource blogSource,
             IDataStorage dataStorage,
             IEnumerable<BlogSetting> blogSettings)
@@ -70,7 +68,7 @@ namespace Blaven.Synchronization
                              slugProvider: null,
                              blavenIdProvider: null,
                              transformersProvider: null,
-                             blogSettings: blogSettings ?? Enumerable.Empty<BlogSetting>());
+                             blogSettings: blogSettings);
             return config;
         }
     }

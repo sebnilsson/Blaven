@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using Blaven.BlogSources.Tests;
+
 namespace Blaven.Tests
 {
     public static class AppSettingTestData
@@ -13,8 +15,12 @@ namespace Blaven.Tests
         {
             var appSettings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
                                   {
-                                          { "Blaven.BlogSources.MockBlogSource.Username", AppSettingsTestUsername },
-                                          { "Blaven.BlogSources.MockBlogSource.Password", AppSettingsTestPassword },
+                                          {
+                                              $"Blaven.BlogSources.{nameof(FakeBlogSource)}.Username", AppSettingsTestUsername
+                                          },
+                                          {
+                                              $"Blaven.BlogSources.{nameof(FakeBlogSource)}.Password", AppSettingsTestPassword
+                                          },
                                           { "Blaven.Blogs.BlogKey1.Id", "BlogKey1Id" },
                                           { "Blaven.Blogs.BlogKey1.Name", "BlogKey1Name" },
                                           { "Blaven.Blogs.BlogKey2.Id", "BlogKey2Id" },

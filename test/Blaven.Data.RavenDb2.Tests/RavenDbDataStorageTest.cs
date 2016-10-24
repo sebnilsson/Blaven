@@ -107,7 +107,7 @@ namespace Blaven.Data.RavenDb2.Tests
 
             var dataStorage = GetRavenDbDataStorage(blogPosts: dbBlogPosts);
             var blogSetting = BlogSettingTestData.Create(BlogMetaTestData.BlogKey);
-            var changeSet = BlogSourceChangeSetTestData.CreateWithData(deletedBlogPosts: deletedBlogPosts);
+            var changeSet = BlogSyncChangeSetTestData.CreateWithData(deletedBlogPosts: deletedBlogPosts);
 
             // Act
             await dataStorage.SaveChanges(blogSetting, changeSet);
@@ -130,7 +130,7 @@ namespace Blaven.Data.RavenDb2.Tests
 
             var dataStorage = GetRavenDbDataStorage(blogPosts: dbBlogPosts);
             var blogSetting = BlogSettingTestData.Create(BlogMetaTestData.BlogKey);
-            var changeSet = BlogSourceChangeSetTestData.CreateWithData(insertedBlogPosts: insertedBlogPosts);
+            var changeSet = BlogSyncChangeSetTestData.CreateWithData(insertedBlogPosts: insertedBlogPosts);
 
             // Act
             await dataStorage.SaveChanges(blogSetting, changeSet);
@@ -154,7 +154,7 @@ namespace Blaven.Data.RavenDb2.Tests
 
             var dataStorage = GetRavenDbDataStorage(blogPosts: dbBlogPosts);
             var blogSetting = BlogSettingTestData.Create(BlogMetaTestData.BlogKey);
-            var changeSet = BlogSourceChangeSetTestData.CreateWithData(updatedBlogPosts: updatedBlogPosts);
+            var changeSet = BlogSyncChangeSetTestData.CreateWithData(updatedBlogPosts: updatedBlogPosts);
 
             // Act
             await dataStorage.SaveChanges(blogSetting, changeSet);
@@ -178,7 +178,7 @@ namespace Blaven.Data.RavenDb2.Tests
 
             var dataStorage = GetRavenDbDataStorage(blogPosts: dbBlogPosts);
             var blogSetting = BlogSettingTestData.Create(BlogMetaTestData.BlogKey);
-            var changeSet = BlogSourceChangeSetTestData.CreateWithData(
+            var changeSet = BlogSyncChangeSetTestData.CreateWithData(
                 insertedBlogPosts: insertedBlogPosts,
                 updatedBlogPosts: updatedBlogPosts);
 
