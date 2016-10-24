@@ -1,26 +1,154 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
-using Blaven.BlogSources.Tests;
-using Blaven.Data.Tests;
-using Blaven.Tests;
+using Blaven.BlogSources;
+using Blaven.Data;
+using Moq;
 using Xunit;
 
 namespace Blaven.Synchronization.Tests
 {
-    public class SynchronizationServiceTest
+    public class BlogSyncServiceTest
     {
+        [Fact]
+        public async Task Update_BlogSourceGetMetaAndGetBlogPostsReturnsNull_ShouldNotThrow()
+        {
+            // Arrange
+            var blogSource = new Mock<IBlogSource>();
+            blogSource.Setup(x => x.GetMeta(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>())).ReturnsAsync(null);
+            blogSource.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>())).ReturnsAsync(null);
+
+            var service = BlogSyncServiceTestFactory.Create(blogSource: blogSource.Object);
+
+            // Act & Assert
+            await service.Update();
+        }
+
+        [Fact]
+        public async Task Update_BlogSourceGetMetaThrows_ShouldThrow()
+        {
+            // Arrange
+            var blogSource = new Mock<IBlogSource>();
+            blogSource.Setup(x => x.GetMeta(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .Throws(new Exception("TEST_ERROR"));
+
+            var service = BlogSyncServiceTestFactory.Create(blogSource: blogSource.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<BlogSyncBlogSourceException>(async () => await service.Update());
+        }
+
+        [Fact]
+        public async Task Update_BlogSourceGetBlogPostsThrows_ShouldThrow()
+        {
+            // Arrange
+            var blogSource = new Mock<IBlogSource>();
+            blogSource.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .Throws(new Exception("TEST_ERROR"));
+
+            var service = BlogSyncServiceTestFactory.Create(blogSource: blogSource.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<BlogSyncBlogSourceException>(async () => await service.Update());
+        }
+
+        [Fact]
+        public async Task Update_DataStorageGetBlogPostsReturnsNull_ShouldThrow()
+        {
+            // Arrange
+            var dataStorage = new Mock<IDataStorage>();
+            dataStorage.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>())).ReturnsAsync(null);
+
+            var service = BlogSyncServiceTestFactory.Create(dataStorage: dataStorage.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<BlogSyncDataStorageResultException>(async () => await service.Update());
+        }
+
+        [Fact]
+        public async Task Update_DataStorageGetBlogPostsThrows_ShouldThrow()
+        {
+            // Arrange
+            var dataStorage = new Mock<IDataStorage>();
+            dataStorage.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .Throws(new Exception("TEST_ERROR"));
+
+            var service = BlogSyncServiceTestFactory.Create(dataStorage: dataStorage.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<BlogSyncDataStorageException>(async () => await service.Update());
+        }
+
+        [Fact]
+        public async Task Update_BlogKeyNotExisting_ShouldThrow()
+        {
+            // Arrange
+            var service = BlogSyncServiceTestFactory.Create();
+
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await service.Update("NON_EXISTING_BLOGKEY"));
+        }
+
+        [Fact]
+        public async Task UpdateAll_BlogKeyNotExisting_ShouldThrow()
+        {
+            // Arrange
+            var service = BlogSyncServiceTestFactory.Create();
+
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await service.UpdateAll("NON_EXISTING_BLOGKEY"));
+        }
+
         //[Fact]
-        //public void Update()
+        //public async Task GetBlogPosts_BlogSourceInsertedPosts_ReturnsInsertedPosts()
         //{
         //    // Arrange
-            
+        //    var dataStoragePosts = GetTestBlogPosts(0, 1).ToList();
+
+        //    var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 3));
+
+        //    var blogSetting = GetTestBlogSetting();
 
         //    // Act
+        //    var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt: null);
 
         //    // Assert
+        //    Assert.Equal(2, blogPosts.Count);
+        //}
+
+        //[Fact]
+        //public async Task GetBlogPosts_BlogSourceDeletedPosts_ReturnsDeletedPosts()
+        //{
+        //    // Arrange
+        //    var dataStoragePosts = GetTestBlogPosts(0, 3).ToList();
+
+        //    var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 1));
+
+        //    var blogSetting = GetTestBlogSetting();
+
+        //    // Act
+        //    var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt: null);
+
+        //    // Assert
+        //    Assert.Equal(2, blogPosts.Count);
+        //}
+
+        //[Fact]
+        //public async Task GetBlogPosts_BlogSourceUpdatedPosts_ReturnsUpdatedPosts()
+        //{
+        //    // Arrange
+        //    var dataStoragePosts = GetTestBlogPosts(0, 2).ToList();
+
+        //    var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => GetTestModifiedPosts(0, 2));
+
+        //    var blogSetting = GetTestBlogSetting();
+
+        //    // Act
+        //    var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt: null);
+
+        //    // Assert
+        //    Assert.Equal(2, blogPosts.Count);
         //}
 
         //[Fact]
@@ -84,149 +212,5 @@ namespace Blaven.Synchronization.Tests
         //    // Assert
         //    Assert.Equal(5, changeSet.UpdatedBlogPosts.Count);
         //}
-
-        [Fact]
-        public void Update_ParallelUsersAndSingleBlogKey_ShouldRunAllMethodsOncePerUserAndWithoutCollisions()
-        {
-            // Arrange
-            var blogSource = new FakeBlogSource(
-                                 blogPosts: BlogPostTestData.CreateCollection(),
-                                 blogMetas: BlogMetaTestData.CreateCollection());
-
-            var dataStorage = new FakeDataStorage(blogPosts: BlogPostTestData.CreateCollection());
-
-            var service = BlogSyncServiceTestFactory.Create(blogSource, dataStorage);
-
-            var blogSourceGetMetaObserver = GetTestEventObserver();
-            var blogSourceGetBlogPostsObserver = GetTestEventObserver();
-            blogSource.OnGetaMetaRun += blogSourceGetMetaObserver.Handler;
-            blogSource.OnGetBlogPostsRun += blogSourceGetBlogPostsObserver.Handler;
-
-            var dataStorageGetLastUpdatedAtObserver = GetTestEventObserver();
-            var dataStorageGetPostBasesObserver = GetTestEventObserver();
-            var dataStorageSaveBlogMetaObserver = GetTestEventObserver();
-            var dataStorageSaveChangesObserver = GetTestEventObserver();
-            dataStorage.OnGetLastUpdatedAtRun += dataStorageGetLastUpdatedAtObserver.Handler;
-            dataStorage.OnGetPostBasesRun += dataStorageGetPostBasesObserver.Handler;
-            dataStorage.OnSaveBlogMetaRun += dataStorageSaveBlogMetaObserver.Handler;
-            dataStorage.OnSaveChangesRun += dataStorageSaveChangesObserver.Handler;
-
-            // Act
-            ParallelUtility.RunParallelUsers(async () => await service.Update(BlogMetaTestData.BlogKey));
-
-            // Assert
-            Assert.Equal(ParallelUtility.DefaultParallelUsersCount, blogSourceGetMetaObserver.RunCount);
-            Assert.Equal(ParallelUtility.DefaultParallelUsersCount, blogSourceGetBlogPostsObserver.RunCount);
-            Assert.Equal(ParallelUtility.DefaultParallelUsersCount, dataStorageGetLastUpdatedAtObserver.RunCount);
-            Assert.Equal(ParallelUtility.DefaultParallelUsersCount, dataStorageGetPostBasesObserver.RunCount);
-            Assert.Equal(ParallelUtility.DefaultParallelUsersCount, dataStorageSaveBlogMetaObserver.RunCount);
-            Assert.Equal(ParallelUtility.DefaultParallelUsersCount, dataStorageSaveChangesObserver.RunCount);
-
-            int totalCollisionCount = blogSourceGetMetaObserver.CollisionCount
-                                      + blogSourceGetBlogPostsObserver.CollisionCount
-                                      + dataStorageGetLastUpdatedAtObserver.CollisionCount
-                                      + dataStorageGetPostBasesObserver.CollisionCount
-                                      + dataStorageSaveBlogMetaObserver.CollisionCount
-                                      + dataStorageSaveChangesObserver.CollisionCount;
-
-            Assert.Equal(0, totalCollisionCount);
-        }
-
-        [Fact]
-        public void Update_ParallelUsersAndMultipleBlogKeys_ShouldRunAllMethodsOncePerUserAndWithoutCollisions()
-        {
-            // Arrange
-            var blogSource = new FakeBlogSource(
-                                 blogPosts: BlogPostTestData.CreateCollection(),
-                                 blogMetas: BlogMetaTestData.CreateCollection());
-
-            var dataStorage = new FakeDataStorage(blogPosts: BlogPostTestData.CreateCollection());
-
-            var service = BlogSyncServiceTestFactory.Create(blogSource, dataStorage);
-
-            var blogSourceGetMetaObserver = GetTestEventObserver();
-            var blogSourceGetBlogPostsObserver = GetTestEventObserver();
-            blogSource.OnGetaMetaRun += blogSourceGetMetaObserver.Handler;
-            blogSource.OnGetBlogPostsRun += blogSourceGetBlogPostsObserver.Handler;
-
-            var dataStorageGetLastUpdatedAtObserver = GetTestEventObserver();
-            var dataStorageGetPostBasesObserver = GetTestEventObserver();
-            var dataStorageSaveBlogMetaObserver = GetTestEventObserver();
-            var dataStorageSaveChangesObserver = GetTestEventObserver();
-            dataStorage.OnGetLastUpdatedAtRun += dataStorageGetLastUpdatedAtObserver.Handler;
-            dataStorage.OnGetPostBasesRun += dataStorageGetPostBasesObserver.Handler;
-            dataStorage.OnSaveBlogMetaRun += dataStorageSaveBlogMetaObserver.Handler;
-            dataStorage.OnSaveChangesRun += dataStorageSaveChangesObserver.Handler;
-
-            // Act
-            ParallelUtility.RunParallelUsers(async () => await service.Update(BlogMetaTestData.BlogKeys));
-
-            // Assert
-            int expectedRunCount = (ParallelUtility.DefaultParallelUsersCount * BlogMetaTestData.BlogKeys.Length);
-
-            Assert.Equal(expectedRunCount, blogSourceGetMetaObserver.RunCount);
-            Assert.Equal(expectedRunCount, blogSourceGetBlogPostsObserver.RunCount);
-            Assert.Equal(expectedRunCount, dataStorageGetLastUpdatedAtObserver.RunCount);
-            Assert.Equal(expectedRunCount, dataStorageGetPostBasesObserver.RunCount);
-            Assert.Equal(expectedRunCount, dataStorageSaveBlogMetaObserver.RunCount);
-            Assert.Equal(expectedRunCount, dataStorageSaveChangesObserver.RunCount);
-
-            int totalCollisionCount = blogSourceGetMetaObserver.CollisionCount
-                                      + blogSourceGetBlogPostsObserver.CollisionCount
-                                      + dataStorageGetLastUpdatedAtObserver.CollisionCount
-                                      + dataStorageGetPostBasesObserver.CollisionCount
-                                      + dataStorageSaveBlogMetaObserver.CollisionCount
-                                      + dataStorageSaveChangesObserver.CollisionCount;
-
-            Assert.Equal(0, totalCollisionCount);
-        }
-
-        [Fact]
-        public async Task Update_BlogKeyNotExisting_ShouldThrow()
-        {
-            // Arrange
-            var service = BlogSyncServiceTestFactory.Create();
-
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await service.Update("NON_EXISTING_BLOGKEY"));
-        }
-
-        [Fact]
-        public async Task UpdateAll_BlogKeyNotExisting_ShouldThrow()
-        {
-            // Arrange
-            var service = BlogSyncServiceTestFactory.Create();
-
-            // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await service.UpdateAll("NON_EXISTING_BLOGKEY"));
-        }
-
-        [Fact]
-        public async Task UpdateAll_BlogSourceAndDataStorageWithData_ShouldNotRunDataStorageGetLastUpdated()
-        {
-            // Arrange
-            var blogSource = new FakeBlogSource(
-                                 blogPosts: BlogPostTestData.CreateCollection(),
-                                 blogMetas: BlogMetaTestData.CreateCollection());
-
-            var dataStorage = new FakeDataStorage(blogPosts: BlogPostTestData.CreateCollection());
-
-            var service = BlogSyncServiceTestFactory.Create(blogSource, dataStorage);
-
-            var dataStorageGetLastUpdatedAtObserver = new EventObserver((_, __) => { Thread.Sleep(200); });
-            dataStorage.OnGetLastUpdatedAtRun += dataStorageGetLastUpdatedAtObserver.Handler;
-
-            // Act
-            await service.UpdateAll(BlogMetaTestData.BlogKey);
-
-            // Assert
-            Assert.Equal(0, dataStorageGetLastUpdatedAtObserver.RunCount);
-        }
-
-        private static EventObserver GetTestEventObserver(int threadSleep = 100)
-        {
-            var observer = new EventObserver((_, __) => { Thread.Sleep(threadSleep); });
-            return observer;
-        }
     }
 }

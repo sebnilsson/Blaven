@@ -38,15 +38,14 @@ namespace Blaven.BlogSources.Blogger.Tests
         }
 
         [Fact]
-        public async Task GetChanges_BloggerApiProviderContainsDataAndEmptyDb_ReturnsInsertWithAllFields()
+        public async Task GetBlogPosts_BloggerApiProviderContainsDataAndEmptyDb_ReturnsInsertWithAllFields()
         {
             // Arrange
             var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts());
             var blogSetting = GetTestBlogSetting();
-            var dataStoragePosts = Enumerable.Empty<BlogPostBase>();
 
             // Act
-            var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, TestLastUpdatedAt);
+            var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, TestLastUpdatedAt);
 
             // Assert
             var post = blogPosts.FirstOrDefault();
@@ -66,57 +65,6 @@ namespace Blaven.BlogSources.Blogger.Tests
                 BloggerTestData.PostTags.OrderBy(x => x).SequenceEqual(post.Tags.OrderBy(x => x));
             Assert.True(tagsAreSequenceEquals);
         }
-
-        //[Fact]
-        //public async Task GetBlogPosts_BlogSourceInsertedPosts_ReturnsInsertedPosts()
-        //{
-        //    // Arrange
-        //    var dataStoragePosts = GetTestBlogPosts(0, 1).ToList();
-
-        //    var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 3));
-
-        //    var blogSetting = GetTestBlogSetting();
-
-        //    // Act
-        //    var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt: null);
-
-        //    // Assert
-        //    Assert.Equal(2, blogPosts.Count);
-        //}
-
-        //[Fact]
-        //public async Task GetBlogPosts_BlogSourceDeletedPosts_ReturnsDeletedPosts()
-        //{
-        //    // Arrange
-        //    var dataStoragePosts = GetTestBlogPosts(0, 3).ToList();
-
-        //    var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 1));
-
-        //    var blogSetting = GetTestBlogSetting();
-
-        //    // Act
-        //    var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt: null);
-
-        //    // Assert
-        //    Assert.Equal(2, blogPosts.Count);
-        //}
-
-        //[Fact]
-        //public async Task GetBlogPosts_BlogSourceUpdatedPosts_ReturnsUpdatedPosts()
-        //{
-        //    // Arrange
-        //    var dataStoragePosts = GetTestBlogPosts(0, 2).ToList();
-
-        //    var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => GetTestModifiedPosts(0, 2));
-
-        //    var blogSetting = GetTestBlogSetting();
-
-        //    // Act
-        //    var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt: null);
-
-        //    // Assert
-        //    Assert.Equal(2, blogPosts.Count);
-        //}
 
         private static BloggerBlogSource GetTestBloggerBlogSource(
             Func<string, BloggerBlogData> getBlogFunc = null,

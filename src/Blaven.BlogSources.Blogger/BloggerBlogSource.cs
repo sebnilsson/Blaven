@@ -45,10 +45,7 @@ namespace Blaven.BlogSources.Blogger
             return blogMeta;
         }
 
-        public async Task<IReadOnlyList<BlogPost>> GetBlogPosts(
-            BlogSetting blogSetting,
-            IEnumerable<BlogPostBase> dataStoragePosts,
-            DateTime? lastUpdatedAt)
+        public async Task<IReadOnlyList<BlogPost>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
             {

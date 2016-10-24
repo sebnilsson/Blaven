@@ -72,6 +72,7 @@
     <Compile Include="Synchronization\BlogSyncConfiguration.cs" />
     <Compile Include="Synchronization\BlogSyncConfigurationDefaults.cs" />
     <Compile Include="Synchronization\BlogSyncDataStorageException.cs" />
+    <Compile Include="Synchronization\BlogSyncDataStorageResultException.cs" />
     <Compile Include="Synchronization\BlogSyncException.cs" />
     <Compile Include="Synchronization\BlogSyncResult.cs" />
     <Compile Include="Synchronization\BlogSyncService.cs" />

@@ -30,10 +30,7 @@ namespace Blaven.BlogSources.Tests
             return Task.FromResult(blogMeta);
         }
 
-        public Task<IReadOnlyList<BlogPost>> GetBlogPosts(
-            BlogSetting blogSetting,
-            IEnumerable<BlogPostBase> dataStoragePosts,
-            DateTime? lastUpdatedAt)
+        public Task<IReadOnlyList<BlogPost>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             var posts =
                 this.blogPosts.Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)

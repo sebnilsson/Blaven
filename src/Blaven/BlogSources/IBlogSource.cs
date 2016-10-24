@@ -8,9 +8,6 @@ namespace Blaven.BlogSources
     {
         Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt);
 
-        Task<IReadOnlyList<BlogPost>> GetBlogPosts(
-            BlogSetting blogSetting,
-            IEnumerable<BlogPostBase> dataStoragePosts,
-            DateTime? lastUpdatedAt);
+        Task<IReadOnlyList<BlogPost>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt);
     }
 }

@@ -3,7 +3,7 @@ using System.Linq;
 
 using Blaven.Tests;
 
-namespace Blaven.Data.RavenDb2
+namespace Blaven.Data.RavenDb2.Tests
 {
     public static class BlogPostTheoryData
     {

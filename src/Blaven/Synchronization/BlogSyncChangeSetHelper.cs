@@ -27,12 +27,11 @@ namespace Blaven.Synchronization
             var cleanSourcePosts =
                 sourcePosts.Where(x => x != null)
                     .OrderByDescending(x => x.UpdatedAt)
-                    .GroupBy(x => x.SourceId)
-                    .Select(x => x.First())
+                    .Distinct(x => x.SourceId)
                     .ToReadOnlyList();
 
             var cleanDataStoragePosts =
-                dataStoragePosts.Where(x => x != null).GroupBy(x => x.SourceId).Select(x => x.First()).ToReadOnlyList();
+                dataStoragePosts.Where(x => x != null).Distinct(x => x.SourceId).ToReadOnlyList();
 
             var changeSet = new BlogSyncChangeSet(blogKey);
 

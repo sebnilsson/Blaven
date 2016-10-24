@@ -28,17 +28,6 @@ namespace Blaven.Tests
             return changeSet;
         }
 
-        //public static IReadOnlyList<BlogPost> GetBlogPosts(string blogKey = null, int blogPostsCount = 11)
-        //{
-        //    blogKey = blogKey ?? BlogMetaTestData.BlogKey;
-
-        //    var blogPosts =
-        //        Enumerable.Range(0, blogPostsCount)
-        //            .Select(i => BlogPostTestData.Create(blogKey, i, isUpdate: (i % 2 == 0)))
-        //            .ToList();
-        //    return blogPosts;
-        //}
-
         public static BlogSyncChangeSet Create(
             string blogKey = null,
             int deletedBlogPostsCount = 3,

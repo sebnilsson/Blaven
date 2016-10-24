@@ -18,7 +18,7 @@ namespace Blaven.Data.Tests
 
         public event EventHandler<string> OnGetLastUpdatedAtRun;
 
-        public event EventHandler<string> OnGetPostBasesRun;
+        public event EventHandler<string> OnGetBlogPostsRun;
 
         public event EventHandler<string> OnSaveBlogMetaRun;
 
@@ -33,14 +33,14 @@ namespace Blaven.Data.Tests
             return Task.FromResult(lastUpdatedAt);
         }
 
-        public Task<IReadOnlyList<BlogPostBase>> GetPostBases(BlogSetting blogSetting, DateTime? lastUpdatedAt)
+        public Task<IReadOnlyList<BlogPostBase>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             var posts =
                 this.blogPosts.Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
                     .Cast<BlogPostBase>()
                     .ToReadOnlyList();
 
-            this.OnGetPostBasesRun?.Invoke(this, blogSetting.BlogKey);
+            this.OnGetBlogPostsRun?.Invoke(this, blogSetting.BlogKey);
 
             return Task.FromResult(posts);
         }

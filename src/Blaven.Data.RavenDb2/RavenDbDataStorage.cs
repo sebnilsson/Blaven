@@ -44,7 +44,7 @@ namespace Blaven.Data.RavenDb2
             }
         }
 
-        public async Task<IReadOnlyList<BlogPostBase>> GetPostBases(BlogSetting blogSetting, DateTime? lastUpdatedAt = null)
+        public async Task<IReadOnlyList<BlogPostBase>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt = null)
         {
             if (blogSetting == null)
             {

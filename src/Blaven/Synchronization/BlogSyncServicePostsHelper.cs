@@ -21,9 +21,13 @@ namespace Blaven.Synchronization
 
         public async Task<BlogSyncChangeSet> Update(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
-            var dataStoragePosts = await this.GetDataStoragePosts(blogSetting, lastUpdatedAt);
+            var sourcePosts = await this.GetSourcePosts(blogSetting, lastUpdatedAt);
+            if (sourcePosts == null)
+            {
+                return null;
+            }
 
-            var sourcePosts = await this.GetSourcePosts(blogSetting, lastUpdatedAt, dataStoragePosts);
+            var dataStoragePosts = await this.GetDataStoragePosts(blogSetting, lastUpdatedAt);
 
             var changeSet = BlogSyncChangeSetHelper.GetChangeSet(blogSetting.BlogKey, sourcePosts, dataStoragePosts);
 
@@ -37,8 +41,7 @@ namespace Blaven.Synchronization
             var cleanedBlogPosts =
                 blogPosts.Where(x => x != null)
                     .OrderByDescending(x => x.UpdatedAt)
-                    .GroupBy(x => x.SourceId)
-                    .Select(x => x.First())
+                    .Distinct(x => x.SourceId)
                     .ToReadOnlyList();
 
             return cleanedBlogPosts;
@@ -51,36 +54,33 @@ namespace Blaven.Synchronization
             IReadOnlyList<BlogPostBase> dataStoragePosts;
             try
             {
-                dataStoragePosts = await this.config.DataStorage.GetPostBases(blogSetting, lastUpdatedAt);
+                dataStoragePosts = await this.config.DataStorage.GetBlogPosts(blogSetting, lastUpdatedAt);
             }
             catch (Exception ex)
             {
                 string message =
-                    $"{nameof(this.config.DataStorage)} threw an unexpected excetion from {nameof(this.config.DataStorage.GetPostBases)}"
+                    $"{nameof(this.config.DataStorage)} threw an unexpected excetion from {nameof(this.config.DataStorage.GetBlogPosts)}"
                     + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}': {ex.Message.TrimEnd('.')}.";
                 throw new BlogSyncDataStorageException(message, ex);
             }
 
-            //if (dataStoragePosts == null)
-            //{
-            //    string message =
-            //        $"{nameof(this.config.DataStorage)} returned a null result from {nameof(this.config.DataStorage.GetPostBases)}"
-            //        + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
-            //    throw new BlogSyncDataStorageResultException(message);
-            //}
+            if (dataStoragePosts == null)
+            {
+                string message =
+                    $"{nameof(this.config.DataStorage)} returned a null result from {nameof(this.config.DataStorage.GetBlogPosts)}"
+                    + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
+                throw new BlogSyncDataStorageResultException(message);
+            }
 
             return dataStoragePosts;
         }
 
-        private async Task<IReadOnlyList<BlogPost>> GetSourcePosts(
-            BlogSetting blogSetting,
-            DateTime? lastUpdatedAt,
-            IEnumerable<BlogPostBase> dataStoragePosts)
+        private async Task<IReadOnlyList<BlogPost>> GetSourcePosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             IReadOnlyList<BlogPost> sourcePosts;
             try
             {
-                sourcePosts = await this.config.BlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt);
+                sourcePosts = await this.config.BlogSource.GetBlogPosts(blogSetting, lastUpdatedAt);
             }
             catch (Exception ex)
             {
@@ -98,7 +98,10 @@ namespace Blaven.Synchronization
             //    throw new BlogSyncBlogSourceResultException(message);
             //}
 
-            sourcePosts = CleanBlogPosts(sourcePosts);
+            if (sourcePosts != null)
+            {
+                sourcePosts = CleanBlogPosts(sourcePosts);
+            }
 
             return sourcePosts;
         }

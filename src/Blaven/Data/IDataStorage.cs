@@ -10,7 +10,7 @@ namespace Blaven.Data
     {
         Task<DateTime?> GetLastUpdatedAt(BlogSetting blogSetting);
 
-        Task<IReadOnlyList<BlogPostBase>> GetPostBases(BlogSetting blogSetting, DateTime? lastUpdatedAt);
+        Task<IReadOnlyList<BlogPostBase>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt);
 
         Task SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta);
 
