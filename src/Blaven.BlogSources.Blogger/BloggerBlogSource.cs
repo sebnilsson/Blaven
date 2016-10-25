@@ -35,7 +35,8 @@ namespace Blaven.BlogSources.Blogger
             if (blog == null)
             {
                 string message =
-                    $"{nameof(BloggerApiProvider)} returned a null result from {nameof(this.apiProvider.GetBlog)} for {nameof(blogSetting)}.{nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
+                    $"{nameof(BloggerApiProvider)} returned a null result from {nameof(this.apiProvider.GetBlog)}"
+                    + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
                 throw new BloggerBlogSourceException(message);
             }
 
@@ -56,7 +57,8 @@ namespace Blaven.BlogSources.Blogger
             if (posts == null)
             {
                 string message =
-                    $"{nameof(IBloggerApiProvider)} returned a null result from {nameof(this.apiProvider.GetPosts)} for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
+                    $"{nameof(IBloggerApiProvider)} returned a null result from {nameof(this.apiProvider.GetPosts)}"
+                    + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
                 throw new BloggerBlogSourceException(message);
             }
 

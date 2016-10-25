@@ -36,7 +36,8 @@ namespace Blaven.Data.Tests
         public Task<IReadOnlyList<BlogPostBase>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             var posts =
-                this.blogPosts.Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
+                this.blogPosts.Where(
+                        x => x.BlogKey == blogSetting.BlogKey && (lastUpdatedAt == null || x.UpdatedAt > lastUpdatedAt))
                     .Cast<BlogPostBase>()
                     .ToReadOnlyList();
 

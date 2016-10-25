@@ -23,7 +23,5 @@ namespace Blaven
         public string Title { get; set; }
 
         public string UrlSlug { get; set; }
-
-        public DateTime? UpdatedAt { get; set; }
     }
 }

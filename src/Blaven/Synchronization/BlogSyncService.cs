@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,8 +19,13 @@ namespace Blaven.Synchronization
 
         private readonly BlogSyncServicePostsHelper postsHelper;
 
-        public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage, params BlogSetting[] blogSettings)
+        public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage, IEnumerable<BlogSetting> blogSettings)
             : this(BlogSyncConfiguration.Create(blogSource, dataStorage, blogSettings))
+        {
+        }
+
+        public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage, params BlogSetting[] blogSettings)
+            : this(blogSource, dataStorage, blogSettings?.AsEnumerable())
         {
         }
 
@@ -80,6 +86,8 @@ namespace Blaven.Synchronization
 
         private async Task<BlogSyncResult> UpdateBlog(string blogKey, bool forceShouldUpdate)
         {
+            var stopwatch = Stopwatch.StartNew();
+
             var result = new BlogSyncResult(blogKey);
 
             string lockKey = blogKey.ToLowerInvariant();
@@ -101,7 +109,12 @@ namespace Blaven.Synchronization
             }
             finally
             {
-                result.OnDone();
+                if (stopwatch != null)
+                {
+                    stopwatch.Stop();
+
+                    result.Elapsed = stopwatch.Elapsed;
+                }
             }
 
             return result;

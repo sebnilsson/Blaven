@@ -85,7 +85,7 @@ namespace Blaven.Synchronization
                 var dbPost = modifiedPost.DbPost;
                 var sourcePost = modifiedPost.SourcePost;
 
-                bool isModified = (dbPost.Hash != sourcePost.Hash);
+                bool isModified = (dbPost.Hash != sourcePost.Hash || dbPost.UpdatedAt != sourcePost.UpdatedAt);
                 if (isModified)
                 {
                     changeSet.UpdatedBlogPosts.Add(sourcePost);

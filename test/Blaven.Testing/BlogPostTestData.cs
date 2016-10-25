@@ -28,9 +28,11 @@ namespace Blaven.Tests
         }
 
         public static BlogPost Create(
-            string blogKey,
+            string blogKey = BlogMetaTestData.BlogKey,
             int index = 0,
             bool isUpdate = false,
+            string hashPrefix = null,
+            int updatedAtAddedDays = 0,
             int tagCount = DefaultTagCount)
         {
             var author = new BlogAuthor
@@ -68,7 +70,7 @@ namespace Blaven.Tests
                                    Content =
                                        TestUtility.GetTestString(nameof(BlogPost.Content), blogKey, index, isUpdate)
                                        + $"{Environment.NewLine}More content",
-                                   Hash = TestUtility.GetTestString(nameof(BlogPost.Hash), blogKey, index),
+                                   Hash = TestUtility.GetTestString(nameof(BlogPost.Hash), $"{hashPrefix}{blogKey}", index),
                                    ImageUrl = TestUtility.GetTestString(nameof(BlogPost.ImageUrl), blogKey, index, isUpdate),
                                    PublishedAt = TestPublishedAt.AddDays(index),
                                    SourceId = CreatePostSourceId(index, blogKey),
@@ -77,7 +79,7 @@ namespace Blaven.Tests
                                    Summary = TestUtility.GetTestString(nameof(BlogPost.Summary), blogKey, index, isUpdate),
                                    Tags = CreatePostTags(index, tagCount).ToList(),
                                    Title = TestUtility.GetTestString(nameof(BlogPost.Title), blogKey, index, isUpdate),
-                                   UpdatedAt = TestUpdatedAt.AddDays(index)
+                                   UpdatedAt = TestUpdatedAt.AddDays(updatedAtAddedDays + index)
                                };
 
             blogPost.UrlSlug = BlogSyncConfigurationDefaults.SlugProvider.GetUrlSlug(blogPost);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,6 +14,11 @@ namespace Blaven
         private readonly IRepository repository;
 
         public BlogService(IRepository repository, params BlogSetting[] blogSettings)
+            : this(repository, blogSettings?.AsEnumerable())
+        {
+        }
+
+        public BlogService(IRepository repository, IEnumerable<BlogSetting> blogSettings)
         {
             if (repository == null)
             {

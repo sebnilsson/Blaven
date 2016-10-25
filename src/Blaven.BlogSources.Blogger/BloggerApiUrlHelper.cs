@@ -43,7 +43,7 @@ namespace Blaven.BlogSources.Blogger
 
             string url = this.AppendApiKey($"{BaseUrl}/{blogId}/posts/");
 
-            string startDate = (lastUpdateAt > DateTime.MinValue)
+            string startDate = (lastUpdateAt != null && lastUpdateAt > DateTime.MinValue)
                                    ? lastUpdateAt.Value.ToRfc3339String()
                                    : null;
 

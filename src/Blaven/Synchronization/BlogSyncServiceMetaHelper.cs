@@ -32,16 +32,16 @@ namespace Blaven.Synchronization
             catch (Exception ex)
             {
                 string message =
-                    $"{nameof(this.config.BlogSource)} threw an unexpected excetion from {nameof(this.config.BlogSource.GetMeta)} "
-                    + $"for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}': {ex.Message.TrimEnd('.')}.";
+                    $"{nameof(this.config.BlogSource)} threw an unexpected excetion from {nameof(this.config.BlogSource.GetMeta)}"
+                    + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}': {ex.Message.TrimEnd('.')}.";
                 throw new BlogSyncBlogSourceException(message, ex);
             }
 
             //if (meta == null)
             //{
             //    string message =
-            //        $"{nameof(this.config.BlogSource)} returned a null result from {nameof(this.config.BlogSource.GetMeta)} "
-            //        + $"for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
+            //        $"{nameof(this.config.BlogSource)} returned a null result from {nameof(this.config.BlogSource.GetMeta)}"
+            //        + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
             //    throw new BlogSyncBlogSourceResultException(message);
             //}
 

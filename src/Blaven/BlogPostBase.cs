@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace Blaven
 {
@@ -10,5 +11,7 @@ namespace Blaven
         public string Hash { get; set; }
 
         public string SourceId { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
     }
 }

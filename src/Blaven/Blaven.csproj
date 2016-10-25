@@ -38,7 +38,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AppSettingsHelper.cs" />
+    <Compile Include="Configuration\AppSettingsHelper.cs" />
     <Compile Include="BlavenBlogPostUrlSlugProvider.cs" />
     <Compile Include="BlavenException.cs" />
     <Compile Include="BlogArchiveItem.cs" />

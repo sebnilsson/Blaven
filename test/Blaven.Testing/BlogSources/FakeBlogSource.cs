@@ -33,7 +33,8 @@ namespace Blaven.BlogSources.Tests
         public Task<IReadOnlyList<BlogPost>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             var posts =
-                this.blogPosts.Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
+                this.blogPosts.Where(
+                        x => x.BlogKey == blogSetting.BlogKey && (lastUpdatedAt == null || x.UpdatedAt > lastUpdatedAt))
                     .ToReadOnlyList();
 
             this.OnGetBlogPostsRun?.Invoke(this, blogSetting.BlogKey);

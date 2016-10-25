@@ -23,5 +23,18 @@ namespace Blaven.Synchronization.Tests
             var service = new BlogSyncService(blogSource, dataStorage, blogSettings.ToArray());
             return service;
         }
+
+        public static BlogSyncService CreateWithData(
+            IEnumerable<BlogPost> blogSourcePosts = null,
+            IEnumerable<BlogMeta> blogSourceMetas = null,
+            IEnumerable<BlogPost> dataStoragePosts = null,
+            IEnumerable<BlogSetting> blogSettings = null)
+        {
+            var blogSource = new FakeBlogSource(blogSourcePosts, blogSourceMetas);
+            var dataStorage = new FakeDataStorage(dataStoragePosts);
+
+            var service = Create(blogSource, dataStorage, blogSettings);
+            return service;
+        }
     }
 }

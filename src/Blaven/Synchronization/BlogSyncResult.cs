@@ -3,11 +3,9 @@ using System.Diagnostics;
 
 namespace Blaven.Synchronization
 {
-    [DebuggerDisplay("BlogKey={BlogKey}, StartedAt={StartedAt}, Elapsed={Elapsed}, ElapsedMs={ElapsedMs}")]
+    [DebuggerDisplay("BlogKey={BlogKey}, Elapsed={Elapsed}, ElapsedMs={ElapsedMs}")]
     public class BlogSyncResult : BlogKeyItemBase
     {
-        private readonly Stopwatch stopwatch;
-
         public BlogSyncResult(string blogKey)
         {
             if (blogKey == null)
@@ -16,33 +14,20 @@ namespace Blaven.Synchronization
             }
 
             this.BlogKey = blogKey;
-
-            this.StartedAt = DateTime.Now;
-
-            this.stopwatch = Stopwatch.StartNew();
         }
 
         public BlogMeta BlogMeta { get; private set; }
 
         public BlogSyncChangeSet ChangeSet { get; private set; }
 
-        public TimeSpan Elapsed { get; private set; }
+        public TimeSpan Elapsed { get; internal set; }
 
         public double ElapsedMs => this.Elapsed.TotalMilliseconds;
 
-        public DateTime StartedAt { get; }
-
-        public void OnDataUpdated(BlogMeta blogMeta, BlogSyncChangeSet changeSet)
+        internal void OnDataUpdated(BlogMeta blogMeta, BlogSyncChangeSet changeSet)
         {
             this.BlogMeta = blogMeta;
             this.ChangeSet = changeSet;
-        }
-
-        public void OnDone()
-        {
-            this.stopwatch.Stop();
-
-            this.Elapsed = this.stopwatch.Elapsed;
         }
     }
 }

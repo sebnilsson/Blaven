@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+
+using Blaven.Configuration;
+
 #if NET_45
 using System.Configuration;
 #endif

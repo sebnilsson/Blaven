@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.BlogSources;
 using Blaven.Data;
+using Blaven.Tests;
 using Moq;
 using Xunit;
 
@@ -100,117 +102,199 @@ namespace Blaven.Synchronization.Tests
             await Assert.ThrowsAsync<KeyNotFoundException>(async () => await service.UpdateAll("NON_EXISTING_BLOGKEY"));
         }
 
-        //[Fact]
-        //public async Task GetBlogPosts_BlogSourceInsertedPosts_ReturnsInsertedPosts()
-        //{
-        //    // Arrange
-        //    var dataStoragePosts = GetTestBlogPosts(0, 1).ToList();
+        [Theory]
+        [InlineData(BlogMetaTestData.BlogKey, 2)]
+        [InlineData(BlogMetaTestData.BlogKey2, 0)]
+        public async Task UpdateAll_BlogSourceDeletedPosts_ReturnsDeletedPosts(
+            string blogKey,
+            int expectedDeletedBlogPosts)
+        {
+            // Arrange
+            var dataStoragePosts = BlogPostTestData.CreateCollection(start: 0, count: 4, blogKey: blogKey);
+            var blogSourcePosts = BlogPostTestData.CreateCollection(start: 0, count: 2, blogKey: blogKey);
 
-        //    var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 3));
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts: blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
 
-        //    var blogSetting = GetTestBlogSetting();
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
 
-        //    // Act
-        //    var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt: null);
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-        //    // Assert
-        //    Assert.Equal(2, blogPosts.Count);
-        //}
+            Assert.Equal(expectedDeletedBlogPosts, result.ChangeSet.DeletedBlogPosts.Count);
+            Assert.Equal(0, result.ChangeSet.InsertedBlogPosts.Count);
+            Assert.Equal(0, result.ChangeSet.UpdatedBlogPosts.Count);
+        }
 
-        //[Fact]
-        //public async Task GetBlogPosts_BlogSourceDeletedPosts_ReturnsDeletedPosts()
-        //{
-        //    // Arrange
-        //    var dataStoragePosts = GetTestBlogPosts(0, 3).ToList();
+        [Theory]
+        [InlineData(BlogMetaTestData.BlogKey, 2)]
+        [InlineData(BlogMetaTestData.BlogKey2, 0)]
+        public async Task UpdateAll_BlogSourceInsertedPosts_ReturnsInsertedPosts(
+            string blogKey,
+            int expectedInsertedBlogPosts)
+        {
+            // Arrange
+            var dataStoragePosts = BlogPostTestData.CreateCollection(start: 0, count: 2, blogKey: blogKey);
+            var blogSourcePosts = BlogPostTestData.CreateCollection(start: 0, count: 4, blogKey: blogKey);
 
-        //    var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => BloggerTestData.GetPosts(0, 1));
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts: blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
 
-        //    var blogSetting = GetTestBlogSetting();
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
 
-        //    // Act
-        //    var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt: null);
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-        //    // Assert
-        //    Assert.Equal(2, blogPosts.Count);
-        //}
+            Assert.Equal(0, result.ChangeSet.DeletedBlogPosts.Count);
+            Assert.Equal(expectedInsertedBlogPosts, result.ChangeSet.InsertedBlogPosts.Count);
+            Assert.Equal(0, result.ChangeSet.UpdatedBlogPosts.Count);
+        }
 
-        //[Fact]
-        //public async Task GetBlogPosts_BlogSourceUpdatedPosts_ReturnsUpdatedPosts()
-        //{
-        //    // Arrange
-        //    var dataStoragePosts = GetTestBlogPosts(0, 2).ToList();
+        [Theory]
+        [InlineData(BlogMetaTestData.BlogKey, 2)]
+        [InlineData(BlogMetaTestData.BlogKey2, 0)]
+        public async Task UpdateAll_BlogSourceUpdatedPostHashs_ReturnsUpdatedPosts(
+            string blogKey,
+            int expectedUpdatedBlogPosts)
+        {
+            // Arrange
+            var dataStoragePosts = BlogPostTestData.CreateCollection(start: 0, count: 2, blogKey: blogKey);
+            var blogSourcePosts = new[]
+                                      {
+                                          BlogPostTestData.Create(blogKey, index: 0, hashPrefix: "CHANGED_"),
+                                          BlogPostTestData.Create(blogKey, index: 1, hashPrefix: "CHANGED_")
+                                      };
 
-        //    var bloggerBlogSource = GetTestBloggerBlogSource(getPostsFunc: _ => GetTestModifiedPosts(0, 2));
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts: blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
 
-        //    var blogSetting = GetTestBlogSetting();
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
 
-        //    // Act
-        //    var blogPosts = await bloggerBlogSource.GetBlogPosts(blogSetting, dataStoragePosts, lastUpdatedAt: null);
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-        //    // Assert
-        //    Assert.Equal(2, blogPosts.Count);
-        //}
+            Assert.Equal(0, result.ChangeSet.DeletedBlogPosts.Count);
+            Assert.Equal(0, result.ChangeSet.InsertedBlogPosts.Count);
+            Assert.Equal(expectedUpdatedBlogPosts, result.ChangeSet.UpdatedBlogPosts.Count);
+        }
 
-        //[Fact]
-        //public void GetChangeSet_LastUpdatedAtAfterLastDbPost_NoDeletedPosts()
-        //{
-        //    // Arrange
-        //    var sourcePosts = BlogPostTestData.CreateCollection(0, 0).ToList();
-        //    var dataStoragePosts = BlogPostTestData.CreateCollection(0, 5).ToList();
-        //    var dbPostList = dataStoragePosts.OfType<BlogPostBase>().ToList();
-        //    var lastUpdatedAt = dataStoragePosts.Select(x => x.UpdatedAt).OrderByDescending(x => x).FirstOrDefault();
+        [Fact]
+        public async Task UpdateAll_BlogSourceUpdatedPostTags_ReturnsUpdatedPostWithUpdatedTags()
+        {
+            // Arrange
+            const int UpdatedTagCount = BlogPostTestData.DefaultTagCount + 2;
 
-        //    // Act
-        //    var changeSet = BlogSyncChangeSetHelper.GetChangeSet(BlogMetaTestData.BlogKey, sourcePosts, dbPostList);
+            var dataStoragePost = BlogPostTestData.Create(index: 0);
 
-        //    // Assert
-        //    Assert.Equal(0, changeSet.DeletedBlogPosts.Count);
-        //}
+            var dataStoragePosts = new[] { dataStoragePost };
+            var blogSourcePosts = new[]
+                                      {
+                                          BlogPostTestData.Create(
+                                              index: 0,
+                                              hashPrefix: "_CHANGED",
+                                              tagCount: UpdatedTagCount)
+                                      };
 
-        //[Fact]
-        //public void GetChangeSet_NoLastUpdatedAt_AllPostsDeleted()
-        //{
-        //    // Arrange
-        //    var sourcePosts = BlogPostTestData.CreateCollection(0, 0).ToList();
-        //    var dataStoragePosts = BlogPostTestData.CreateCollection(0, 5).ToList();
-        //    var dataStoragePostList = dataStoragePosts.OfType<BlogPostBase>().ToList();
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts: blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
 
-        //    // Act
-        //    var changeSet = BlogSyncChangeSetHelper.GetChangeSet(BlogMetaTestData.BlogKey, sourcePosts, dataStoragePostList);
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
 
-        //    // Assert
-        //    Assert.Equal(5, changeSet.DeletedBlogPosts.Count);
-        //}
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
+            var updatedPost = result.ChangeSet.UpdatedBlogPosts.First();
 
-        //[Fact]
-        //public void GetChangeSet_LastUpdatedAtAfterLastDbPost_NoUpdatedBlogPosts()
-        //{
-        //    // Arrange
-        //    var sourcePosts = BlogPostTestData.CreateCollection(0, 5).ToList();
-        //    var dataStoragePosts = BlogPostTestData.CreateCollection(0, 5).ToList();
-        //    var dataStoragePostList = dataStoragePosts.OfType<BlogPostBase>().ToList();
-        //    var lastUpdatedAt = dataStoragePosts.Select(x => x.UpdatedAt).OrderByDescending(x => x).FirstOrDefault();
+            Assert.Equal(BlogPostTestData.DefaultTagCount, dataStoragePost.Tags.Count());
+            Assert.Equal(UpdatedTagCount, updatedPost.Tags.Count());
+        }
 
-        //    // Act
-        //    var changeSet = BlogSyncChangeSetHelper.GetChangeSet(BlogMetaTestData.BlogKey, sourcePosts, dataStoragePostList);
+        [Theory]
+        [InlineData(BlogMetaTestData.BlogKey, 2)]
+        [InlineData(BlogMetaTestData.BlogKey2, 0)]
+        public async Task UpdateAll_BlogSourceUpdatedPostUpdatedAts_ReturnsUpdatedPosts(
+            string blogKey,
+            int expectedUpdatedBlogPosts)
+        {
+            // Arrange
+            var dataStoragePosts = BlogPostTestData.CreateCollection(start: 0, count: 2, blogKey: blogKey);
+            var blogSourcePosts = new[]
+                                      {
+                                          BlogPostTestData.Create(blogKey, index: 0, updatedAtAddedDays: 1),
+                                          BlogPostTestData.Create(blogKey, index: 1, updatedAtAddedDays: 2)
+                                      };
 
-        //    // Assert
-        //    Assert.Equal(0, changeSet.UpdatedBlogPosts.Count);
-        //}
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts: blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
 
-        //[Fact]
-        //public void GetChangeSet_NoLastUpdatedAt_AllPostsUpdated()
-        //{
-        //    // Arrange
-        //    var sourcePosts = BlogPostTestData.CreateCollection(0, 5).ToList();
-        //    var dataStoragePosts = BlogPostTestData.CreateCollection(0, 5).ToList();
-        //    var dataStoragePostList = dataStoragePosts.OfType<BlogPostBase>().ToList();
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
 
-        //    // Act
-        //    var changeSet = BlogSyncChangeSetHelper.GetChangeSet(BlogMetaTestData.BlogKey, sourcePosts, dataStoragePostList);
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-        //    // Assert
-        //    Assert.Equal(5, changeSet.UpdatedBlogPosts.Count);
-        //}
+            Assert.Equal(0, result.ChangeSet.DeletedBlogPosts.Count);
+            Assert.Equal(0, result.ChangeSet.InsertedBlogPosts.Count);
+            Assert.Equal(expectedUpdatedBlogPosts, result.ChangeSet.UpdatedBlogPosts.Count);
+        }
+
+        [Fact]
+        public async Task UpdateAll_BlogSourceChangesInOtherBlogKey_ReturnsNoChanges()
+        {
+            // Arrange
+            var dataStoragePosts = new[] { BlogPostTestData.Create(index: 1), BlogPostTestData.Create(index: 3) };
+            var blogSourcePosts = new[]
+                                      {
+                                          BlogPostTestData.Create(index: 0), BlogPostTestData.Create(index: 1),
+                                          BlogPostTestData.Create(index: 2)
+                                      };
+
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts: blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
+
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey2);
+
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey2);
+
+            Assert.Equal(0, result.ChangeSet.DeletedBlogPosts.Count);
+            Assert.Equal(0, result.ChangeSet.InsertedBlogPosts.Count);
+            Assert.Equal(0, result.ChangeSet.UpdatedBlogPosts.Count);
+        }
+
+        [Theory]
+        [InlineData(BlogMetaTestData.BlogKey, true)]
+        [InlineData(BlogMetaTestData.BlogKey2, false)]
+        public async Task UpdateAll_BlogSourceBlogMetaChange_ReturnsBlogMeta(string blogKey, bool expectNotNull)
+        {
+            // Arrange
+            var blogSourceMetas = new[]
+                                      {
+                                          BlogMetaTestData.Create(blogKey),
+                                          BlogMetaTestData.Create(BlogMetaTestData.BlogKey3)
+                                      };
+
+            var service = BlogSyncServiceTestFactory.CreateWithData(blogSourceMetas: blogSourceMetas);
+
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
+
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
+
+            bool isExpectedNull = expectNotNull ? (result.BlogMeta != null) : (result.BlogMeta == null);
+
+            Assert.True(isExpectedNull);
+        }
     }
 }
