@@ -29,7 +29,7 @@ namespace Blaven.Synchronization
 
             var dataStoragePosts = await this.GetDataStoragePosts(blogSetting, lastUpdatedAt);
 
-            var changeSet = BlogSyncChangeSetHelper.GetChangeSet(blogSetting.BlogKey, sourcePosts, dataStoragePosts);
+            var changeSet = BlogSyncPostsChangeSetHelper.GetChangeSet(blogSetting.BlogKey, sourcePosts, dataStoragePosts);
 
             this.HandleChanges(blogSetting.BlogKey, changeSet);
 

@@ -11,13 +11,16 @@ namespace Blaven.Tests
             string blogKey = BlogMetaTestData.BlogKey,
             bool isUpdate = false)
         {
-            var blogPostBases = Enumerable.Range(start, count).Select(i => Create(blogKey, i, isUpdate)).ToList();
+            var blogPostBases = Enumerable.Range(start, count).Select(i => Create(i, blogKey, isUpdate)).ToList();
             return blogPostBases;
         }
 
-        public static BlogPostBase Create(string blogKey, int index = 0, bool isUpdate = false)
+        public static BlogPostBase Create(
+            int index = 0,
+            string blogKey = BlogMetaTestData.BlogKey,
+            bool isUpdate = false)
         {
-            var blogPost = BlogPostTestData.Create(blogKey, index, isUpdate);
+            var blogPost = BlogPostTestData.Create(index, blogKey, isUpdate);
             return blogPost;
         }
     }

@@ -494,7 +494,7 @@ namespace Blaven.Data.RavenDb.Tests
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            string postContent = BlogPostTestData.Create(BlogMetaTestData.BlogKey).Content;
+            string postContent = BlogPostTestData.Create(blogKey: BlogMetaTestData.BlogKey).Content;
 
             // Act
             var posts = repository.SearchPosts(new[] { BlogMetaTestData.BlogKey }, postContent).ToList();
@@ -542,7 +542,7 @@ namespace Blaven.Data.RavenDb.Tests
             // Arrange
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
 
-            string postTitle = BlogPostTestData.Create(BlogMetaTestData.BlogKey).Title;
+            string postTitle = BlogPostTestData.Create().Title;
 
             // Act
             var posts = repository.SearchPosts(new[] { BlogMetaTestData.BlogKey }, postTitle).ToList();

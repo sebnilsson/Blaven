@@ -52,7 +52,7 @@
     <Compile Include="BlogSetting.cs" />
     <Compile Include="BlogSettingsHelper.cs" />
     <Compile Include="Synchronization\BlogSyncPostsChangeSet.cs" />
-    <Compile Include="Synchronization\BlogSyncChangeSetHelper.cs" />
+    <Compile Include="Synchronization\BlogSyncPostsChangeSetHelper.cs" />
     <Compile Include="BlogSources\IBlogSource.cs" />
     <Compile Include="BlogTagItem.cs" />
     <Compile Include="Configuration\AppSettingsConfigService.cs" />

@@ -10,6 +10,8 @@ namespace Blaven.Tests
     {
         public const int DefaultTagCount = 5;
 
+        public const int DefaultBlogPostsCount = 11;
+
         public static string BlavenId1 => CreateBlavenId(1);
 
         public static string BlavenId2 => CreateBlavenId(2);
@@ -22,17 +24,18 @@ namespace Blaven.Tests
 
         public static string CreateBlavenId(int index, string blogKey = BlogMetaTestData.BlogKey)
         {
-            var blogPost = Create(blogKey, index);
+            var blogPost = Create(index, blogKey);
 
             return blogPost.BlavenId;
         }
 
         public static BlogPost Create(
-            string blogKey = BlogMetaTestData.BlogKey,
             int index = 0,
+            string blogKey = BlogMetaTestData.BlogKey,
             bool isUpdate = false,
             string hashPrefix = null,
             int updatedAtAddedDays = 0,
+            DateTime? updatedAt = null,
             int tagCount = DefaultTagCount)
         {
             var author = new BlogAuthor
@@ -63,6 +66,8 @@ namespace Blaven.Tests
                                          isUpdate)
                              };
 
+            var updatedAtValue = updatedAt ?? TestUpdatedAt.AddDays(updatedAtAddedDays + index);
+
             var blogPost = new BlogPost
                                {
                                    Author = author,
@@ -79,7 +84,7 @@ namespace Blaven.Tests
                                    Summary = TestUtility.GetTestString(nameof(BlogPost.Summary), blogKey, index, isUpdate),
                                    Tags = CreatePostTags(index, tagCount).ToList(),
                                    Title = TestUtility.GetTestString(nameof(BlogPost.Title), blogKey, index, isUpdate),
-                                   UpdatedAt = TestUpdatedAt.AddDays(updatedAtAddedDays + index)
+                                   UpdatedAt = updatedAtValue
                                };
 
             blogPost.UrlSlug = BlogSyncConfigurationDefaults.SlugProvider.GetUrlSlug(blogPost);
@@ -90,8 +95,8 @@ namespace Blaven.Tests
         }
 
         public static IReadOnlyList<BlogPost> CreateCollection(
-            int start,
-            int count,
+            int start = 0,
+            int count = DefaultBlogPostsCount,
             string blogKey = BlogMetaTestData.BlogKey,
             string hashPrefix = null)
         {
@@ -100,15 +105,6 @@ namespace Blaven.Tests
                     .Select(x => Create(blogKey: blogKey, index: x, hashPrefix: hashPrefix))
                     .ToReadOnlyList();
             return posts;
-        }
-
-        public static IReadOnlyList<BlogPost> CreateCollection(
-            string blogKey = BlogMetaTestData.BlogKey,
-            int blogPostsCount = 11)
-        {
-            var blogPosts =
-                Enumerable.Range(0, blogPostsCount).Select(i => Create(blogKey, i, isUpdate: (i % 2 == 0))).ToList();
-            return blogPosts;
         }
 
         public static string CreatePostSourceId(int index, string blogKey = BlogMetaTestData.BlogKey)

@@ -43,13 +43,13 @@ namespace Blaven.Synchronization.Tests
 
             var insertedBlogPosts =
                 Enumerable.Range(0, insertedBlogPostsCount)
-                    .Select(i => BlogPostTestData.Create(blogKey, i, isUpdate: false))
+                    .Select(i => BlogPostTestData.Create(i, blogKey, isUpdate: false))
                     .ToList();
 
             int updatedBlogPostsStart = (insertedBlogPostsCount + 1);
             var updatedBlogPosts =
                 Enumerable.Range(updatedBlogPostsStart, updatedBlogPostsCount)
-                    .Select(i => BlogPostTestData.Create(blogKey, i, isUpdate: true))
+                    .Select(i => BlogPostTestData.Create(i, blogKey, isUpdate: true))
                     .ToList();
 
             changeSet.DeletedBlogPosts.AddRange(deletedBlogPosts);

@@ -98,7 +98,7 @@ namespace Blaven.Tests
         public async Task GetPost_ExistingBlogKey_ReturnsBlogPost()
         {
             // Arrange
-            var mockBlogPost = BlogPostTestData.Create(BlogMetaTestData.BlogKey);
+            var mockBlogPost = BlogPostTestData.Create();
             var service = BlogServiceTestFactory.Create(blogPosts: new[] { mockBlogPost });
 
             // Act
@@ -126,7 +126,7 @@ namespace Blaven.Tests
         public async Task GetPostBySourceId_ExistingBlogKey_ReturnsBlogPost()
         {
             // Arrange
-            var mockBlogPost = BlogPostTestData.Create(BlogMetaTestData.BlogKey);
+            var mockBlogPost = BlogPostTestData.Create();
             var service = BlogServiceTestFactory.Create(blogPosts: new[] { mockBlogPost });
 
             // Act

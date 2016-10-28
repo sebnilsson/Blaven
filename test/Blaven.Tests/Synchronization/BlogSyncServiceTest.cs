@@ -93,6 +93,42 @@ namespace Blaven.Synchronization.Tests
         }
 
         [Fact]
+        public async Task Update_DataStorageContainsPosts_ShouldUpdateNewAndNotFlagOldAsDeleted()
+        {
+            // Arrange
+            var dataStoragePosts = new[]
+                                       {
+                                           BlogPostTestData.Create(index: 0, updatedAt: new DateTime(2016, 1, 1)),
+                                           BlogPostTestData.Create(index: 1, updatedAt: new DateTime(2016, 2, 2)),
+                                           BlogPostTestData.Create(index: 2, updatedAt: new DateTime(2016, 3, 3)),
+                                           BlogPostTestData.Create(index: 3, updatedAt: new DateTime(2016, 4, 4))
+                                       };
+            var blogSourcePosts = new[]
+                                       {
+                                           BlogPostTestData.Create(index: 0, updatedAt: new DateTime(2016, 1, 1), hashPrefix: "CHANGED_"),
+                                           BlogPostTestData.Create(index: 1, updatedAt: new DateTime(2016, 2, 2), hashPrefix: "CHANGED_"),
+                                           BlogPostTestData.Create(index: 2, updatedAt: new DateTime(2016, 3, 3)),
+                                           BlogPostTestData.Create(index: 3, updatedAt: new DateTime(2016, 4, 4)),
+                                           BlogPostTestData.Create(index: 4, updatedAt: new DateTime(2016, 5, 5)),
+                                           BlogPostTestData.Create(index: 5, updatedAt: new DateTime(2016, 6, 6))
+                                       };
+
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts: blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
+
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
+
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
+
+            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Equal(2, result.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Equal(2, result.BlogPostsChanges.UpdatedBlogPosts.Count);
+        }
+
+        [Fact]
         public async Task UpdateAll_BlogKeyNotExisting_ShouldThrow()
         {
             // Arrange
@@ -165,8 +201,8 @@ namespace Blaven.Synchronization.Tests
             var dataStoragePosts = BlogPostTestData.CreateCollection(start: 0, count: 2, blogKey: blogKey);
             var blogSourcePosts = new[]
                                       {
-                                          BlogPostTestData.Create(blogKey, index: 0, hashPrefix: "CHANGED_"),
-                                          BlogPostTestData.Create(blogKey, index: 1, hashPrefix: "CHANGED_")
+                                          BlogPostTestData.Create(index: 0, blogKey: blogKey, hashPrefix: "CHANGED_"),
+                                          BlogPostTestData.Create(index: 1, blogKey: blogKey, hashPrefix: "CHANGED_")
                                       };
 
             var service = BlogSyncServiceTestFactory.CreateWithData(
@@ -227,8 +263,8 @@ namespace Blaven.Synchronization.Tests
             var dataStoragePosts = BlogPostTestData.CreateCollection(start: 0, count: 2, blogKey: blogKey);
             var blogSourcePosts = new[]
                                       {
-                                          BlogPostTestData.Create(blogKey, index: 0, updatedAtAddedDays: 1),
-                                          BlogPostTestData.Create(blogKey, index: 1, updatedAtAddedDays: 2)
+                                          BlogPostTestData.Create(index: 0, blogKey: blogKey, updatedAtAddedDays: 1),
+                                          BlogPostTestData.Create(index: 1, blogKey: blogKey, updatedAtAddedDays: 2)
                                       };
 
             var service = BlogSyncServiceTestFactory.CreateWithData(

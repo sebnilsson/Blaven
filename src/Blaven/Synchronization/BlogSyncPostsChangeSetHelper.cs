@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Blaven.Synchronization
 {
-    internal static class BlogSyncChangeSetHelper
+    internal static class BlogSyncPostsChangeSetHelper
     {
         public static BlogSyncPostsChangeSet GetChangeSet(
             string blogKey,
@@ -85,7 +85,7 @@ namespace Blaven.Synchronization
                 var dbPost = modifiedPost.DbPost;
                 var sourcePost = modifiedPost.SourcePost;
 
-                bool isModified = (dbPost.Hash != sourcePost.Hash || dbPost.UpdatedAt != sourcePost.UpdatedAt);
+                bool isModified = (dbPost.Hash != sourcePost.Hash || sourcePost.UpdatedAt > dbPost.UpdatedAt);
                 if (isModified)
                 {
                     changeSet.UpdatedBlogPosts.Add(sourcePost);
