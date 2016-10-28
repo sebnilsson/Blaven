@@ -18,7 +18,7 @@ namespace Blaven.Synchronization
 
             this.BlogKey = blogKey;
         }
-
+        // TODO: Move BlogMeta into here
         public List<BlogPostBase> DeletedBlogPosts { get; } = new List<BlogPostBase>();
 
         public List<BlogPost> InsertedBlogPosts { get; } = new List<BlogPost>();

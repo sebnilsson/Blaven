@@ -64,7 +64,6 @@
     <Compile Include="RavenDbDataStorage.cs" />
     <Compile Include="RavenDbIdConventions.cs" />
     <Compile Include="RavenDbinitializer.cs" />
-    <Compile Include="RavenDbInitializerException.cs" />
     <Compile Include="RavenDbRepository.cs" />
   </ItemGroup>
   <ItemGroup>

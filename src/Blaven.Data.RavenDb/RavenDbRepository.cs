@@ -12,6 +12,8 @@ namespace Blaven.Data.RavenDb
 {
     public class RavenDbRepository : IRepository
     {
+        private readonly IDocumentStore documentStore;
+
         public RavenDbRepository(IDocumentStore documentStore)
         {
             if (documentStore == null)
@@ -19,14 +21,12 @@ namespace Blaven.Data.RavenDb
                 throw new ArgumentNullException(nameof(documentStore));
             }
 
-            this.DocumentStore = documentStore;
+            this.documentStore = documentStore;
         }
-
-        public IDocumentStore DocumentStore { get; }
 
         public IQueryable<BlogMeta> GetBlogMetas()
         {
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 var metas = session.Query<BlogMeta>().OrderBy(x => x.Name);
                 return metas;
@@ -42,7 +42,7 @@ namespace Blaven.Data.RavenDb
 
             string blogMetaId = RavenDbIdConventions.GetBlogMetaId(blogKey);
 
-            using (var session = this.DocumentStore.OpenAsyncSession())
+            using (var session = this.documentStore.OpenAsyncSession())
             {
                 var meta = await session.LoadAsync<BlogMeta>(blogMetaId);
                 return meta;
@@ -62,7 +62,7 @@ namespace Blaven.Data.RavenDb
 
             string blogPostId = RavenDbIdConventions.GetBlogPostId(blogKey, blavenId);
 
-            using (var session = this.DocumentStore.OpenAsyncSession())
+            using (var session = this.documentStore.OpenAsyncSession())
             {
                 var post = await session.LoadAsync<BlogPost>(blogPostId);
                 return post;
@@ -80,7 +80,7 @@ namespace Blaven.Data.RavenDb
                 throw new ArgumentNullException(nameof(sourceId));
             }
 
-            using (var session = this.DocumentStore.OpenAsyncSession())
+            using (var session = this.documentStore.OpenAsyncSession())
             {
                 var post =
                     await
@@ -98,7 +98,7 @@ namespace Blaven.Data.RavenDb
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 var archive =
                     session.Query<BlogArchiveItem, ArchiveCountIndex>()
@@ -115,7 +115,7 @@ namespace Blaven.Data.RavenDb
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 var tags =
                     session.Query<BlogTagItem, TagsCountIndex>().Where(x => x.BlogKey.In(blogKeys)).OrderBy(x => x.Name);
@@ -130,7 +130,7 @@ namespace Blaven.Data.RavenDb
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 var heads =
                     session.Query<BlogPostHead, BlogPostsIndex>()
@@ -147,7 +147,7 @@ namespace Blaven.Data.RavenDb
                 throw new ArgumentNullException(nameof(blogKeys));
             }
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 var posts =
                     session.Query<BlogPost, BlogPostsIndex>()
@@ -167,7 +167,7 @@ namespace Blaven.Data.RavenDb
             var archiveDateStart = new DateTime(archiveDate.Year, archiveDate.Month, 1);
             var archiveDateEnd = archiveDateStart.AddMonths(1);
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 var posts =
                     session.Query<BlogPost, BlogPostsIndex>()
@@ -191,7 +191,7 @@ namespace Blaven.Data.RavenDb
                 throw new ArgumentNullException(nameof(tagName));
             }
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 var posts =
                     session.Query<BlogPost, BlogPostsIndex>()
@@ -222,7 +222,7 @@ namespace Blaven.Data.RavenDb
 
             string whereClause = $"Content:\"{escapedSearch}\" {blogKeysClause}";
 
-            using (var session = this.DocumentStore.OpenSession())
+            using (var session = this.documentStore.OpenSession())
             {
                 var posts =
                     session.Advanced.LuceneQuery<BlogPost, SearchBlogPostsIndex>().Where(whereClause).AsQueryable();

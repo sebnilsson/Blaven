@@ -83,19 +83,19 @@ namespace Blaven.Data.RavenDb
             {
                 string blogMetaId = RavenDbIdConventions.GetBlogMetaId(blogSetting.BlogKey);
 
-                var updatedBlogMeta = await session.LoadAsync<BlogMeta>(blogMetaId);
-                if (updatedBlogMeta == null)
+                var existingMeta = await session.LoadAsync<BlogMeta>(blogMetaId);
+                if (existingMeta == null)
                 {
-                    updatedBlogMeta = new BlogMeta { BlogKey = blogSetting.BlogKey };
-                    await session.StoreAsync(updatedBlogMeta);
+                    existingMeta = new BlogMeta { BlogKey = blogSetting.BlogKey };
+                    await session.StoreAsync(existingMeta);
                 }
 
-                updatedBlogMeta.Description = blogMeta.Description;
-                updatedBlogMeta.Name = blogMeta.Name;
-                updatedBlogMeta.PublishedAt = blogMeta.PublishedAt;
-                updatedBlogMeta.SourceId = blogMeta.SourceId;
-                updatedBlogMeta.UpdatedAt = blogMeta.UpdatedAt;
-                updatedBlogMeta.Url = blogMeta.Url;
+                existingMeta.Description = blogMeta.Description;
+                existingMeta.Name = blogMeta.Name;
+                existingMeta.PublishedAt = blogMeta.PublishedAt;
+                existingMeta.SourceId = blogMeta.SourceId;
+                existingMeta.UpdatedAt = blogMeta.UpdatedAt;
+                existingMeta.Url = blogMeta.Url;
 
                 await session.SaveChangesAsync();
             }
@@ -146,25 +146,25 @@ namespace Blaven.Data.RavenDb
             {
                 string postId = RavenDbIdConventions.GetBlogPostId(post.BlogKey, post.BlavenId);
 
-                var ravenDbPost = await session.LoadAsync<BlogPost>(postId);
-                if (ravenDbPost == null)
+                var existingPost = await session.LoadAsync<BlogPost>(postId);
+                if (existingPost == null)
                 {
-                    ravenDbPost = new BlogPost { BlogKey = post.BlogKey, BlavenId = post.BlavenId };
-                    await session.StoreAsync(ravenDbPost);
+                    existingPost = new BlogPost { BlogKey = post.BlogKey, BlavenId = post.BlavenId };
+                    await session.StoreAsync(existingPost);
                 }
 
-                ravenDbPost.Author = post.Author;
-                ravenDbPost.Content = post.Content;
-                ravenDbPost.Hash = post.Hash;
-                ravenDbPost.ImageUrl = post.ImageUrl;
-                ravenDbPost.PublishedAt = post.PublishedAt;
-                ravenDbPost.SourceId = post.SourceId;
-                ravenDbPost.SourceUrl = post.SourceUrl;
-                ravenDbPost.Summary = post.Summary;
-                ravenDbPost.Tags = post.Tags;
-                ravenDbPost.Title = post.Title;
-                ravenDbPost.UpdatedAt = post.UpdatedAt;
-                ravenDbPost.UrlSlug = post.UrlSlug;
+                existingPost.Author = post.Author;
+                existingPost.Content = post.Content;
+                existingPost.Hash = post.Hash;
+                existingPost.ImageUrl = post.ImageUrl;
+                existingPost.PublishedAt = post.PublishedAt;
+                existingPost.SourceId = post.SourceId;
+                existingPost.SourceUrl = post.SourceUrl;
+                existingPost.Summary = post.Summary;
+                existingPost.Tags = post.Tags;
+                existingPost.Title = post.Title;
+                existingPost.UpdatedAt = post.UpdatedAt;
+                existingPost.UrlSlug = post.UrlSlug;
             }
         }
     }
