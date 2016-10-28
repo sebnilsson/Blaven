@@ -2,9 +2,9 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-using Blaven.Data.RavenDb;
 using Blaven.Synchronization.Tests;
 using Blaven.Tests;
+using Raven.Client;
 using Xunit;
 
 namespace Blaven.Data.RavenDb.Tests

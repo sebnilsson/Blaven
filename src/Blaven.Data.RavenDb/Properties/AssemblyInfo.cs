@@ -5,15 +5,14 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Blaven")]
+[assembly: AssemblyTitle("Blaven.Data.RavenDb")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Blaven")]
+[assembly: AssemblyProduct("Blaven.Data.RavenDb")]
 [assembly: AssemblyCopyright("Copyright © Sebastian Nilsson 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-//[assembly: NeutralResourcesLanguage("en")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,4 +30,4 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyInformationalVersion("0.5.0")] // Nuget
 
 [assembly: InternalsVisibleTo("Blaven.Tests")]
-[assembly: InternalsVisibleTo("Blaven.Testing")]
+[assembly: InternalsVisibleTo("Blaven.Data.RavenDb.Tests")]

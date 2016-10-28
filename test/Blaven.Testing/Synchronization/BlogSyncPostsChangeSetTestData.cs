@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.Synchronization;
+using Blaven.Tests;
 
-namespace Blaven.Tests
+namespace Blaven.Synchronization.Tests
 {
     public static class BlogSyncChangeSetTestData
     {
-        public static BlogSyncChangeSet CreateWithData(
+        public static BlogSyncPostsChangeSet CreateWithData(
             string blogKey = null,
             IEnumerable<BlogPostBase> deletedBlogPosts = null,
             IEnumerable<BlogPost> insertedBlogPosts = null,
@@ -19,7 +19,7 @@ namespace Blaven.Tests
             var insertedBlogPostList = (insertedBlogPosts ?? Enumerable.Empty<BlogPost>()).ToList();
             var updatedBlogPostList = (updatedBlogPosts ?? Enumerable.Empty<BlogPost>()).ToList();
 
-            var changeSet = new BlogSyncChangeSet(blogKey);
+            var changeSet = new BlogSyncPostsChangeSet(blogKey);
 
             deletedBlogPostList.ForEach(x => changeSet.DeletedBlogPosts.Add(x));
             insertedBlogPostList.ForEach(x => changeSet.InsertedBlogPosts.Add(x));
@@ -28,7 +28,7 @@ namespace Blaven.Tests
             return changeSet;
         }
 
-        public static BlogSyncChangeSet Create(
+        public static BlogSyncPostsChangeSet Create(
             string blogKey = null,
             int deletedBlogPostsCount = 3,
             int insertedBlogPostsCount = 5,
@@ -36,7 +36,7 @@ namespace Blaven.Tests
         {
             blogKey = blogKey ?? BlogMetaTestData.BlogKey;
 
-            var changeSet = new BlogSyncChangeSet(blogKey);
+            var changeSet = new BlogSyncPostsChangeSet(blogKey);
 
             var deletedBlogPosts =
                 BlogPostTestData.CreateCollection(0, deletedBlogPostsCount, blogKey).OfType<BlogPostBase>().ToList();

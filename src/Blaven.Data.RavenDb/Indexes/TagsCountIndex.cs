@@ -3,7 +3,7 @@ using System.Linq;
 
 using Raven.Client.Indexes;
 
-namespace Blaven.Data.RavenDb2.Indexes
+namespace Blaven.Data.RavenDb.Indexes
 {
     public class TagsCountIndex : AbstractIndexCreationTask<BlogPost, BlogTagItem>
     {
@@ -17,7 +17,6 @@ namespace Blaven.Data.RavenDb2.Indexes
             this.Reduce = results => from result in results
                                      group result by new { result.BlogKey, Name = result.Name.ToLowerInvariant() }
                                      into g
-                                     orderby g.Key.Name ascending
                                      select
                                          new BlogTagItem
                                              {

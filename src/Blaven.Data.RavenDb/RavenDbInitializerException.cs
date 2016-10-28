@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Blaven.Data.RavenDb2
+namespace Blaven.Data.RavenDb
 {
     public class RavenDbInitializerException : BlavenException
     {

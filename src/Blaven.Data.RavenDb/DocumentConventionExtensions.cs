@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 using Raven.Client.Document;
 
-namespace Blaven.Data.RavenDb2
+namespace Blaven.Data.RavenDb
 {
     public static class DocumentConventionExtensions
     {
@@ -22,7 +22,7 @@ namespace Blaven.Data.RavenDb2
 
             conventions.RegisterIdConvention<TEntity>((dbName, commands, entity) => idFactory(entity));
             conventions.RegisterAsyncIdConvention<TEntity>(
-                (dbName, commands, entity) => Task.FromResult(idFactory(entity)));
+                async (dbName, commands, entity) => await Task.FromResult(idFactory(entity)));
 
             return conventions;
         }

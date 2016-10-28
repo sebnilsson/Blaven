@@ -1,0 +1,11 @@
+﻿{
+  "dependencies": {
+    "RavenDB.Client": "3.0.30155"
+  },
+  "frameworks": {
+    "net46": {}
+  },
+  "runtimes": {
+    "win": {}
+  }
+}

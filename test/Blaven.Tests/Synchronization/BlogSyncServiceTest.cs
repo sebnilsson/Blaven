@@ -123,9 +123,9 @@ namespace Blaven.Synchronization.Tests
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-            Assert.Equal(expectedDeletedBlogPosts, result.ChangeSet.DeletedBlogPosts.Count);
-            Assert.Equal(0, result.ChangeSet.InsertedBlogPosts.Count);
-            Assert.Equal(0, result.ChangeSet.UpdatedBlogPosts.Count);
+            Assert.Equal(expectedDeletedBlogPosts, result.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
 
         [Theory]
@@ -149,9 +149,9 @@ namespace Blaven.Synchronization.Tests
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-            Assert.Equal(0, result.ChangeSet.DeletedBlogPosts.Count);
-            Assert.Equal(expectedInsertedBlogPosts, result.ChangeSet.InsertedBlogPosts.Count);
-            Assert.Equal(0, result.ChangeSet.UpdatedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Equal(expectedInsertedBlogPosts, result.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
 
         [Theory]
@@ -179,9 +179,9 @@ namespace Blaven.Synchronization.Tests
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-            Assert.Equal(0, result.ChangeSet.DeletedBlogPosts.Count);
-            Assert.Equal(0, result.ChangeSet.InsertedBlogPosts.Count);
-            Assert.Equal(expectedUpdatedBlogPosts, result.ChangeSet.UpdatedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Equal(expectedUpdatedBlogPosts, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
 
         [Fact]
@@ -210,7 +210,7 @@ namespace Blaven.Synchronization.Tests
 
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
-            var updatedPost = result.ChangeSet.UpdatedBlogPosts.First();
+            var updatedPost = result.BlogPostsChanges.UpdatedBlogPosts.First();
 
             Assert.Equal(BlogPostTestData.DefaultTagCount, dataStoragePost.Tags.Count());
             Assert.Equal(UpdatedTagCount, updatedPost.Tags.Count());
@@ -241,9 +241,9 @@ namespace Blaven.Synchronization.Tests
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-            Assert.Equal(0, result.ChangeSet.DeletedBlogPosts.Count);
-            Assert.Equal(0, result.ChangeSet.InsertedBlogPosts.Count);
-            Assert.Equal(expectedUpdatedBlogPosts, result.ChangeSet.UpdatedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Equal(expectedUpdatedBlogPosts, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
 
         [Fact]
@@ -267,9 +267,9 @@ namespace Blaven.Synchronization.Tests
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey2);
 
-            Assert.Equal(0, result.ChangeSet.DeletedBlogPosts.Count);
-            Assert.Equal(0, result.ChangeSet.InsertedBlogPosts.Count);
-            Assert.Equal(0, result.ChangeSet.UpdatedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Equal(0, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
 
         [Theory]
@@ -295,6 +295,72 @@ namespace Blaven.Synchronization.Tests
             bool isExpectedNull = expectNotNull ? (result.BlogMeta != null) : (result.BlogMeta == null);
 
             Assert.True(isExpectedNull);
+        }
+
+        [Fact]
+        public async Task UpdateAll_BlogSourceInsertedAndUpdatedPostsWithMultipleBlogKeys_ReturnsAllChanges()
+        {
+            // Arrange
+            var dataStoragePosts1 = BlogPostTestData.CreateCollection(
+                start: 0,
+                count: 4,
+                blogKey: BlogMetaTestData.BlogKey1);
+            var dataStoragePosts2 = BlogPostTestData.CreateCollection(
+                start: 3,
+                count: 4,
+                blogKey: BlogMetaTestData.BlogKey2);
+            var dataStoragePosts3 = BlogPostTestData.CreateCollection(
+                start: 6,
+                count: 4,
+                blogKey: BlogMetaTestData.BlogKey3);
+
+            var blogSourcePosts1 = BlogPostTestData.CreateCollection(
+                start: 2,
+                count: 4,
+                blogKey: BlogMetaTestData.BlogKey1,
+                hashPrefix: "CHANGED_");
+            var blogSourcePosts2 = BlogPostTestData.CreateCollection(
+                start: 5,
+                count: 4,
+                blogKey: BlogMetaTestData.BlogKey2,
+                hashPrefix: "CHANGED_");
+            var blogSourcePosts3 = BlogPostTestData.CreateCollection(
+                start: 8,
+                count: 4,
+                blogKey: BlogMetaTestData.BlogKey3,
+                hashPrefix: "CHANGED_");
+
+            var service =
+                BlogSyncServiceTestFactory.CreateWithData(
+                    blogSourcePosts: dataStoragePosts1.Concat(dataStoragePosts2).Concat(dataStoragePosts3),
+                    dataStoragePosts: blogSourcePosts1.Concat(blogSourcePosts2).Concat(blogSourcePosts3));
+
+            // Act
+            var results = await service.UpdateAll();
+
+            // Assert
+            var testDataBlogKeys = BlogSettingTestData.CreateCollection().Select(x => x.BlogKey).OrderBy(x => x).ToList();
+            var resultBlogKeys = results.Select(x => x.BlogKey).OrderBy(x => x).ToList();
+
+            var result1 = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey1);
+            var result2 = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey2);
+            var result3 = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey3);
+
+            bool resultBlogKeysReferenceEquals = resultBlogKeys.SequenceEqual(testDataBlogKeys);
+
+            Assert.True(resultBlogKeysReferenceEquals);
+
+            Assert.Equal(2, result1.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Equal(2, result1.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Equal(2, result1.BlogPostsChanges.UpdatedBlogPosts.Count);
+
+            Assert.Equal(2, result2.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Equal(2, result2.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Equal(2, result2.BlogPostsChanges.UpdatedBlogPosts.Count);
+
+            Assert.Equal(2, result3.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Equal(2, result3.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Equal(2, result3.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
     }
 }

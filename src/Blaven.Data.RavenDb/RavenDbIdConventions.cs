@@ -2,7 +2,7 @@
 
 using Raven.Client;
 
-namespace Blaven.Data.RavenDb2
+namespace Blaven.Data.RavenDb
 {
     public static class RavenDbIdConventions
     {
@@ -38,7 +38,7 @@ namespace Blaven.Data.RavenDb2
             {
                 throw new ArgumentNullException(nameof(documentStore));
             }
-            
+
             documentStore.Conventions.RegisterIdConventions<BlogMeta>(meta => GetBlogMetaId(meta.BlogKey));
             documentStore.Conventions.RegisterIdConventions<BlogPost>(
                 post => GetBlogPostId(post.BlogKey, post.BlavenId));

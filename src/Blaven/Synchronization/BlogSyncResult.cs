@@ -18,16 +18,16 @@ namespace Blaven.Synchronization
 
         public BlogMeta BlogMeta { get; private set; }
 
-        public BlogSyncChangeSet ChangeSet { get; private set; }
+        public BlogSyncPostsChangeSet BlogPostsChanges { get; private set; }
 
         public TimeSpan Elapsed { get; internal set; }
 
         public double ElapsedMs => this.Elapsed.TotalMilliseconds;
 
-        internal void OnDataUpdated(BlogMeta blogMeta, BlogSyncChangeSet changeSet)
+        internal void OnDataUpdated(BlogMeta blogMeta, BlogSyncPostsChangeSet changeSet)
         {
             this.BlogMeta = blogMeta;
-            this.ChangeSet = changeSet;
+            this.BlogPostsChanges = changeSet;
         }
     }
 }

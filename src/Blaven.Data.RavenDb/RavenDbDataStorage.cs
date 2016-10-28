@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Blaven.Data.RavenDb2.Indexes;
+using Blaven.Data.RavenDb.Indexes;
 using Blaven.Synchronization;
 using Raven.Client;
 
-namespace Blaven.Data.RavenDb2
+namespace Blaven.Data.RavenDb
 {
     public class RavenDbDataStorage : IDataStorage
     {
@@ -44,7 +44,9 @@ namespace Blaven.Data.RavenDb2
             }
         }
 
-        public async Task<IReadOnlyList<BlogPostBase>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt = null)
+        public async Task<IReadOnlyList<BlogPostBase>> GetBlogPosts(
+            BlogSetting blogSetting,
+            DateTime? lastUpdatedAt = null)
         {
             if (blogSetting == null)
             {
@@ -58,7 +60,8 @@ namespace Blaven.Data.RavenDb2
                         session.Query<BlogPostHead, BlogPostsIndex>()
                             .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
                             .Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
-                            .AsProjection<BlogPostBase>()
+                            .OrderByDescending(x => x.PublishedAt)
+                            .ProjectFromIndexFieldsInto<BlogPostBase>()
                             .ToListAllAsync();
 
                 return posts.ToReadOnlyList();
@@ -98,7 +101,7 @@ namespace Blaven.Data.RavenDb2
             }
         }
 
-        public async Task SaveChanges(BlogSetting blogSetting, BlogSyncChangeSet changeSet)
+        public async Task SaveChanges(BlogSetting blogSetting, BlogSyncPostsChangeSet changeSet)
         {
             if (blogSetting == null)
             {
@@ -135,7 +138,9 @@ namespace Blaven.Data.RavenDb2
             }
         }
 
-        private static async Task InsertOrUpdatePosts(IAsyncDocumentSession session, IEnumerable<BlogPost> insertedOrUpdatedPosts)
+        private static async Task InsertOrUpdatePosts(
+            IAsyncDocumentSession session,
+            IEnumerable<BlogPost> insertedOrUpdatedPosts)
         {
             foreach (var post in insertedOrUpdatedPosts)
             {

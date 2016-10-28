@@ -92,9 +92,13 @@ namespace Blaven.Tests
         public static IReadOnlyList<BlogPost> CreateCollection(
             int start,
             int count,
-            string blogKey = BlogMetaTestData.BlogKey)
+            string blogKey = BlogMetaTestData.BlogKey,
+            string hashPrefix = null)
         {
-            var posts = Enumerable.Range(start, count).Select(x => Create(blogKey, x)).ToReadOnlyList();
+            var posts =
+                Enumerable.Range(start, count)
+                    .Select(x => Create(blogKey: blogKey, index: x, hashPrefix: hashPrefix))
+                    .ToReadOnlyList();
             return posts;
         }
 

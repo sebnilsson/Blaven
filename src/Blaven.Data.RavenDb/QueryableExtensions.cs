@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Raven.Client;
 
-namespace Blaven.Data.RavenDb2
+namespace Blaven.Data.RavenDb
 {
     public static class QueryableExtensions
     {

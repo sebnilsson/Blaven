@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Blaven.Data.RavenDb2.Indexes;
+using Blaven.Data.RavenDb.Indexes;
+
 using Raven.Client;
 using Raven.Client.Linq;
 
-namespace Blaven.Data.RavenDb2
+namespace Blaven.Data.RavenDb
 {
     public class RavenDbRepository : IRepository
     {
@@ -27,7 +28,7 @@ namespace Blaven.Data.RavenDb2
         {
             using (var session = this.DocumentStore.OpenSession())
             {
-                var metas = session.Query<BlogMeta>();
+                var metas = session.Query<BlogMeta>().OrderBy(x => x.Name);
                 return metas;
             }
         }
@@ -82,9 +83,10 @@ namespace Blaven.Data.RavenDb2
             using (var session = this.DocumentStore.OpenAsyncSession())
             {
                 var post =
-                    await session.Query<BlogPost, BlogPostsIndex>()
-                        .OrderBy(x => x.PublishedAt)
-                        .FirstOrDefaultAsync(x => x.BlogKey == blogKey && x.SourceId == sourceId);
+                    await
+                        session.Query<BlogPost, BlogPostsIndex>()
+                            .OrderBy(x => x.PublishedAt)
+                            .FirstOrDefaultAsync(x => x.BlogKey == blogKey && x.SourceId == sourceId);
                 return post;
             }
         }
@@ -98,7 +100,10 @@ namespace Blaven.Data.RavenDb2
 
             using (var session = this.DocumentStore.OpenSession())
             {
-                var archive = session.Query<BlogArchiveItem, ArchiveCountIndex>().Where(x => x.BlogKey.In(blogKeys));
+                var archive =
+                    session.Query<BlogArchiveItem, ArchiveCountIndex>()
+                        .Where(x => x.BlogKey.In(blogKeys))
+                        .OrderByDescending(x => x.Date);
                 return archive;
             }
         }
@@ -112,7 +117,8 @@ namespace Blaven.Data.RavenDb2
 
             using (var session = this.DocumentStore.OpenSession())
             {
-                var tags = session.Query<BlogTagItem, TagsCountIndex>().Where(x => x.BlogKey.In(blogKeys));
+                var tags =
+                    session.Query<BlogTagItem, TagsCountIndex>().Where(x => x.BlogKey.In(blogKeys)).OrderBy(x => x.Name);
                 return tags;
             }
         }
@@ -126,7 +132,10 @@ namespace Blaven.Data.RavenDb2
 
             using (var session = this.DocumentStore.OpenSession())
             {
-                var heads = session.Query<BlogPostHead, BlogPostsIndex>().Where(x => x.BlogKey.In(blogKeys));
+                var heads =
+                    session.Query<BlogPostHead, BlogPostsIndex>()
+                        .Where(x => x.BlogKey.In(blogKeys))
+                        .OrderByDescending(x => x.PublishedAt);
                 return heads;
             }
         }
@@ -140,7 +149,10 @@ namespace Blaven.Data.RavenDb2
 
             using (var session = this.DocumentStore.OpenSession())
             {
-                var posts = session.Query<BlogPost, BlogPostsIndex>().Where(x => x.BlogKey.In(blogKeys));
+                var posts =
+                    session.Query<BlogPost, BlogPostsIndex>()
+                        .Where(x => x.BlogKey.In(blogKeys))
+                        .OrderByDescending(x => x.PublishedAt);
                 return posts;
             }
         }
@@ -161,8 +173,9 @@ namespace Blaven.Data.RavenDb2
                     session.Query<BlogPost, BlogPostsIndex>()
                         .Where(
                             x =>
-                            x.BlogKey.In(blogKeys) && x.PublishedAt >= archiveDateStart
-                            && x.PublishedAt < archiveDateEnd);
+                                x.BlogKey.In(blogKeys) && x.PublishedAt >= archiveDateStart
+                                && x.PublishedAt < archiveDateEnd)
+                        .OrderByDescending(x => x.PublishedAt);
                 return posts;
             }
         }
@@ -182,7 +195,8 @@ namespace Blaven.Data.RavenDb2
             {
                 var posts =
                     session.Query<BlogPost, BlogPostsIndex>()
-                        .Where(x => x.BlogKey.In(blogKeys) && x.Tags.Any(tag => tag == tagName));
+                        .Where(x => x.BlogKey.In(blogKeys) && x.Tags.Any(tag => tag == tagName))
+                        .OrderByDescending(x => x.PublishedAt);
                 return posts;
             }
         }

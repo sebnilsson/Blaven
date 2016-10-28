@@ -4,7 +4,7 @@ using System.Linq;
 using Raven.Abstractions.Indexing;
 using Raven.Client.Indexes;
 
-namespace Blaven.Data.RavenDb2.Indexes
+namespace Blaven.Data.RavenDb.Indexes
 {
     public class BlogPostsIndex : AbstractIndexCreationTask<BlogPost, BlogPost>
     {
@@ -12,7 +12,6 @@ namespace Blaven.Data.RavenDb2.Indexes
         {
             this.Map = posts => from post in posts
                                 where post.PublishedAt > DateTime.MinValue
-                                orderby post.PublishedAt descending
                                 select
                                     new BlogPost
                                         {

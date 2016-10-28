@@ -7,9 +7,9 @@ namespace Blaven.Synchronization
     [DebuggerDisplay(
          "BlogKey={BlogKey}, Inserted={InsertedBlogPosts.Count}, Updated={UpdatedBlogPosts.Count}, Deleted={DeletedBlogPosts.Count}"
      )]
-    public class BlogSyncChangeSet : BlogKeyItemBase
+    public class BlogSyncPostsChangeSet : BlogKeyItemBase
     {
-        public BlogSyncChangeSet(string blogKey)
+        public BlogSyncPostsChangeSet(string blogKey)
         {
             if (blogKey == null)
             {

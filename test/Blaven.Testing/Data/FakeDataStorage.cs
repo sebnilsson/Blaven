@@ -53,7 +53,7 @@ namespace Blaven.Data.Tests
             return Task.CompletedTask;
         }
 
-        public Task SaveChanges(BlogSetting blogSetting, BlogSyncChangeSet changeSet)
+        public Task SaveChanges(BlogSetting blogSetting, BlogSyncPostsChangeSet changeSet)
         {
             this.OnSaveChangesRun?.Invoke(this, blogSetting.BlogKey);
 

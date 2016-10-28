@@ -22,8 +22,7 @@ namespace Blaven.Data.RavenDb.Tests
                                             {
                                                 DataDirectory = path,
                                                 RunInMemory = true,
-                                                RunInUnreliableYetFastModeThatIsNotSuitableForProduction
-                                                    = true,
+                                                RunInUnreliableYetFastModeThatIsNotSuitableForProduction = true,
                                                 MaxPageSize = 1024
                                             },
                                         RunInMemory = true

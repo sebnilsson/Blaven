@@ -3,7 +3,7 @@ using System.Linq;
 
 using Raven.Client.Indexes;
 
-namespace Blaven.Data.RavenDb2.Indexes
+namespace Blaven.Data.RavenDb.Indexes
 {
     public class ArchiveCountIndex : AbstractIndexCreationTask<BlogPost, BlogArchiveItem>
     {
@@ -17,14 +17,13 @@ namespace Blaven.Data.RavenDb2.Indexes
             this.Reduce = results => from result in results
                                      group result by new { result.BlogKey, result.Date }
                                      into g
-                                     orderby g.Key.Date descending
                                      select
-                                         new BlogArchiveItem
-                                             {
-                                                 BlogKey = g.Key.BlogKey,
-                                                 Date = g.Key.Date,
-                                                 Count = g.Sum(x => x.Count)
-                                             };
+                                     new BlogArchiveItem
+                                         {
+                                             BlogKey = g.Key.BlogKey,
+                                             Date = g.Key.Date,
+                                             Count = g.Sum(x => x.Count)
+                                         };
         }
     }
 }
