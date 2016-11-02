@@ -53,6 +53,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.EntityFramework
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.RavenDb2.Tests", "test\Blaven.Data.RavenDb.Tests\Blaven.Data.RavenDb2.Tests.csproj", "{B5A6DD6A-6B5D-4A1F-B5E9-FBAE6754D7DF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembly Infos", "Assembly Infos", "{72D8C0F6-F9F0-4524-8363-8A7C7A3888C1}"
+	ProjectSection(SolutionItems) = preProject
+		src\Blaven\Properties\AssemblyInfo.cs = src\Blaven\Properties\AssemblyInfo.cs
+		src\Blaven.BlogSources.Blogger\Properties\AssemblyInfo.cs = src\Blaven.BlogSources.Blogger\Properties\AssemblyInfo.cs
+		src\Blaven.Data.EntityFramework\Properties\AssemblyInfo.cs = src\Blaven.Data.EntityFramework\Properties\AssemblyInfo.cs
+		src\Blaven.Data.EntityFramework.PostgreSql\Properties\AssemblyInfo.cs = src\Blaven.Data.EntityFramework.PostgreSql\Properties\AssemblyInfo.cs
+		src\Blaven.Data.RavenDb\Properties\AssemblyInfo.cs = src\Blaven.Data.RavenDb\Properties\AssemblyInfo.cs
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

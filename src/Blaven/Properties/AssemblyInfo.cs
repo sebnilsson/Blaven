@@ -1,19 +1,17 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Blaven")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Synchronize blog-data from external services to your own data-storage")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Sebastian Nilsson")]
 [assembly: AssemblyProduct("Blaven")]
 [assembly: AssemblyCopyright("Copyright © Sebastian Nilsson 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-//[assembly: NeutralResourcesLanguage("en")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -26,9 +24,9 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.5.0.0")] // .NET
-[assembly: AssemblyFileVersion("0.5.0.0")] // Windows Explorer
-[assembly: AssemblyInformationalVersion("0.5.0")] // Nuget
+[assembly: AssemblyVersion("0.1.0.0")] // .NET
+[assembly: AssemblyFileVersion("0.1.0.0")] // Windows Explorer
+[assembly: AssemblyInformationalVersion("0.1.0")] // Nuget
 
 [assembly: InternalsVisibleTo("Blaven.Tests")]
 [assembly: InternalsVisibleTo("Blaven.Testing")]
