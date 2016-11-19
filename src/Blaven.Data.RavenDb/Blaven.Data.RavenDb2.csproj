@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;NET46</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;NET46;RAVENDB2</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="DocumentConventionExtensions.cs" />
     <Compile Include="Indexes\ArchiveCountIndex.cs" />
+    <Compile Include="Indexes\BlogPostTagsIndex.cs" />
     <Compile Include="Indexes\BlogPostsIndex.cs" />
     <Compile Include="Indexes\SearchBlogPostsIndex.cs" />
     <Compile Include="Indexes\TagsCountIndex.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="RavenDbDataStorage.cs" />
     <Compile Include="RavenDbIdConventions.cs" />
     <Compile Include="RavenDbinitializer.cs" />
+    <Compile Include="RavenDbInitializerException.cs" />
     <Compile Include="RavenDbRepository.cs" />
   </ItemGroup>
   <ItemGroup>

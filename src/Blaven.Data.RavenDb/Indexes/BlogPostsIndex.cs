@@ -21,7 +21,7 @@ namespace Blaven.Data.RavenDb.Indexes
                                         BlogPostTags = post.BlogPostTags,
                                         UpdatedAt = post.UpdatedAt
                                     };
-
+            
             this.Index(x => x.SourceId, FieldIndexing.NotAnalyzed);
         }
     }

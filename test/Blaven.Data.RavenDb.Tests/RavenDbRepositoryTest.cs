@@ -445,7 +445,32 @@ namespace Blaven.Data.RavenDb.Tests
             // Assert
             bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
-            bool allPostsContainsTag = posts.All(x => x.TagTexts.Contains(tag));
+            bool allPostsContainsTag = posts.All(x => x.TagTexts.Contains(tag, StringComparer.InvariantCultureIgnoreCase));
+
+            Assert.True(allPostsMatchBlogKey);
+            Assert.True(allHasBlogPostFieldValues);
+            Assert.True(allPostsContainsTag);
+        }
+
+        [Theory]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
+        public void ListPostsByTag_ExistingBlogKeyWithWrongCasing_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
+        {
+            // Arrange
+            var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
+
+            var tag = BlogPostTestData.CreatePostTag(1).ToUpperInvariant();
+
+            // Act
+            var postQuery = repository.ListPostsByTag(new[] { BlogMetaTestData.BlogKey }, tag);
+
+            var posts = postQuery.Skip(0).Take(100).ToList();
+
+            // Assert
+            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
+            bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
+            bool allPostsContainsTag = posts.All(x => x.TagTexts.Contains(tag, StringComparer.InvariantCultureIgnoreCase));
 
             Assert.True(allPostsMatchBlogKey);
             Assert.True(allHasBlogPostFieldValues);

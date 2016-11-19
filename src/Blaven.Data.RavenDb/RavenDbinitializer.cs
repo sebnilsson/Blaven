@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -19,6 +18,18 @@ namespace Blaven.Data.RavenDb
                 throw new ArgumentNullException(nameof(documentStore));
             }
 
+            try
+            {
+                await InitializeInternal(documentStore);
+            }
+            catch (Exception ex)
+            {
+                throw new RavenDbInitializerException($"Failed to initialize RavenDB: {ex.Message}", ex);
+            }
+        }
+
+        private static async Task InitializeInternal(IDocumentStore documentStore)
+        {
             documentStore.Initialize();
 
             RavenDbIdConventions.Init(documentStore);

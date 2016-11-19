@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.Data.RavenDb.Indexes;
-
 using Raven.Client;
 using Raven.Client.Linq;
 
@@ -194,8 +193,9 @@ namespace Blaven.Data.RavenDb
             using (var session = this.documentStore.OpenSession())
             {
                 var posts =
-                    session.Query<BlogPost, BlogPostsIndex>()
-                        .Where(x => x.BlogKey.In(blogKeys) && x.TagTexts.Any(tag => tag == tagName))
+                    session.Query<BlogPostTagsIndex.Result, BlogPostTagsIndex>()
+                        .Where(x => x.BlogKey.In(blogKeys) && x.TagText == tagName)
+                        .OfType<BlogPost>()
                         .OrderByDescending(x => x.PublishedAt);
                 return posts;
             }
@@ -224,8 +224,14 @@ namespace Blaven.Data.RavenDb
 
             using (var session = this.documentStore.OpenSession())
             {
-                var posts =
-                    session.Advanced.LuceneQuery<BlogPost, SearchBlogPostsIndex>().Where(whereClause).AsQueryable();
+                var posts = session.Advanced
+#if RAVENDB2
+                    .LuceneQuery<BlogPost, SearchBlogPostsIndex>()
+#else
+                    .DocumentQuery<BlogPost, SearchBlogPostsIndex>()
+#endif
+                    .Where(whereClause).AsQueryable();
+
                 return posts;
             }
         }

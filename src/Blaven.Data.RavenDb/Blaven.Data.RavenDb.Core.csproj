@@ -37,6 +37,7 @@
     <Compile Include="DocumentConventionExtensions.cs" />
     <Compile Include="Indexes\ArchiveCountIndex.cs" />
     <Compile Include="Indexes\BlogPostsIndex.cs" />
+    <Compile Include="Indexes\BlogPostTagsIndex.cs" />
     <Compile Include="Indexes\SearchBlogPostsIndex.cs" />
     <Compile Include="Indexes\TagsCountIndex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -44,6 +45,7 @@
     <Compile Include="RavenDbDataStorage.cs" />
     <Compile Include="RavenDbIdConventions.cs" />
     <Compile Include="RavenDbinitializer.cs" />
+    <Compile Include="RavenDbInitializerException.cs" />
     <Compile Include="RavenDbRepository.cs" />
   </ItemGroup>
   <ItemGroup>

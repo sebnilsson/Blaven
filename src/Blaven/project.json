@@ -21,7 +21,7 @@
   "dependencies": {
     "System.Collections.Concurrent": "4.3.0",
     "System.Diagnostics.Debug": "4.3.0",
-    "System.Globalization.Extensions": "4.3.0",
+    "System.Globalization.Extensions": "4.0.1",
     "System.Linq.Queryable": "4.3.0",
     "System.Text.RegularExpressions": "4.3.0",
     "System.Threading": "4.3.0"
