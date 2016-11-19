@@ -18,8 +18,10 @@ namespace Blaven.Synchronization.Tests
         {
             // Arrange
             var blogSource = new Mock<IBlogSource>();
-            blogSource.Setup(x => x.GetMeta(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>())).ReturnsAsync(null);
-            blogSource.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>())).ReturnsAsync(null);
+            blogSource.Setup(x => x.GetMeta(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .ReturnsAsync((BlogMeta)null);
+            blogSource.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .ReturnsAsync((IReadOnlyList<BlogPost>)null);
 
             var service = BlogSyncServiceTestFactory.Create(blogSource: blogSource.Object);
 
@@ -60,7 +62,8 @@ namespace Blaven.Synchronization.Tests
         {
             // Arrange
             var dataStorage = new Mock<IDataStorage>();
-            dataStorage.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>())).ReturnsAsync(null);
+            dataStorage.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .ReturnsAsync((IReadOnlyList<BlogPostBase>)null);
 
             var service = BlogSyncServiceTestFactory.Create(dataStorage: dataStorage.Object);
 

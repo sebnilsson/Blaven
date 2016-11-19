@@ -1,6 +1,6 @@
 ﻿{
   "dependencies": {
-    "RavenDB.Client": "3.0.30155"
+    "RavenDB.Client": "3.5.1"
   },
   "frameworks": {
     "net46": {}

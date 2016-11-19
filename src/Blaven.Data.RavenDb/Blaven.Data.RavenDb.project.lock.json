@@ -3,7 +3,7 @@
   "version": 1,
   "targets": {
     ".NETFramework,Version=v4.6": {
-      "RavenDB.Client/3.0.30155": {
+      "RavenDB.Client/3.5.1": {
         "frameworkAssemblies": [
           "System.ComponentModel.Composition"
         ],
@@ -16,7 +16,7 @@
           "lib/net45/Raven.Client.Lightweight.dll": {}
         }
       },
-      "System.Collections.Concurrent/4.0.12": {
+      "System.Collections.Concurrent/4.3.0": {
         "frameworkAssemblies": [
           "System"
         ],
@@ -27,7 +27,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Diagnostics.Debug/4.0.11": {
+      "System.Diagnostics.Debug/4.3.0": {
         "frameworkAssemblies": [
           "System"
         ],
@@ -38,7 +38,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Globalization.Extensions/4.0.1": {
+      "System.Globalization.Extensions/4.3.0": {
         "frameworkAssemblies": [
           "mscorlib"
         ],
@@ -59,7 +59,7 @@
           }
         }
       },
-      "System.Linq.Queryable/4.0.1": {
+      "System.Linq.Queryable/4.3.0": {
         "frameworkAssemblies": [
           "System.Core"
         ],
@@ -70,7 +70,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Text.RegularExpressions/4.1.0": {
+      "System.Text.RegularExpressions/4.3.0": {
         "frameworkAssemblies": [
           "System"
         ],
@@ -81,7 +81,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Threading/4.0.11": {
+      "System.Threading/4.3.0": {
         "frameworkAssemblies": [
           "System",
           "System.Core"
@@ -95,7 +95,7 @@
       }
     },
     ".NETFramework,Version=v4.6/win": {
-      "RavenDB.Client/3.0.30155": {
+      "RavenDB.Client/3.5.1": {
         "frameworkAssemblies": [
           "System.ComponentModel.Composition"
         ],
@@ -108,7 +108,7 @@
           "lib/net45/Raven.Client.Lightweight.dll": {}
         }
       },
-      "System.Collections.Concurrent/4.0.12": {
+      "System.Collections.Concurrent/4.3.0": {
         "frameworkAssemblies": [
           "System"
         ],
@@ -119,7 +119,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Diagnostics.Debug/4.0.11": {
+      "System.Diagnostics.Debug/4.3.0": {
         "frameworkAssemblies": [
           "System"
         ],
@@ -130,7 +130,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Globalization.Extensions/4.0.1": {
+      "System.Globalization.Extensions/4.3.0": {
         "frameworkAssemblies": [
           "mscorlib"
         ],
@@ -141,7 +141,7 @@
           "runtimes/win/lib/net46/System.Globalization.Extensions.dll": {}
         }
       },
-      "System.Linq.Queryable/4.0.1": {
+      "System.Linq.Queryable/4.3.0": {
         "frameworkAssemblies": [
           "System.Core"
         ],
@@ -152,7 +152,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Text.RegularExpressions/4.1.0": {
+      "System.Text.RegularExpressions/4.3.0": {
         "frameworkAssemblies": [
           "System"
         ],
@@ -163,7 +163,7 @@
           "lib/net45/_._": {}
         }
       },
-      "System.Threading/4.0.11": {
+      "System.Threading/4.3.0": {
         "frameworkAssemblies": [
           "System",
           "System.Core"
@@ -178,27 +178,34 @@
     }
   },
   "libraries": {
-    "RavenDB.Client/3.0.30155": {
-      "sha512": "ReRbMmV7w/v7vATlolVHf5xyQTMrZKUL5+7N+qpHsG52bmk1xl58LQ5aNV5zeXb67ovO9+qyNwg74nrVemYVJA==",
+    "RavenDB.Client/3.5.1": {
+      "sha512": "sg7rYSt93J0thIHFnu4YYsxEG06D50e7iZFY9VJmINrssvwU/gvPF1KGZhSwjy/vNDVk0N3UKU/i4TNInrRi5A==",
       "type": "package",
-      "path": "RavenDB.Client/3.0.30155",
+      "path": "RavenDB.Client/3.5.1",
       "files": [
-        "RavenDB.Client.3.0.30155.nupkg.sha512",
+        "RavenDB.Client.3.5.1.nupkg.sha512",
         "RavenDB.Client.nuspec",
         "lib/net45/Raven.Abstractions.dll",
         "lib/net45/Raven.Abstractions.pdb",
         "lib/net45/Raven.Abstractions.xml",
         "lib/net45/Raven.Client.Lightweight.XML",
         "lib/net45/Raven.Client.Lightweight.dll",
-        "lib/net45/Raven.Client.Lightweight.pdb"
+        "lib/net45/Raven.Client.Lightweight.pdb",
+        "lib/netstandard1.3/Raven.Abstractions.dll",
+        "lib/netstandard1.3/Raven.Abstractions.pdb",
+        "lib/netstandard1.3/Raven.Client.Lightweight.deps.json",
+        "lib/netstandard1.3/Raven.Client.Lightweight.dll",
+        "lib/netstandard1.3/Raven.Client.Lightweight.pdb",
+        "lib/netstandard1.3/Sparrow.dll",
+        "lib/netstandard1.3/Sparrow.pdb"
       ]
     },
-    "System.Collections.Concurrent/4.0.12": {
-      "sha512": "2gBcbb3drMLgxlI0fBfxMA31ec6AEyYCHygGse4vxceJan8mRIWeKJ24BFzN7+bi/NFTgdIgufzb94LWO5EERQ==",
+    "System.Collections.Concurrent/4.3.0": {
+      "sha512": "ztl69Xp0Y/UXCL+3v3tEU+lIy+bvjKNUmopn1wep/a291pVPK7dxBd6T7WnlQqRog+d1a/hSsgRsmFnIBKTPLQ==",
       "type": "package",
-      "path": "System.Collections.Concurrent/4.0.12",
+      "path": "System.Collections.Concurrent/4.3.0",
       "files": [
-        "System.Collections.Concurrent.4.0.12.nupkg.sha512",
+        "System.Collections.Concurrent.4.3.0.nupkg.sha512",
         "System.Collections.Concurrent.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -259,12 +266,12 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "System.Diagnostics.Debug/4.0.11": {
-      "sha512": "w5U95fVKHY4G8ASs/K5iK3J5LY+/dLFd4vKejsnI/ZhBsWS9hQakfx3Zr7lRWKg4tAw9r4iktyvsTagWkqYCiw==",
+    "System.Diagnostics.Debug/4.3.0": {
+      "sha512": "wtg85zBbPrOo5lkGsdSlSXfy9ebeKW/3kcg6m3pA2PZaeib8gkSssMRCwqSG16hV+nAMoRZwbqzxFZT7LW7NXg==",
       "type": "package",
-      "path": "System.Diagnostics.Debug/4.0.11",
+      "path": "System.Diagnostics.Debug/4.3.0",
       "files": [
-        "System.Diagnostics.Debug.4.0.11.nupkg.sha512",
+        "System.Diagnostics.Debug.4.3.0.nupkg.sha512",
         "System.Diagnostics.Debug.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -325,12 +332,12 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "System.Globalization.Extensions/4.0.1": {
-      "sha512": "KKo23iKeOaIg61SSXwjANN7QYDr/3op3OWGGzDzz7mypx0Za0fZSeG0l6cco8Ntp8YMYkIQcAqlk8yhm5/Uhcg==",
+    "System.Globalization.Extensions/4.3.0": {
+      "sha512": "FhKmdR6MPG+pxow6wGtNAWdZh7noIOpdD5TwQ3CprzgIE1bBBoim0vbR1+AWsWjQmU7zXHgQo4TWSP6lCeiWcQ==",
       "type": "package",
-      "path": "System.Globalization.Extensions/4.0.1",
+      "path": "System.Globalization.Extensions/4.3.0",
       "files": [
-        "System.Globalization.Extensions.4.0.1.nupkg.sha512",
+        "System.Globalization.Extensions.4.3.0.nupkg.sha512",
         "System.Globalization.Extensions.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -364,12 +371,12 @@
         "runtimes/win/lib/netstandard1.3/System.Globalization.Extensions.dll"
       ]
     },
-    "System.Linq.Queryable/4.0.1": {
-      "sha512": "Yn/WfYe9RoRfmSLvUt2JerP0BTGGykCZkQPgojaxgzF2N0oPo+/AhB8TXOpdCcNlrG3VRtsamtK2uzsp3cqRVw==",
+    "System.Linq.Queryable/4.3.0": {
+      "sha512": "In1Bmmvl/j52yPu3xgakQSI0YIckPUr870w4K5+Lak3JCCa8hl+my65lABOuKfYs4ugmZy25ScFerC4nz8+b6g==",
       "type": "package",
-      "path": "System.Linq.Queryable/4.0.1",
+      "path": "System.Linq.Queryable/4.3.0",
       "files": [
-        "System.Linq.Queryable.4.0.1.nupkg.sha512",
+        "System.Linq.Queryable.4.3.0.nupkg.sha512",
         "System.Linq.Queryable.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -421,12 +428,12 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "System.Text.RegularExpressions/4.1.0": {
-      "sha512": "i88YCXpRTjCnoSQZtdlHkAOx4KNNik4hMy83n0+Ftlb7jvV6ZiZWMpnEZHhjBp6hQVh8gWd/iKNPzlPF7iyA2g==",
+    "System.Text.RegularExpressions/4.3.0": {
+      "sha512": "RpT2DA+L660cBt1FssIE9CAGpLFdFPuheB7pLpKpn6ZXNby7jDERe8Ua/Ne2xGiwLVG2JOqziiaVCGDon5sKFA==",
       "type": "package",
-      "path": "System.Text.RegularExpressions/4.1.0",
+      "path": "System.Text.RegularExpressions/4.3.0",
       "files": [
-        "System.Text.RegularExpressions.4.1.0.nupkg.sha512",
+        "System.Text.RegularExpressions.4.3.0.nupkg.sha512",
         "System.Text.RegularExpressions.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -459,6 +466,7 @@
         "ref/netcore50/ru/System.Text.RegularExpressions.xml",
         "ref/netcore50/zh-hans/System.Text.RegularExpressions.xml",
         "ref/netcore50/zh-hant/System.Text.RegularExpressions.xml",
+        "ref/netcoreapp1.1/System.Text.RegularExpressions.dll",
         "ref/netstandard1.0/System.Text.RegularExpressions.dll",
         "ref/netstandard1.0/System.Text.RegularExpressions.xml",
         "ref/netstandard1.0/de/System.Text.RegularExpressions.xml",
@@ -502,12 +510,12 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "System.Threading/4.0.11": {
-      "sha512": "N+3xqIcg3VDKyjwwCGaZ9HawG9aC6cSDI+s7ROma310GQo8vilFZa86hqKppwTHleR/G0sfOzhvgnUxWCR/DrQ==",
+    "System.Threading/4.3.0": {
+      "sha512": "/MayCVIEltqXBtXrPKVadskHubAE6SnOQpLvifR/dXEOPFRvvwJtVpwqiV101SdHSsJi9Mzb7bpHWMM0C5Hr9Q==",
       "type": "package",
-      "path": "System.Threading/4.0.11",
+      "path": "System.Threading/4.3.0",
       "files": [
-        "System.Threading.4.0.11.nupkg.sha512",
+        "System.Threading.4.3.0.nupkg.sha512",
         "System.Threading.nuspec",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
@@ -574,7 +582,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "RavenDB.Client >= 3.0.30155"
+      "RavenDB.Client >= 3.5.1"
     ],
     ".NETFramework,Version=v4.6": []
   }

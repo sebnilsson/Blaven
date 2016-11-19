@@ -19,7 +19,7 @@
     }
   },
   "dependencies": {
-    "Npgsql.EntityFrameworkCore.PostgreSQL": "1.0.2"
+    "Npgsql.EntityFrameworkCore.PostgreSQL": "1.1.0-preview1-final"
   },
   "frameworks": {
     "netstandard1.3": {

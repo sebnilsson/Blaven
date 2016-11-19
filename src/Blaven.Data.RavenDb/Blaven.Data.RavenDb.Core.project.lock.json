@@ -104,7 +104,7 @@
           "ref/netstandard1.3/_._": {}
         }
       },
-      "RavenDB.Client/3.5.0-rc-35173": {
+      "RavenDB.Client/3.5.1": {
         "type": "package",
         "dependencies": {
           "Microsoft.CSharp": "4.0.1",
@@ -1600,12 +1600,12 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "RavenDB.Client/3.5.0-rc-35173": {
-      "sha512": "od5AHWZyQqc/JmeyCh6IYlfslP9se56hlo6ttkHxKEGixR6sPyQsigyXvkxU8aK9FjrjgEaQ62CKG/wnkliQDQ==",
+    "RavenDB.Client/3.5.1": {
+      "sha512": "sg7rYSt93J0thIHFnu4YYsxEG06D50e7iZFY9VJmINrssvwU/gvPF1KGZhSwjy/vNDVk0N3UKU/i4TNInrRi5A==",
       "type": "package",
-      "path": "RavenDB.Client/3.5.0-rc-35173",
+      "path": "RavenDB.Client/3.5.1",
       "files": [
-        "RavenDB.Client.3.5.0-rc-35173.nupkg.sha512",
+        "RavenDB.Client.3.5.1.nupkg.sha512",
         "RavenDB.Client.nuspec",
         "lib/net45/Raven.Abstractions.dll",
         "lib/net45/Raven.Abstractions.pdb",
@@ -5354,7 +5354,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "RavenDB.Client >= 3.5.0-rc-35173"
+      "RavenDB.Client >= 3.5.1"
     ],
     ".NETStandard,Version=v1.3": []
   },

@@ -19,7 +19,7 @@
     }
   },
   "dependencies": {
-    "RavenDB.Client": "3.5.0-rc-35173"
+    "RavenDB.Client": "3.5.1"
   },
   "frameworks": {
     "netstandard1.3": {
