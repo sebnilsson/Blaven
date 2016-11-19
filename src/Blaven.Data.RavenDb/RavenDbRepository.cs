@@ -195,7 +195,7 @@ namespace Blaven.Data.RavenDb
             {
                 var posts =
                     session.Query<BlogPost, BlogPostsIndex>()
-                        .Where(x => x.BlogKey.In(blogKeys) && x.Tags.Any(tag => tag == tagName))
+                        .Where(x => x.BlogKey.In(blogKeys) && x.TagTexts.Any(tag => tag == tagName))
                         .OrderByDescending(x => x.PublishedAt);
                 return posts;
             }

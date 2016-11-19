@@ -13,15 +13,15 @@ namespace Blaven.Data.RavenDb.Indexes
             this.Map = posts => from post in posts
                                 where post.PublishedAt > DateTime.MinValue
                                 select
-                                    new BlogPost
-                                        {
-                                            BlogKey = post.BlogKey,
-                                            SourceId = post.SourceId,
-                                            PublishedAt = post.PublishedAt,
-                                            Tags = post.Tags,
-                                            UpdatedAt = post.UpdatedAt
+                                new BlogPost
+                                    {
+                                        BlogKey = post.BlogKey,
+                                        SourceId = post.SourceId,
+                                        PublishedAt = post.PublishedAt,
+                                        BlogPostTags = post.BlogPostTags,
+                                        UpdatedAt = post.UpdatedAt
                                     };
-            
+
             this.Index(x => x.SourceId, FieldIndexing.NotAnalyzed);
         }
     }

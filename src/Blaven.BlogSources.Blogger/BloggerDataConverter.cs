@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Blaven.BlogSources.Blogger
@@ -42,13 +43,14 @@ namespace Blaven.BlogSources.Blogger
             // Properties set by BlogSyncServiceUpdatePostsHelper: BlavenId, UrlSlug
             var blogPost = new BlogPost
                                {
-                                   Author = author,
+                                   BlogAuthor = author,
                                    Content = post.Content,
                                    Hash = GetBlogPostHash(post),
                                    PublishedAt = post.Published,
                                    SourceId = post.Id,
                                    SourceUrl = post.Url,
-                                   Tags = post.Labels ?? Enumerable.Empty<string>(),
+                                   BlogPostTags =
+                                       post.Labels?.Select(x => new BlogPostTag(x)).ToList() ?? new List<BlogPostTag>(),
                                    Title = post.Title,
                                    UpdatedAt = post.Updated
                                };

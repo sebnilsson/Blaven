@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -10,14 +6,25 @@ namespace Blaven.Data.EntityFramework
 {
     public class BlavenDbContext : DbContext
     {
-        public BlavenDbContext(DbContextOptions<BlavenDbContext> options)
+        private readonly Action<ModelBuilder> onModelCreating;
+
+        public BlavenDbContext(DbContextOptions<BlavenDbContext> options, Action<ModelBuilder> onModelCreating = null)
             : base(options)
         {
+            this.onModelCreating = onModelCreating;
         }
 
-        // TODO: Create DbBlogMeta, DbBlogPost, DbBlogPostTag
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            this.onModelCreating?.Invoke(modelBuilder);
+        }
+
+        public DbSet<BlogAuthor> BlogAuthors { get; set; }
+
         public DbSet<BlogMeta> BlogMetas { get; set; }
 
         public DbSet<BlogPost> BlogPosts { get; set; }
+
+        public DbSet<BlogPostTag> BlogPostTags { get; set; }
     }
 }

@@ -3,10 +3,12 @@
 namespace Blaven
 {
     [DebuggerDisplay(
-        "BlogKey={BlogKey}, BlavenId={BlavenId}, SourceId={SourceId}, Hash={Hash}, "
-        + "Title={Title}, Content.Length={Content.Length}")]
+         "BlogKey={BlogKey}, BlavenId={BlavenId}, SourceId={SourceId}, Hash={Hash}, "
+         + "Title={Title}, Content.Length={Content.Length}")]
     public class BlogPost : BlogPostHead
     {
+        public long Id { get; set; }
+
         public string Content { get; set; }
     }
 }

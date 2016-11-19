@@ -503,7 +503,7 @@ namespace Blaven.Tests
                 return false;
             }
 
-            bool tagsAllContainsBlogPosts = blogPosts.All(p => tags.Any(t => p.Tags.Contains(t.Name)));
+            bool tagsAllContainsBlogPosts = blogPosts.All(p => tags.Any(t => p.TagTexts.Contains(t.Name)));
             return tagsAllContainsBlogPosts;
         }
     }

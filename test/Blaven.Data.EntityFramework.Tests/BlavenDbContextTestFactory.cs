@@ -9,7 +9,6 @@ namespace Blaven.Data.EntityFramework.Tests
         {
             var serviceProvider = new ServiceCollection().AddEntityFrameworkInMemoryDatabase().BuildServiceProvider();
 
-
             var optionsBuilder = new DbContextOptionsBuilder<BlavenDbContext>();
             optionsBuilder.UseInMemoryDatabase().UseInternalServiceProvider(serviceProvider);
 

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.Synchronization;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Blaven.Data.EntityFramework
@@ -132,7 +131,7 @@ namespace Blaven.Data.EntityFramework
                     this.dbContext.BlogPosts.Add(existingPost);
                 }
 
-                existingPost.Author = post.Author;
+                existingPost.BlogAuthor = post.BlogAuthor;
                 existingPost.Content = post.Content;
                 existingPost.Hash = post.Hash;
                 existingPost.ImageUrl = post.ImageUrl;
@@ -140,7 +139,7 @@ namespace Blaven.Data.EntityFramework
                 existingPost.SourceId = post.SourceId;
                 existingPost.SourceUrl = post.SourceUrl;
                 existingPost.Summary = post.Summary;
-                existingPost.Tags = post.Tags;
+                existingPost.BlogPostTags = post.BlogPostTags;
                 existingPost.Title = post.Title;
                 existingPost.UpdatedAt = post.UpdatedAt;
                 existingPost.UrlSlug = post.UrlSlug;

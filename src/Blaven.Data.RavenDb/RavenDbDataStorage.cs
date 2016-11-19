@@ -153,7 +153,7 @@ namespace Blaven.Data.RavenDb
                     await session.StoreAsync(existingPost);
                 }
 
-                existingPost.Author = post.Author;
+                existingPost.BlogAuthor = post.BlogAuthor;
                 existingPost.Content = post.Content;
                 existingPost.Hash = post.Hash;
                 existingPost.ImageUrl = post.ImageUrl;
@@ -161,7 +161,7 @@ namespace Blaven.Data.RavenDb
                 existingPost.SourceId = post.SourceId;
                 existingPost.SourceUrl = post.SourceUrl;
                 existingPost.Summary = post.Summary;
-                existingPost.Tags = post.Tags;
+                existingPost.BlogPostTags = post.BlogPostTags;
                 existingPost.Title = post.Title;
                 existingPost.UpdatedAt = post.UpdatedAt;
                 existingPost.UrlSlug = post.UrlSlug;

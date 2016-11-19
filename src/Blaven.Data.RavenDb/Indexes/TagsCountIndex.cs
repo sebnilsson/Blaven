@@ -10,9 +10,9 @@ namespace Blaven.Data.RavenDb.Indexes
         public TagsCountIndex()
         {
             this.Map = posts => from post in posts
-                                from tagName in post.Tags
+                                from tag in post.BlogPostTags
                                 where post.PublishedAt > DateTime.MinValue
-                                select new BlogTagItem { BlogKey = post.BlogKey, Name = tagName, Count = 1, };
+                                select new BlogTagItem { BlogKey = post.BlogKey, Name = tag.Text, Count = 1, };
 
             this.Reduce = results => from result in results
                                      group result by new { result.BlogKey, Name = result.Name.ToLowerInvariant() }

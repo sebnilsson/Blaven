@@ -7,7 +7,7 @@
     <ProjectGuid>{21D9BDBE-AF87-4016-84F7-53E29179F6F7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blaven.Data.EntityFramework.Tests</RootNamespace>
+    <RootNamespace>Blaven.Data.EntityFramework</RootNamespace>
     <AssemblyName>Blaven.Data.EntityFramework.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -111,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlavenDbContextTestFactory.cs" />
+    <Compile Include="EntityFrameworkRepositoryTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +122,10 @@
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">
       <Project>{87aa2b88-6b18-4243-9f07-a890f641ae62}</Project>
       <Name>Blaven</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Blaven.Testing\Blaven.Testing.csproj">
+      <Project>{87fbf4e8-fbc4-44d4-969a-785c892aee30}</Project>
+      <Name>Blaven.Testing</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -52,17 +52,17 @@ namespace Blaven.BlogSources.Blogger.Tests
 
             Assert.NotNull(post);
             Assert.Equal(blogSetting.BlogKey, post.BlogKey);
-            Assert.Equal(BloggerTestData.AuthorId, post.Author.SourceId);
-            Assert.Equal(BloggerTestData.AuthorImageUrl, post.Author.ImageUrl);
-            Assert.Equal(BloggerTestData.AuthorDisplayName, post.Author.Name);
-            Assert.Equal(BloggerTestData.AuthorUrl, post.Author.Url);
+            Assert.Equal(BloggerTestData.AuthorId, post.BlogAuthor.SourceId);
+            Assert.Equal(BloggerTestData.AuthorImageUrl, post.BlogAuthor.ImageUrl);
+            Assert.Equal(BloggerTestData.AuthorDisplayName, post.BlogAuthor.Name);
+            Assert.Equal(BloggerTestData.AuthorUrl, post.BlogAuthor.Url);
             Assert.Equal(BloggerTestData.PostContent, post.Content);
             Assert.Equal(BloggerTestData.PostId, post.SourceId);
             Assert.Equal(BloggerTestData.PostTitle, post.Title);
             Assert.Equal(BloggerTestData.PostUrl, post.SourceUrl);
             Assert.Equal(BloggerTestData.PostPublishedAt, post.PublishedAt);
             bool tagsAreSequenceEquals =
-                BloggerTestData.PostTags.OrderBy(x => x).SequenceEqual(post.Tags.OrderBy(x => x));
+                BloggerTestData.PostTags.OrderBy(x => x).SequenceEqual(post.TagTexts.OrderBy(x => x));
             Assert.True(tagsAreSequenceEquals);
         }
 

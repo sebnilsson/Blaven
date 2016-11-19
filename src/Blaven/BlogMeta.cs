@@ -6,6 +6,8 @@ namespace Blaven
     [DebuggerDisplay("BlogKey={BlogKey}, SourceId={SourceId}, Name={Name}")]
     public class BlogMeta : BlogKeyItemBase
     {
+        public long Id { get; set; }
+
         public string Description { get; set; }
 
         public string Name { get; set; }

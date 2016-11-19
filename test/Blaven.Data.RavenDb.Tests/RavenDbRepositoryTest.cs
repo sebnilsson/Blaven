@@ -274,7 +274,7 @@ namespace Blaven.Data.RavenDb.Tests
                                 BlogKey = (i < 2) ? BlogMetaTestData.BlogKey : BlogMetaTestData.BlogKey.ToLowerInvariant(),
                                 BlavenId = BlogPostTestData.CreateBlavenId(i),
                                 PublishedAt = BlogPostTestData.TestPublishedAt,
-                                Tags = new[] { x }
+                                BlogPostTags = new List<BlogPostTag> { new BlogPostTag(x) }
                             }).ToList();
 
             var repository = GetRavenDbRepository(blogPosts: dbBlogPosts);
@@ -445,7 +445,7 @@ namespace Blaven.Data.RavenDb.Tests
             // Assert
             bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
-            bool allPostsContainsTag = posts.All(x => x.Tags.Contains(tag));
+            bool allPostsContainsTag = posts.All(x => x.TagTexts.Contains(tag));
 
             Assert.True(allPostsMatchBlogKey);
             Assert.True(allHasBlogPostFieldValues);
@@ -527,7 +527,7 @@ namespace Blaven.Data.RavenDb.Tests
             // Assert
             bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
-            bool allPostsContainsTag = posts.All(x => x.Tags.Contains(tag));
+            bool allPostsContainsTag = posts.All(x => x.TagTexts.Contains(tag));
 
             Assert.True(allPostsMatchBlogKey);
             Assert.True(allHasBlogPostFieldValues);
@@ -612,12 +612,12 @@ namespace Blaven.Data.RavenDb.Tests
 
             bool hasBlogPostBaseAllFieldValues = HasBlogPostBaseAllFieldValues(postHead);
 
-            bool hasFieldValues = hasBlogPostBaseAllFieldValues && (postHead.Author != null)
-                                  && (postHead.Author.ImageUrl != null) && (postHead.Author.Name != null)
-                                  && (postHead.Author.SourceId != null) && (postHead.Author.Url != null)
+            bool hasFieldValues = hasBlogPostBaseAllFieldValues && (postHead.BlogAuthor != null)
+                                  && (postHead.BlogAuthor.ImageUrl != null) && (postHead.BlogAuthor.Name != null)
+                                  && (postHead.BlogAuthor.SourceId != null) && (postHead.BlogAuthor.Url != null)
                                   && (postHead.ImageUrl != null) && (postHead.PublishedAt != null)
                                   && (postHead.SourceUrl != null) && (postHead.Summary != null)
-                                  && (postHead.Tags != null) && postHead.Tags.Any() && (postHead.Title != null)
+                                  && (postHead.BlogPostTags != null) && postHead.BlogPostTags.Any() && (postHead.Title != null)
                                   && (postHead.UrlSlug != null) && (postHead.UpdatedAt != null);
             return hasFieldValues;
         }

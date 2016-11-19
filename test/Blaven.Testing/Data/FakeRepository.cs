@@ -63,9 +63,9 @@ namespace Blaven.Data.Tests
         public IQueryable<BlogTagItem> ListTags(IEnumerable<string> blogKeys)
         {
             var tags = from post in this.blogPosts
-                       where blogKeys.Contains(post.BlogKey) && post.PublishedAt != null && post.Tags != null
-                       from tag in post.Tags
-                       group tag by tag
+                       where blogKeys.Contains(post.BlogKey) && post.PublishedAt != null && post.BlogPostTags != null
+                       from tag in post.BlogPostTags
+                       group tag by tag.Text
                        into g
                        select new BlogTagItem { Name = g.Key, Count = g.Count() };
             return tags.AsQueryable();
@@ -99,8 +99,8 @@ namespace Blaven.Data.Tests
             var posts =
                 this.blogPosts.Where(
                     x =>
-                        blogKeys.Contains(x.BlogKey) && x.Tags != null
-                        && x.Tags.Contains(tagName, StringComparer.InvariantCultureIgnoreCase));
+                        blogKeys.Contains(x.BlogKey) && x.BlogPostTags != null
+                        && x.TagTexts.Contains(tagName, StringComparer.InvariantCultureIgnoreCase));
             return posts.AsQueryable();
         }
 

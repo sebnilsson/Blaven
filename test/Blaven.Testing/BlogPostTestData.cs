@@ -42,25 +42,25 @@ namespace Blaven.Tests
                              {
                                  ImageUrl =
                                      TestUtility.GetTestString(
-                                         nameof(BlogPost.Author) + nameof(BlogAuthor.ImageUrl),
+                                         nameof(BlogPost.BlogAuthor) + nameof(BlogAuthor.ImageUrl),
                                          blogKey,
                                          index,
                                          isUpdate),
                                  Name =
                                      TestUtility.GetTestString(
-                                         nameof(BlogPost.Author) + nameof(BlogAuthor.Name),
+                                         nameof(BlogPost.BlogAuthor) + nameof(BlogAuthor.Name),
                                          blogKey,
                                          index,
                                          isUpdate),
                                  SourceId =
                                      TestUtility.GetTestString(
-                                         nameof(BlogPost.Author) + nameof(BlogAuthor.SourceId),
+                                         nameof(BlogPost.BlogAuthor) + nameof(BlogAuthor.SourceId),
                                          blogKey,
                                          index,
                                          isUpdate),
                                  Url =
                                      TestUtility.GetTestString(
-                                         nameof(BlogPost.Author) + nameof(BlogAuthor.Url),
+                                         nameof(BlogPost.BlogAuthor) + nameof(BlogAuthor.Url),
                                          blogKey,
                                          index,
                                          isUpdate)
@@ -70,7 +70,7 @@ namespace Blaven.Tests
 
             var blogPost = new BlogPost
                                {
-                                   Author = author,
+                                   BlogAuthor = author,
                                    BlogKey = blogKey,
                                    Content =
                                        TestUtility.GetTestString(nameof(BlogPost.Content), blogKey, index, isUpdate)
@@ -82,7 +82,7 @@ namespace Blaven.Tests
                                    SourceUrl =
                                        TestUtility.GetTestString(nameof(BlogPost.SourceUrl), blogKey, index, isUpdate),
                                    Summary = TestUtility.GetTestString(nameof(BlogPost.Summary), blogKey, index, isUpdate),
-                                   Tags = CreatePostTags(index, tagCount).ToList(),
+                                   BlogPostTags = CreatePostTags(index, tagCount).Select(x => new BlogPostTag(x)).ToList(),
                                    Title = TestUtility.GetTestString(nameof(BlogPost.Title), blogKey, index, isUpdate),
                                    UpdatedAt = updatedAtValue
                                };

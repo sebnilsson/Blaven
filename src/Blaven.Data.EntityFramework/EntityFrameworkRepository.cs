@@ -21,7 +21,8 @@ namespace Blaven.Data.EntityFramework
 
         public IQueryable<BlogMeta> GetBlogMetas()
         {
-            throw new NotImplementedException();
+            var metas = this.dbContext.BlogMetas.OrderBy(x => x.Name);
+            return metas;
         }
 
         public Task<BlogMeta> GetBlogMeta(string blogKey)

@@ -248,8 +248,8 @@ namespace Blaven.Synchronization.Tests
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
             var updatedPost = result.BlogPostsChanges.UpdatedBlogPosts.First();
 
-            Assert.Equal(BlogPostTestData.DefaultTagCount, dataStoragePost.Tags.Count());
-            Assert.Equal(UpdatedTagCount, updatedPost.Tags.Count());
+            Assert.Equal(BlogPostTestData.DefaultTagCount, dataStoragePost.BlogPostTags.Count);
+            Assert.Equal(UpdatedTagCount, updatedPost.BlogPostTags.Count);
         }
 
         [Theory]

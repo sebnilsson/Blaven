@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 
 namespace Blaven.Data.EntityFramework.PostgreSql
 {
@@ -16,10 +17,15 @@ namespace Blaven.Data.EntityFramework.PostgreSql
             var optionsBuilder = new DbContextOptionsBuilder<BlavenDbContext>();
             optionsBuilder.UseNpgsql(connectionString);
 
-            var dbContext = new BlavenDbContext(optionsBuilder.Options);
+            var dbContext = new BlavenDbContext(optionsBuilder.Options, onModelCreating: OnModelCreating);
             //dbContext.Database.EnsureCreated();
 
             return dbContext;
+        }
+
+        private static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.HasPostgresExtension("hstore");
         }
     }
 }

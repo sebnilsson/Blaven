@@ -8,7 +8,9 @@ namespace Blaven
     [DebuggerDisplay("BlogKey={BlogKey}, BlavenId={BlavenId}, SourceId={SourceId}, Hash={Hash}, Title={Title}")]
     public class BlogPostHead : BlogPostBase
     {
-        public BlogAuthor Author { get; set; } = new BlogAuthor();
+        public BlogAuthor BlogAuthor { get; set; } = new BlogAuthor();
+
+        public long BlogAuthorId { get; set; }
 
         public string ImageUrl { get; set; }
 
@@ -18,7 +20,9 @@ namespace Blaven
 
         public string Summary { get; set; }
 
-        public IEnumerable<string> Tags { get; set; } = Enumerable.Empty<string>();
+        public List<BlogPostTag> BlogPostTags { get; set; }
+
+        public IEnumerable<string> TagTexts => this.BlogPostTags?.Select(x => x.Text) ?? Enumerable.Empty<string>();
 
         public string Title { get; set; }
 
