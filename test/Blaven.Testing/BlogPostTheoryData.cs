@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.Tests;
-
-namespace Blaven.Data.RavenDb.Tests
+namespace Blaven.Tests
 {
     public static class BlogPostTheoryData
     {

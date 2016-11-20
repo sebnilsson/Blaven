@@ -78,7 +78,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlogPostTheoryData.cs" />
     <Compile Include="DocumentSessionExtensions.cs" />
     <Compile Include="DocumentStoreExtensions.cs" />
     <Compile Include="EmbeddableDocumentStoreHelper.cs" />

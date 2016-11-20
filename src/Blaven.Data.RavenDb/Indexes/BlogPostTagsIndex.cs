@@ -17,20 +17,16 @@ namespace Blaven.Data.RavenDb.Indexes
                                 new Result
                                     {
                                         BlogKey = post.BlogKey,
-                                        BlavenId = post.BlavenId,
                                         PublishedAt = post.PublishedAt,
                                         TagText = tag.Text
                                     };
-            
-            this.Index(x => x.PublishedAt, FieldIndexing.Default);
-            this.Index(x => x.TagText, FieldIndexing.Default);
+
+            this.Index(x => x.PublishedAt, FieldIndexing.NotAnalyzed);
         }
 
         public class Result
         {
             public string BlogKey { get; set; }
-
-            public string BlavenId { get; set; }
 
             public DateTime? PublishedAt { get; set; }
 

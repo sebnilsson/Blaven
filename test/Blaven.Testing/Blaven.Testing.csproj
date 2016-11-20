@@ -53,6 +53,7 @@
     <Compile Include="BlogMetaTestData.cs" />
     <Compile Include="BlogPostBaseTestData.cs" />
     <Compile Include="BlogPostTestData.cs" />
+    <Compile Include="BlogPostTheoryData.cs" />
     <Compile Include="BlogServiceTestFactory.cs" />
     <Compile Include="BlogSettingTestData.cs" />
     <Compile Include="Synchronization\BlogSyncPostsChangeSetTestData.cs" />

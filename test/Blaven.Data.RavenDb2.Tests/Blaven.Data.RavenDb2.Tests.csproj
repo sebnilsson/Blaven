@@ -113,9 +113,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Blaven.Data.RavenDb.Tests\BlogPostTheoryData.cs">
-      <Link>BlogPostTheoryData.cs</Link>
-    </Compile>
     <Compile Include="..\Blaven.Data.RavenDb.Tests\DocumentSessionExtensions.cs">
       <Link>DocumentSessionExtensions.cs</Link>
     </Compile>
