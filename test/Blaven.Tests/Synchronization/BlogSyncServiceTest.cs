@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.BlogSources;
-using Blaven.Data;
+using Blaven.DataStorage;
 using Blaven.Tests;
 using Moq;
 using Xunit;

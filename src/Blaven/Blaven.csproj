@@ -58,8 +58,8 @@
     <Compile Include="BlogTagItem.cs" />
     <Compile Include="Configuration\AppSettingsConfigService.cs" />
     <Compile Include="Configuration\AppSettingsUtility.cs" />
-    <Compile Include="Data\IDataStorage.cs" />
-    <Compile Include="Data\IRepository.cs" />
+    <Compile Include="DataStorage\IDataStorage.cs" />
+    <Compile Include="DataStorage\IRepository.cs" />
     <Compile Include="EnumerableExtensions.cs" />
     <Compile Include="IBlogPostBlavenIdProvider.cs" />
     <Compile Include="IBlogPostUrlSlugProvider.cs" />

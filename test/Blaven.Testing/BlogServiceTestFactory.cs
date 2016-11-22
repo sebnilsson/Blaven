@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.Data.Tests;
+using Blaven.DataStorage.Tests;
 
 namespace Blaven.Tests
 {

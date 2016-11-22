@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".solution-items", ".solution-items", "{20F37748-9C71-427E-86F7-11907161E7F4}"
-	ProjectSection(SolutionItems) = preProject
-		Blaven.vsmdi = Blaven.vsmdi
-		Local.testsettings = Local.testsettings
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Tests", "test\Blaven.Tests\Blaven.Tests.csproj", "{1644FBD1-085D-40E1-8B1F-CFCE1FC059AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.BlogSources.Blogger.Tests", "test\Blaven.BlogSources.Blogger.Tests\Blaven.BlogSources.Blogger.Tests.csproj", "{FFA84615-99B6-4498-B5AE-43161A364BBF}"
@@ -27,13 +21,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Testing", "test\Blav
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "RavenDb", "RavenDb", "{B6CDF2A7-13E5-4A58-8274-B105C06E9337}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.RavenDb.Core", "src\Blaven.Data.RavenDb\Blaven.Data.RavenDb.Core.csproj", "{A2A3ECDB-63FD-4F79-80B3-28B4DF4E3DEF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataStorage.RavenDb.Core", "src\Blaven.Storage.RavenDb\Blaven.DataStorage.RavenDb.Core.csproj", "{A2A3ECDB-63FD-4F79-80B3-28B4DF4E3DEF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.RavenDb.Tests", "test\Blaven.Data.RavenDb.Tests\Blaven.Data.RavenDb.Tests.csproj", "{9779E4D2-BD05-4105-96E3-D1D51CE06B00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataStorage.RavenDb.Tests", "test\Blaven.Storage.RavenDb.Tests\Blaven.DataStorage.RavenDb.Tests.csproj", "{9779E4D2-BD05-4105-96E3-D1D51CE06B00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.RavenDb", "src\Blaven.Data.RavenDb\Blaven.Data.RavenDb.csproj", "{E32D1734-8A79-42A3-863D-782A37185829}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataStorage.RavenDb", "src\Blaven.Storage.RavenDb\Blaven.DataStorage.RavenDb.csproj", "{E32D1734-8A79-42A3-863D-782A37185829}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.RavenDb2", "src\Blaven.Data.RavenDb\Blaven.Data.RavenDb2.csproj", "{19F6406F-9815-43A7-B678-325C35BE7806}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataStorage.RavenDb2", "src\Blaven.Storage.RavenDb\Blaven.DataStorage.RavenDb2.csproj", "{19F6406F-9815-43A7-B678-325C35BE7806}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{38D9EC06-6EB6-47D0-BBF2-D598C50E5917}"
 EndProject
@@ -43,24 +37,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{15F7D4B3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EntityFramework", "EntityFramework", "{A37923BC-8B25-4E38-8623-83C8F11FA5E9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.EntityFramework", "src\Blaven.Data.EntityFramework\Blaven.Data.EntityFramework.csproj", "{4F610AB0-3A9B-4F12-AA4F-9831FC5F975C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataStorage.EntityFramework", "src\Blaven.Storage.EntityFramework\Blaven.DataStorage.EntityFramework.csproj", "{4F610AB0-3A9B-4F12-AA4F-9831FC5F975C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.EntityFramework.PostgreSql", "src\Blaven.Data.EntityFramework.PostgreSql\Blaven.Data.EntityFramework.PostgreSql.csproj", "{18EB603B-BC90-4378-804B-DCD412C0717D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataStorage.EntityFramework.PostgreSql", "src\Blaven.Storage.EntityFramework.PostgreSql\Blaven.DataStorage.EntityFramework.PostgreSql.csproj", "{18EB603B-BC90-4378-804B-DCD412C0717D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A8DDACB1-A490-47C7-8F4A-E3235505D348}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.EntityFramework.Tests", "test\Blaven.Data.EntityFramework.Tests\Blaven.Data.EntityFramework.Tests.csproj", "{21D9BDBE-AF87-4016-84F7-53E29179F6F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataStorage.EntityFramework.Tests", "test\Blaven.Storage.EntityFramework.Tests\Blaven.DataStorage.EntityFramework.Tests.csproj", "{21D9BDBE-AF87-4016-84F7-53E29179F6F7}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assembly Infos", "Assembly Infos", "{72D8C0F6-F9F0-4524-8363-8A7C7A3888C1}"
-	ProjectSection(SolutionItems) = preProject
-		src\Blaven\Properties\AssemblyInfo.cs = src\Blaven\Properties\AssemblyInfo.cs
-		src\Blaven.BlogSources.Blogger\Properties\AssemblyInfo.cs = src\Blaven.BlogSources.Blogger\Properties\AssemblyInfo.cs
-		src\Blaven.Data.EntityFramework\Properties\AssemblyInfo.cs = src\Blaven.Data.EntityFramework\Properties\AssemblyInfo.cs
-		src\Blaven.Data.EntityFramework.PostgreSql\Properties\AssemblyInfo.cs = src\Blaven.Data.EntityFramework.PostgreSql\Properties\AssemblyInfo.cs
-		src\Blaven.Data.RavenDb\Properties\AssemblyInfo.cs = src\Blaven.Data.RavenDb\Properties\AssemblyInfo.cs
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataStorage.RavenDb2.Tests", "test\Blaven.Storage.RavenDb2.Tests\Blaven.DataStorage.RavenDb2.Tests.csproj", "{3D130A47-80C5-4EB2-B83F-1B458DBF1DF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Data.RavenDb2.Tests", "test\Blaven.Data.RavenDb2.Tests\Blaven.Data.RavenDb2.Tests.csproj", "{3D130A47-80C5-4EB2-B83F-1B458DBF1DF2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.DataStorage.Tests", "test\Blaven.Storage.Tests\Blaven.DataStorage.Tests.csproj", "{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -238,6 +225,18 @@ Global
 		{3D130A47-80C5-4EB2-B83F-1B458DBF1DF2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3D130A47-80C5-4EB2-B83F-1B458DBF1DF2}.Release|x86.ActiveCfg = Release|Any CPU
 		{3D130A47-80C5-4EB2-B83F-1B458DBF1DF2}.Release|x86.Build.0 = Release|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Debug|x86.Build.0 = Debug|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Release|x86.ActiveCfg = Release|Any CPU
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -261,6 +260,7 @@ Global
 		{A8DDACB1-A490-47C7-8F4A-E3235505D348} = {A37923BC-8B25-4E38-8623-83C8F11FA5E9}
 		{21D9BDBE-AF87-4016-84F7-53E29179F6F7} = {A8DDACB1-A490-47C7-8F4A-E3235505D348}
 		{3D130A47-80C5-4EB2-B83F-1B458DBF1DF2} = {38D9EC06-6EB6-47D0-BBF2-D598C50E5917}
+		{0735EBF9-1BE0-4EB3-AB68-D5AE00002C52} = {9C1102E9-D394-48B1-B7F8-75FDB107DB05}
 	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = Blaven.vsmdi

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Blaven.Data.Tests;
+using Blaven.DataStorage.Tests;
 using Xunit;
 
 namespace Blaven.Tests

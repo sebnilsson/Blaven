@@ -3,8 +3,8 @@ using System.Linq;
 
 using Blaven.BlogSources;
 using Blaven.BlogSources.Tests;
-using Blaven.Data;
-using Blaven.Data.Tests;
+using Blaven.DataStorage;
+using Blaven.DataStorage.Tests;
 using Blaven.Tests;
 
 namespace Blaven.Synchronization.Tests

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Blaven.BlogSources;
-using Blaven.Data;
+using Blaven.DataStorage;
 using Blaven.Transformers;
 
 namespace Blaven.Synchronization
