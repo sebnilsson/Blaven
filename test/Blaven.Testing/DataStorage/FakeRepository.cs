@@ -100,7 +100,7 @@ namespace Blaven.DataStorage.Tests
                 this.blogPosts.Where(
                     x =>
                         blogKeys.Contains(x.BlogKey) && x.BlogPostTags != null
-                        && x.TagTexts.Contains(tagName, StringComparer.InvariantCultureIgnoreCase));
+                        && x.TagTexts.Contains(tagName, StringComparer.OrdinalIgnoreCase));
             return posts.AsQueryable();
         }
 

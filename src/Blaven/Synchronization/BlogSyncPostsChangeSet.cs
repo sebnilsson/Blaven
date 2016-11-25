@@ -9,7 +9,7 @@ namespace Blaven.Synchronization
      )]
     public class BlogSyncPostsChangeSet : BlogKeyItemBase
     {
-        public BlogSyncPostsChangeSet(string blogKey)
+        internal BlogSyncPostsChangeSet(string blogKey)
         {
             if (blogKey == null)
             {

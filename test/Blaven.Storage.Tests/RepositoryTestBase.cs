@@ -218,6 +218,7 @@ namespace Blaven.DataStorage.Tests
 
             // Assert
             bool anyTagItems = tags.Any();
+
             Assert.False(anyTagItems);
         }
 
@@ -243,6 +244,7 @@ namespace Blaven.DataStorage.Tests
 
             // Assert
             var testTagItem = tags.FirstOrDefault(x => x.Name == "Test tag");
+
             Assert.NotNull(testTagItem);
             Assert.Equal(5, testTagItem.Count);
         }
@@ -347,6 +349,7 @@ namespace Blaven.DataStorage.Tests
 
             // Assert
             bool anyArchiveItems = archive.Any();
+
             Assert.False(anyArchiveItems);
         }
 
@@ -362,6 +365,7 @@ namespace Blaven.DataStorage.Tests
 
             // Assert
             bool anyArchiveItems = archive.Any();
+
             Assert.False(anyArchiveItems);
         }
 
@@ -380,8 +384,7 @@ namespace Blaven.DataStorage.Tests
             // Assert
             bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
-            bool allPostsContainsTag =
-                posts.All(x => x.TagTexts.Contains(tag, StringComparer.InvariantCultureIgnoreCase));
+            bool allPostsContainsTag = posts.All(x => x.TagTexts.Contains(tag, StringComparer.OrdinalIgnoreCase));
 
             Assert.True(allPostsMatchBlogKey);
             Assert.True(allHasBlogPostFieldValues);
@@ -404,8 +407,7 @@ namespace Blaven.DataStorage.Tests
             // Assert
             bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
-            bool allPostsContainsTag =
-                posts.All(x => x.TagTexts.Contains(tag, StringComparer.InvariantCultureIgnoreCase));
+            bool allPostsContainsTag = posts.All(x => x.TagTexts.Contains(tag, StringComparer.OrdinalIgnoreCase));
 
             Assert.True(allPostsMatchBlogKey);
             Assert.True(allHasBlogPostFieldValues);
@@ -423,6 +425,7 @@ namespace Blaven.DataStorage.Tests
 
             // Assert
             bool anyArchiveItems = archive.Any();
+
             Assert.False(anyArchiveItems);
         }
 
@@ -438,6 +441,7 @@ namespace Blaven.DataStorage.Tests
 
             // Assert
             bool anyArchiveItems = posts.Any();
+
             Assert.False(anyArchiveItems);
         }
 
@@ -447,6 +451,9 @@ namespace Blaven.DataStorage.Tests
             var repository = this.GetRepository(blogPosts: dbBlogPosts);
 
             string postContent = BlogPostTestData.Create(blogKey: BlogMetaTestData.BlogKey).Content;
+            postContent = postContent.Substring(
+                0,
+                postContent.IndexOf(Environment.NewLine, StringComparison.OrdinalIgnoreCase));
 
             // Act
             var posts = repository.SearchPosts(new[] { BlogMetaTestData.BlogKey }, postContent).ToList();
@@ -454,7 +461,7 @@ namespace Blaven.DataStorage.Tests
             // Assert
             bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
             bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
-            bool allPostsContainsTitle = posts.All(x => x.Content == postContent);
+            bool allPostsContainsTitle = posts.All(x => x.Content.Contains(postContent));
 
             Assert.True(allPostsMatchBlogKey);
             Assert.True(allHasBlogPostFieldValues);
@@ -503,6 +510,27 @@ namespace Blaven.DataStorage.Tests
             Assert.True(allPostsContainsTitle);
         }
 
+        public virtual void SearchPosts_ExistingBlogKeyAndUpperCaseTitle_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
+        {
+            // Arrange
+            var repository = this.GetRepository(blogPosts: dbBlogPosts);
+
+            string postTitle = BlogPostTestData.Create().Title;
+            string postTitleUpper = postTitle.ToUpperInvariant();
+
+            // Act
+            var posts = repository.SearchPosts(new[] { BlogMetaTestData.BlogKey }, postTitleUpper).ToList();
+
+            // Assert
+            bool allPostsMatchBlogKey = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey);
+            bool allHasBlogPostFieldValues = posts.All(HasBlogPostAllFieldValues);
+            bool allPostsContainsTitle = posts.All(x => x.Title == postTitle);
+
+            Assert.True(allPostsMatchBlogKey);
+            Assert.True(allHasBlogPostFieldValues);
+            Assert.True(allPostsContainsTitle);
+        }
+
         public virtual void SearchPosts_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange
@@ -513,6 +541,7 @@ namespace Blaven.DataStorage.Tests
 
             // Assert
             bool anyArchiveItems = archive.Any();
+
             Assert.False(anyArchiveItems);
         }
 

@@ -13,7 +13,7 @@ namespace Blaven.Tests
 
         public static IDictionary<string, string> CreateDictionary()
         {
-            var appSettings = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+            var appSettings = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                                   {
                                           {
                                               $"Blaven.BlogSources.{nameof(FakeBlogSource)}.Username", AppSettingsTestUsername

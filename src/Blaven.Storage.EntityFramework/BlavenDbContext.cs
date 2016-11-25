@@ -8,9 +8,20 @@ namespace Blaven.DataStorage.EntityFramework
     {
         private readonly Action<ModelBuilder> onModelCreating;
 
+        public BlavenDbContext()
+        {
+        }
+
+        public BlavenDbContext(Action<ModelBuilder> onModelCreating)
+        {
+            this.onModelCreating = onModelCreating;
+        }
+
         public BlavenDbContext(DbContextOptions<BlavenDbContext> options, Action<ModelBuilder> onModelCreating = null)
             : base(options)
         {
+            this.Options = options;
+
             this.onModelCreating = onModelCreating;
         }
 
@@ -26,5 +37,7 @@ namespace Blaven.DataStorage.EntityFramework
         public DbSet<BlogPost> BlogPosts { get; set; }
 
         public DbSet<BlogPostTag> BlogPostTags { get; set; }
+
+        internal DbContextOptions<BlavenDbContext> Options { get; }
     }
 }

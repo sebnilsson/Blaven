@@ -8,11 +8,11 @@ using Raven.Client.Listeners;
 
 namespace Blaven.DataStorage.RavenDb.Tests
 {
-    public static class EmbeddableDocumentStoreHelper
+    public static class EmbeddableDocumentStoreTestFactory
     {
         private static readonly object RavenDbInitializerLock = new object();
 
-        public static EmbeddableDocumentStore Get(string path = null, bool initIndexes = true)
+        public static EmbeddableDocumentStore Create(string path = null, bool initIndexes = true)
         {
             path = !string.IsNullOrWhiteSpace(path) ? path : $"{Guid.NewGuid()}";
 
@@ -41,13 +41,13 @@ namespace Blaven.DataStorage.RavenDb.Tests
             return documentStore;
         }
 
-        public static EmbeddableDocumentStore GetWithData(
+        public static EmbeddableDocumentStore CreateWithData(
             string path = null,
             bool initIndexes = true,
             IEnumerable<BlogMeta> blogMetas = null,
             IEnumerable<BlogPost> blogPosts = null)
         {
-            var documentStore = Get(path, initIndexes);
+            var documentStore = Create(path, initIndexes);
 
             var blogMetaList = blogMetas?.ToList() ?? new List<BlogMeta>(0);
             var blogPostList = blogPosts?.ToList() ?? new List<BlogPost>(0);

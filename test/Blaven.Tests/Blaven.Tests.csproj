@@ -8,7 +8,7 @@
     <ProjectGuid>{1644FBD1-085D-40E1-8B1F-CFCE1FC059AE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blaven</RootNamespace>
+    <RootNamespace>Blaven.Tests</RootNamespace>
     <AssemblyName>Blaven.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

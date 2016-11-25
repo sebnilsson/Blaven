@@ -274,6 +274,15 @@ namespace Blaven.DataStorage.RavenDb.Tests
         [Theory]
         [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
              MemberType = typeof(BlogPostTheoryData))]
+        public new void SearchPosts_ExistingBlogKeyAndUpperCaseTitle_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
+        {
+            // Arrange & Act & Assert
+            base.SearchPosts_ExistingBlogKeyAndUpperCaseTitle_ReturnsPosts(dbBlogPosts);
+        }
+
+        [Theory]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public new void SearchPosts_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange & Act & Assert
@@ -284,7 +293,7 @@ namespace Blaven.DataStorage.RavenDb.Tests
             IEnumerable<BlogMeta> blogMetas = null,
             IEnumerable<BlogPost> blogPosts = null)
         {
-            var documentStore = EmbeddableDocumentStoreHelper.GetWithData(blogMetas: blogMetas, blogPosts: blogPosts);
+            var documentStore = EmbeddableDocumentStoreTestFactory.CreateWithData(blogMetas: blogMetas, blogPosts: blogPosts);
 
             var repository = new RavenDbRepository(documentStore);
             return repository;

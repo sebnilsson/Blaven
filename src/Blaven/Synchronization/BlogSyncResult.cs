@@ -6,7 +6,7 @@ namespace Blaven.Synchronization
     [DebuggerDisplay("BlogKey={BlogKey}, Elapsed={Elapsed}, ElapsedMs={ElapsedMs}")]
     public class BlogSyncResult : BlogKeyItemBase
     {
-        public BlogSyncResult(string blogKey)
+        internal BlogSyncResult(string blogKey)
         {
             if (blogKey == null)
             {

@@ -35,6 +35,7 @@ namespace Blaven.DataStorage.Tests
 
             // Assert
             bool allPostsHasBlogKey2 = posts.Any() && posts.All(x => x.BlogKey == BlogMetaTestData.BlogKey2);
+
             Assert.True(allPostsHasBlogKey2);
         }
 
@@ -136,12 +137,12 @@ namespace Blaven.DataStorage.Tests
             // Arrange
             var insertedBlogPosts = BlogPostTestData.CreateCollection(start: 3, count: 5);
             var updatedBlogPosts = BlogPostTestData.CreateCollection(start: 6, count: 5);
-
-            var dataStorage = this.GetDataStorage(blogPosts: dbBlogPosts);
-            var blogSetting = BlogSettingTestData.Create(BlogMetaTestData.BlogKey);
             var changeSet = BlogSyncChangeSetTestData.CreateWithData(
                 insertedBlogPosts: insertedBlogPosts,
                 updatedBlogPosts: updatedBlogPosts);
+
+            var dataStorage = this.GetDataStorage(blogPosts: dbBlogPosts);
+            var blogSetting = BlogSettingTestData.Create(BlogMetaTestData.BlogKey);
 
             // Act
             await dataStorage.SaveChanges(blogSetting, changeSet);

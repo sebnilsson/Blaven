@@ -119,15 +119,13 @@
     <Compile Include="..\Blaven.Storage.RavenDb.Tests\DocumentStoreExtensions.cs">
       <Link>DocumentStoreExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\Blaven.Storage.RavenDb.Tests\EmbeddableDocumentStoreHelper.cs">
-      <Link>EmbeddableDocumentStoreHelper.cs</Link>
-    </Compile>
     <Compile Include="..\Blaven.Storage.RavenDb.Tests\RavenDbDataStorageTest.cs">
       <Link>RavenDbDataStorageTest.cs</Link>
     </Compile>
     <Compile Include="..\Blaven.Storage.RavenDb.Tests\RavenDbRepositoryTest.cs">
       <Link>RavenDbRepositoryTest.cs</Link>
     </Compile>
+    <Compile Include="EmbeddableDocumentStoreTestFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

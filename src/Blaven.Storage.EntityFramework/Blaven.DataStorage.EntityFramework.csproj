@@ -39,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BlavenDbContext.cs" />
+    <Compile Include="DbSetExtensions.cs" />
     <Compile Include="EntityFrameworkDataStorage.cs" />
     <Compile Include="EntityFrameworkRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

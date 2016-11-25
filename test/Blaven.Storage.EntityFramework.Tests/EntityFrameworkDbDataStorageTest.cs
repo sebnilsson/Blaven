@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -116,7 +117,9 @@ namespace Blaven.DataStorage.EntityFramework.Tests
                     as EntityFrameworkDataStorage;
 
             // Assert
-            int blogPostCount = dataStorage.DbContext.BlogPosts.Count(x => x.BlogKey == BlogMetaTestData.BlogKey);
+            int blogPostCount =
+                dataStorage.DbContext.BlogPosts.Count(
+                    x => x.BlogKey.Equals(BlogMetaTestData.BlogKey, StringComparison.OrdinalIgnoreCase));
 
             Assert.Equal(11, blogPostCount);
         }
@@ -125,16 +128,7 @@ namespace Blaven.DataStorage.EntityFramework.Tests
             IEnumerable<BlogMeta> blogMetas = null,
             IEnumerable<BlogPost> blogPosts = null)
         {
-            var dbContext = BlavenDbContextTestFactory.Create();
-
-            if (blogMetas != null)
-            {
-                dbContext.BlogMetas.AddRange(blogMetas);
-            }
-            if (blogPosts != null)
-            {
-                dbContext.BlogPosts.AddRange(blogPosts);
-            }
+            var dbContext = BlavenDbContextTestFactory.CreateWithData(blogMetas, blogPosts);
 
             var dataStorage = new EntityFrameworkDataStorage(dbContext);
             return dataStorage;

@@ -46,7 +46,7 @@ namespace Blaven.Synchronization
 
         public BlogSyncConfiguration Config { get; }
 
-        public async Task<IReadOnlyList<BlogSyncResult>> Update(params string[] blogKeys)
+        public async Task<IReadOnlyList<BlogSyncResult>> Update(params BlogKey[] blogKeys)
         {
             if (blogKeys == null)
             {
@@ -59,7 +59,7 @@ namespace Blaven.Synchronization
             return result;
         }
 
-        public async Task<IReadOnlyList<BlogSyncResult>> UpdateAll(params string[] blogKeys)
+        public async Task<IReadOnlyList<BlogSyncResult>> UpdateAll(params BlogKey[] blogKeys)
         {
             if (blogKeys == null)
             {

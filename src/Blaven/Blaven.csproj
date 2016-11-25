@@ -38,6 +38,7 @@
     <None Include="project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlogKey.cs" />
     <Compile Include="BlogPostTag.cs" />
     <Compile Include="Configuration\AppSettingsHelper.cs" />
     <Compile Include="BlavenBlogPostUrlSlugProvider.cs" />

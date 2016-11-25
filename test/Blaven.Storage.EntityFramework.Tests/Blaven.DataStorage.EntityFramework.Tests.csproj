@@ -8,7 +8,7 @@
     <ProjectGuid>{21D9BDBE-AF87-4016-84F7-53E29179F6F7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blaven.DataStorage.EntityFramework</RootNamespace>
+    <RootNamespace>Blaven.DataStorage.EntityFramework.Tests</RootNamespace>
     <AssemblyName>Blaven.DataStorage.EntityFramework.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

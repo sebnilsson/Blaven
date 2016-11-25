@@ -6,14 +6,18 @@ namespace Blaven
     [DebuggerDisplay("BlogKey={BlogKey}, Id={Id}, Name={Name}")]
     public class BlogSetting : BlogKeyItemBase
     {
-        public BlogSetting(string blogKey, string id = null, string name = null)
+        public BlogSetting(BlogKey blogKey, string id = null, string name = null)
         {
             if (blogKey == null)
             {
                 throw new ArgumentNullException(nameof(blogKey));
             }
+            if (!blogKey.HasValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(blogKey), $"{nameof(Blaven.BlogKey)} must have a value.");
+            }
 
-            this.BlogKey = blogKey;
+            this.BlogKey = blogKey.Value;
             this.Id = id;
             this.Name = name;
         }

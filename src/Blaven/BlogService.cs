@@ -36,7 +36,7 @@ namespace Blaven
             return meta;
         }
 
-        public async Task<BlogMeta> GetBlogMeta(string blogKey = null)
+        public async Task<BlogMeta> GetBlogMeta(BlogKey blogKey = null)
         {
             var ensuredBlogKey = this.blogSettings.GetEnsuredBlogKey(blogKey);
 
@@ -44,7 +44,7 @@ namespace Blaven
             return meta;
         }
 
-        public async Task<BlogPost> GetPost(string blavenId, string blogKey = null)
+        public async Task<BlogPost> GetPost(string blavenId, BlogKey blogKey = null)
         {
             if (blavenId == null)
             {
@@ -57,15 +57,20 @@ namespace Blaven
             return post;
         }
 
-        public async Task<BlogPost> GetPostBySourceId(string sourceId, string blogKey = null)
+        public async Task<BlogPost> GetPostBySourceId(string sourceId, BlogKey blogKey = null)
         {
+            if (sourceId == null)
+            {
+                throw new ArgumentNullException(nameof(sourceId));
+            }
+
             var ensuredBlogKey = this.blogSettings.GetEnsuredBlogKey(blogKey);
 
             var post = await this.repository.GetPostBySourceId(ensuredBlogKey, sourceId);
             return post;
         }
 
-        public IQueryable<BlogArchiveItem> ListArchive(params string[] blogKeys)
+        public IQueryable<BlogArchiveItem> ListArchive(params BlogKey[] blogKeys)
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
@@ -73,7 +78,7 @@ namespace Blaven
             return allArchive;
         }
 
-        public IQueryable<BlogTagItem> ListTags(params string[] blogKeys)
+        public IQueryable<BlogTagItem> ListTags(params BlogKey[] blogKeys)
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
@@ -81,7 +86,7 @@ namespace Blaven
             return allTags;
         }
 
-        public IQueryable<BlogPostHead> ListPostHeads(params string[] blogKeys)
+        public IQueryable<BlogPostHead> ListPostHeads(params BlogKey[] blogKeys)
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
@@ -89,7 +94,7 @@ namespace Blaven
             return postHeads;
         }
 
-        public IQueryable<BlogPost> ListPosts(params string[] blogKeys)
+        public IQueryable<BlogPost> ListPosts(params BlogKey[] blogKeys)
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
@@ -97,7 +102,7 @@ namespace Blaven
             return posts;
         }
 
-        public IQueryable<BlogPost> ListPostsByArchive(DateTime archiveDate, params string[] blogKeys)
+        public IQueryable<BlogPost> ListPostsByArchive(DateTime archiveDate, params BlogKey[] blogKeys)
         {
             var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
 
@@ -106,7 +111,7 @@ namespace Blaven
             return posts;
         }
 
-        public IQueryable<BlogPost> ListPostsByTag(string tagName, params string[] blogKeys)
+        public IQueryable<BlogPost> ListPostsByTag(string tagName, params BlogKey[] blogKeys)
         {
             if (tagName == null)
             {
@@ -119,7 +124,7 @@ namespace Blaven
             return posts;
         }
 
-        public IQueryable<BlogPost> Search(string search, params string[] blogKeys)
+        public IQueryable<BlogPost> Search(string search, params BlogKey[] blogKeys)
         {
             if (search == null)
             {

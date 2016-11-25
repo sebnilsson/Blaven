@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Blaven.DataStorage.RavenDb.Indexes;
-
 using Raven.Client;
 using Raven.Client.Linq;
 
@@ -213,15 +212,7 @@ namespace Blaven.DataStorage.RavenDb
                 throw new ArgumentNullException(nameof(search));
             }
 
-            string escapedSearch = search.Replace("\"", "\\\"");
-
-            var escapedBlogKeys = blogKeys.Select(key => key.Replace("\"", "\\\""));
-
-            string blogKeysValues = string.Join(" OR ", escapedBlogKeys.Select(key => $"BlogKey:\"{key}\""));
-
-            string blogKeysClause = !string.IsNullOrWhiteSpace(blogKeysValues) ? $" AND ({blogKeysValues})" : null;
-
-            string whereClause = $"Content:\"{escapedSearch}\" {blogKeysClause}";
+            var whereClause = GetWhereSearchClause(blogKeys, search);
 
             using (var session = this.documentStore.OpenSession())
             {
@@ -235,6 +226,20 @@ namespace Blaven.DataStorage.RavenDb
 
                 return posts;
             }
+        }
+
+        private static string GetWhereSearchClause(IEnumerable<string> blogKeys, string search)
+        {
+            string escapedSearch = search.Replace("\"", "\\\"").ToLowerInvariant();
+
+            var escapedBlogKeys = blogKeys.Select(key => key.Replace("\"", "\\\""));
+
+            string blogKeysValues = string.Join(" OR ", escapedBlogKeys.Select(key => $"BlogKey:\"{key}\""));
+
+            string blogKeysClause = !string.IsNullOrWhiteSpace(blogKeysValues) ? $" AND ({blogKeysValues})" : null;
+
+            string whereClause = $"Content:\"{escapedSearch}\" {blogKeysClause}";
+            return whereClause;
         }
     }
 }

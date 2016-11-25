@@ -31,12 +31,11 @@ namespace Blaven.DataStorage.EntityFramework
 
             var lastPost =
                 await
-                    this.DbContext.BlogPosts.Where(x => x.BlogKey == blogSetting.BlogKey)
-                        .OrderByDescending(x => x.UpdatedAt)
-                        .FirstOrDefaultAsync();
+                    this.DbContext.BlogPosts.OrderByDescending(x => x.UpdatedAt)
+                        .FirstOrDefaultAsync(
+                            x => x.BlogKey.Equals(blogSetting.BlogKey, StringComparison.OrdinalIgnoreCase));
 
             return lastPost?.UpdatedAt;
-
         }
 
         public async Task<IReadOnlyList<BlogPostBase>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
@@ -48,7 +47,10 @@ namespace Blaven.DataStorage.EntityFramework
 
             var posts =
                 await
-                    this.DbContext.BlogPosts.Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
+                    this.DbContext.BlogPosts.Where(
+                            x =>
+                                x.BlogKey.Equals(blogSetting.BlogKey, StringComparison.OrdinalIgnoreCase)
+                                && (lastUpdatedAt == null || x.UpdatedAt > lastUpdatedAt))
                         .OrderByDescending(x => x.PublishedAt)
                         .ToListAsync();
 
@@ -67,11 +69,14 @@ namespace Blaven.DataStorage.EntityFramework
             }
 
             var existingMeta =
-                await this.DbContext.BlogMetas.SingleOrDefaultAsync(x => x.BlogKey == blogSetting.BlogKey);
+                await
+                    this.DbContext.BlogMetas.SingleOrDefaultLocalOrSourceAsync(
+                        x => x.BlogKey.Equals(blogSetting.BlogKey, StringComparison.OrdinalIgnoreCase));
+
             if (existingMeta == null)
             {
                 existingMeta = new BlogMeta { BlogKey = blogSetting.BlogKey };
-                this.DbContext.BlogMetas.Add(existingMeta);
+                await this.DbContext.BlogMetas.AddAsync(existingMeta);
             }
 
             existingMeta.Description = blogMeta.Description;
@@ -83,6 +88,8 @@ namespace Blaven.DataStorage.EntityFramework
 
             await this.DbContext.SaveChangesAsync();
         }
+
+
 
         public async Task SaveChanges(BlogSetting blogSetting, BlogSyncPostsChangeSet changeSet)
         {
@@ -108,8 +115,11 @@ namespace Blaven.DataStorage.EntityFramework
             {
                 var existingPost =
                     await
-                        this.DbContext.BlogPosts.SingleOrDefaultAsync(
-                            x => x.BlogKey == deletedPost.BlogKey && x.BlavenId == deletedPost.BlavenId);
+                        this.DbContext.BlogPosts.SingleOrDefaultLocalOrSourceAsync(
+                            x =>
+                                x.BlogKey.Equals(deletedPost.BlogKey, StringComparison.OrdinalIgnoreCase)
+                                && x.BlavenId.Equals(deletedPost.BlavenId, StringComparison.OrdinalIgnoreCase));
+
                 if (existingPost != null)
                 {
                     this.DbContext.BlogPosts.Remove(existingPost);
@@ -123,12 +133,15 @@ namespace Blaven.DataStorage.EntityFramework
             {
                 var existingPost =
                     await
-                        this.DbContext.BlogPosts.SingleOrDefaultAsync(
-                            x => x.BlogKey == post.BlogKey && x.BlavenId == post.BlavenId);
+                        this.DbContext.BlogPosts.SingleOrDefaultLocalOrSourceAsync(
+                            x =>
+                                x.BlogKey.Equals(post.BlogKey, StringComparison.OrdinalIgnoreCase)
+                                && x.BlavenId.Equals(post.BlavenId, StringComparison.OrdinalIgnoreCase));
+
                 if (existingPost == null)
                 {
                     existingPost = new BlogPost { BlogKey = post.BlogKey, BlavenId = post.BlavenId };
-                    this.DbContext.BlogPosts.Add(existingPost);
+                    await this.DbContext.BlogPosts.AddAsync(existingPost);
                 }
 
                 existingPost.BlogAuthor = post.BlogAuthor;

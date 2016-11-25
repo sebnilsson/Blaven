@@ -18,32 +18,34 @@ namespace Blaven
             this.blogSettings = blogSettings.ToReadOnlyList();
 
             this.BlogKeys =
-                this.blogSettings.Where(x => !string.IsNullOrWhiteSpace(x?.BlogKey))
-                    .Select(x => x.BlogKey.ToLowerInvariant())
-                    .ToReadOnlyList();
+                this.blogSettings.Select(x => new BlogKey(x.BlogKey)).Where(x => x.HasValue).ToReadOnlyList();
         }
 
-        public IReadOnlyList<string> BlogKeys { get; }
+        public IReadOnlyList<BlogKey> BlogKeys { get; }
 
-        public BlogSetting GetBlogSetting(string blogKey)
+        public BlogSetting GetBlogSetting(BlogKey blogKey)
         {
             if (blogKey == null)
             {
                 throw new ArgumentNullException(nameof(blogKey));
             }
+            if (!blogKey.HasValue)
+            {
+                throw new ArgumentOutOfRangeException(nameof(blogKey), $"{nameof(BlogKey)} must have a value.");
+            }
 
             var blogSetting =
-                this.blogSettings.FirstOrDefault(x => x.BlogKey.Equals(blogKey, StringComparison.OrdinalIgnoreCase));
+                this.blogSettings.FirstOrDefault(x => x.BlogKey.Equals(blogKey.Value, StringComparison.OrdinalIgnoreCase));
             if (blogSetting == null)
             {
-                string message = $"Settings did not contain any item with key '{blogKey}'.";
+                string message = $"Settings did not contain any item with key '{blogKey.Value}'.";
                 throw new KeyNotFoundException(message);
             }
 
             return blogSetting;
         }
 
-        public string GetEnsuredBlogKey(string blogKey)
+        public BlogKey GetEnsuredBlogKey(BlogKey blogKey)
         {
             if (blogKey != null)
             {
@@ -62,15 +64,30 @@ namespace Blaven
 
         public ICollection<string> GetEnsuredBlogKeys(IEnumerable<string> blogKeys)
         {
-            var blogKeyList =
-                blogKeys?.Where(x => !string.IsNullOrWhiteSpace(x)).Select(x => x.ToLowerInvariant()).ToList();
+            var blogKeyList = blogKeys?.Select(x => new BlogKey(x));
+
+            var ensuredBlogKeys = this.GetEnsuredBlogKeys(blogKeyList);
+            return ensuredBlogKeys;
+        }
+
+        public ICollection<string> GetEnsuredBlogKeys(IEnumerable<BlogKey> blogKeys)
+        {
+            var ensuredBlogKeys =
+                this.GetEnsuredBlogKeysInternal(blogKeys).Where(x => x.HasValue).Select(x => x.Value).ToList();
+            return ensuredBlogKeys;
+        }
+
+        private IEnumerable<BlogKey> GetEnsuredBlogKeysInternal(IEnumerable<BlogKey> blogKeys)
+        {
+            var blogKeyList = blogKeys?.ToList();
 
             if (blogKeyList != null && blogKeyList.Any())
             {
                 return blogKeyList;
             }
 
-            var blogSettingsBlogKeys = this.BlogKeys.ToList();
+            var blogSettingsBlogKeys = this.BlogKeys;
+
             if (!blogSettingsBlogKeys.Any())
             {
                 string message = $"No default items found in {nameof(this.BlogKeys)}.";

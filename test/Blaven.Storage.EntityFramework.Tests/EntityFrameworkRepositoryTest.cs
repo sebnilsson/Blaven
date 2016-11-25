@@ -274,6 +274,15 @@ namespace Blaven.DataStorage.EntityFramework.Tests
         [Theory]
         [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
              MemberType = typeof(BlogPostTheoryData))]
+        public new void SearchPosts_ExistingBlogKeyAndUpperCaseTitle_ReturnsPosts(IEnumerable<BlogPost> dbBlogPosts)
+        {
+            // Arrange & Act & Assert
+            base.SearchPosts_ExistingBlogKeyAndUpperCaseTitle_ReturnsPosts(dbBlogPosts);
+        }
+
+        [Theory]
+        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
+             MemberType = typeof(BlogPostTheoryData))]
         public new void SearchPosts_NonExistingBlogKey_ReturnsEmpty(IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange & Act & Assert
@@ -284,16 +293,7 @@ namespace Blaven.DataStorage.EntityFramework.Tests
             IEnumerable<BlogMeta> blogMetas = null,
             IEnumerable<BlogPost> blogPosts = null)
         {
-            var dbContext = BlavenDbContextTestFactory.Create();
-
-            if (blogMetas != null)
-            {
-                dbContext.BlogMetas.AddRange(blogMetas);
-            }
-            if (blogPosts != null)
-            {
-                dbContext.BlogPosts.AddRange(blogPosts);
-            }
+            var dbContext = BlavenDbContextTestFactory.CreateWithData(blogMetas, blogPosts);
 
             var repository = new EntityFrameworkRepository(dbContext);
             return repository;

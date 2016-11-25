@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 
+using Raven.Abstractions.Indexing;
 using Raven.Client.Indexes;
 
 namespace Blaven.DataStorage.RavenDb.Indexes
@@ -25,7 +26,7 @@ namespace Blaven.DataStorage.RavenDb.Indexes
                              from tag in post.BlogPostTags
                              select new Result { BlogKey = post.BlogKey, Content = new object[] { tag.Text } });
 
-            this.Index(x => x.Content, Raven.Abstractions.Indexing.FieldIndexing.Analyzed);
+            this.Index(x => x.Content, FieldIndexing.Analyzed);
         }
 
         public class Result : BlogKeyItemBase

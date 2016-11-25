@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 using Xunit;
 
@@ -74,7 +75,7 @@ namespace Blaven.Tests
             var settingsHelper = GetTestBlogSettingsHelper();
 
             // Act
-            var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys: null);
+            var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys: (IEnumerable<string>)null);
 
             // Assert
             var blogSettingsBlogKeys = BlogSettingTestData.CreateCollection().Select(x => x.BlogKey);

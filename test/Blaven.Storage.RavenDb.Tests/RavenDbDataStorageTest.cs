@@ -130,7 +130,7 @@ namespace Blaven.DataStorage.RavenDb.Tests
             IEnumerable<BlogMeta> blogMetas = null,
             IEnumerable<BlogPost> blogPosts = null)
         {
-            var documentStore = EmbeddableDocumentStoreHelper.GetWithData(blogMetas: blogMetas, blogPosts: blogPosts);
+            var documentStore = EmbeddableDocumentStoreTestFactory.CreateWithData(blogMetas: blogMetas, blogPosts: blogPosts);
 
             var dataStorage = new RavenDbDataStorage(documentStore);
             return dataStorage;

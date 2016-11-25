@@ -8,7 +8,7 @@
     <ProjectGuid>{24FB1E1F-4E4F-4063-A54C-99110840C2C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blaven.BlogSources.Blogger</RootNamespace>
+    <RootNamespace>Blaven.BlogSources.Blogger.IntegrationsTests</RootNamespace>
     <AssemblyName>Blaven.BlogSources.Blogger.IntegrationsTests</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
