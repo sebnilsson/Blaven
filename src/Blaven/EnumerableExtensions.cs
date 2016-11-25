@@ -52,7 +52,7 @@ namespace Blaven
                    select item;
         }
 
-        public static IEnumerable<TSource> Paged<TSource>(this IEnumerable<TSource> source, int pageSize, int pageIndex)
+        public static IEnumerable<TSource> Paged<TSource>(this IEnumerable<TSource> source, int pageSize, int pageIndex = 0)
         {
             if (source == null)
             {
@@ -60,17 +60,6 @@ namespace Blaven
             }
 
             var paged = PagingUtility.GetPaged(source, pageSize: pageSize, pageIndex: pageIndex);
-            return paged;
-        }
-
-        public static IEnumerable<TSource> Paged<TSource>(this IEnumerable<TSource> source, int pageSize)
-        {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            var paged = source.Paged(pageSize: pageSize, pageIndex: 0);
             return paged;
         }
 

@@ -18,7 +18,23 @@ namespace Blaven.DataStorage.RavenDb
                 throw new ArgumentNullException(nameof(queryable));
             }
 
-            var result = queryable.ToListAllAsync().GetAwaiter().GetResult();
+            var result = new List<T>();
+
+            IList<T> items;
+            int i = 0;
+
+            do
+            {
+                int skipCount = PagingUtility.GetSkip(PageSize, i);
+
+                items = queryable.Skip(skipCount).Take(PageSize).ToList();
+
+                result.AddRange(items);
+
+                i++;
+            }
+            while (items.Count == PageSize);
+
             return result;
         }
 

@@ -12,7 +12,7 @@ namespace Blaven.Configuration
         private static readonly Regex AppSettingBlogIdRegex = new Regex(
                                                                   @"Blaven\.Blogs\.([^\.]+)(?:.*)",
                                                                   RegexOptions.IgnoreCase);
-
+        
         private readonly IDictionary<string, string> appSettings;
 
         public AppSettingsConfigService(IDictionary<string, string> appSettings)

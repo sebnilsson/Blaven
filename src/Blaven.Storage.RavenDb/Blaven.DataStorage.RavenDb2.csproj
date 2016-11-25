@@ -7,7 +7,7 @@
     <ProjectGuid>{19F6406F-9815-43A7-B678-325C35BE7806}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blaven.DataStorage.RavenDb2</RootNamespace>
+    <RootNamespace>Blaven.DataStorage.RavenDb</RootNamespace>
     <AssemblyName>Blaven.DataStorage.RavenDb2</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -29,7 +29,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\.release-builds\</OutputPath>
     <DefineConstants>TRACE;NET46;RAVENDB2</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>

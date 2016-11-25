@@ -28,7 +28,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\.release-builds\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -53,6 +53,7 @@
     <Compile Include="BlogService.cs" />
     <Compile Include="BlogSetting.cs" />
     <Compile Include="BlogSettingsHelper.cs" />
+    <Compile Include="QueryableExtensions.cs" />
     <Compile Include="Synchronization\BlogSyncPostsChangeSet.cs" />
     <Compile Include="Synchronization\BlogSyncPostsChangeSetHelper.cs" />
     <Compile Include="BlogSources\IBlogSource.cs" />
