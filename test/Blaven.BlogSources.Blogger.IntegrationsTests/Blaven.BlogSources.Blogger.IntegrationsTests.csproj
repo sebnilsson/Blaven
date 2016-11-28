@@ -97,7 +97,7 @@
       <Name>Blaven.BlogSources.Blogger</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">
-      <Project>{30fb0ddf-b9a6-4d40-a1d8-979a5df398ea}</Project>
+      <Project>{d4a47162-58b2-40c8-851a-f8d4ded5b936}</Project>
       <Name>Blaven</Name>
     </ProjectReference>
     <ProjectReference Include="..\Blaven.BlogSources.Blogger.Tests\Blaven.BlogSources.Blogger.Tests.csproj">

@@ -94,7 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">
-      <Project>{87aa2b88-6b18-4243-9f07-a890f641ae62}</Project>
+      <Project>{d4a47162-58b2-40c8-851a-f8d4ded5b936}</Project>
       <Name>Blaven</Name>
     </ProjectReference>
     <ProjectReference Include="..\Blaven.Testing\Blaven.Testing.csproj">

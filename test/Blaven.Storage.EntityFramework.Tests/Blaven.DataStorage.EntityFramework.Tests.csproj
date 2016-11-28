@@ -197,11 +197,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Blaven.Storage.EntityFramework\Blaven.DataStorage.EntityFramework.csproj">
-      <Project>{4f610ab0-3a9b-4f12-aa4f-9831fc5f975c}</Project>
+      <Project>{13c1c218-155a-490d-8e05-6082e755ed54}</Project>
       <Name>Blaven.DataStorage.EntityFramework</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">
-      <Project>{87aa2b88-6b18-4243-9f07-a890f641ae62}</Project>
+      <Project>{d4a47162-58b2-40c8-851a-f8d4ded5b936}</Project>
       <Name>Blaven</Name>
     </ProjectReference>
     <ProjectReference Include="..\Blaven.Storage.Tests\Blaven.DataStorage.Tests.csproj">

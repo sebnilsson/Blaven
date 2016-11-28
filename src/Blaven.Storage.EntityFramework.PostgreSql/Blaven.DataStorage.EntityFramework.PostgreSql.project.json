@@ -1,9 +1,9 @@
 ﻿{
   "dependencies": {
-    "RavenDB.Client": "3.5.1"
+    "Npgsql.EntityFrameworkCore.PostgreSQL": "1.1.0"
   },
   "frameworks": {
-    "net45": {}
+    "net452": {}
   },
   "runtimes": {
     "win": {}

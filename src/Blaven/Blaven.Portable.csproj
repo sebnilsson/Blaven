@@ -2,16 +2,19 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D4A47162-58B2-40C8-851A-F8D4DED5B936}</ProjectGuid>
+    <ProjectGuid>{87AA2B88-6B18-4243-9F07-A890F641AE62}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Blaven</RootNamespace>
-    <AssemblyName>Blaven</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <AssemblyName>Blaven.Portable</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,34 +34,31 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <!-- A reference to the entire .NET Framework is automatically included -->
+    <None Include="Blaven.Portable.project.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BlogKey.cs" />
+    <Compile Include="BlogPostTag.cs" />
+    <Compile Include="Configuration\AppSettingsHelper.cs" />
     <Compile Include="BlavenBlogPostUrlSlugProvider.cs" />
     <Compile Include="BlavenException.cs" />
     <Compile Include="BlogArchiveItem.cs" />
     <Compile Include="BlogAuthor.cs" />
-    <Compile Include="BlogKey.cs" />
     <Compile Include="BlogKeyItemBase.cs" />
     <Compile Include="BlogMeta.cs" />
     <Compile Include="BlogPost.cs" />
     <Compile Include="BlogPostBase.cs" />
     <Compile Include="BlogPostHead.cs" />
-    <Compile Include="BlogPostTag.cs" />
     <Compile Include="BlogService.cs" />
     <Compile Include="BlogSetting.cs" />
     <Compile Include="BlogSettingsHelper.cs" />
+    <Compile Include="QueryableExtensions.cs" />
+    <Compile Include="Synchronization\BlogSyncPostsChangeSet.cs" />
+    <Compile Include="Synchronization\BlogSyncPostsChangeSetHelper.cs" />
     <Compile Include="BlogSources\IBlogSource.cs" />
     <Compile Include="BlogTagItem.cs" />
     <Compile Include="Configuration\AppSettingsConfigService.cs" />
-    <Compile Include="Configuration\AppSettingsHelper.cs" />
     <Compile Include="Configuration\AppSettingsUtility.cs" />
     <Compile Include="DataStorage\IDataStorage.cs" />
     <Compile Include="DataStorage\IRepository.cs" />
@@ -70,7 +70,6 @@
     <Compile Include="PagingUtility.cs" />
     <Compile Include="PermalinkBlogPostBlavenIdProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueryableExtensions.cs" />
     <Compile Include="SourceIdBlogPostBlavenIdProvider.cs" />
     <Compile Include="Synchronization\BlogSyncBlogSourceException.cs" />
     <Compile Include="Synchronization\BlogSyncConfiguration.cs" />
@@ -78,8 +77,6 @@
     <Compile Include="Synchronization\BlogSyncDataStorageException.cs" />
     <Compile Include="Synchronization\BlogSyncDataStorageResultException.cs" />
     <Compile Include="Synchronization\BlogSyncException.cs" />
-    <Compile Include="Synchronization\BlogSyncPostsChangeSet.cs" />
-    <Compile Include="Synchronization\BlogSyncPostsChangeSetHelper.cs" />
     <Compile Include="Synchronization\BlogSyncResult.cs" />
     <Compile Include="Synchronization\BlogSyncService.cs" />
     <Compile Include="Synchronization\BlogSyncServiceMetaHelper.cs" />
@@ -90,7 +87,7 @@
     <Compile Include="Transformers\IBlogPostTransformer.cs" />
     <Compile Include="Transformers\PhraseTagsTransformer.cs" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

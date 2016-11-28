@@ -134,10 +134,10 @@ namespace Blaven.Synchronization
 
             var saveBlogMetaTask = (meta != null)
                                        ? this.Config.DataStorage.SaveBlogMeta(blogSetting, meta)
-                                       : Task.CompletedTask;
+                                       : TaskHelper.CompletedTask;
             var saveChangesTask = (changeSet != null)
                                       ? this.Config.DataStorage.SaveChanges(blogSetting, changeSet)
-                                      : Task.CompletedTask;
+                                      : TaskHelper.CompletedTask;
 
             await Task.WhenAll(saveBlogMetaTask, saveChangesTask);
         }

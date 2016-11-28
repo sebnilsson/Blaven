@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Blaven.DataStorage.RavenDb</RootNamespace>
     <AssemblyName>Blaven.DataStorage.RavenDb2</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -30,7 +30,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\..\.release-builds\</OutputPath>
-    <DefineConstants>TRACE;NET46;RAVENDB2</DefineConstants>
+    <DefineConstants>TRACE;NET45;RAVENDB2</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -69,13 +69,13 @@
     <Compile Include="RavenDbRepository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Blaven\Blaven.csproj">
-      <Project>{30fb0ddf-b9a6-4d40-a1d8-979a5df398ea}</Project>
-      <Name>Blaven</Name>
-    </ProjectReference>
+    <None Include="Blaven.DataStorage.RavenDb2.project.json" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Blaven.DataStorage.RavenDb2.project.json" />
+    <ProjectReference Include="..\Blaven\Blaven.csproj">
+      <Project>{d4a47162-58b2-40c8-851a-f8d4ded5b936}</Project>
+      <Name>Blaven</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

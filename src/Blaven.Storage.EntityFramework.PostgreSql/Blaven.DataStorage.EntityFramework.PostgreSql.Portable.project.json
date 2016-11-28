@@ -19,8 +19,9 @@
     }
   },
   "dependencies": {
-    "Newtonsoft.Json": "9.0.1",
-    "System.Net.Http": "4.3.0"
+    "Npgsql.EntityFrameworkCore.PostgreSQL": "1.1.0",
+    "NETStandard.Library": "1.6.1",
+    "System.Linq.Queryable": "4.3.0"
   },
   "frameworks": {
     "netstandard1.3": {

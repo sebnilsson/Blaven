@@ -5,11 +5,11 @@
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A2A3ECDB-63FD-4F79-80B3-28B4DF4E3DEF}</ProjectGuid>
+    <ProjectGuid>{4F610AB0-3A9B-4F12-AA4F-9831FC5F975C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blaven.DataStorage.RavenDb</RootNamespace>
-    <AssemblyName>Blaven.DataStorage.RavenDb.Core</AssemblyName>
+    <RootNamespace>Blaven.DataStorage.EntityFramework</RootNamespace>
+    <AssemblyName>Blaven.DataStorage.EntityFramework.Portable</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile>
@@ -34,27 +34,20 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="DocumentConventionExtensions.cs" />
-    <Compile Include="Indexes\ArchiveCountIndex.cs" />
-    <Compile Include="Indexes\BlogPostsIndex.cs" />
-    <Compile Include="Indexes\BlogPostTagsIndex.cs" />
-    <Compile Include="Indexes\SearchBlogPostsIndex.cs" />
-    <Compile Include="Indexes\TagsCountIndex.cs" />
+    <None Include="Blaven.DataStorage.EntityFramework.Portable.project.json" />
+    <!-- A reference to the entire .NET Framework is automatically included -->
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BlavenDbContext.cs" />
+    <Compile Include="DbSetExtensions.cs" />
+    <Compile Include="EntityFrameworkDataStorage.cs" />
+    <Compile Include="EntityFrameworkRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueryableExtensions.cs" />
-    <Compile Include="RavenDbDataStorage.cs" />
-    <Compile Include="RavenDbIdConventions.cs" />
-    <Compile Include="RavenDbinitializer.cs" />
-    <Compile Include="RavenDbInitializerException.cs" />
-    <Compile Include="RavenDbRepository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Blaven.DataStorage.RavenDb.Core.project.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Blaven\Blaven.csproj">
-      <Project>{87aa2b88-6b18-4243-9f07-a890f641ae62}</Project>
-      <Name>Blaven</Name>
+    <ProjectReference Include="..\Blaven\Blaven.Portable.csproj">
+      <Project>{87AA2B88-6B18-4243-9F07-A890F641AE62}</Project>
+      <Name>Blaven.Portable</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

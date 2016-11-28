@@ -2,16 +2,19 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{C72AD2C4-6229-4C0E-917A-21F6C17254A1}</ProjectGuid>
+    <ProjectGuid>{2CFAE5BB-82DF-4710-9E9D-0910176A621D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Blaven.DataStorage.EntityFramework.PostgreSql</RootNamespace>
-    <AssemblyName>Blaven.DataStorage.EntityFramework.PostgreSql</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>Blaven.BlogSources.Blogger</RootNamespace>
+    <AssemblyName>Blaven.BlogSources.Blogger.Portable</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,33 +34,30 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <None Include="Blaven.BlogSources.Blogger.Portable.project.json" />
+    <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BlavenDbContextPostgreSqlFactory.cs" />
+    <Compile Include="BloggerApiUrlHelper.cs" />
+    <Compile Include="BloggerApiProvider.cs" />
+    <Compile Include="BloggerBlogData.cs" />
+    <Compile Include="BloggerBlogSource.cs" />
+    <Compile Include="BloggerBlogSourceAppSettingsHelper.cs" />
+    <Compile Include="BloggerBlogSourceException.cs" />
+    <Compile Include="BloggerDataConverter.cs" />
+    <Compile Include="BloggerPostData.cs" />
+    <Compile Include="BloggerPostsData.cs" />
+    <Compile Include="DateTimeExtensions.cs" />
+    <Compile Include="IBloggerApiProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Blaven.Storage.EntityFramework\Blaven.DataStorage.EntityFramework.csproj">
-      <Project>{13c1c218-155a-490d-8e05-6082e755ed54}</Project>
-      <Name>Blaven.DataStorage.EntityFramework</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Blaven\Blaven.csproj">
-      <Project>{d4a47162-58b2-40c8-851a-f8d4ded5b936}</Project>
-      <Name>Blaven</Name>
+    <ProjectReference Include="..\Blaven\Blaven.Portable.csproj">
+      <Project>{87aa2b88-6b18-4243-9f07-a890f641ae62}</Project>
+      <Name>Blaven.Portable</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="Blaven.DataStorage.EntityFramework.PostgreSql.project.json" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
