@@ -17,8 +17,7 @@ namespace Blaven.Synchronization
             new Lazy<IBlogPostUrlSlugProvider>(() => new BlavenBlogPostUrlSlugProvider());
 
         private static readonly Lazy<BlogTransformersProvider> TransformersProviderLazy =
-            new Lazy<BlogTransformersProvider>(
-                () => new BlogTransformersProvider(BlogTransformersProvider.GetDefaultTransformers()));
+            new Lazy<BlogTransformersProvider>(() => new BlogTransformersProvider());
 
         public static IBlogPostBlavenIdProvider BlavenIdProvider => BlavenIdProviderLazy.Value;
 

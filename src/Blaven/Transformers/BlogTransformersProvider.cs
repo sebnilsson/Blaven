@@ -5,14 +5,9 @@ namespace Blaven.Transformers
 {
     public class BlogTransformersProvider
     {
-        public BlogTransformersProvider(IEnumerable<IBlogPostTransformer> transformers)
+        public BlogTransformersProvider()
         {
-            if (transformers == null)
-            {
-                throw new ArgumentNullException(nameof(transformers));
-            }
-
-            this.Transformers = new List<IBlogPostTransformer>(transformers);
+            this.Transformers = new List<IBlogPostTransformer>();
         }
 
         public List<IBlogPostTransformer> Transformers { get; }
@@ -32,7 +27,7 @@ namespace Blaven.Transformers
             return blogPost;
         }
 
-        internal static IEnumerable<IBlogPostTransformer> GetDefaultTransformers()
+        public static IEnumerable<IBlogPostTransformer> GetDefaultTransformers()
         {
             yield return new PhraseTagsTransformer();
         }
