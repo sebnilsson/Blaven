@@ -4,10 +4,6 @@ namespace Blaven
 {
     public class SourceIdBlogPostBlavenIdProvider : IBlogPostBlavenIdProvider
     {
-        internal SourceIdBlogPostBlavenIdProvider()
-        {
-        }
-
         public string GetBlavenId(BlogPostHead blogPost)
         {
             string blavenId = GetBlogPostBlavenId(blogPost);
