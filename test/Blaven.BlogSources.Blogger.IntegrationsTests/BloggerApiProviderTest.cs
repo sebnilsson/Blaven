@@ -100,7 +100,8 @@ namespace Blaven.BlogSources.Blogger
 
             var bloggerApiProvider = new BloggerApiProvider(apiKey)
                                          {
-                                             PostListRequestMaxResults = postListRequestMaxResults
+                
+                                             //PostListRequestMaxResults = postListRequestMaxResults
                                          };
 
             return bloggerApiProvider;
