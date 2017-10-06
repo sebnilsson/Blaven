@@ -2,7 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Blaven.Tests
+namespace Blaven.Testing
 {
     public static class ParallelUtility
     {

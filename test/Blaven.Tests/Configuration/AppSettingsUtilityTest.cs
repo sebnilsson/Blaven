@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 
-using Blaven.BlogSources.Tests;
-using Blaven.Tests;
+using Blaven.BlogSources.Testing;
+using Blaven.Testing;
 using Xunit;
 
 namespace Blaven.Configuration.Tests

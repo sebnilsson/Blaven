@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Blaven.Tests
+namespace Blaven.Testing
 {
     public static class BlogSettingTestData
     {

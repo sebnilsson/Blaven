@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.DataStorage.Tests;
+using Blaven.DataStorage.Testing;
 
-namespace Blaven.Tests
+namespace Blaven.Testing
 {
     public static class BlogServiceTestFactory
     {

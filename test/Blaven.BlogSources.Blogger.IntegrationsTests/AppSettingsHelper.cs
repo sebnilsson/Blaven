@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 
-namespace Blaven.BlogSources.Blogger
+namespace Blaven.BlogSources.Blogger.IntegrationsTests
 {
     internal static class AppSettingsHelper
     {

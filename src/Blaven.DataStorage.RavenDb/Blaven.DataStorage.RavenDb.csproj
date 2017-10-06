@@ -2,22 +2,24 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3</TargetFrameworks>
-    <RootNamespace>Blaven.BlogSources.Blogger</RootNamespace>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Company />
+    <RootNamespace>Blaven.DataStorage.RavenDb</RootNamespace>
+
+    <PackageId>Blaven.DataStorage.RavenDb</PackageId>
+    <Description>RavenDB data-storage for Blaven</Description>
     <Authors>Sebastian Nilsson</Authors>
-    <Description>Blogger blog-source for Blaven</Description>
+    <Company />
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="RavenDB.Client" Version="3.5.5-patch-35222" />
     <PackageReference Include="System.Globalization.Extensions" Version="4.3.0" />
     <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
-    <PackageReference Include="System.Net.Http" Version="4.3.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Blaven\Blaven.csproj" />
   </ItemGroup>
+
+  <Import Project="..\Blaven.DataStorage.RavenDb.Shared\Blaven.DataStorage.RavenDb.Shared.projitems" Label="Shared" />
 
 </Project>

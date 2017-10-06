@@ -4,7 +4,7 @@ using System.Linq;
 
 using Blaven.Synchronization;
 
-namespace Blaven.Tests
+namespace Blaven.Testing
 {
     public static class BlogPostTestData
     {

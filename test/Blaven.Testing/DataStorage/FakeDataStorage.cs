@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Blaven.Synchronization;
 
-namespace Blaven.DataStorage.Tests
+namespace Blaven.DataStorage.Testing
 {
     public class FakeDataStorage : IDataStorage
     {

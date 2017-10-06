@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using Blaven.BlogSources.Tests;
+using Blaven.BlogSources.Testing;
 
-namespace Blaven.Tests
+namespace Blaven.Testing
 {
     public static class AppSettingTestData
     {

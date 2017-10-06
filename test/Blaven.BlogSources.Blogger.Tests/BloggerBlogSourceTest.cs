@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-using Blaven.Tests;
+using Blaven.Testing;
 using Xunit;
 
 namespace Blaven.BlogSources.Blogger.Tests

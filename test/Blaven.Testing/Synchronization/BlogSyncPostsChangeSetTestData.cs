@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.Tests;
+using Blaven.Testing;
 
-namespace Blaven.Synchronization.Tests
+namespace Blaven.Synchronization.Testing
 {
     public static class BlogSyncChangeSetTestData
     {

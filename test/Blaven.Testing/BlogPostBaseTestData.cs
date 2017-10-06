@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Blaven.Tests
+namespace Blaven.Testing
 {
     public static class BlogPostBaseTestData
     {

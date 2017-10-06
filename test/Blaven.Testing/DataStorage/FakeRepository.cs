@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Blaven.DataStorage.Tests
+namespace Blaven.DataStorage.Testing
 {
     public class FakeRepository : IRepository
     {

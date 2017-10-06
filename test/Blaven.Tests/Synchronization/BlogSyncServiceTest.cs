@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 using Blaven.BlogSources;
 using Blaven.DataStorage;
-using Blaven.Tests;
+using Blaven.Testing;
 using Moq;
 using Xunit;
 
-namespace Blaven.Synchronization.Tests
+namespace Blaven.Synchronization.Testing
 {
     public class BlogSyncServiceTest
     {

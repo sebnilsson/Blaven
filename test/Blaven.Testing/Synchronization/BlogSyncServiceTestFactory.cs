@@ -2,12 +2,12 @@
 using System.Linq;
 
 using Blaven.BlogSources;
-using Blaven.BlogSources.Tests;
+using Blaven.BlogSources.Testing;
 using Blaven.DataStorage;
-using Blaven.DataStorage.Tests;
-using Blaven.Tests;
+using Blaven.DataStorage.Testing;
+using Blaven.Testing;
 
-namespace Blaven.Synchronization.Tests
+namespace Blaven.Synchronization.Testing
 {
     public static class BlogSyncServiceTestFactory
     {

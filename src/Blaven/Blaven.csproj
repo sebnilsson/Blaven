@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
+    <TargetFramework>netstandard1.3</TargetFramework>
+    
     <RootNamespace>Blaven</RootNamespace>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-
     <PackageId>Blaven</PackageId>
     <Description>Synchronize blog-data from external services to your own data-storage</Description>
     <Authors>Sebastian Nilsson</Authors>
@@ -13,13 +12,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Globalization.Extensions" Version="4.3.0" />
     <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.3'">
-    <PackageReference Include="System.Globalization.Extensions">
-      <Version>4.3.0</Version>
-    </PackageReference>
   </ItemGroup>
     
 </Project>

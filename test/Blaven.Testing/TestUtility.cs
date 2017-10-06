@@ -1,4 +1,4 @@
-﻿namespace Blaven.Tests
+﻿namespace Blaven.Testing
 {
     public static class TestUtility
     {

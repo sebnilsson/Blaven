@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 using Xunit;
 
-namespace Blaven.BlogSources.Blogger
+namespace Blaven.BlogSources.Blogger.IntegrationsTests
 {
     public class BloggerApiProviderTest
     {
@@ -78,12 +78,12 @@ namespace Blaven.BlogSources.Blogger
             Assert.NotNull(firstPost.Url);
         }
 
-        public static IEnumerable<object> ForceUpdateData()
+        public static IEnumerable<object[]> ForceUpdateData()
         {
             yield return new object[] { DateTime.MinValue, AppSettingsHelper.ExpectedPostsCount };
         }
 
-        public static IEnumerable<object> AfterLastUpdatedAtData()
+        public static IEnumerable<object[]> AfterLastUpdatedAtData()
         {
             yield return
                 new object[]

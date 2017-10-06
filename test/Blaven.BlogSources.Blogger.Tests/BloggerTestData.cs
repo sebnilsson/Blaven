@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-using Blaven.Tests;
+using Blaven.Testing;
 
 namespace Blaven.BlogSources.Blogger.Tests
 {

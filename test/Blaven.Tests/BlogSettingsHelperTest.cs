@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
+using Blaven.Testing;
 using Xunit;
 
 namespace Blaven.Tests

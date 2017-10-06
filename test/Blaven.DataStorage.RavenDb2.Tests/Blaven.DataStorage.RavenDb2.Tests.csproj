@@ -1,15 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net47;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net47</TargetFrameworks>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DefineConstants>TRACE;DEBUG;NET47;RAVENDB2</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170923-02" />
+    <PackageReference Include="RavenDB.Client" Version="2.5.25023" />
+    <PackageReference Include="RavenDB.Embedded" Version="2.5.25023" />
     <PackageReference Include="System.Globalization.Extensions" Version="4.3.0" />
     <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0-preview-20170923-02" />
     <PackageReference Include="xunit" Version="2.3.0-rc3-build3818" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.0-rc3-build3818" />
 
@@ -17,7 +24,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="..\Blaven.DataStorage.RavenDb.Tests\*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Blaven.DataStorage.RavenDb2\Blaven.DataStorage.RavenDb2.csproj" />
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj" />
+    <ProjectReference Include="..\Blaven.DataStorage.Testing\Blaven.DataStorage.Testing.csproj" />
     <ProjectReference Include="..\Blaven.Testing\Blaven.Testing.csproj" />
   </ItemGroup>
 

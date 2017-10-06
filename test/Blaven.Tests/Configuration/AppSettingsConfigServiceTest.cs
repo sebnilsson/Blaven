@@ -1,8 +1,8 @@
 ﻿using System.Linq;
 
-using Blaven.BlogSources.Tests;
+using Blaven.BlogSources.Testing;
 using Blaven.Configuration;
-using Blaven.Tests;
+using Blaven.Testing;
 using Xunit;
 
 namespace Blaven.BlogSources.Configuration.Tests

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-using Blaven.Tests;
+using Blaven.Testing;
 using Xunit;
 
 namespace Blaven.BlogSources.Blogger.Tests

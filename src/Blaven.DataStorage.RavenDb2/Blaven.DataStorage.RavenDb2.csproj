@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net46</TargetFrameworks>
+    <RootNamespace>Blaven.DataStorage.RavenDb2</RootNamespace>
+
+    <PackageId>Blaven.DataStorage.RavenDb2</PackageId>
+    <Description>RavenDB data-storage for Blaven</Description>
+    <Authors>Sebastian Nilsson</Authors>
+    <Company />
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants>TRACE;DEBUG;NET46;RAVENDB2</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RavenDB.Client" Version="2.5.25023" />
+    <PackageReference Include="System.Globalization.Extensions" Version="4.3.0" />
+    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Blaven\Blaven.csproj" />
+  </ItemGroup>
+
+  <Import Project="..\Blaven.DataStorage.RavenDb.Shared\Blaven.DataStorage.RavenDb.Shared.projitems" Label="Shared" />
+
+</Project>

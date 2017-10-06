@@ -1,12 +1,12 @@
 ﻿using System;
 
 using Blaven.BlogSources;
-using Blaven.BlogSources.Tests;
+using Blaven.BlogSources.Testing;
 using Blaven.DataStorage;
-using Blaven.DataStorage.Tests;
+using Blaven.DataStorage.Testing;
 using Xunit;
 
-namespace Blaven.Synchronization.Tests
+namespace Blaven.Synchronization.Testing
 {
     public class SynchronizationConfigurationTest
     {
