@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
+
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Globalization.Extensions" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
     <PackageReference Include="xunit" Version="2.3.0" />
   </ItemGroup>
 
