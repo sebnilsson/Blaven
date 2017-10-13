@@ -4,7 +4,8 @@
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
 
     <PackageId>Blaven.DataStorage.EntityFramework</PackageId>
-    <Version>0.8.0</Version>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Description>EntityFramework data-storage for Blaven</Description>
 
     <Authors>Sebastian Nilsson</Authors>

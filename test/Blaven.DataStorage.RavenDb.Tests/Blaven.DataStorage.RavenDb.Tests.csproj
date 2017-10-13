@@ -18,18 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Blaven.DataStorage.RavenDb\Blaven.DataStorage.RavenDb.csproj">
-      <Private>true</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\..\src\Blaven\Blaven.csproj">
-      <Private>true</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Blaven.DataStorage.Testing\Blaven.DataStorage.Testing.csproj">
-      <Private>true</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Blaven.Testing\Blaven.Testing.csproj">
-      <Private>true</Private>
-    </ProjectReference>
+    <ProjectReference Include="..\..\src\Blaven.DataStorage.RavenDb\Blaven.DataStorage.RavenDb.csproj" />
+    <ProjectReference Include="..\..\src\Blaven\Blaven.csproj" />
+    <ProjectReference Include="..\Blaven.DataStorage.Testing\Blaven.DataStorage.Testing.csproj" />
+    <ProjectReference Include="..\Blaven.Testing\Blaven.Testing.csproj" />
   </ItemGroup>
 
 </Project>

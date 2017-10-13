@@ -4,7 +4,8 @@
     <TargetFramework>netstandard1.3</TargetFramework>
 
     <PackageId>Blaven</PackageId>
-    <Version>0.8.0</Version>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
     <Description>Synchronize blog-data from external services to your own data-storage</Description>
     
     <Authors>Sebastian Nilsson</Authors>
@@ -13,8 +14,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Globalization.Extensions" Version="4.3.0" />
-    <PackageReference Include="System.Linq.Queryable" Version="4.3.0" />
+    <PackageReference Include="System.Globalization.Extensions" Version="4.0.1" />
+    <PackageReference Include="System.Linq.Queryable" Version="4.0.1" />
   </ItemGroup>
     
 </Project>
