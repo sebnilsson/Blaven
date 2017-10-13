@@ -23,20 +23,22 @@ namespace Blaven.DataStorage.RavenDb.Tests
                                                 DataDirectory = path,
                                                 RunInMemory = true,
                                                 RunInUnreliableYetFastModeThatIsNotSuitableForProduction = true,
-                                                MaxPageSize = 1024
+                                                Storage =
+                                                    {
+                                                        Voron =
+                                                            {
+                                                                AllowOn32Bits = true
+                                                            }
+                                                    }
                                             },
                                         RunInMemory = true
                                     };
-
-#if !RAVENDB2
-            documentStore.Configuration.Storage.Voron.AllowOn32Bits = true;
-#endif
 
             if (initIndexes)
             {
                 lock (RavenDbInitializerLock)
                 {
-                    RavenDbInitializer.Initialize(documentStore).GetAwaiter().GetResult();
+                    RavenDbInitializer.Initialize(documentStore).ConfigureAwait(false).GetAwaiter().GetResult();
                 }
             }
 

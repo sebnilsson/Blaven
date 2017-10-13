@@ -34,11 +34,7 @@ namespace Blaven.DataStorage.RavenDb
 
             RavenDbIdConventions.Init(documentStore);
 
-#if (NET45 || NET451 || NET452 || NET46 || NET461 || NET46)
-            var assembly = Assembly.GetAssembly(typeof(BlogPostsIndex));
-#else
             var assembly = typeof(BlogPostsIndex).GetTypeInfo().Assembly;
-#endif
 
             await IndexCreation.CreateIndexesAsync(assembly, documentStore);
         }

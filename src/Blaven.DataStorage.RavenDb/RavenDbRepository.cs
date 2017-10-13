@@ -217,11 +217,7 @@ namespace Blaven.DataStorage.RavenDb
             using (var session = this.documentStore.OpenSession())
             {
                 var posts = session.Advanced
-#if RAVENDB2
-                    .LuceneQuery<BlogPost, SearchBlogPostsIndex>()
-#else
                     .DocumentQuery<BlogPost, SearchBlogPostsIndex>()
-#endif
                     .Where(whereClause).AsQueryable();
 
                 return posts;

@@ -20,6 +20,4 @@
     <ProjectReference Include="..\Blaven\Blaven.csproj" />
   </ItemGroup>
 
-  <Import Project="..\Blaven.DataStorage.RavenDb.Shared\Blaven.DataStorage.RavenDb.Shared.projitems" Label="Shared" />
-
 </Project>
