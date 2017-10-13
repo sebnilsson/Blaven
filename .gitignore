@@ -37,3 +37,4 @@ node_modules
 **/AppSettings.config
 
 .release-builds
+/build-artifacts
