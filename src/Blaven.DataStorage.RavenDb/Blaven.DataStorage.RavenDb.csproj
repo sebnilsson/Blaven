@@ -2,12 +2,14 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3</TargetFrameworks>
-    <RootNamespace>Blaven.DataStorage.RavenDb</RootNamespace>
 
     <PackageId>Blaven.DataStorage.RavenDb</PackageId>
+    <Version>0.8.0</Version>
     <Description>RavenDB data-storage for Blaven</Description>
+
     <Authors>Sebastian Nilsson</Authors>
-    <Company />
+    <PackageProjectUrl>https://github.com/sebnilsson/Blaven</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sebnilsson/Blaven</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

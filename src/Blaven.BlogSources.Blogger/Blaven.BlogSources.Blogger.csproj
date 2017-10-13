@@ -2,11 +2,14 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3</TargetFrameworks>
-    <RootNamespace>Blaven.BlogSources.Blogger</RootNamespace>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <Company />
-    <Authors>Sebastian Nilsson</Authors>
+
+    <PackageId>Blaven.BlogSources.Blogger</PackageId>
+    <Version>0.8.0</Version>
     <Description>Blogger blog-source for Blaven</Description>
+
+    <Authors>Sebastian Nilsson</Authors>
+    <PackageProjectUrl>https://github.com/sebnilsson/Blaven</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sebnilsson/Blaven</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>

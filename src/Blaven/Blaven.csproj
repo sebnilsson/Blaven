@@ -2,13 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.3</TargetFramework>
-    
-    <RootNamespace>Blaven</RootNamespace>
+
     <PackageId>Blaven</PackageId>
+    <Version>0.8.0</Version>
     <Description>Synchronize blog-data from external services to your own data-storage</Description>
+    
     <Authors>Sebastian Nilsson</Authors>
-    <Company />
-    <Product>Blaven</Product>
+    <PackageProjectUrl>https://github.com/sebnilsson/Blaven</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/sebnilsson/Blaven</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
