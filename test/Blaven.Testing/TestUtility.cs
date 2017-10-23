@@ -4,9 +4,9 @@
     {
         public static string GetTestString(string name, string blogKey, int index, bool isUpdate = false)
         {
-            string prefix = isUpdate ? "Updated" : null;
+            var prefix = isUpdate ? "Updated" : null;
 
-            string testString = $"{prefix}Test{name}_{blogKey}_{index}";
+            var testString = $"{prefix}Test{name}_{blogKey}_{index}";
             return testString;
         }
     }

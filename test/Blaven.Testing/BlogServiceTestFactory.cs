@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
 using Blaven.DataStorage.Testing;
 
 namespace Blaven.Testing
@@ -14,7 +13,7 @@ namespace Blaven.Testing
         {
             var repository = new FakeRepository(blogPosts, blogMetas);
 
-            blogSettings = (blogSettings != null && blogSettings.Any())
+            blogSettings = blogSettings != null && blogSettings.Any()
                                ? blogSettings
                                : BlogSettingTestData.CreateCollection().ToArray();
 

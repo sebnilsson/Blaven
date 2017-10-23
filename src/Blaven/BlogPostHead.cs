@@ -12,6 +12,8 @@ namespace Blaven
 
         public long BlogAuthorId { get; set; }
 
+        public List<BlogPostTag> BlogPostTags { get; set; }
+
         public string ImageUrl { get; set; }
 
         public DateTime? PublishedAt { get; set; }
@@ -20,9 +22,7 @@ namespace Blaven
 
         public string Summary { get; set; }
 
-        public List<BlogPostTag> BlogPostTags { get; set; }
-
-        public IEnumerable<string> TagTexts => this.BlogPostTags?.Select(x => x.Text) ?? Enumerable.Empty<string>();
+        public IEnumerable<string> TagTexts => BlogPostTags?.Select(x => x.Text) ?? Enumerable.Empty<string>();
 
         public string Title { get; set; }
 

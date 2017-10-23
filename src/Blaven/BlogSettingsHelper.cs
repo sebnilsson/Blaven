@@ -6,19 +6,16 @@ namespace Blaven
 {
     public class BlogSettingsHelper
     {
-        private readonly IReadOnlyList<BlogSetting> blogSettings;
+        private readonly IReadOnlyList<BlogSetting> _blogSettings;
 
         public BlogSettingsHelper(IEnumerable<BlogSetting> blogSettings)
         {
             if (blogSettings == null)
-            {
                 throw new ArgumentNullException(nameof(blogSettings));
-            }
 
-            this.blogSettings = blogSettings.ToReadOnlyList();
+            _blogSettings = blogSettings.ToReadOnlyList();
 
-            this.BlogKeys =
-                this.blogSettings.Select(x => new BlogKey(x.BlogKey)).Where(x => x.HasValue).ToReadOnlyList();
+            BlogKeys = _blogSettings.Select(x => new BlogKey(x.BlogKey)).Where(x => x.HasValue).ToReadOnlyList();
         }
 
         public IReadOnlyList<BlogKey> BlogKeys { get; }
@@ -26,19 +23,15 @@ namespace Blaven
         public BlogSetting GetBlogSetting(BlogKey blogKey)
         {
             if (blogKey == null)
-            {
                 throw new ArgumentNullException(nameof(blogKey));
-            }
             if (!blogKey.HasValue)
-            {
                 throw new ArgumentOutOfRangeException(nameof(blogKey), $"{nameof(BlogKey)} must have a value.");
-            }
 
-            var blogSetting =
-                this.blogSettings.FirstOrDefault(x => x.BlogKey.Equals(blogKey.Value, StringComparison.OrdinalIgnoreCase));
+            var blogSetting = _blogSettings.FirstOrDefault(
+                x => x.BlogKey.Equals(blogKey.Value, StringComparison.OrdinalIgnoreCase));
             if (blogSetting == null)
             {
-                string message = $"Settings did not contain any item with key '{blogKey.Value}'.";
+                var message = $"Settings did not contain any item with key '{blogKey.Value}'.";
                 throw new KeyNotFoundException(message);
             }
 
@@ -48,14 +41,12 @@ namespace Blaven
         public BlogKey GetEnsuredBlogKey(BlogKey blogKey)
         {
             if (blogKey != null)
-            {
                 return blogKey;
-            }
 
-            string blogSettingsBlogKey = this.BlogKeys.FirstOrDefault();
+            string blogSettingsBlogKey = BlogKeys.FirstOrDefault();
             if (blogSettingsBlogKey == null)
             {
-                string message = $"No default item found in {nameof(this.BlogKeys)}.";
+                var message = $"No default item found in {nameof(BlogKeys)}.";
                 throw new KeyNotFoundException(message);
             }
 
@@ -66,14 +57,16 @@ namespace Blaven
         {
             var blogKeyList = blogKeys?.Select(x => new BlogKey(x));
 
-            var ensuredBlogKeys = this.GetEnsuredBlogKeys(blogKeyList);
+            var ensuredBlogKeys = GetEnsuredBlogKeys(blogKeyList);
             return ensuredBlogKeys;
         }
 
         public ICollection<string> GetEnsuredBlogKeys(IEnumerable<BlogKey> blogKeys)
         {
-            var ensuredBlogKeys =
-                this.GetEnsuredBlogKeysInternal(blogKeys).Where(x => x.HasValue).Select(x => x.Value).ToList();
+            var ensuredBlogKeys = GetEnsuredBlogKeysInternal(blogKeys)
+                .Where(x => x.HasValue)
+                .Select(x => x.Value)
+                .ToList();
             return ensuredBlogKeys;
         }
 
@@ -82,15 +75,13 @@ namespace Blaven
             var blogKeyList = blogKeys?.ToList();
 
             if (blogKeyList != null && blogKeyList.Any())
-            {
                 return blogKeyList;
-            }
 
-            var blogSettingsBlogKeys = this.BlogKeys;
+            var blogSettingsBlogKeys = BlogKeys;
 
             if (!blogSettingsBlogKeys.Any())
             {
-                string message = $"No default items found in {nameof(this.BlogKeys)}.";
+                var message = $"No default items found in {nameof(BlogKeys)}.";
                 throw new KeyNotFoundException(message);
             }
 

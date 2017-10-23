@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-
 using Blaven.BlogSources;
 
 namespace Blaven.Configuration
@@ -10,24 +9,32 @@ namespace Blaven.Configuration
     public class AppSettingsConfigService
     {
         private static readonly Regex AppSettingBlogIdRegex = new Regex(
-                                                                  @"Blaven\.Blogs\.([^\.]+)(?:.*)",
-                                                                  RegexOptions.IgnoreCase);
-        
-        private readonly IDictionary<string, string> appSettings;
+            @"Blaven\.Blogs\.([^\.]+)(?:.*)",
+            RegexOptions.IgnoreCase);
+        private readonly IDictionary<string, string> _appSettings;
 
         public AppSettingsConfigService(IDictionary<string, string> appSettings)
         {
-            if (appSettings == null)
-            {
-                throw new ArgumentNullException(nameof(appSettings));
-            }
+            _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
+        }
 
-            this.appSettings = appSettings;
+        public TBlogSource BuildBlogSource<TBlogSource>(
+            Func<string, string, TBlogSource> blogSourceUsernameAndPasswordFactory)
+            where TBlogSource : IBlogSource
+        {
+            if (blogSourceUsernameAndPasswordFactory == null)
+                throw new ArgumentNullException(nameof(blogSourceUsernameAndPasswordFactory));
+
+            var username = AppSettingsUtility.GetUsername<TBlogSource>(_appSettings);
+            var password = AppSettingsUtility.GetPassword<TBlogSource>(_appSettings);
+
+            var blogSource = blogSourceUsernameAndPasswordFactory(username, password);
+            return blogSource;
         }
 
         public IEnumerable<BlogSetting> GetBlogSettings()
         {
-            var blogKeys = from setting in this.appSettings
+            var blogKeys = from setting in _appSettings
                            where setting.Key != null
                            let match = AppSettingBlogIdRegex.Matches(setting.Key).OfType<Match>().FirstOrDefault()
                            let groupMatch = match?.Groups.OfType<Group>().ElementAtOrDefault(1)
@@ -39,29 +46,14 @@ namespace Blaven.Configuration
 
             foreach (var blogKey in uniqueBlogKeys)
             {
-                string idKey = string.Format(AppSettingsHelper.BlogsKeyFormat, blogKey, "Id");
-                string nameKey = string.Format(AppSettingsHelper.BlogsKeyFormat, blogKey, "Name");
+                var idKey = string.Format(AppSettingsHelper.BlogsKeyFormat, blogKey, "Id");
+                var nameKey = string.Format(AppSettingsHelper.BlogsKeyFormat, blogKey, "Name");
 
-                string id = AppSettingsHelper.TryGetValue(idKey, this.appSettings);
-                string name = AppSettingsHelper.TryGetValue(nameKey, this.appSettings);
+                var id = AppSettingsHelper.TryGetValue(idKey, _appSettings);
+                var name = AppSettingsHelper.TryGetValue(nameKey, _appSettings);
 
                 yield return new BlogSetting(blogKey, id, name);
             }
-        }
-
-        public TBlogSource BuildBlogSource<TBlogSource>(
-            Func<string, string, TBlogSource> blogSourceUsernameAndPasswordFactory) where TBlogSource : IBlogSource
-        {
-            if (blogSourceUsernameAndPasswordFactory == null)
-            {
-                throw new ArgumentNullException(nameof(blogSourceUsernameAndPasswordFactory));
-            }
-
-            string username = AppSettingsUtility.GetUsername<TBlogSource>(this.appSettings);
-            string password = AppSettingsUtility.GetPassword<TBlogSource>(this.appSettings);
-
-            var blogSource = blogSourceUsernameAndPasswordFactory(username, password);
-            return blogSource;
         }
     }
 }

@@ -8,6 +8,14 @@ namespace Blaven.Testing
     {
         public const int DefaultParallelUsersCount = 5;
 
+        public static int GetRandomSleep()
+        {
+            var random = new Random();
+
+            var randomSleep = random.Next(0, 100);
+            return randomSleep;
+        }
+
         public static void RunParallelUsers(Action action, int userCount = DefaultParallelUsersCount)
         {
             RunParallelUsers(_ => action(), userCount);
@@ -19,20 +27,12 @@ namespace Blaven.Testing
                 0,
                 userCount,
                 i =>
-                    {
-                        int randomSleep = GetRandomSleep();
-                        Thread.Sleep(randomSleep);
+                {
+                    var randomSleep = GetRandomSleep();
+                    Thread.Sleep(randomSleep);
 
-                        action(i);
-                    });
-        }
-
-        public static int GetRandomSleep()
-        {
-            var random = new Random();
-
-            int randomSleep = random.Next(0, 100);
-            return randomSleep;
+                    action(i);
+                });
         }
     }
 }

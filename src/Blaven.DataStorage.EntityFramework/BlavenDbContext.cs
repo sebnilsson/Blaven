@@ -1,12 +1,11 @@
 ﻿using System;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Blaven.DataStorage.EntityFramework
 {
     public class BlavenDbContext : DbContext
     {
-        private readonly Action<ModelBuilder> onModelCreating;
+        private readonly Action<ModelBuilder> _onModelCreating;
 
         public BlavenDbContext()
         {
@@ -14,20 +13,15 @@ namespace Blaven.DataStorage.EntityFramework
 
         public BlavenDbContext(Action<ModelBuilder> onModelCreating)
         {
-            this.onModelCreating = onModelCreating;
+            _onModelCreating = onModelCreating;
         }
 
         public BlavenDbContext(DbContextOptions<BlavenDbContext> options, Action<ModelBuilder> onModelCreating = null)
             : base(options)
         {
-            this.Options = options;
+            Options = options;
 
-            this.onModelCreating = onModelCreating;
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            this.onModelCreating?.Invoke(modelBuilder);
+            _onModelCreating = onModelCreating;
         }
 
         public DbSet<BlogAuthor> BlogAuthors { get; set; }
@@ -39,5 +33,10 @@ namespace Blaven.DataStorage.EntityFramework
         public DbSet<BlogPostTag> BlogPostTags { get; set; }
 
         internal DbContextOptions<BlavenDbContext> Options { get; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            _onModelCreating?.Invoke(modelBuilder);
+        }
     }
 }

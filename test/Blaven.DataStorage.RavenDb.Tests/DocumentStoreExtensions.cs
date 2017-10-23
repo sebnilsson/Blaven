@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Raven.Client;
 using Raven.Client.Linq;
 
@@ -12,13 +11,9 @@ namespace Blaven.DataStorage.RavenDb.Tests
             Func<IRavenQueryable<T>, TResult> queryFactory)
         {
             if (documentStore == null)
-            {
                 throw new ArgumentNullException(nameof(documentStore));
-            }
             if (queryFactory == null)
-            {
                 throw new ArgumentNullException(nameof(queryFactory));
-            }
 
             TResult result;
 

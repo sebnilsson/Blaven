@@ -24,7 +24,7 @@ namespace Blaven.BlogSources.Blogger
         public DateTime? Updated { get; set; }
 
         public string Url { get; set; }
-        
+
         public class AuthorData
         {
             public string DisplayName { get; set; }

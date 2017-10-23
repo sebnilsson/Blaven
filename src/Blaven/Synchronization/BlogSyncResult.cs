@@ -8,12 +8,7 @@ namespace Blaven.Synchronization
     {
         internal BlogSyncResult(string blogKey)
         {
-            if (blogKey == null)
-            {
-                throw new ArgumentNullException(nameof(blogKey));
-            }
-
-            this.BlogKey = blogKey;
+            BlogKey = blogKey ?? throw new ArgumentNullException(nameof(blogKey));
         }
 
         public BlogMeta BlogMeta { get; private set; }
@@ -22,12 +17,12 @@ namespace Blaven.Synchronization
 
         public TimeSpan Elapsed { get; internal set; }
 
-        public double ElapsedMs => this.Elapsed.TotalMilliseconds;
+        public double ElapsedMs => Elapsed.TotalMilliseconds;
 
         internal void OnDataUpdated(BlogMeta blogMeta, BlogSyncPostsChangeSet changeSet)
         {
-            this.BlogMeta = blogMeta;
-            this.BlogPostsChanges = changeSet;
+            BlogMeta = blogMeta;
+            BlogPostsChanges = changeSet;
         }
     }
 }

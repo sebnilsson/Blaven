@@ -12,23 +12,16 @@ namespace Blaven.Synchronization
             IReadOnlyList<BlogPostBase> dataStoragePosts)
         {
             if (blogKey == null)
-            {
                 throw new ArgumentNullException(nameof(blogKey));
-            }
             if (sourcePosts == null)
-            {
                 throw new ArgumentNullException(nameof(sourcePosts));
-            }
             if (dataStoragePosts == null)
-            {
                 throw new ArgumentNullException(nameof(dataStoragePosts));
-            }
 
-            var cleanSourcePosts =
-                sourcePosts.Where(x => x != null)
-                    .OrderByDescending(x => x.UpdatedAt)
-                    .Distinct(x => x.SourceId)
-                    .ToReadOnlyList();
+            var cleanSourcePosts = sourcePosts.Where(x => x != null)
+                .OrderByDescending(x => x.UpdatedAt)
+                .Distinct(x => x.SourceId)
+                .ToReadOnlyList();
 
             var cleanDataStoragePosts =
                 dataStoragePosts.Where(x => x != null).Distinct(x => x.SourceId).ToReadOnlyList();
@@ -73,23 +66,25 @@ namespace Blaven.Synchronization
             IEnumerable<BlogPostBase> dataStoragePosts,
             BlogSyncPostsChangeSet changeSet)
         {
-            var modifiedPosts =
-                dataStoragePosts.Join(
+            var modifiedPosts = dataStoragePosts.Join(
                     sourcePosts,
                     dbPost => dbPost.SourceId,
                     sourcePost => sourcePost.SourceId,
-                    (dbPost, sourcePost) => new { DbPost = dbPost, SourcePost = sourcePost }).ToList();
+                    (dbPost, sourcePost) => new
+                                            {
+                                                DbPost = dbPost,
+                                                SourcePost = sourcePost
+                                            })
+                .ToList();
 
             foreach (var modifiedPost in modifiedPosts)
             {
                 var dbPost = modifiedPost.DbPost;
                 var sourcePost = modifiedPost.SourcePost;
 
-                bool isModified = (dbPost.Hash != sourcePost.Hash || sourcePost.UpdatedAt > dbPost.UpdatedAt);
+                var isModified = dbPost.Hash != sourcePost.Hash || sourcePost.UpdatedAt > dbPost.UpdatedAt;
                 if (isModified)
-                {
                     changeSet.UpdatedBlogPosts.Add(sourcePost);
-                }
             }
         }
     }

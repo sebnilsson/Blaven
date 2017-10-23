@@ -2,23 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Blaven.DataStorage.Testing;
 using Blaven.Testing;
 using Xunit;
 
 namespace Blaven.DataStorage.EntityFramework.Tests
 {
-    using Blaven.DataStorage.Testing;
-
     public class EntityFrameworkDataStorageTest : DataStorageTestBase
     {
-        [Fact]
-        public override async Task GetBlogPosts_SettingWithBlogKey2_ReturnsOnlyBlogKey2Posts()
-        {
-            // Arrange & Act & Assert
-            await base.GetBlogPosts_SettingWithBlogKey2_ReturnsOnlyBlogKey2Posts();
-        }
-
         [Fact]
         public override async Task GetBlogPosts_PostCountMoreThanRavenDbPageCount_ReturnsAllPosts()
         {
@@ -27,18 +18,10 @@ namespace Blaven.DataStorage.EntityFramework.Tests
         }
 
         [Fact]
-        public override async Task<IDataStorage> SaveBlogMeta_NonExistingBlogMeta_ReturnsNewBlogMeta()
+        public override async Task GetBlogPosts_SettingWithBlogKey2_ReturnsOnlyBlogKey2Posts()
         {
-            // Arrange & Act
-            var dataStorage =
-                await base.SaveBlogMeta_NonExistingBlogMeta_ReturnsNewBlogMeta() as EntityFrameworkDataStorage;
-
-            // Assert
-            var ravenDbBlogMeta =
-                dataStorage.DbContext.BlogMetas.FirstOrDefault(x => x.BlogKey == BlogMetaTestData.BlogKey);
-            Assert.NotNull(ravenDbBlogMeta);
-
-            return dataStorage;
+            // Arrange & Act & Assert
+            await base.GetBlogPosts_SettingWithBlogKey2_ReturnsOnlyBlogKey2Posts();
         }
 
         [Fact]
@@ -61,25 +44,71 @@ namespace Blaven.DataStorage.EntityFramework.Tests
             return dataStorage;
         }
 
+        [Fact]
+        public override async Task<IDataStorage> SaveBlogMeta_NonExistingBlogMeta_ReturnsNewBlogMeta()
+        {
+            // Arrange & Act
+            var dataStorage =
+                await base.SaveBlogMeta_NonExistingBlogMeta_ReturnsNewBlogMeta() as EntityFrameworkDataStorage;
+
+            // Assert
+            var ravenDbBlogMeta =
+                dataStorage.DbContext.BlogMetas.FirstOrDefault(x => x.BlogKey == BlogMetaTestData.BlogKey);
+            Assert.NotNull(ravenDbBlogMeta);
+
+            return dataStorage;
+        }
+
         [Theory]
-        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
-             MemberType = typeof(BlogPostTheoryData))]
-        public override async Task<IDataStorage> SaveChanges_DeletedPosts_DbContainsRemainingPosts(IEnumerable<BlogPost> dbBlogPosts)
+        [MemberData(
+            nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys),
+            0,
+            5,
+            MemberType = typeof(BlogPostTheoryData))]
+        public override async Task<IDataStorage> SaveChanges_DeletedPosts_DbContainsRemainingPosts(
+            IEnumerable<BlogPost> dbBlogPosts)
         {
             // Arrange & Act
             var dataStorage =
                 await base.SaveChanges_DeletedPosts_DbContainsRemainingPosts(dbBlogPosts) as EntityFrameworkDataStorage;
 
             // Assert
-            int blogPostCount = dataStorage.DbContext.BlogPosts.Count(x => x.BlogKey == BlogMetaTestData.BlogKey);
+            var blogPostCount = dataStorage.DbContext.BlogPosts.Count(x => x.BlogKey == BlogMetaTestData.BlogKey);
             Assert.Equal(2, blogPostCount);
 
             return dataStorage;
         }
 
         [Theory]
-        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
-             MemberType = typeof(BlogPostTheoryData))]
+        [MemberData(
+            nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys),
+            0,
+            5,
+            MemberType = typeof(BlogPostTheoryData))]
+        public override async Task<IDataStorage>
+            SaveChanges_InsertedAndUpdatedPostsOverlapping_DbContainsPostsWithoutDuplicates(
+                IEnumerable<BlogPost> dbBlogPosts)
+        {
+            // Arrange & Act
+            var dataStorage =
+                await base.SaveChanges_InsertedAndUpdatedPostsOverlapping_DbContainsPostsWithoutDuplicates(dbBlogPosts)
+                    as EntityFrameworkDataStorage;
+
+            // Assert
+            var blogPostCount = dataStorage.DbContext.BlogPosts.Count(
+                x => x.BlogKey.Equals(BlogMetaTestData.BlogKey, StringComparison.OrdinalIgnoreCase));
+
+            Assert.Equal(11, blogPostCount);
+
+            return dataStorage;
+        }
+
+        [Theory]
+        [MemberData(
+            nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys),
+            0,
+            5,
+            MemberType = typeof(BlogPostTheoryData))]
         public override async Task<IDataStorage> SaveChanges_InsertedPostsOverlapping_DbContainsPostsWithoutDuplicates(
             IEnumerable<BlogPost> dbBlogPosts)
         {
@@ -89,17 +118,19 @@ namespace Blaven.DataStorage.EntityFramework.Tests
                     EntityFrameworkDataStorage;
 
             // Assert
-            int blogPostCount = dataStorage.DbContext.BlogPosts.Count(x => x.BlogKey == BlogMetaTestData.BlogKey);
+            var blogPostCount = dataStorage.DbContext.BlogPosts.Count(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
             Assert.Equal(8, blogPostCount);
 
             return dataStorage;
         }
 
-
         [Theory]
-        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
-             MemberType = typeof(BlogPostTheoryData))]
+        [MemberData(
+            nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys),
+            0,
+            5,
+            MemberType = typeof(BlogPostTheoryData))]
         public override async Task<IDataStorage> SaveChanges_UpdatedPostsOverlapping_DbContainsPostsWithoutDuplicates(
             IEnumerable<BlogPost> dbBlogPosts)
         {
@@ -109,30 +140,9 @@ namespace Blaven.DataStorage.EntityFramework.Tests
                     EntityFrameworkDataStorage;
 
             // Assert
-            int blogPostCount = dataStorage.DbContext.BlogPosts.Count(x => x.BlogKey == BlogMetaTestData.BlogKey);
+            var blogPostCount = dataStorage.DbContext.BlogPosts.Count(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
             Assert.Equal(8, blogPostCount);
-
-            return dataStorage;
-        }
-
-        [Theory]
-        [MemberData(nameof(BlogPostTheoryData.GetDbBlogPostsForSingleAndMultipleKeys), 0, 5,
-             MemberType = typeof(BlogPostTheoryData))]
-        public override async Task<IDataStorage> SaveChanges_InsertedAndUpdatedPostsOverlapping_DbContainsPostsWithoutDuplicates(
-            IEnumerable<BlogPost> dbBlogPosts)
-        {
-            // Arrange & Act
-            var dataStorage =
-                await base.SaveChanges_InsertedAndUpdatedPostsOverlapping_DbContainsPostsWithoutDuplicates(dbBlogPosts)
-                    as EntityFrameworkDataStorage;
-
-            // Assert
-            int blogPostCount =
-                dataStorage.DbContext.BlogPosts.Count(
-                    x => x.BlogKey.Equals(BlogMetaTestData.BlogKey, StringComparison.OrdinalIgnoreCase));
-
-            Assert.Equal(11, blogPostCount);
 
             return dataStorage;
         }

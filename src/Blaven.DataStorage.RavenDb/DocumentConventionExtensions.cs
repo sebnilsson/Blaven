@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using Raven.Client.Document;
 
 namespace Blaven.DataStorage.RavenDb
@@ -12,13 +11,9 @@ namespace Blaven.DataStorage.RavenDb
             Func<TEntity, string> idFactory)
         {
             if (conventions == null)
-            {
                 throw new ArgumentNullException(nameof(conventions));
-            }
             if (idFactory == null)
-            {
                 throw new ArgumentNullException(nameof(idFactory));
-            }
 
             conventions.RegisterIdConvention<TEntity>((dbName, commands, entity) => idFactory(entity));
             conventions.RegisterAsyncIdConvention<TEntity>(

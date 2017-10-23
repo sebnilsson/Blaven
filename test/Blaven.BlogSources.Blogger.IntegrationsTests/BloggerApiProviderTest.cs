@@ -2,13 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Xunit;
 
 namespace Blaven.BlogSources.Blogger.IntegrationsTests
 {
     public class BloggerApiProviderTest
     {
+        public static IEnumerable<object[]> AfterLastUpdatedAtData()
+        {
+            yield return new object[]
+                         {
+                             AppSettingsHelper.ExpectedAfterLastUpdatedAt,
+                             AppSettingsHelper.ExpectedAfterLastUpdatedAtPostsCount
+                         };
+        }
+
+        public static IEnumerable<object[]> ForceUpdateData()
+        {
+            yield return new object[] { DateTime.MinValue, AppSettingsHelper.ExpectedPostsCount };
+        }
+
         [Fact]
         public async Task GetBlog_BloggerBlogContainsData_ReturnsWithAllFields()
         {
@@ -37,7 +50,7 @@ namespace Blaven.BlogSources.Blogger.IntegrationsTests
             int expectedPostCount)
         {
             // Arrange
-            var bloggerApiProvider = GetTestBloggerApiProvider(postListRequestMaxResults: 5);
+            var bloggerApiProvider = GetTestBloggerApiProvider(5);
             var blogSetting = GetTestBlogSetting();
 
             // Act
@@ -51,7 +64,7 @@ namespace Blaven.BlogSources.Blogger.IntegrationsTests
         public async Task GetPosts_BloggerBlogContainsData_ReturnsPostWithAllFields()
         {
             // Arrange
-            var bloggerApiProvider = GetTestBloggerApiProvider(postListRequestMaxResults: 2);
+            var bloggerApiProvider = GetTestBloggerApiProvider(2);
             var blogSetting = GetTestBlogSetting();
 
             // Act
@@ -78,38 +91,19 @@ namespace Blaven.BlogSources.Blogger.IntegrationsTests
             Assert.NotNull(firstPost.Url);
         }
 
-        public static IEnumerable<object[]> ForceUpdateData()
-        {
-            yield return new object[] { DateTime.MinValue, AppSettingsHelper.ExpectedPostsCount };
-        }
-
-        public static IEnumerable<object[]> AfterLastUpdatedAtData()
-        {
-            yield return
-                new object[]
-                    {
-                        AppSettingsHelper.ExpectedAfterLastUpdatedAt,
-                        AppSettingsHelper.ExpectedAfterLastUpdatedAtPostsCount
-                    };
-        }
-
         private static BloggerApiProvider GetTestBloggerApiProvider(
             int postListRequestMaxResults = BloggerApiProvider.DefaultPostListRequestMaxResults)
         {
-            string apiKey = AppSettingsHelper.GetApiKey();
+            var apiKey = AppSettingsHelper.GetApiKey();
 
-            var bloggerApiProvider = new BloggerApiProvider(apiKey)
-                                         {
-                
-                                             //PostListRequestMaxResults = postListRequestMaxResults
-                                         };
+            var bloggerApiProvider = new BloggerApiProvider(apiKey);
 
             return bloggerApiProvider;
         }
 
         private static BlogSetting GetTestBlogSetting()
         {
-            string blogId = AppSettingsHelper.GetBlogId();
+            var blogId = AppSettingsHelper.GetBlogId();
 
             var settings = new BlogSetting(string.Empty, blogId, string.Empty);
             return settings;

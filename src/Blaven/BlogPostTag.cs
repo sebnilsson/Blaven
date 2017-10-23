@@ -8,14 +8,14 @@
 
         public BlogPostTag(string text)
         {
-            this.Text = text;
+            Text = text;
         }
-
-        public long Id { get; set; }
 
         public BlogPost BlogPost { get; set; }
 
         public long BlogPostId { get; set; }
+
+        public long Id { get; set; }
 
         public string Text { get; set; }
     }

@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-
 using Blaven.BlogSources.Testing;
 using Blaven.Configuration;
 using Blaven.Testing;
@@ -9,30 +8,6 @@ namespace Blaven.BlogSources.Configuration.Tests
 {
     public class BlogSourceFactoryTest
     {
-        [Fact]
-        public void BuildBlogSource_NullMockBlogSource_FuncContainsUsernameAndPassword()
-        {
-            // Arrange
-            var appSettings = AppSettingTestData.CreateDictionary();
-            var service = new AppSettingsConfigService(appSettings);
-
-            string username = null;
-            string password = null;
-
-            // Act
-            service.BuildBlogSource<FakeBlogSource>(
-                (appSettingUsername, appSettingsPassword) =>
-                    {
-                        username = appSettingUsername;
-                        password = appSettingsPassword;
-                        return null;
-                    });
-
-            // Assert
-            Assert.Equal(AppSettingTestData.AppSettingsTestUsername, username);
-            Assert.Equal(AppSettingTestData.AppSettingsTestPassword, password);
-        }
-
         [Fact]
         public void BuildBlogSource_MockBlogSource_ReturnsNotNullBlogSource()
         {
@@ -48,14 +23,38 @@ namespace Blaven.BlogSources.Configuration.Tests
         }
 
         [Fact]
+        public void BuildBlogSource_NullMockBlogSource_FuncContainsUsernameAndPassword()
+        {
+            // Arrange
+            var appSettings = AppSettingTestData.CreateDictionary();
+            var service = new AppSettingsConfigService(appSettings);
+
+            string username = null;
+            string password = null;
+
+            // Act
+            service.BuildBlogSource<FakeBlogSource>(
+                (appSettingUsername, appSettingsPassword) =>
+                {
+                    username = appSettingUsername;
+                    password = appSettingsPassword;
+                    return null;
+                });
+
+            // Assert
+            Assert.Equal(AppSettingTestData.AppSettingsTestUsername, username);
+            Assert.Equal(AppSettingTestData.AppSettingsTestPassword, password);
+        }
+
+        [Fact]
         public void GetBlogSettingsInternal_AppSettingsContainingSettings_ReturnsBlogSettings()
         {
             // Arrange
             var appSettings = AppSettingTestData.CreateDictionary();
             var service = new AppSettingsConfigService(appSettings);
 
-            string blogKey1 = nameof(BlogMetaTestData.BlogKey1).ToLowerInvariant();
-            string blogKey2 = nameof(BlogMetaTestData.BlogKey2).ToLowerInvariant();
+            var blogKey1 = nameof(BlogMetaTestData.BlogKey1).ToLowerInvariant();
+            var blogKey2 = nameof(BlogMetaTestData.BlogKey2).ToLowerInvariant();
 
             // Act
             var blogSettings = service.GetBlogSettings().ToList();
@@ -82,7 +81,7 @@ namespace Blaven.BlogSources.Configuration.Tests
             var appSettings = AppSettingTestData.CreateDictionary();
             var service = new AppSettingsConfigService(appSettings);
 
-            string blogKey3 = nameof(BlogMetaTestData.BlogKey3).ToLowerInvariant();
+            var blogKey3 = nameof(BlogMetaTestData.BlogKey3).ToLowerInvariant();
 
             // Act
             var blogSettings = service.GetBlogSettings().ToList();

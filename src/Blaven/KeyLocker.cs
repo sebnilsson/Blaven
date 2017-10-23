@@ -9,30 +9,33 @@ namespace Blaven
 
     public class KeyLocker<TKey>
     {
-        private readonly ConcurrentDictionary<TKey, object> locks = new ConcurrentDictionary<TKey, object>();
+        private readonly ConcurrentDictionary<TKey, object> _locks = new ConcurrentDictionary<TKey, object>();
 
         public object GetLock(TKey key)
         {
             if (key == null)
-            {
                 throw new ArgumentNullException(nameof(key));
-            }
 
-            return this.locks.GetOrAdd(key, s => new object());
+            return _locks.GetOrAdd(key, s => new object());
+        }
+
+        public void RemoveLock(TKey key)
+        {
+            if (key == null)
+                throw new ArgumentNullException(nameof(key));
+
+            object o;
+            _locks.TryRemove(key, out o);
         }
 
         public TResult RunWithLock<TResult>(TKey key, Func<TResult> body)
         {
             if (key == null)
-            {
                 throw new ArgumentNullException(nameof(key));
-            }
             if (body == null)
-            {
                 throw new ArgumentNullException(nameof(body));
-            }
 
-            lock (this.locks.GetOrAdd(key, s => new object()))
+            lock (_locks.GetOrAdd(key, s => new object()))
             {
                 return body();
             }
@@ -41,29 +44,14 @@ namespace Blaven
         public void RunWithLock(TKey key, Action body)
         {
             if (key == null)
-            {
                 throw new ArgumentNullException(nameof(key));
-            }
             if (body == null)
-            {
                 throw new ArgumentNullException(nameof(body));
-            }
 
-            lock (this.locks.GetOrAdd(key, s => new object()))
+            lock (_locks.GetOrAdd(key, s => new object()))
             {
                 body();
             }
-        }
-
-        public void RemoveLock(TKey key)
-        {
-            if (key == null)
-            {
-                throw new ArgumentNullException(nameof(key));
-            }
-
-            object o;
-            this.locks.TryRemove(key, out o);
         }
     }
 }

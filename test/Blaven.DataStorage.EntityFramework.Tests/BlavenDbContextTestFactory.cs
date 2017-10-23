@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Microsoft.EntityFrameworkCore;
 
 namespace Blaven.DataStorage.EntityFramework.Tests
@@ -25,13 +24,9 @@ namespace Blaven.DataStorage.EntityFramework.Tests
             if (blogMetas != null || blogPosts != null)
             {
                 if (blogMetas != null)
-                {
                     dbContext.BlogMetas.AddRange(blogMetas);
-                }
                 if (blogPosts != null)
-                {
                     dbContext.BlogPosts.AddRange(blogPosts);
-                }
 
                 dbContext.SaveChanges();
             }

@@ -7,7 +7,7 @@ namespace Blaven.BlogSources.Blogger
 {
     public class BloggerBlogSource : IBlogSource
     {
-        private readonly IBloggerApiProvider apiProvider;
+        private readonly IBloggerApiProvider _apiProvider;
 
         public BloggerBlogSource(string apiKey)
             : this(new BloggerApiProvider(apiKey))
@@ -16,27 +16,37 @@ namespace Blaven.BlogSources.Blogger
 
         internal BloggerBlogSource(IBloggerApiProvider apiProvider)
         {
-            if (apiProvider == null)
+            _apiProvider = apiProvider ?? throw new ArgumentNullException(nameof(apiProvider));
+        }
+
+        public async Task<IReadOnlyList<BlogPost>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
+        {
+            if (blogSetting == null)
+                throw new ArgumentNullException(nameof(blogSetting));
+
+            var posts = await _apiProvider.GetPosts(blogSetting.Id, lastUpdatedAt);
+            if (posts == null)
             {
-                throw new ArgumentNullException(nameof(apiProvider));
+                var message =
+                    $"{nameof(IBloggerApiProvider)} returned a null result from {nameof(_apiProvider.GetPosts)}"
+                    + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
+                throw new BloggerBlogSourceException(message);
             }
 
-            this.apiProvider = apiProvider;
+            var blogPosts = posts.Where(x => x != null).Select(x => GetBlogPost(x, blogSetting)).ToReadOnlyList();
+            return blogPosts;
         }
 
         public async Task<BlogMeta> GetMeta(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
-            {
                 throw new ArgumentNullException(nameof(blogSetting));
-            }
 
-            var blog = await this.apiProvider.GetBlog(blogSetting.Id);
+            var blog = await _apiProvider.GetBlog(blogSetting.Id);
             if (blog == null)
             {
-                string message =
-                    $"{nameof(BloggerApiProvider)} returned a null result from {nameof(this.apiProvider.GetBlog)}"
-                    + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
+                var message = $"{nameof(BloggerApiProvider)} returned a null result from {nameof(_apiProvider.GetBlog)}"
+                              + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
                 throw new BloggerBlogSourceException(message);
             }
 
@@ -44,26 +54,6 @@ namespace Blaven.BlogSources.Blogger
             blogMeta.BlogKey = blogSetting.BlogKey;
 
             return blogMeta;
-        }
-
-        public async Task<IReadOnlyList<BlogPost>> GetBlogPosts(BlogSetting blogSetting, DateTime? lastUpdatedAt)
-        {
-            if (blogSetting == null)
-            {
-                throw new ArgumentNullException(nameof(blogSetting));
-            }
-
-            var posts = await this.apiProvider.GetPosts(blogSetting.Id, lastUpdatedAt);
-            if (posts == null)
-            {
-                string message =
-                    $"{nameof(IBloggerApiProvider)} returned a null result from {nameof(this.apiProvider.GetPosts)}"
-                    + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}'.";
-                throw new BloggerBlogSourceException(message);
-            }
-
-            var blogPosts = posts.Where(x => x != null).Select(x => GetBlogPost(x, blogSetting)).ToReadOnlyList();
-            return blogPosts;
         }
 
         private static BlogPost GetBlogPost(BloggerPostData post, BlogSetting blogSetting)

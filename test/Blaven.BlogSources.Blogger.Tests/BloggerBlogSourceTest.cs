@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Blaven.Testing;
 using Xunit;
 
@@ -11,31 +10,8 @@ namespace Blaven.BlogSources.Blogger.Tests
     public class BloggerBlogSourceTest
     {
         private const string TestBlogId = "TestBlogId";
-
         private const string TestBlogName = "TestBlogName";
-
         private static readonly DateTime TestLastUpdatedAt = new DateTime(2015, 1, 1);
-
-        [Fact]
-        public async Task GetMeta_BloggerApiProviderContainsData_ShouldReturnAllFields()
-        {
-            // Arrange
-            var bloggerBlogSource = GetTestBloggerBlogSource(getBlogFunc: _ => BloggerTestData.GetBlog());
-            var blogSetting = GetTestBlogSetting();
-
-            // Act
-            var meta = await bloggerBlogSource.GetMeta(blogSetting, TestLastUpdatedAt);
-
-            // Assert
-            Assert.NotNull(meta);
-            Assert.Equal(blogSetting.BlogKey, meta.BlogKey);
-            Assert.Equal(BloggerTestData.BlogDescription, meta.Description);
-            Assert.Equal(BloggerTestData.BlogName, meta.Name);
-            Assert.Equal(BloggerTestData.BlogPublishedAt, meta.PublishedAt);
-            Assert.Equal(BloggerTestData.BlogId, meta.SourceId);
-            Assert.Equal(BloggerTestData.BlogUpdatedAt, meta.UpdatedAt);
-            Assert.Equal(BloggerTestData.BlogUrl, meta.Url);
-        }
 
         [Fact]
         public async Task GetBlogPosts_BloggerApiProviderContainsDataAndEmptyDb_ReturnsInsertWithAllFields()
@@ -61,9 +37,30 @@ namespace Blaven.BlogSources.Blogger.Tests
             Assert.Equal(BloggerTestData.PostTitle, post.Title);
             Assert.Equal(BloggerTestData.PostUrl, post.SourceUrl);
             Assert.Equal(BloggerTestData.PostPublishedAt, post.PublishedAt);
-            bool tagsAreSequenceEquals =
+            var tagsAreSequenceEquals =
                 BloggerTestData.PostTags.OrderBy(x => x).SequenceEqual(post.TagTexts.OrderBy(x => x));
             Assert.True(tagsAreSequenceEquals);
+        }
+
+        [Fact]
+        public async Task GetMeta_BloggerApiProviderContainsData_ShouldReturnAllFields()
+        {
+            // Arrange
+            var bloggerBlogSource = GetTestBloggerBlogSource(_ => BloggerTestData.GetBlog());
+            var blogSetting = GetTestBlogSetting();
+
+            // Act
+            var meta = await bloggerBlogSource.GetMeta(blogSetting, TestLastUpdatedAt);
+
+            // Assert
+            Assert.NotNull(meta);
+            Assert.Equal(blogSetting.BlogKey, meta.BlogKey);
+            Assert.Equal(BloggerTestData.BlogDescription, meta.Description);
+            Assert.Equal(BloggerTestData.BlogName, meta.Name);
+            Assert.Equal(BloggerTestData.BlogPublishedAt, meta.PublishedAt);
+            Assert.Equal(BloggerTestData.BlogId, meta.SourceId);
+            Assert.Equal(BloggerTestData.BlogUpdatedAt, meta.UpdatedAt);
+            Assert.Equal(BloggerTestData.BlogUrl, meta.Url);
         }
 
         private static BloggerBlogSource GetTestBloggerBlogSource(

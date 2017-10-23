@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using Blaven.BlogSources;
 
 namespace Blaven.Configuration
@@ -11,11 +10,9 @@ namespace Blaven.Configuration
             where TBlogSource : IBlogSource
         {
             if (appSettings == null)
-            {
                 throw new ArgumentNullException(nameof(appSettings));
-            }
 
-            var config = GetValue<TBlogSource>(AppSettingsHelper.PasswordKey, appSettings, requireValue: false);
+            var config = GetValue<TBlogSource>(AppSettingsHelper.PasswordKey, appSettings, false);
             return config;
         }
 
@@ -23,31 +20,26 @@ namespace Blaven.Configuration
             where TBlogSource : IBlogSource
         {
             if (appSettings == null)
-            {
                 throw new ArgumentNullException(nameof(appSettings));
-            }
 
-            var config = GetValue<TBlogSource>(AppSettingsHelper.UsernameKey, appSettings, requireValue: false);
+            var config = GetValue<TBlogSource>(AppSettingsHelper.UsernameKey, appSettings, false);
             return config;
         }
 
         public static string GetValue<TBlogSource>(
             string key,
             IDictionary<string, string> appSettings,
-            bool requireValue = true) where TBlogSource : IBlogSource
+            bool requireValue = true)
+            where TBlogSource : IBlogSource
         {
             if (key == null)
-            {
                 throw new ArgumentNullException(nameof(key));
-            }
             if (appSettings == null)
-            {
                 throw new ArgumentNullException(nameof(appSettings));
-            }
 
             var type = typeof(TBlogSource);
 
-            string value = GetValue(type, key, appSettings, requireValue);
+            var value = GetValue(type, key, appSettings, requireValue);
             return value;
         }
 
@@ -58,25 +50,19 @@ namespace Blaven.Configuration
             bool requireValue)
         {
             if (type == null)
-            {
                 throw new ArgumentNullException(nameof(type));
-            }
             if (key == null)
-            {
                 throw new ArgumentNullException(nameof(key));
-            }
             if (appSettings == null)
-            {
                 throw new ArgumentNullException(nameof(appSettings));
-            }
 
-            string typeName = type.Name;
+            var typeName = type.Name;
 
-            string appSettingsKey = string.Format(AppSettingsHelper.BlogSourcesKeyFormat, typeName, key);
+            var appSettingsKey = string.Format(AppSettingsHelper.BlogSourcesKeyFormat, typeName, key);
 
-            string value = requireValue
-                               ? AppSettingsHelper.GetValue(appSettingsKey, appSettings)
-                               : AppSettingsHelper.TryGetValue(appSettingsKey, appSettings);
+            var value = requireValue
+                            ? AppSettingsHelper.GetValue(appSettingsKey, appSettings)
+                            : AppSettingsHelper.TryGetValue(appSettingsKey, appSettings);
             return value;
         }
     }

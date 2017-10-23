@@ -1,5 +1,4 @@
 ﻿using System.Net;
-
 using Xunit;
 
 namespace Blaven.Transformers.Tests
@@ -9,21 +8,24 @@ namespace Blaven.Transformers.Tests
         [Fact]
         public void Transform_BlogPostWithContentCodeBlockContainingLink_ContainsLinks()
         {
-            const string Content =
+            const string content =
                 "<code><a href=\"http://msdn.microsoft.com/en-us/library/system.web.httprequest.applicationpath.aspx\">Request.ApplicationPath</a>:</code>";
 
             // Arrange
             var transformer = new PhraseTagsTransformer();
-            var blogPost = new BlogPost { Content = Content };
+            var blogPost = new BlogPost
+                           {
+                               Content = content
+                           };
 
             // Act
             transformer.Transform(blogPost);
 
             // Assert
-            string decodedContent = WebUtility.HtmlDecode(blogPost.Content);
+            var decodedContent = WebUtility.HtmlDecode(blogPost.Content);
 
-            bool contentContainsAHrefTag = blogPost.Content.Contains("<a href");
-            bool decodedContentContainsAHrefTag = decodedContent.Contains("<a href");
+            var contentContainsAHrefTag = blogPost.Content.Contains("<a href");
+            var decodedContentContainsAHrefTag = decodedContent.Contains("<a href");
 
             Assert.False(contentContainsAHrefTag);
             Assert.True(decodedContentContainsAHrefTag);
@@ -32,18 +34,21 @@ namespace Blaven.Transformers.Tests
         [Fact]
         public void Transform_BlogPostWithPreCodeBlockWithHtml_ContainsUnencodedHtml()
         {
-            const string Content = "<pre><code><head>\n<title>Title</title></code></pre>";
-            const string Expected = "<pre><code>&lt;head&gt;\n&lt;title&gt;Title&lt;/title&gt;</code></pre>";
+            const string content = "<pre><code><head>\n<title>Title</title></code></pre>";
+            const string expected = "<pre><code>&lt;head&gt;\n&lt;title&gt;Title&lt;/title&gt;</code></pre>";
 
             // Arrange
             var transformer = new PhraseTagsTransformer();
-            var blogPost = new BlogPost { Content = Content };
+            var blogPost = new BlogPost
+                           {
+                               Content = content
+                           };
 
             // Act
             transformer.Transform(blogPost);
 
             // Assert
-            Assert.Equal(Expected, blogPost.Content);
+            Assert.Equal(expected, blogPost.Content);
         }
     }
 }

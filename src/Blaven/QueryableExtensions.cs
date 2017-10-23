@@ -11,11 +11,9 @@ namespace Blaven
             int pageIndex = 0)
         {
             if (source == null)
-            {
                 throw new ArgumentNullException(nameof(source));
-            }
 
-            var paged = PagingUtility.GetPaged(source, pageSize: pageSize, pageIndex: pageIndex);
+            var paged = PagingUtility.GetPaged(source, pageSize, pageIndex);
             return paged;
         }
     }

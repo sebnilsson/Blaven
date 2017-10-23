@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Raven.Client;
 using Raven.Client.Embedded;
 using Raven.Client.Listeners;
@@ -17,22 +16,24 @@ namespace Blaven.DataStorage.RavenDb.Tests
             path = !string.IsNullOrWhiteSpace(path) ? path : $"{Guid.NewGuid()}";
 
             var documentStore = new EmbeddableDocumentStore
+                                {
+                                    Configuration =
                                     {
-                                        Configuration =
+                                        DataDirectory = path,
+                                        RunInMemory = true,
+                                        RunInUnreliableYetFastModeThatIsNotSuitableForProduction
+                                            = true,
+                                        Storage =
+                                        {
+                                            Voron =
                                             {
-                                                DataDirectory = path,
-                                                RunInMemory = true,
-                                                RunInUnreliableYetFastModeThatIsNotSuitableForProduction = true,
-                                                Storage =
-                                                    {
-                                                        Voron =
-                                                            {
-                                                                AllowOn32Bits = true
-                                                            }
-                                                    }
-                                            },
-                                        RunInMemory = true
-                                    };
+                                                AllowOn32Bits
+                                                    = true
+                                            }
+                                        }
+                                    },
+                                    RunInMemory = true
+                                };
 
             if (initIndexes)
             {

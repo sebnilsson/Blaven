@@ -6,27 +6,19 @@ namespace Blaven.BlogSources.Blogger
     internal class BloggerApiUrlHelper
     {
         private const string BaseUrl = "https://www.googleapis.com/blogger/v3/blogs";
-
-        private readonly string apiKey;
+        private readonly string _apiKey;
 
         public BloggerApiUrlHelper(string apiKey)
         {
-            if (apiKey == null)
-            {
-                throw new ArgumentNullException(nameof(apiKey));
-            }
-
-            this.apiKey = apiKey;
+            _apiKey = apiKey ?? throw new ArgumentNullException(nameof(apiKey));
         }
 
         public string GetBlogUrl(string blogId)
         {
             if (blogId == null)
-            {
                 throw new ArgumentNullException(nameof(blogId));
-            }
 
-            string url = this.AppendApiKey($"{BaseUrl}/{blogId}");
+            var url = AppendApiKey($"{BaseUrl}/{blogId}");
             return url;
         }
 
@@ -37,15 +29,13 @@ namespace Blaven.BlogSources.Blogger
             int postsRequestMaxResults)
         {
             if (blogId == null)
-            {
                 throw new ArgumentNullException(nameof(blogId));
-            }
 
-            string url = this.AppendApiKey($"{BaseUrl}/{blogId}/posts/");
+            var url = AppendApiKey($"{BaseUrl}/{blogId}/posts/");
 
-            string startDate = (lastUpdateAt != null && lastUpdateAt > DateTime.MinValue)
-                                   ? lastUpdateAt.Value.ToRfc3339String()
-                                   : null;
+            var startDate = lastUpdateAt != null && lastUpdateAt > DateTime.MinValue
+                                ? lastUpdateAt.Value.ToRfc3339String()
+                                : null;
 
             url = AppendParam(url, "startDate", startDate);
 
@@ -67,26 +57,24 @@ namespace Blaven.BlogSources.Blogger
             return url;
         }
 
-        private string AppendApiKey(string url)
-        {
-            string apiKeyUrl = AppendParam(url, "key", this.apiKey);
-            return apiKeyUrl;
-        }
-
         private static string AppendParam(string url, string paramKey, string paramValue)
         {
             if (string.IsNullOrWhiteSpace(paramValue))
-            {
                 return url;
-            }
 
-            string separator = url.Contains("?") ? "&" : "?";
+            var separator = url.Contains("?") ? "&" : "?";
 
-            string encodedKey = WebUtility.UrlEncode(paramKey);
-            string encodedValue = WebUtility.UrlEncode(paramValue);
+            var encodedKey = WebUtility.UrlEncode(paramKey);
+            var encodedValue = WebUtility.UrlEncode(paramValue);
 
-            string appendedUrl = $"{url}{separator}{encodedKey}={encodedValue}";
+            var appendedUrl = $"{url}{separator}{encodedKey}={encodedValue}";
             return appendedUrl;
+        }
+
+        private string AppendApiKey(string url)
+        {
+            var apiKeyUrl = AppendParam(url, "key", _apiKey);
+            return apiKeyUrl;
         }
     }
 }

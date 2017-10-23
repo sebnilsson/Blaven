@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Blaven.BlogSources;
 using Blaven.BlogSources.Testing;
 using Blaven.DataStorage;
@@ -10,26 +9,6 @@ namespace Blaven.Synchronization.Testing
 {
     public class SynchronizationConfigurationTest
     {
-        [Fact]
-        public void Ctor_BlogSourceNullArgument_ThrowsArgumentNullException()
-        {
-            // Arrange
-            var dataStorage = new FakeDataStorage();
-            
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => GetTestBlogSyncConfiguration(null, dataStorage));
-        }
-
-        [Fact]
-        public void Ctor_DataStorageNullArgument_ThrowsArgumentNullException()
-        {
-            // Arrange
-            var blogSource = new FakeBlogSource();
-
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => GetTestBlogSyncConfiguration(blogSource));
-        }
-
         [Fact]
         public void BlavenIdProvider_CtorNullArgument_ReturnsDefaultType()
         {
@@ -43,6 +22,26 @@ namespace Blaven.Synchronization.Testing
             // Assert
             Assert.NotNull(config.BlavenIdProvider);
             Assert.IsType<PermalinkBlogPostBlavenIdProvider>(config.BlavenIdProvider);
+        }
+
+        [Fact]
+        public void Ctor_BlogSourceNullArgument_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var dataStorage = new FakeDataStorage();
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => GetTestBlogSyncConfiguration(null, dataStorage));
+        }
+
+        [Fact]
+        public void Ctor_DataStorageNullArgument_ThrowsArgumentNullException()
+        {
+            // Arrange
+            var blogSource = new FakeBlogSource();
+
+            // Act & Assert
+            Assert.Throws<ArgumentNullException>(() => GetTestBlogSyncConfiguration(blogSource));
         }
 
         [Fact]

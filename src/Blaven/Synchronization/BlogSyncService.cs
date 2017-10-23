@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Blaven.BlogSources;
 using Blaven.DataStorage;
 
@@ -12,12 +11,9 @@ namespace Blaven.Synchronization
     public class BlogSyncService
     {
         private static readonly KeyLocker UpdateBlogLocker = new KeyLocker();
-
-        private readonly BlogSettingsHelper blogSettings;
-
-        private readonly BlogSyncServiceMetaHelper metaHelper;
-
-        private readonly BlogSyncServicePostsHelper postsHelper;
+        private readonly BlogSettingsHelper _blogSettings;
+        private readonly BlogSyncServiceMetaHelper _metaHelper;
+        private readonly BlogSyncServicePostsHelper _postsHelper;
 
         public BlogSyncService(IBlogSource blogSource, IDataStorage dataStorage, IEnumerable<BlogSetting> blogSettings)
             : this(BlogSyncConfiguration.Create(blogSource, dataStorage, blogSettings))
@@ -31,17 +27,12 @@ namespace Blaven.Synchronization
 
         public BlogSyncService(BlogSyncConfiguration config)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
+            Config = config ?? throw new ArgumentNullException(nameof(config));
 
-            this.Config = config;
+            _blogSettings = new BlogSettingsHelper(config.BlogSettings);
 
-            this.blogSettings = new BlogSettingsHelper(config.BlogSettings);
-
-            this.metaHelper = new BlogSyncServiceMetaHelper(config);
-            this.postsHelper = new BlogSyncServicePostsHelper(config);
+            _metaHelper = new BlogSyncServiceMetaHelper(config);
+            _postsHelper = new BlogSyncServicePostsHelper(config);
         }
 
         public BlogSyncConfiguration Config { get; }
@@ -49,39 +40,23 @@ namespace Blaven.Synchronization
         public async Task<IReadOnlyList<BlogSyncResult>> Update(params BlogKey[] blogKeys)
         {
             if (blogKeys == null)
-            {
                 throw new ArgumentNullException(nameof(blogKeys));
-            }
 
-            var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
+            var ensuredBlogKeys = _blogSettings.GetEnsuredBlogKeys(blogKeys);
 
-            var result = await this.UpdateBlogs(ensuredBlogKeys, forceShouldUpdate: false);
+            var result = await UpdateBlogs(ensuredBlogKeys, false);
             return result;
         }
 
         public async Task<IReadOnlyList<BlogSyncResult>> UpdateAll(params BlogKey[] blogKeys)
         {
             if (blogKeys == null)
-            {
                 throw new ArgumentNullException(nameof(blogKeys));
-            }
 
-            var ensuredBlogKeys = this.blogSettings.GetEnsuredBlogKeys(blogKeys);
+            var ensuredBlogKeys = _blogSettings.GetEnsuredBlogKeys(blogKeys);
 
-            var result = await this.UpdateBlogs(ensuredBlogKeys, forceShouldUpdate: true);
+            var result = await UpdateBlogs(ensuredBlogKeys, true);
             return result;
-        }
-
-        private async Task<IReadOnlyList<BlogSyncResult>> UpdateBlogs(
-            IEnumerable<string> blogKeys,
-            bool forceShouldUpdate)
-        {
-            var resultTasks =
-                blogKeys.Select(async blogKey => await this.UpdateBlog(blogKey, forceShouldUpdate)).ToList();
-
-            await Task.WhenAll(resultTasks);
-
-            return resultTasks.Select(x => x.Result).ToReadOnlyList();
         }
 
         private async Task<BlogSyncResult> UpdateBlog(string blogKey, bool forceShouldUpdate)
@@ -90,22 +65,22 @@ namespace Blaven.Synchronization
 
             var result = new BlogSyncResult(blogKey);
 
-            string lockKey = blogKey.ToLowerInvariant();
+            var lockKey = blogKey.ToLowerInvariant();
 
             try
             {
-                var blogSetting = this.blogSettings.GetBlogSetting(blogKey);
+                var blogSetting = _blogSettings.GetBlogSetting(blogKey);
 
                 await UpdateBlogLocker.RunWithLock(
                     lockKey,
                     async () =>
-                        {
-                            var lastUpdatedAt = !forceShouldUpdate
-                                                    ? await this.Config.DataStorage.GetLastUpdatedAt(blogSetting)
-                                                    : null;
+                    {
+                        var lastUpdatedAt = !forceShouldUpdate
+                                                ? await Config.DataStorage.GetLastUpdatedAt(blogSetting)
+                                                : null;
 
-                            await this.UpdateBlogData(blogSetting, lastUpdatedAt, result);
-                        });
+                        await UpdateBlogData(blogSetting, lastUpdatedAt, result);
+                    });
             }
             finally
             {
@@ -122,8 +97,8 @@ namespace Blaven.Synchronization
 
         private async Task UpdateBlogData(BlogSetting blogSetting, DateTime? lastUpdatedAt, BlogSyncResult result)
         {
-            var updateMetaTask = this.metaHelper.Update(blogSetting, lastUpdatedAt);
-            var updatePostsTask = this.postsHelper.Update(blogSetting, lastUpdatedAt);
+            var updateMetaTask = _metaHelper.Update(blogSetting, lastUpdatedAt);
+            var updatePostsTask = _postsHelper.Update(blogSetting, lastUpdatedAt);
 
             await Task.WhenAll(updateMetaTask, updatePostsTask);
 
@@ -132,14 +107,24 @@ namespace Blaven.Synchronization
 
             result.OnDataUpdated(meta, changeSet);
 
-            var saveBlogMetaTask = (meta != null)
-                                       ? this.Config.DataStorage.SaveBlogMeta(blogSetting, meta)
-                                       : TaskHelper.CompletedTask;
-            var saveChangesTask = (changeSet != null)
-                                      ? this.Config.DataStorage.SaveChanges(blogSetting, changeSet)
+            var saveBlogMetaTask =
+                meta != null ? Config.DataStorage.SaveBlogMeta(blogSetting, meta) : TaskHelper.CompletedTask;
+            var saveChangesTask = changeSet != null
+                                      ? Config.DataStorage.SaveChanges(blogSetting, changeSet)
                                       : TaskHelper.CompletedTask;
 
             await Task.WhenAll(saveBlogMetaTask, saveChangesTask);
+        }
+
+        private async Task<IReadOnlyList<BlogSyncResult>> UpdateBlogs(
+            IEnumerable<string> blogKeys,
+            bool forceShouldUpdate)
+        {
+            var resultTasks = blogKeys.Select(async blogKey => await UpdateBlog(blogKey, forceShouldUpdate)).ToList();
+
+            await Task.WhenAll(resultTasks);
+
+            return resultTasks.Select(x => x.Result).ToReadOnlyList();
         }
     }
 }

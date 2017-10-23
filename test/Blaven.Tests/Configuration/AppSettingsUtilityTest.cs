@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-
 using Blaven.BlogSources.Testing;
 using Blaven.Testing;
 using Xunit;
@@ -15,7 +14,7 @@ namespace Blaven.Configuration.Tests
             var appSettings = AppSettingTestData.CreateDictionary();
 
             // Act
-            string password = AppSettingsUtility.GetPassword<FakeBlogSource>(appSettings);
+            var password = AppSettingsUtility.GetPassword<FakeBlogSource>(appSettings);
 
             // Assert
             Assert.Equal(AppSettingTestData.AppSettingsTestPassword, password);
@@ -28,7 +27,7 @@ namespace Blaven.Configuration.Tests
             var appSettings = AppSettingTestData.CreateDictionary();
 
             // Act
-            string username = AppSettingsUtility.GetUsername<FakeBlogSource>(appSettings);
+            var username = AppSettingsUtility.GetUsername<FakeBlogSource>(appSettings);
 
             // Assert
             Assert.Equal(AppSettingTestData.AppSettingsTestUsername, username);

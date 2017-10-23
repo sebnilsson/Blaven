@@ -12,13 +12,9 @@ namespace Blaven
             Func<TSource, TKey> keySelector)
         {
             if (source == null)
-            {
                 throw new ArgumentNullException(nameof(source));
-            }
             if (keySelector == null)
-            {
                 throw new ArgumentNullException(nameof(keySelector));
-            }
 
             return from item in source.GroupBy(keySelector) select item.First();
         }
@@ -26,9 +22,7 @@ namespace Blaven
         public static IEnumerable<TSource> Duplicates<TSource>(this IEnumerable<TSource> source)
         {
             if (source == null)
-            {
                 throw new ArgumentNullException(nameof(source));
-            }
 
             return from grouping in source.GroupBy(x => x) where grouping.Count() > 1 from item in grouping select item;
         }
@@ -38,13 +32,9 @@ namespace Blaven
             Func<TSource, TKey> keySelector)
         {
             if (source == null)
-            {
                 throw new ArgumentNullException(nameof(source));
-            }
             if (keySelector == null)
-            {
                 throw new ArgumentNullException(nameof(keySelector));
-            }
 
             return from grouping in source.GroupBy(keySelector)
                    where grouping.Count() > 1
@@ -52,23 +42,22 @@ namespace Blaven
                    select item;
         }
 
-        public static IEnumerable<TSource> Paged<TSource>(this IEnumerable<TSource> source, int pageSize, int pageIndex = 0)
+        public static IEnumerable<TSource> Paged<TSource>(
+            this IEnumerable<TSource> source,
+            int pageSize,
+            int pageIndex = 0)
         {
             if (source == null)
-            {
                 throw new ArgumentNullException(nameof(source));
-            }
 
-            var paged = PagingUtility.GetPaged(source, pageSize: pageSize, pageIndex: pageIndex);
+            var paged = PagingUtility.GetPaged(source, pageSize, pageIndex);
             return paged;
         }
 
         public static IReadOnlyList<TSource> ToReadOnlyList<TSource>(this IEnumerable<TSource> source)
         {
             if (source == null)
-            {
                 throw new ArgumentNullException(nameof(source));
-            }
 
             var list = source.ToList();
             return new ReadOnlyCollection<TSource>(list);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Blaven.DataStorage.RavenDb.Indexes;
 using Blaven.Synchronization;
 using Raven.Client;
@@ -13,80 +12,66 @@ namespace Blaven.DataStorage.RavenDb
     {
         public RavenDbDataStorage(IDocumentStore documentStore)
         {
-            if (documentStore == null)
-            {
-                throw new ArgumentNullException(nameof(documentStore));
-            }
-
-            this.DocumentStore = documentStore;
+            DocumentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
         }
 
         internal IDocumentStore DocumentStore { get; }
-
-        public async Task<DateTime?> GetLastUpdatedAt(BlogSetting blogSetting)
-        {
-            if (blogSetting == null)
-            {
-                throw new ArgumentNullException(nameof(blogSetting));
-            }
-
-            using (var session = this.DocumentStore.OpenAsyncSession())
-            {
-                var lastPost =
-                    await
-                        session.Query<BlogPostHead, BlogPostsIndex>()
-                            .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                            .Where(x => x.BlogKey == blogSetting.BlogKey)
-                            .OrderByDescending(x => x.UpdatedAt)
-                            .FirstOrDefaultAsync();
-
-                return lastPost?.UpdatedAt;
-            }
-        }
 
         public async Task<IReadOnlyList<BlogPostBase>> GetBlogPosts(
             BlogSetting blogSetting,
             DateTime? lastUpdatedAt = null)
         {
             if (blogSetting == null)
-            {
                 throw new ArgumentNullException(nameof(blogSetting));
-            }
 
-            using (var session = this.DocumentStore.OpenAsyncSession())
+            using (var session = DocumentStore.OpenAsyncSession())
             {
-                var posts =
-                    await
-                        session.Query<BlogPostHead, BlogPostsIndex>()
-                            .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
-                            .Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
-                            .OrderByDescending(x => x.PublishedAt)
-                            .ProjectFromIndexFieldsInto<BlogPostBase>()
-                            .ToListAllAsync();
+                var posts = await session.Query<BlogPostHead, BlogPostsIndex>()
+                                .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                .Where(x => x.BlogKey == blogSetting.BlogKey && x.UpdatedAt > lastUpdatedAt)
+                                .OrderByDescending(x => x.PublishedAt)
+                                .ProjectFromIndexFieldsInto<BlogPostBase>()
+                                .ToListAllAsync();
 
                 return posts.ToReadOnlyList();
+            }
+        }
+
+        public async Task<DateTime?> GetLastUpdatedAt(BlogSetting blogSetting)
+        {
+            if (blogSetting == null)
+                throw new ArgumentNullException(nameof(blogSetting));
+
+            using (var session = DocumentStore.OpenAsyncSession())
+            {
+                var lastPost = await session.Query<BlogPostHead, BlogPostsIndex>()
+                                   .Customize(x => x.WaitForNonStaleResultsAsOfLastWrite())
+                                   .Where(x => x.BlogKey == blogSetting.BlogKey)
+                                   .OrderByDescending(x => x.UpdatedAt)
+                                   .FirstOrDefaultAsync();
+
+                return lastPost?.UpdatedAt;
             }
         }
 
         public async Task SaveBlogMeta(BlogSetting blogSetting, BlogMeta blogMeta)
         {
             if (blogSetting == null)
-            {
                 throw new ArgumentNullException(nameof(blogSetting));
-            }
             if (blogMeta == null)
-            {
                 throw new ArgumentNullException(nameof(blogMeta));
-            }
 
-            using (var session = this.DocumentStore.OpenAsyncSession())
+            using (var session = DocumentStore.OpenAsyncSession())
             {
-                string blogMetaId = RavenDbIdConventions.GetBlogMetaId(blogSetting.BlogKey);
+                var blogMetaId = RavenDbIdConventions.GetBlogMetaId(blogSetting.BlogKey);
 
                 var existingMeta = await session.LoadAsync<BlogMeta>(blogMetaId);
                 if (existingMeta == null)
                 {
-                    existingMeta = new BlogMeta { BlogKey = blogSetting.BlogKey };
+                    existingMeta = new BlogMeta
+                                   {
+                                       BlogKey = blogSetting.BlogKey
+                                   };
                     await session.StoreAsync(existingMeta);
                 }
 
@@ -104,15 +89,11 @@ namespace Blaven.DataStorage.RavenDb
         public async Task SaveChanges(BlogSetting blogSetting, BlogSyncPostsChangeSet changeSet)
         {
             if (blogSetting == null)
-            {
                 throw new ArgumentNullException(nameof(blogSetting));
-            }
             if (changeSet == null)
-            {
                 throw new ArgumentNullException(nameof(changeSet));
-            }
 
-            using (var session = this.DocumentStore.OpenAsyncSession())
+            using (var session = DocumentStore.OpenAsyncSession())
             {
                 session.Advanced.MaxNumberOfRequestsPerSession = int.MaxValue;
 
@@ -128,13 +109,11 @@ namespace Blaven.DataStorage.RavenDb
         {
             foreach (var deletedPost in deletedPosts)
             {
-                string postId = RavenDbIdConventions.GetBlogPostId(deletedPost.BlogKey, deletedPost.BlavenId);
+                var postId = RavenDbIdConventions.GetBlogPostId(deletedPost.BlogKey, deletedPost.BlavenId);
 
                 var existingPost = await session.LoadAsync<BlogPost>(postId);
                 if (existingPost != null)
-                {
                     session.Delete(existingPost);
-                }
             }
         }
 
@@ -144,12 +123,16 @@ namespace Blaven.DataStorage.RavenDb
         {
             foreach (var post in insertedOrUpdatedPosts)
             {
-                string postId = RavenDbIdConventions.GetBlogPostId(post.BlogKey, post.BlavenId);
+                var postId = RavenDbIdConventions.GetBlogPostId(post.BlogKey, post.BlavenId);
 
                 var existingPost = await session.LoadAsync<BlogPost>(postId);
                 if (existingPost == null)
                 {
-                    existingPost = new BlogPost { BlogKey = post.BlogKey, BlavenId = post.BlavenId };
+                    existingPost = new BlogPost
+                                   {
+                                       BlogKey = post.BlogKey,
+                                       BlavenId = post.BlavenId
+                                   };
                     await session.StoreAsync(existingPost);
                 }
 

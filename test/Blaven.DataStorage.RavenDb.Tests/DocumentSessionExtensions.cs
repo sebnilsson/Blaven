@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Raven.Client;
 using Raven.Client.Linq;
 
@@ -10,9 +9,7 @@ namespace Blaven.DataStorage.RavenDb.Tests
         public static IRavenQueryable<T> QueryNonStale<T>(this IDocumentSession documentSession)
         {
             if (documentSession == null)
-            {
                 throw new ArgumentNullException(nameof(documentSession));
-            }
 
             var query = documentSession.Query<T>().Customize(x => x.WaitForNonStaleResultsAsOfNow());
             return query;

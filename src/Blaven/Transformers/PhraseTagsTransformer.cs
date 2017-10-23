@@ -10,9 +10,7 @@ namespace Blaven.Transformers
         public Task<BlogPost> Transform(BlogPost blogPost)
         {
             if (blogPost.Content != null)
-            {
                 blogPost.Content = EncodePreTags(blogPost.Content);
-            }
 
             return Task.FromResult(blogPost);
         }
@@ -20,28 +18,26 @@ namespace Blaven.Transformers
         private static string EncodePreTags(string content)
         {
             var regex = new Regex(
-                            @"<(pre|code|samp)+.*?>(<code>)?(?<Content>.*?)(</code>)?</(pre|code|samp)+>",
-                            RegexOptions.Singleline);
+                @"<(pre|code|samp)+.*?>(<code>)?(?<Content>.*?)(</code>)?</(pre|code|samp)+>",
+                RegexOptions.Singleline);
             var matches = regex.Matches(content).OfType<Match>().ToList();
 
             if (!matches.Any())
-            {
                 return content;
-            }
 
             var matchingCaptures =
                 (from match in matches
                  from captures in match.Groups["Content"].Captures.OfType<Capture>()
                  select captures).Reverse();
 
-            string parsedContent = content;
+            var parsedContent = content;
 
             foreach (var capture in matchingCaptures)
             {
-                int index = capture.Index;
-                int length = capture.Length;
+                var index = capture.Index;
+                var length = capture.Length;
 
-                string encodedContent = WebUtility.HtmlEncode(capture.Value);
+                var encodedContent = WebUtility.HtmlEncode(capture.Value);
                 parsedContent = parsedContent.Remove(index, length);
                 parsedContent = parsedContent.Insert(index, encodedContent);
             }

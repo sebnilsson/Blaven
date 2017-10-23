@@ -5,34 +5,27 @@ namespace Blaven.Synchronization
 {
     internal class BlogSyncServiceMetaHelper
     {
-        private readonly BlogSyncConfiguration config;
+        private readonly BlogSyncConfiguration _config;
 
         public BlogSyncServiceMetaHelper(BlogSyncConfiguration config)
         {
-            if (config == null)
-            {
-                throw new ArgumentNullException(nameof(config));
-            }
-
-            this.config = config;
+            _config = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         public async Task<BlogMeta> Update(BlogSetting blogSetting, DateTime? lastUpdatedAt)
         {
             if (blogSetting == null)
-            {
                 throw new ArgumentNullException(nameof(blogSetting));
-            }
 
             BlogMeta meta;
             try
             {
-                meta = await this.config.BlogSource.GetMeta(blogSetting, lastUpdatedAt);
+                meta = await _config.BlogSource.GetMeta(blogSetting, lastUpdatedAt);
             }
             catch (Exception ex)
             {
-                string message =
-                    $"{nameof(this.config.BlogSource)} threw an unexpected excetion from {nameof(this.config.BlogSource.GetMeta)}"
+                var message =
+                    $"{nameof(_config.BlogSource)} threw an unexpected excetion from {nameof(_config.BlogSource.GetMeta)}"
                     + $" for {nameof(blogSetting.BlogKey)} '{blogSetting.BlogKey}': {ex.Message.TrimEnd('.')}.";
                 throw new BlogSyncBlogSourceException(message, ex);
             }

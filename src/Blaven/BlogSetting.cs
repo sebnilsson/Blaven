@@ -9,17 +9,13 @@ namespace Blaven
         public BlogSetting(BlogKey blogKey, string id = null, string name = null)
         {
             if (blogKey == null)
-            {
                 throw new ArgumentNullException(nameof(blogKey));
-            }
             if (!blogKey.HasValue)
-            {
                 throw new ArgumentOutOfRangeException(nameof(blogKey), $"{nameof(Blaven.BlogKey)} must have a value.");
-            }
 
-            this.BlogKey = blogKey.Value;
-            this.Id = id;
-            this.Name = name;
+            BlogKey = blogKey.Value;
+            Id = id;
+            Name = name;
         }
 
         public string Id { get; }

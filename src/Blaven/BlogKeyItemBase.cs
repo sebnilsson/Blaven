@@ -2,18 +2,12 @@
 {
     public abstract class BlogKeyItemBase
     {
-        private string blogKey;
+        private string _blogKey;
 
         public string BlogKey
         {
-            get
-            {
-                return this.blogKey;
-            }
-            set
-            {
-                this.blogKey = value?.ToLowerInvariant();
-            }
+            get => _blogKey;
+            set => _blogKey = value?.ToLowerInvariant();
         }
     }
 }

@@ -4,13 +4,13 @@
     {
         public BlogKey(string value)
         {
-            this.Value = value?.ToLowerInvariant();
+            Value = value?.ToLowerInvariant();
         }
 
-        public bool HasValue => (this.Value != null);
+        public bool HasValue => Value != null;
 
         public string Value { get; }
-        
+
         public static implicit operator BlogKey(string value)
         {
             var blogKey = new BlogKey(value);
@@ -19,7 +19,7 @@
 
         public static implicit operator string(BlogKey blogKey)
         {
-            string value = blogKey.Value;
+            var value = blogKey.Value;
             return value;
         }
     }

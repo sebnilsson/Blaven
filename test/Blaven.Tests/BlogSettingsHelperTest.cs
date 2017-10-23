@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-
 using Blaven.Testing;
 using Xunit;
 
@@ -28,7 +27,7 @@ namespace Blaven.Tests
             var settingsHelper = GetTestBlogSettingsHelper();
 
             // Act
-            var ensuredBlogKey = settingsHelper.GetEnsuredBlogKey(blogKey: null);
+            var ensuredBlogKey = settingsHelper.GetEnsuredBlogKey(null);
 
             // Assert
             var firstBlogSetting = BlogSettingTestData.CreateCollection().FirstOrDefault();
@@ -36,6 +35,22 @@ namespace Blaven.Tests
             Assert.NotNull(ensuredBlogKey);
             Assert.NotNull(firstBlogSetting);
             Assert.Equal(firstBlogSetting.BlogKey, ensuredBlogKey);
+        }
+
+        [Fact]
+        public void GetEnsuredBlogKeys_EmptyBlogKeys_ReturnsAllBlogSettingsBlogKeys()
+        {
+            // Arrange
+            var settingsHelper = GetTestBlogSettingsHelper();
+
+            // Act
+            var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(Enumerable.Empty<string>());
+
+            // Assert
+            var blogSettingsBlogKeys = BlogSettingTestData.CreateCollection().Select(x => x.BlogKey);
+
+            var ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys = ensuredBlogKeys.SequenceEqual(blogSettingsBlogKeys);
+            Assert.True(ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys);
         }
 
         [Fact]
@@ -49,24 +64,8 @@ namespace Blaven.Tests
             var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys);
 
             // Assert
-            bool ensuredBlogKeysSequenceEqualsBlogKeys = ensuredBlogKeys.SequenceEqual(blogKeys);
+            var ensuredBlogKeysSequenceEqualsBlogKeys = ensuredBlogKeys.SequenceEqual(blogKeys);
             Assert.True(ensuredBlogKeysSequenceEqualsBlogKeys);
-        }
-
-        [Fact]
-        public void GetEnsuredBlogKeys_EmptyBlogKeys_ReturnsAllBlogSettingsBlogKeys()
-        {
-            // Arrange
-            var settingsHelper = GetTestBlogSettingsHelper();
-
-            // Act
-            var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys: Enumerable.Empty<string>());
-
-            // Assert
-            var blogSettingsBlogKeys = BlogSettingTestData.CreateCollection().Select(x => x.BlogKey);
-
-            bool ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys = ensuredBlogKeys.SequenceEqual(blogSettingsBlogKeys);
-            Assert.True(ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys);
         }
 
         [Fact]
@@ -76,12 +75,12 @@ namespace Blaven.Tests
             var settingsHelper = GetTestBlogSettingsHelper();
 
             // Act
-            var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys(blogKeys: (IEnumerable<string>)null);
+            var ensuredBlogKeys = settingsHelper.GetEnsuredBlogKeys((IEnumerable<string>)null);
 
             // Assert
             var blogSettingsBlogKeys = BlogSettingTestData.CreateCollection().Select(x => x.BlogKey);
 
-            bool ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys = ensuredBlogKeys.SequenceEqual(blogSettingsBlogKeys);
+            var ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys = ensuredBlogKeys.SequenceEqual(blogSettingsBlogKeys);
             Assert.True(ensuredBlogKeysSequenceEqualsBlogSettingBlogKeys);
         }
 

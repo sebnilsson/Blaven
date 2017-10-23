@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-
 using Blaven.DataStorage.RavenDb.Indexes;
-
 using Raven.Client;
 using Raven.Client.Indexes;
 
@@ -14,9 +12,7 @@ namespace Blaven.DataStorage.RavenDb
         public static async Task Initialize(IDocumentStore documentStore)
         {
             if (documentStore == null)
-            {
                 throw new ArgumentNullException(nameof(documentStore));
-            }
 
             try
             {

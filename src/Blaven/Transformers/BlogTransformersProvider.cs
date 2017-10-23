@@ -7,29 +7,25 @@ namespace Blaven.Transformers
     {
         public BlogTransformersProvider()
         {
-            this.Transformers = new List<IBlogPostTransformer>();
+            Transformers = new List<IBlogPostTransformer>();
         }
 
         public List<IBlogPostTransformer> Transformers { get; }
 
-        public BlogPost ApplyTransformers(BlogPost blogPost)
-        {
-            if (blogPost == null)
-            {
-                throw new ArgumentNullException(nameof(blogPost));
-            }
-
-            foreach (var transformer in this.Transformers)
-            {
-                transformer.Transform(blogPost);
-            }
-
-            return blogPost;
-        }
-
         public static IEnumerable<IBlogPostTransformer> GetDefaultTransformers()
         {
             yield return new PhraseTagsTransformer();
+        }
+
+        public BlogPost ApplyTransformers(BlogPost blogPost)
+        {
+            if (blogPost == null)
+                throw new ArgumentNullException(nameof(blogPost));
+
+            foreach (var transformer in Transformers)
+                transformer.Transform(blogPost);
+
+            return blogPost;
         }
     }
 }
