@@ -8,7 +8,7 @@ namespace Blaven.Tests
     {
         public static BlogPost Create(
             int index = 1,
-            Action<BlogPost> config = null)
+            Action<BlogPost>? config = null)
         {
             var blogPost = new BlogPost
             {

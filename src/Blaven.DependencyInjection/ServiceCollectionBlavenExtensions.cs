@@ -25,14 +25,14 @@ namespace Blaven.DependencyInjection
                     var storage = x.GetService<IStorage>();
                     AssertService(storage);
 
-                    var blogPostTransformerService =
+                    var transformerService =
                         x.GetService<ITransformerService>();
-                    AssertService(blogPostTransformerService);
+                    AssertService(transformerService);
 
                     return new SynchronizationService(
                         blogSource,
                         storage,
-                        blogPostTransformerService);
+                        transformerService);
                 });
 
             services

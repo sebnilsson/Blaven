@@ -2,6 +2,6 @@
 {
     public interface IBlogPostTransformer
     {
-        void Transform(BlogPost blogPost);
+        void Transform(BlogPost post);
     }
 }
