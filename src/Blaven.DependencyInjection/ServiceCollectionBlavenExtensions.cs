@@ -2,7 +2,7 @@
 using Blaven.BlogSource;
 using Blaven.Storage;
 using Blaven.Synchronization;
-using Blaven.Transformers;
+using Blaven.Synchronization.Transformation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -25,16 +25,23 @@ namespace Blaven.DependencyInjection
                     var storage = x.GetService<IStorage>();
                     AssertService(storage);
 
-                    return new SynchronizationService(blogSource, storage);
+                    var blogPostTransformerService =
+                        x.GetService<ITransformerService>();
+                    AssertService(blogPostTransformerService);
+
+                    return new SynchronizationService(
+                        blogSource,
+                        storage,
+                        blogPostTransformerService);
                 });
 
             services
-                .TryAddSingleton<IBlogPostTransformerService>(x =>
+                .TryAddSingleton<ITransformerService>(x =>
                 {
                     var transformers = x.GetServices<IBlogPostTransformer>();
                     AssertService(transformers);
 
-                    return new BlogPostTransformerService(transformers);
+                    return new TransformerService(transformers);
                 });
 
             services

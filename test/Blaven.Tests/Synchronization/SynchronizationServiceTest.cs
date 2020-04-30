@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Blaven.BlogSource;
 using Blaven.Storage;
 using Blaven.Tests;
+using Blaven.Synchronization.Transformation;
 using Moq;
 using Xunit;
 
@@ -176,8 +177,13 @@ namespace Blaven.Synchronization.Tests
                 x.GetPosts(It.IsAny<BlogKey>(), It.IsAny<DateTimeOffset?>()))
             .Returns(Task.FromResult(storagePosts.ToList() as IReadOnlyList<BlogPostBase>));
 
+            var blogPostTransformerService = new Mock<ITransformerService>();
+
             return
-                new SynchronizationService(blogSource.Object, storage.Object);
+                new SynchronizationService(
+                    blogSource.Object,
+                    storage.Object,
+                    blogPostTransformerService.Object);
         }
     }
 }

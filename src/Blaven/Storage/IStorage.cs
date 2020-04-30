@@ -15,6 +15,7 @@ namespace Blaven.Storage
             DateTimeOffset? lastUpdatedAt);
 
         Task Update(
+            BlogKey blogKey,
             BlogMeta? meta,
             IEnumerable<BlogPost> insertedPosts,
             IEnumerable<BlogPost> updatedPosts,

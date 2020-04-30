@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Blaven.Transformers
+﻿namespace Blaven.Synchronization.Transformation
 {
     public interface IBlogPostTransformer
     {

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Blaven.BlogSource;
 using Blaven.Storage;
+using Blaven.Synchronization.Transformation;
 
 namespace Blaven.Synchronization
 {
@@ -10,13 +11,19 @@ namespace Blaven.Synchronization
     {
         private readonly IBlogSource _blogSource;
         private readonly IStorage _storage;
+        private readonly ITransformerService _transformerService;
 
-        public SynchronizationService(IBlogSource blogSource, IStorage storage)
+        public SynchronizationService(
+            IBlogSource blogSource,
+            IStorage storage,
+            ITransformerService transformerService)
         {
             _blogSource = blogSource
                 ?? throw new ArgumentNullException(nameof(blogSource));
             _storage = storage
                 ?? throw new ArgumentNullException(nameof(storage));
+            _transformerService = transformerService
+                ?? throw new ArgumentNullException(nameof(transformerService));
         }
 
         public async Task<SynchronizationResult> Synchronize(
@@ -30,7 +37,8 @@ namespace Blaven.Synchronization
             var posts =
                 await SyncPosts(blogKey, lastUpdatedAt).ConfigureAwait(false);
 
-            await Update(meta, posts, lastUpdatedAt).ConfigureAwait(false);
+            await Update(blogKey, meta, posts, lastUpdatedAt)
+                .ConfigureAwait(false);
 
             stopwatch.Stop();
 
@@ -88,12 +96,23 @@ namespace Blaven.Synchronization
         }
 
         private async Task Update(
+            BlogKey blogKey,
             BlogMeta? meta,
             SynchronizationBlogPosts posts,
             DateTimeOffset? lastUpdatedAt)
         {
+            foreach (var post in posts.Inserted)
+            {
+                _transformerService.TransformPost(post);
+            }
+            foreach (var post in posts.Updated)
+            {
+                _transformerService.TransformPost(post);
+            }
+
             await
                 _storage.Update(
+                    blogKey,
                     meta,
                     insertedPosts: posts.Inserted,
                     updatedPosts: posts.Updated,

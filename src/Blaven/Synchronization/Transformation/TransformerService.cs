@@ -1,27 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Blaven.Transformers
+namespace Blaven.Synchronization.Transformation
 {
-    public class BlogPostTransformerService : IBlogPostTransformerService
+    public class TransformerService : ITransformerService
     {
         private readonly IEnumerable<IBlogPostTransformer> _transformers;
 
-        public BlogPostTransformerService(
+        public TransformerService(
             IEnumerable<IBlogPostTransformer> transformers)
         {
             _transformers = transformers
                 ?? throw new ArgumentNullException(nameof(transformers));
         }
 
-        public void Apply(BlogPost blogPost)
+        public void TransformPost(BlogPost post)
         {
-            if (blogPost is null)
-                throw new ArgumentNullException(nameof(blogPost));
+            if (post is null)
+                throw new ArgumentNullException(nameof(post));
 
             foreach (var transformer in _transformers)
             {
-                transformer.Transform(blogPost);
+                transformer.Transform(post);
             }
         }
     }
