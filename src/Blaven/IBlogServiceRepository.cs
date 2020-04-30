@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Blaven.Storage
+namespace Blaven
 {
-    public interface IStorageRepository
+    public interface IBlogServiceRepository
     {
-        Task<BlogMeta> GetBlogMeta(BlogKey blogKey);
+        Task<BlogMeta> GetMeta(BlogKey blogKey);
 
         Task<BlogPost> GetPost(string id, BlogKey blogKey);
 
@@ -17,15 +17,14 @@ namespace Blaven.Storage
         Task<IReadOnlyList<BlogArchiveItem>> ListArchive(
             IEnumerable<BlogKey> blogKeys);
 
-        Task<IReadOnlyList<BlogMeta>> ListBlogMetas(
-            IEnumerable<BlogKey> blogKeys);
+        Task<IReadOnlyList<BlogMeta>> ListMetas(IEnumerable<BlogKey> blogKeys);
 
         Task<IReadOnlyList<BlogPostHeader>> ListPostHeaders(
             Paging paging,
             IEnumerable<BlogKey> blogKeys);
 
         Task<IReadOnlyList<BlogPost>> ListPostsByArchive(
-            DateTime archiveDate,
+            DateTimeOffset archiveDate,
             Paging paging,
             IEnumerable<BlogKey> blogKeys);
 

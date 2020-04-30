@@ -14,11 +14,11 @@ namespace Blaven
 
         public string Name { get; set; } = string.Empty;
 
-        public DateTime? PublishedAt { get; set; }
+        public DateTimeOffset? PublishedAt { get; set; }
 
         public string SourceId { get; set; } = string.Empty;
 
-        public DateTime? UpdatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
 
         public string Url { get; set; } = string.Empty;
     }

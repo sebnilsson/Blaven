@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Blaven.Storage;
 
 namespace Blaven
 {
     public class BlogService : IBlogService
     {
-        private readonly IStorageRepository _storageRepository;
+        private readonly IBlogServiceRepository _repository;
 
-        public BlogService(IStorageRepository storageRepository)
+        public BlogService(IBlogServiceRepository repository)
         {
-            _storageRepository = storageRepository
-                ?? throw new ArgumentNullException(nameof(storageRepository));
+            _repository = repository
+                ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<BlogMeta> GetBlogMeta(BlogKey blogKey = default)
+        public async Task<BlogMeta> GetMeta(BlogKey blogKey = default)
         {
-            return await
-                _storageRepository.GetBlogMeta(blogKey).ConfigureAwait(false);
+            return await _repository.GetMeta(blogKey).ConfigureAwait(false);
         }
 
         public async Task<BlogPost> GetPost(
@@ -29,7 +27,7 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(id));
 
             return await
-                _storageRepository
+                _repository
                     .GetPost(id, blogKey)
                     .ConfigureAwait(false);
         }
@@ -42,7 +40,7 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(slug));
 
             return await
-                _storageRepository
+                _repository
                     .GetPostBySlug(slug, blogKey)
                     .ConfigureAwait(false);
         }
@@ -55,7 +53,7 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(sourceId));
 
             return await
-                _storageRepository
+                _repository
                     .GetPostBySourceId(sourceId, blogKey)
                     .ConfigureAwait(false);
         }
@@ -67,20 +65,20 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(blogKeys));
 
             return await
-                _storageRepository
+                _repository
                     .ListArchive(blogKeys)
                     .ConfigureAwait(false);
         }
 
-        public async Task<IReadOnlyList<BlogMeta>> ListBlogMetas(
+        public async Task<IReadOnlyList<BlogMeta>> ListMetas(
             params BlogKey[] blogKeys)
         {
             if (blogKeys is null)
                 throw new ArgumentNullException(nameof(blogKeys));
 
             return await
-                _storageRepository
-                    .ListBlogMetas(blogKeys)
+                _repository
+                    .ListMetas(blogKeys)
                     .ConfigureAwait(false);
         }
 
@@ -92,13 +90,13 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(blogKeys));
 
             return await
-                _storageRepository
+                _repository
                     .ListPostHeaders(paging, blogKeys)
                     .ConfigureAwait(false);
         }
 
         public async Task<IReadOnlyList<BlogPostHeader>> ListPostsByArchive(
-            DateTime archiveDate,
+            DateTimeOffset archiveDate,
             Paging paging = default,
             params BlogKey[] blogKeys)
         {
@@ -106,7 +104,7 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(blogKeys));
 
             return await
-                _storageRepository
+                _repository
                     .ListPostsByArchive(archiveDate, paging, blogKeys)
                     .ConfigureAwait(false);
         }
@@ -120,7 +118,7 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(blogKeys));
 
             return await
-                _storageRepository
+                _repository
                     .ListPostsByTag(tag, paging, blogKeys)
                     .ConfigureAwait(false);
         }
@@ -132,7 +130,7 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(blogKeys));
 
             return await
-                _storageRepository
+                _repository
                     .ListTags(blogKeys)
                     .ConfigureAwait(false);
         }
@@ -148,7 +146,7 @@ namespace Blaven
                 throw new ArgumentNullException(nameof(blogKeys));
 
             return await
-                _storageRepository
+                _repository
                     .SearchPostHeaders(searchText, paging, blogKeys)
                     .ConfigureAwait(false);
         }
