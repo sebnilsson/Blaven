@@ -3,12 +3,14 @@ using System.Collections.Generic;
 
 namespace Blaven
 {
-    public struct BlogKey : IEquatable<BlogKey>
+    public readonly struct BlogKey : IEquatable<BlogKey>
     {
         public BlogKey(string value)
         {
             Value = (value ?? string.Empty).ToLowerInvariant();
         }
+
+        public bool HasValue => !string.IsNullOrWhiteSpace(Value);
 
         public string Value { get; }
 

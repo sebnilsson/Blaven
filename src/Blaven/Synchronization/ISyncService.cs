@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Blaven.Synchronization
 {
-    public interface ISynchronizationService
+    public interface ISyncService
     {
-        Task<SynchronizationResult> Synchronize(
+        Task<SyncResult> Synchronize(
             BlogKey blogKey = default,
             DateTimeOffset? lastUpdatedAt = null);
     }

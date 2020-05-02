@@ -1,25 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Blaven.Storage;
 
 namespace Blaven
 {
     public class BlogService : IBlogService
     {
-        private readonly IBlogServiceRepository _repository;
+        private readonly IStorageQueryRepository _repository;
 
-        public BlogService(IBlogServiceRepository repository)
+        public BlogService(IStorageQueryRepository repository)
         {
             _repository = repository
                 ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<BlogMeta> GetMeta(BlogKey blogKey = default)
+        public async Task<BlogMeta?> GetMeta(BlogKey blogKey = default)
         {
             return await _repository.GetMeta(blogKey).ConfigureAwait(false);
         }
 
-        public async Task<BlogPost> GetPost(
+        public async Task<BlogPost?> GetPost(
             string id,
             BlogKey blogKey = default)
         {
@@ -32,7 +33,7 @@ namespace Blaven
                     .ConfigureAwait(false);
         }
 
-        public async Task<BlogPost> GetPostBySlug(
+        public async Task<BlogPost?> GetPostBySlug(
             string slug,
             BlogKey blogKey = default)
         {
@@ -45,20 +46,7 @@ namespace Blaven
                     .ConfigureAwait(false);
         }
 
-        public async Task<BlogPost> GetPostBySourceId(
-            string sourceId,
-            BlogKey blogKey = default)
-        {
-            if (sourceId is null)
-                throw new ArgumentNullException(nameof(sourceId));
-
-            return await
-                _repository
-                    .GetPostBySourceId(sourceId, blogKey)
-                    .ConfigureAwait(false);
-        }
-
-        public async Task<IReadOnlyList<BlogArchiveItem>> ListArchive(
+        public async Task<IReadOnlyList<BlogDateItem>> ListAllDates(
             params BlogKey[] blogKeys)
         {
             if (blogKeys is null)
@@ -66,7 +54,19 @@ namespace Blaven
 
             return await
                 _repository
-                    .ListArchive(blogKeys)
+                    .ListAllDates(blogKeys)
+                    .ConfigureAwait(false);
+        }
+
+        public async Task<IReadOnlyList<BlogTagItem>> ListAllTags(
+            params BlogKey[] blogKeys)
+        {
+            if (blogKeys is null)
+                throw new ArgumentNullException(nameof(blogKeys));
+
+            return await
+                _repository
+                    .ListAllTags(blogKeys)
                     .ConfigureAwait(false);
         }
 
@@ -110,7 +110,7 @@ namespace Blaven
         }
 
         public async Task<IReadOnlyList<BlogPostHeader>> ListPostsByTag(
-            string tag,
+            string tagName,
             Paging paging = default,
             params BlogKey[] blogKeys)
         {
@@ -119,19 +119,7 @@ namespace Blaven
 
             return await
                 _repository
-                    .ListPostsByTag(tag, paging, blogKeys)
-                    .ConfigureAwait(false);
-        }
-
-        public async Task<IReadOnlyList<BlogTagItem>> ListTags(
-            params BlogKey[] blogKeys)
-        {
-            if (blogKeys is null)
-                throw new ArgumentNullException(nameof(blogKeys));
-
-            return await
-                _repository
-                    .ListTags(blogKeys)
+                    .ListPostsByTag(tagName, paging, blogKeys)
                     .ConfigureAwait(false);
         }
 

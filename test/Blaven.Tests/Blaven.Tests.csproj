@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Blaven.Testing\Blaven.Testing.csproj" />
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj" />
   </ItemGroup>
 

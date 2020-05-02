@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Blaven.Storage
 {
-    public interface IStorage
+    public interface IStorageSyncRepository
     {
         Task<IReadOnlyList<BlogPostBase>> GetPosts(
             BlogKey blogKey,

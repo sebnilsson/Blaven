@@ -2,22 +2,23 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Blaven
+namespace Blaven.Storage
 {
-    public interface IBlogServiceRepository
+    public interface IStorageQueryRepository
     {
-        Task<BlogMeta> GetMeta(BlogKey blogKey);
+        Task<BlogMeta?> GetMeta(BlogKey blogKey);
 
-        Task<BlogPost> GetPost(string id, BlogKey blogKey);
+        Task<BlogPost?> GetPost(string id, BlogKey blogKey);
 
-        Task<BlogPost> GetPostBySlug(string slug, BlogKey blogKey);
+        Task<BlogPost?> GetPostBySlug(string slug, BlogKey blogKey);
 
-        Task<BlogPost> GetPostBySourceId(string sourceId, BlogKey blogKey);
-
-        Task<IReadOnlyList<BlogArchiveItem>> ListArchive(
+        Task<IReadOnlyList<BlogDateItem>> ListAllDates(
             IEnumerable<BlogKey> blogKeys);
 
-        Task<IReadOnlyList<BlogMeta>> ListMetas(IEnumerable<BlogKey> blogKeys);
+        Task<IReadOnlyList<BlogMeta>> ListAllMetas();
+
+        Task<IReadOnlyList<BlogTagItem>> ListAllTags(
+            IEnumerable<BlogKey> blogKeys);
 
         Task<IReadOnlyList<BlogPostHeader>> ListPostHeaders(
             Paging paging,
@@ -29,11 +30,8 @@ namespace Blaven
             IEnumerable<BlogKey> blogKeys);
 
         Task<IReadOnlyList<BlogPost>> ListPostsByTag(
-            string tag,
+            string tagName,
             Paging paging,
-            IEnumerable<BlogKey> blogKeys);
-
-        Task<IReadOnlyList<BlogTagItem>> ListTags(
             IEnumerable<BlogKey> blogKeys);
 
         Task<IReadOnlyList<BlogPostHeader>> SearchPostHeaders(

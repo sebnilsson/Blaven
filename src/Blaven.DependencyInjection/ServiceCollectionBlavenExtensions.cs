@@ -17,19 +17,16 @@ namespace Blaven.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
 
             services
-                .TryAddTransient<ISynchronizationService>(x =>
+                .TryAddTransient<ISyncService>(x =>
                 {
-                    var blogSource = x.GetService<IBlogSource>();
-                    AssertService(blogSource);
+                    var blogSource = x.GetRequiredService<IBlogSource>();
 
-                    var storage = x.GetService<IStorage>();
-                    AssertService(storage);
+                    var storage = x.GetRequiredService<IStorageSyncRepository>();
 
                     var transformerService =
-                        x.GetService<ITransformerService>();
-                    AssertService(transformerService);
+                        x.GetRequiredService<ITransformerService>();
 
-                    return new SynchronizationService(
+                    return new SyncService(
                         blogSource,
                         storage,
                         transformerService);
@@ -47,8 +44,8 @@ namespace Blaven.DependencyInjection
             services
                 .TryAddTransient<IBlogService>(x =>
                 {
-                    var repository = x.GetService<IBlogServiceRepository>();
-                    AssertService(repository);
+                    var repository =
+                        x.GetRequiredService<IStorageQueryRepository>();
 
                     return new BlogService(repository);
                 });
@@ -61,8 +58,7 @@ namespace Blaven.DependencyInjection
             if (service == null)
             {
                 throw new InvalidOperationException(
-                    $"Failed to resolve type '{typeof(T).GetType().FullName}'." +
-                    $" Register type in the service collection.");
+                    $"No service for type '{typeof(T).FullName}' has been registered.");
             }
         }
     }

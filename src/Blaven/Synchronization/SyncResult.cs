@@ -4,12 +4,12 @@ using System.Diagnostics;
 namespace Blaven.Synchronization
 {
     [DebuggerDisplay("BlogKey={BlogKey}, Elapsed={Elapsed}, ElapsedMs={ElapsedMs}")]
-    public class SynchronizationResult
+    public class SyncResult
     {
-        public SynchronizationResult(
+        public SyncResult(
             BlogKey blogKey,
             BlogMeta? meta,
-            SynchronizationBlogPosts posts,
+            SyncBlogPosts posts,
             TimeSpan elapsed)
         {
             BlogKey = blogKey;
@@ -26,6 +26,6 @@ namespace Blaven.Synchronization
 
         public BlogMeta? Meta { get; }
 
-        public SynchronizationBlogPosts Posts { get; }
+        public SyncBlogPosts Posts { get; }
     }
 }

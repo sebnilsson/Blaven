@@ -6,18 +6,16 @@ namespace Blaven
 {
     public interface IBlogService
     {
-        Task<BlogMeta> GetMeta(BlogKey blogKey = default);
+        Task<BlogMeta?> GetMeta(BlogKey blogKey = default);
 
-        Task<BlogPost> GetPost(string id, BlogKey blogKey = default);
+        Task<BlogPost?> GetPost(string id, BlogKey blogKey = default);
 
-        Task<BlogPost> GetPostBySlug(string slug, BlogKey blogKey = default);
+        Task<BlogPost?> GetPostBySlug(string slug, BlogKey blogKey = default);
 
-        Task<BlogPost> GetPostBySourceId(
-            string sourceId,
-            BlogKey blogKey = default);
-
-        Task<IReadOnlyList<BlogArchiveItem>> ListArchive(
+        Task<IReadOnlyList<BlogDateItem>> ListAllDates(
             params BlogKey[] blogKeys);
+
+        Task<IReadOnlyList<BlogTagItem>> ListAllTags(params BlogKey[] blogKeys);
 
         Task<IReadOnlyList<BlogMeta>> ListMetas(params BlogKey[] blogKeys);
 
@@ -31,11 +29,9 @@ namespace Blaven
             params BlogKey[] blogKeys);
 
         Task<IReadOnlyList<BlogPostHeader>> ListPostsByTag(
-            string tag,
+            string tagName,
             Paging paging = default,
             params BlogKey[] blogKeys);
-
-        Task<IReadOnlyList<BlogTagItem>> ListTags(params BlogKey[] blogKeys);
 
         Task<IReadOnlyList<BlogPostHeader>> SearchPostHeaders(
             string searchText,

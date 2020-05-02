@@ -6,7 +6,7 @@ namespace Blaven.Synchronization
 {
     internal static class BlogPostComparer
     {
-        public static SynchronizationBlogPosts Compare(
+        public static SyncBlogPosts Compare(
             IReadOnlyList<BlogPost> blogSourcePosts,
             IReadOnlyList<BlogPostBase> storagePosts)
         {
@@ -32,7 +32,7 @@ namespace Blaven.Synchronization
                  select blogSourcePost)
                 .ToList();
 
-            return new SynchronizationBlogPosts(
+            return new SyncBlogPosts(
                 inserted: inserted,
                 updated: updated,
                 deleted: deleted);

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blaven.BlogSource;
 using Blaven.Storage;
-using Blaven.Tests;
 using Blaven.Synchronization.Transformation;
+using Blaven.Testing;
 using Moq;
 using Xunit;
 
 namespace Blaven.Synchronization.Tests
 {
-    public class SynchronizationServiceTest
+    public class SyncServiceTest
     {
         [Fact]
         public async Task Synchronize_ContainsInserts_ReturnsInserts()
@@ -163,7 +163,7 @@ namespace Blaven.Synchronization.Tests
                 };
         }
 
-        private static SynchronizationService GetSynchronizationService(
+        private static SyncService GetSynchronizationService(
             IEnumerable<BlogPost> blogSourcePosts,
             IEnumerable<BlogPostBase> storagePosts)
         {
@@ -172,7 +172,7 @@ namespace Blaven.Synchronization.Tests
                 x.GetPosts(It.IsAny<BlogKey>(), It.IsAny<DateTimeOffset?>()))
             .Returns(Task.FromResult(blogSourcePosts.ToList() as IReadOnlyList<BlogPost>));
 
-            var storage = new Mock<IStorage>();
+            var storage = new Mock<IStorageSyncRepository>();
             storage.Setup(x =>
                 x.GetPosts(It.IsAny<BlogKey>(), It.IsAny<DateTimeOffset?>()))
             .Returns(Task.FromResult(storagePosts.ToList() as IReadOnlyList<BlogPostBase>));
@@ -180,7 +180,7 @@ namespace Blaven.Synchronization.Tests
             var blogPostTransformerService = new Mock<ITransformerService>();
 
             return
-                new SynchronizationService(
+                new SyncService(
                     blogSource.Object,
                     storage.Object,
                     blogPostTransformerService.Object);

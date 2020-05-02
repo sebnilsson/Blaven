@@ -7,15 +7,15 @@ using Blaven.Synchronization.Transformation;
 
 namespace Blaven.Synchronization
 {
-    public class SynchronizationService : ISynchronizationService
+    public class SyncService : ISyncService
     {
         private readonly IBlogSource _blogSource;
-        private readonly IStorage _storage;
+        private readonly IStorageSyncRepository _storage;
         private readonly ITransformerService _transformerService;
 
-        public SynchronizationService(
+        public SyncService(
             IBlogSource blogSource,
-            IStorage storage,
+            IStorageSyncRepository storage,
             ITransformerService transformerService)
         {
             _blogSource = blogSource
@@ -26,7 +26,7 @@ namespace Blaven.Synchronization
                 ?? throw new ArgumentNullException(nameof(transformerService));
         }
 
-        public async Task<SynchronizationResult> Synchronize(
+        public async Task<SyncResult> Synchronize(
             BlogKey blogKey = default,
             DateTimeOffset? lastUpdatedAt = null)
         {
@@ -42,7 +42,7 @@ namespace Blaven.Synchronization
 
             stopwatch.Stop();
 
-            return new SynchronizationResult(
+            return new SyncResult(
                 blogKey,
                 meta,
                 posts,
@@ -76,7 +76,7 @@ namespace Blaven.Synchronization
             return !equals ? blogSourceMeta : null;
         }
 
-        private async Task<SynchronizationBlogPosts> SyncPosts(
+        private async Task<SyncBlogPosts> SyncPosts(
             BlogKey blogKey,
             DateTimeOffset? lastUpdatedAt)
         {
@@ -98,7 +98,7 @@ namespace Blaven.Synchronization
         private async Task Update(
             BlogKey blogKey,
             BlogMeta? meta,
-            SynchronizationBlogPosts posts,
+            SyncBlogPosts posts,
             DateTimeOffset? lastUpdatedAt)
         {
             foreach (var post in posts.Inserted)

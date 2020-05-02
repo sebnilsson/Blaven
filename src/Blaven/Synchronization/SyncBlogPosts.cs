@@ -6,9 +6,9 @@ using System.Linq;
 namespace Blaven.Synchronization
 {
     [DebuggerDisplay("Inserted={Inserted.Count}, Updated={Updated.Count}, Deleted={Deleted.Count}")]
-    public class SynchronizationBlogPosts
+    public class SyncBlogPosts
     {
-        public SynchronizationBlogPosts(
+        public SyncBlogPosts(
             IEnumerable<BlogPost> inserted,
             IEnumerable<BlogPost> updated,
             IEnumerable<BlogPostBase> deleted)
