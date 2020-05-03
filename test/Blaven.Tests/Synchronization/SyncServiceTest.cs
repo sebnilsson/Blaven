@@ -2,29 +2,34 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blaven.BlogSource;
-using Blaven.Storage;
-using Blaven.Synchronization.Transformation;
 using Blaven.Testing;
-using Moq;
 using Xunit;
 
 namespace Blaven.Synchronization.Tests
 {
     public class SyncServiceTest
     {
+        protected readonly ServicesContext ServicesContext;
+
+        public SyncServiceTest()
+        {
+            ServicesContext = new ServicesContext();
+        }
+
         [Fact]
         public async Task Synchronize_ContainsInserts_ReturnsInserts()
         {
             // Arrange
-            var blogSourcePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
-            var storagePosts = BlogPostTestFactory.CreateList(2, 3);
+            ServicesContext.ConfigBlogSource(
+                BlogPostTestFactory.CreateList(1, 2, 3, 4));
 
-            var service =
-                GetSynchronizationService(blogSourcePosts, storagePosts);
+            ServicesContext.ConfigStorageSyncRepo(
+                BlogPostTestFactory.CreateList(2, 3));
+
+            var syncService = ServicesContext.GetSyncService();
 
             // Act
-            var result = await service.Synchronize();
+            var result = await syncService.Synchronize();
 
             // Assert
             Assert.Equal(2, result.Posts.Inserted.Count);
@@ -39,13 +44,15 @@ namespace Blaven.Synchronization.Tests
             int expectedUpdateCount)
         {
             // Arrange
-            var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
+            ServicesContext.ConfigBlogSource(
+                BlogPostTestFactory.CreateList(1, 2, 3, 4));
 
-            var service =
-                GetSynchronizationService(blogSourcePosts, storagePosts);
+            ServicesContext.ConfigStorageSyncRepo(blogSourcePosts);
+
+            var syncService = ServicesContext.GetSyncService();
 
             // Act
-            var result = await service.Synchronize();
+            var result = await syncService.Synchronize();
 
             // Assert
             Assert.Equal(expectedUpdateCount, result.Posts.Updated.Count);
@@ -57,14 +64,16 @@ namespace Blaven.Synchronization.Tests
         public async Task Synchronize_ContainsDeleted_ReturnsDeleted()
         {
             // Arrange
-            var blogSourcePosts = BlogPostTestFactory.CreateList(2, 3);
-            var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
+            ServicesContext.ConfigBlogSource(
+                BlogPostTestFactory.CreateList(2, 3));
 
-            var service =
-                GetSynchronizationService(blogSourcePosts, storagePosts);
+            ServicesContext.ConfigStorageSyncRepo(
+                BlogPostTestFactory.CreateList(1, 2, 3, 4));
+
+            var syncService = ServicesContext.GetSyncService();
 
             // Act
-            var result = await service.Synchronize();
+            var result = await syncService.Synchronize();
 
             // Assert
             Assert.Equal(2, result.Posts.Deleted.Count);
@@ -76,14 +85,16 @@ namespace Blaven.Synchronization.Tests
         public async Task Synchronize_NoChanges_ReturnsNoChanges()
         {
             // Arrange
-            var blogSourcePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
-            var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
+            ServicesContext.ConfigBlogSource(
+                BlogPostTestFactory.CreateList(1, 2, 3, 4));
 
-            var service =
-                GetSynchronizationService(blogSourcePosts, storagePosts);
+            ServicesContext.ConfigStorageSyncRepo(
+                BlogPostTestFactory.CreateList(1, 2, 3, 4));
+
+            var syncService = ServicesContext.GetSyncService();
 
             // Act
-            var result = await service.Synchronize();
+            var result = await syncService.Synchronize();
 
             // Assert
             Assert.Empty(result.Posts.Inserted);
@@ -161,29 +172,6 @@ namespace Blaven.Synchronization.Tests
                     BlogPostTestFactory.Create(3, config),
                     BlogPostTestFactory.Create(4)
                 };
-        }
-
-        private static SyncService GetSynchronizationService(
-            IEnumerable<BlogPost> blogSourcePosts,
-            IEnumerable<BlogPostBase> storagePosts)
-        {
-            var blogSource = new Mock<IBlogSource>();
-            blogSource.Setup(x =>
-                x.GetPosts(It.IsAny<BlogKey>(), It.IsAny<DateTimeOffset?>()))
-            .Returns(Task.FromResult(blogSourcePosts.ToList() as IReadOnlyList<BlogPost>));
-
-            var storage = new Mock<IStorageSyncRepository>();
-            storage.Setup(x =>
-                x.GetPosts(It.IsAny<BlogKey>(), It.IsAny<DateTimeOffset?>()))
-            .Returns(Task.FromResult(storagePosts.ToList() as IReadOnlyList<BlogPostBase>));
-
-            var blogPostTransformerService = new Mock<ITransformerService>();
-
-            return
-                new SyncService(
-                    blogSource.Object,
-                    storage.Object,
-                    blogPostTransformerService.Object);
         }
     }
 }

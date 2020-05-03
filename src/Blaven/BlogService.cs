@@ -70,15 +70,11 @@ namespace Blaven
                     .ConfigureAwait(false);
         }
 
-        public async Task<IReadOnlyList<BlogMeta>> ListMetas(
-            params BlogKey[] blogKeys)
+        public async Task<IReadOnlyList<BlogMeta>> ListAllMetas()
         {
-            if (blogKeys is null)
-                throw new ArgumentNullException(nameof(blogKeys));
-
             return await
                 _repository
-                    .ListMetas(blogKeys)
+                    .ListAllMetas()
                     .ConfigureAwait(false);
         }
 

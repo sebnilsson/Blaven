@@ -15,9 +15,9 @@ namespace Blaven
         Task<IReadOnlyList<BlogDateItem>> ListAllDates(
             params BlogKey[] blogKeys);
 
-        Task<IReadOnlyList<BlogTagItem>> ListAllTags(params BlogKey[] blogKeys);
+        Task<IReadOnlyList<BlogMeta>> ListAllMetas();
 
-        Task<IReadOnlyList<BlogMeta>> ListMetas(params BlogKey[] blogKeys);
+        Task<IReadOnlyList<BlogTagItem>> ListAllTags(params BlogKey[] blogKeys);
 
         Task<IReadOnlyList<BlogPostHeader>> ListPostHeaders(
             Paging paging = default,
