@@ -6,25 +6,25 @@ namespace Blaven.Tests
 {
     public class BlogServiceTest
     {
-        protected readonly ServicesContext ServicesContext;
+        protected readonly TestContext Context;
 
         public BlogServiceTest()
         {
-            ServicesContext = new ServicesContext();
+            Context = new TestContext();
         }
 
         [Fact]
         public async Task Synchronize_ContainsInserts_ReturnsInserts()
         {
             // Arrange
-            ServicesContext.ConfigBlogSource(
+            Context.ConfigBlogSource(
                 BlogPostTestFactory.CreateList(1, 2, 3, 4));
 
-            ServicesContext.ConfigStorageSyncRepo(
+            Context.ConfigStorageSyncRepo(
                 BlogPostTestFactory.CreateList(2, 3));
 
-            var blogService = ServicesContext.GetBlogService();
-            var syncService = ServicesContext.GetSyncService();
+            var blogService = Context.GetBlogService();
+            var syncService = Context.GetSyncService();
 
             // Act
             await syncService.Synchronize();
@@ -32,7 +32,7 @@ namespace Blaven.Tests
             // Assert
             var posts = await blogService.ListPostHeaders();
 
-            Assert.Equal(2, posts.Count);
+            Assert.Equal(4, posts.Count);
         }
     }
 }

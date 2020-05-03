@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blaven.Storage.Queries;
 
 namespace Blaven.Storage
 {
     public class InMemoryStorageRepository
-        : IStorageSyncRepository, IStorageQueryRepository
+        : IStorageQueryRepository, IStorageSyncRepository
     {
-        internal List<BlogMeta> Metas { get; } = new List<BlogMeta>();
-        internal List<BlogPost> Posts { get; } = new List<BlogPost>();
+        private readonly List<BlogMeta> _metas = new List<BlogMeta>();
+        private readonly List<BlogPost> _posts = new List<BlogPost>();
+
+        internal IQueryable<BlogMeta> Metas => _metas.AsQueryable();
+
+        internal IQueryable<BlogPost> Posts => _posts.AsQueryable();
 
         public Task<BlogMeta?> GetMeta(
             BlogKey blogKey,
@@ -17,9 +22,8 @@ namespace Blaven.Storage
         {
             var meta =
                 Metas
-                    .Where(x => x.BlogKey == blogKey || !blogKey.HasValue)
-                    .Where(x => x.UpdatedAt > lastUpdatedAt
-                        || lastUpdatedAt == null)
+                    .WhereBlogKey(blogKey)
+                    .WhereUpdatedAt(lastUpdatedAt)
                     .FirstOrDefault();
 
             return Task.FromResult<BlogMeta?>(meta);
@@ -35,13 +39,9 @@ namespace Blaven.Storage
             if (id is null)
                 throw new ArgumentNullException(nameof(id));
 
-            var post =
-                Posts
-                    .Where(x => x.BlogKey == blogKey || !blogKey.HasValue)
-                    .Where(x => x.Id == id)
-                    .FirstOrDefault();
+            var post = Posts.WhereBlogKey(blogKey).FirstOrDefaultById(id);
 
-            return Task.FromResult<BlogPost?>(post);
+            return Task.FromResult(post);
         }
 
         public Task<BlogPost?> GetPostBySlug(string slug, BlogKey blogKey)
@@ -49,13 +49,9 @@ namespace Blaven.Storage
             if (slug is null)
                 throw new ArgumentNullException(nameof(slug));
 
-            var post =
-                Posts
-                    .Where(x => x.BlogKey == blogKey || !blogKey.HasValue)
-                    .Where(x => x.Slug == slug)
-                    .FirstOrDefault();
+            var post = Posts.WhereBlogKey(blogKey).FirstOrDefaultBySlug(slug);
 
-            return Task.FromResult<BlogPost?>(post);
+            return Task.FromResult(post);
         }
 
         public Task<IReadOnlyList<BlogPostBase>> GetPosts(
@@ -64,9 +60,8 @@ namespace Blaven.Storage
         {
             var posts =
                 Posts
-                    .Where(x => x.BlogKey == blogKey || !blogKey.HasValue)
-                    .Where(x => x.UpdatedAt > lastUpdatedAt
-                        || lastUpdatedAt == null)
+                    .WhereBlogKey(blogKey)
+                    .WhereUpdatedAfter(lastUpdatedAt)
                     .OfType<BlogPostBase>()
                     .ToList()
                      as IReadOnlyList<BlogPostBase>;
@@ -81,21 +76,7 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var dates =
-                (from post in Posts
-                 where !blogKeys.Any() || blogKeys.Contains(post.BlogKey)
-                 let publishedAt = post.PublishedAt
-                 where publishedAt != null
-                 let date =
-                    new DateTime(publishedAt.Value.Year, publishedAt.Value.Month, 1)
-                 group post by new { post.BlogKey, Date = date } into g
-                 orderby g.Key.Date descending
-                 select new BlogDateItem
-                 {
-                     BlogKey = g.Key.BlogKey,
-                     Count = g.Count(),
-                     Date = g.Key.Date
-                 }).ToList()
-                 as IReadOnlyList<BlogDateItem>;
+                Posts.ToDateList(blogKeys) as IReadOnlyList<BlogDateItem>;
 
             return Task.FromResult(dates);
         }
@@ -113,19 +94,7 @@ namespace Blaven.Storage
             if (blogKeys is null)
                 throw new ArgumentNullException(nameof(blogKeys));
 
-            var tags =
-                (from post in Posts
-                 where !blogKeys.Any() || blogKeys.Contains(post.BlogKey)
-                 from tag in post.Tags
-                 group post by new { post.BlogKey, Tag = tag } into g
-                 orderby g.Key.Tag ascending
-                 select new BlogTagItem
-                 {
-                     BlogKey = g.Key.BlogKey,
-                     Count = g.Count(),
-                     Name = g.Key.Tag
-                 }).ToList()
-                 as IReadOnlyList<BlogTagItem>;
+            var tags = Posts.ToTagList(blogKeys) as IReadOnlyList<BlogTagItem>;
 
             return Task.FromResult(tags);
         }
@@ -139,7 +108,7 @@ namespace Blaven.Storage
 
             var posts =
                 Posts
-                    .Where(x => !blogKeys.Any() || blogKeys.Contains(x.BlogKey))
+                    .WhereBlogKeys(blogKeys)
                     .OfType<BlogPostHeader>()
                     .ApplyPaging(paging)
                     .ToList()
@@ -158,10 +127,8 @@ namespace Blaven.Storage
 
             var posts =
                 Posts
-                    .Where(x => !blogKeys.Any() || blogKeys.Contains(x.BlogKey))
-                    .Where(x =>
-                        x.PublishedAt?.Year == archiveDate.Year
-                        && x.PublishedAt?.Month == archiveDate.Month)
+                    .WhereBlogKeys(blogKeys)
+                    .WherePublishedAt(archiveDate)
                     .ApplyPaging(paging)
                     .ToList()
                      as IReadOnlyList<BlogPost>;
@@ -181,11 +148,8 @@ namespace Blaven.Storage
 
             var posts =
                 Posts
-                    .Where(x => !blogKeys.Any() || blogKeys.Contains(x.BlogKey))
-                    .Where(x =>
-                        x.Tags.Contains(
-                            tagName,
-                            StringComparer.InvariantCultureIgnoreCase))
+                    .WhereBlogKeys(blogKeys)
+                    .WhereTagName(tagName)
                     .ApplyPaging(paging)
                     .ToList()
                      as IReadOnlyList<BlogPost>;
@@ -205,9 +169,8 @@ namespace Blaven.Storage
 
             var posts =
                 Posts
-                    .Where(x => !blogKeys.Any() || blogKeys.Contains(x.BlogKey))
-                    .Where(x =>
-                        x.Content.ContainsIgnoreCase(searchText))
+                    .WhereBlogKeys(blogKeys)
+                    .WhereContentContains(searchText)
                     .ApplyPaging(paging)
                     .OfType<BlogPostHeader>()
                     .ToList()
@@ -233,7 +196,7 @@ namespace Blaven.Storage
 
             if (lastUpdatedAt == null)
             {
-                Posts.RemoveAll(x => x.BlogKey == blogKey);
+                _posts.RemoveAll(x => x.BlogKey == blogKey);
             }
 
             CreateOrUpdateMeta(blogKey, meta);
@@ -263,21 +226,21 @@ namespace Blaven.Storage
                 return;
             }
 
-            Metas.RemoveAll(x => x.BlogKey == blogKey);
+            _metas.RemoveAll(x => x.BlogKey == blogKey);
 
-            Metas.Add(meta);
+            _metas.Add(meta);
         }
 
         private void CreateOrUpdatePost(BlogKey blogKey, BlogPost post)
         {
             DeletePost(blogKey, post);
 
-            Posts.Add(post);
+            _posts.Add(post);
         }
 
         private void DeletePost(BlogKey blogKey, BlogPostBase post)
         {
-            Posts.RemoveAll(x => x.BlogKey == blogKey && x.Id == post.Id);
+            _posts.RemoveAll(x => x.BlogKey == blogKey && x.Id == post.Id);
         }
     }
 }

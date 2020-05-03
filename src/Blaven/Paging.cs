@@ -8,15 +8,22 @@ namespace Blaven
     {
         public const int DefaultPageSize = 10;
 
+        private readonly int _pageSize;
+
         public Paging(int pageIndex = 0, int pageSize = DefaultPageSize)
         {
+            if (pageIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize < 0)
+                throw new ArgumentOutOfRangeException(nameof(pageSize));
+
             PageIndex = pageIndex;
-            PageSize = pageSize;
+            _pageSize = pageSize;
         }
 
         public int PageIndex { get; }
 
-        public int PageSize { get; }
+        public int PageSize => _pageSize > 0 ? _pageSize : DefaultPageSize;
 
         public IEnumerable<T> Apply<T>(IEnumerable<T> enumerable)
         {

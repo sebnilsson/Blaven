@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Blaven.Testing;
 using Xunit;
@@ -9,24 +8,24 @@ namespace Blaven.Synchronization.Tests
 {
     public class SyncServiceTest
     {
-        protected readonly ServicesContext ServicesContext;
+        protected readonly TestContext Context;
 
         public SyncServiceTest()
         {
-            ServicesContext = new ServicesContext();
+            Context = new TestContext();
         }
 
         [Fact]
         public async Task Synchronize_ContainsInserts_ReturnsInserts()
         {
             // Arrange
-            ServicesContext.ConfigBlogSource(
+            Context.ConfigBlogSource(
                 BlogPostTestFactory.CreateList(1, 2, 3, 4));
 
-            ServicesContext.ConfigStorageSyncRepo(
+            Context.ConfigStorageSyncRepo(
                 BlogPostTestFactory.CreateList(2, 3));
 
-            var syncService = ServicesContext.GetSyncService();
+            var syncService = Context.GetSyncService();
 
             // Act
             var result = await syncService.Synchronize();
@@ -44,12 +43,12 @@ namespace Blaven.Synchronization.Tests
             int expectedUpdateCount)
         {
             // Arrange
-            ServicesContext.ConfigBlogSource(
+            Context.ConfigBlogSource(
                 BlogPostTestFactory.CreateList(1, 2, 3, 4));
 
-            ServicesContext.ConfigStorageSyncRepo(blogSourcePosts);
+            Context.ConfigStorageSyncRepo(blogSourcePosts);
 
-            var syncService = ServicesContext.GetSyncService();
+            var syncService = Context.GetSyncService();
 
             // Act
             var result = await syncService.Synchronize();
@@ -64,13 +63,13 @@ namespace Blaven.Synchronization.Tests
         public async Task Synchronize_ContainsDeleted_ReturnsDeleted()
         {
             // Arrange
-            ServicesContext.ConfigBlogSource(
+            Context.ConfigBlogSource(
                 BlogPostTestFactory.CreateList(2, 3));
 
-            ServicesContext.ConfigStorageSyncRepo(
+            Context.ConfigStorageSyncRepo(
                 BlogPostTestFactory.CreateList(1, 2, 3, 4));
 
-            var syncService = ServicesContext.GetSyncService();
+            var syncService = Context.GetSyncService();
 
             // Act
             var result = await syncService.Synchronize();
@@ -85,13 +84,13 @@ namespace Blaven.Synchronization.Tests
         public async Task Synchronize_NoChanges_ReturnsNoChanges()
         {
             // Arrange
-            ServicesContext.ConfigBlogSource(
+            Context.ConfigBlogSource(
                 BlogPostTestFactory.CreateList(1, 2, 3, 4));
 
-            ServicesContext.ConfigStorageSyncRepo(
+            Context.ConfigStorageSyncRepo(
                 BlogPostTestFactory.CreateList(1, 2, 3, 4));
 
-            var syncService = ServicesContext.GetSyncService();
+            var syncService = Context.GetSyncService();
 
             // Act
             var result = await syncService.Synchronize();

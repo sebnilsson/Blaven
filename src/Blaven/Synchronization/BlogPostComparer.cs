@@ -22,7 +22,8 @@ namespace Blaven.Synchronization
 
             var inserted =
                 blogSourcePosts
-                    .Where(x => !storagePosts.Any(y => y.Id == x.Id));
+                    .Where(x => !storagePosts.Any(y => y.Id == x.Id))
+                    .ToList();
 
             var updated =
                 (from blogSourcePost in blogSourcePosts.Except(inserted)

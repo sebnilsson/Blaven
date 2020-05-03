@@ -6,7 +6,7 @@ namespace Blaven.Storage.InMemory.Tests.Synchronization
     {
         public BlogServiceTest()
         {
-            ServicesContext.Config(services =>
+            Context.Config(services =>
             {
                 var inMemoryStorage = new InMemoryStorageRepository();
 
