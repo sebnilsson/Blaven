@@ -4,34 +4,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Blaven.Storage.Queries;
 
-namespace Blaven.Storage
+namespace Blaven.Storage.InMemory
 {
-    public class InMemoryStorageRepository
-        : IStorageQueryRepository, IStorageSyncRepository
+    public class InMemoryStorageQueryRepository : IStorageQueryRepository
     {
-        private readonly List<BlogMeta> _metas = new List<BlogMeta>();
-        private readonly List<BlogPost> _posts = new List<BlogPost>();
+        private readonly IInMemoryStorage _inMemoryStorage;
 
-        internal IQueryable<BlogMeta> Metas => _metas.AsQueryable();
-
-        internal IQueryable<BlogPost> Posts => _posts.AsQueryable();
-
-        public Task<BlogMeta?> GetMeta(
-            BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt)
+        public InMemoryStorageQueryRepository(IInMemoryStorage inMemoryStorage)
         {
-            var meta =
-                Metas
-                    .WhereBlogKey(blogKey)
-                    .WhereUpdatedAt(lastUpdatedAt)
-                    .FirstOrDefault();
-
-            return Task.FromResult<BlogMeta?>(meta);
+            _inMemoryStorage = inMemoryStorage
+                ?? throw new ArgumentNullException(nameof(inMemoryStorage));
         }
 
         public Task<BlogMeta?> GetMeta(BlogKey blogKey)
         {
-            return GetMeta(blogKey, null);
+            var meta =
+                _inMemoryStorage
+                    .Metas
+                    .WhereBlogKey(blogKey)
+                    .FirstOrDefault();
+
+            return Task.FromResult<BlogMeta?>(meta);
         }
 
         public Task<BlogPost?> GetPost(string id, BlogKey blogKey)
@@ -39,7 +32,11 @@ namespace Blaven.Storage
             if (id is null)
                 throw new ArgumentNullException(nameof(id));
 
-            var post = Posts.WhereBlogKey(blogKey).FirstOrDefaultById(id);
+            var post =
+                _inMemoryStorage
+                    .Posts
+                    .WhereBlogKey(blogKey)
+                    .FirstOrDefaultById(id);
 
             return Task.FromResult(post);
         }
@@ -49,24 +46,13 @@ namespace Blaven.Storage
             if (slug is null)
                 throw new ArgumentNullException(nameof(slug));
 
-            var post = Posts.WhereBlogKey(blogKey).FirstOrDefaultBySlug(slug);
+            var post =
+                _inMemoryStorage
+                    .Posts
+                    .WhereBlogKey(blogKey)
+                    .FirstOrDefaultBySlug(slug);
 
             return Task.FromResult(post);
-        }
-
-        public Task<IReadOnlyList<BlogPostBase>> GetPosts(
-            BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt)
-        {
-            var posts =
-                Posts
-                    .WhereBlogKey(blogKey)
-                    .WhereUpdatedAfter(lastUpdatedAt)
-                    .OfType<BlogPostBase>()
-                    .ToList()
-                     as IReadOnlyList<BlogPostBase>;
-
-            return Task.FromResult(posts);
         }
 
         public Task<IReadOnlyList<BlogDateItem>> ListAllDates(
@@ -76,14 +62,17 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var dates =
-                Posts.ToDateList(blogKeys) as IReadOnlyList<BlogDateItem>;
+                _inMemoryStorage.Posts.ToDateList(blogKeys)
+                as IReadOnlyList<BlogDateItem>;
 
             return Task.FromResult(dates);
         }
 
         public Task<IReadOnlyList<BlogMeta>> ListAllMetas()
         {
-            var metas = Metas.ToList() as IReadOnlyList<BlogMeta>;
+            var metas =
+                _inMemoryStorage.Metas.ToList()
+                as IReadOnlyList<BlogMeta>;
 
             return Task.FromResult(metas);
         }
@@ -94,7 +83,9 @@ namespace Blaven.Storage
             if (blogKeys is null)
                 throw new ArgumentNullException(nameof(blogKeys));
 
-            var tags = Posts.ToTagList(blogKeys) as IReadOnlyList<BlogTagItem>;
+            var tags =
+                _inMemoryStorage.Posts.ToTagList(blogKeys)
+                as IReadOnlyList<BlogTagItem>;
 
             return Task.FromResult(tags);
         }
@@ -107,7 +98,8 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var posts =
-                Posts
+                _inMemoryStorage
+                    .Posts
                     .WhereBlogKeys(blogKeys)
                     .OfType<BlogPostHeader>()
                     .ApplyPaging(paging)
@@ -126,7 +118,8 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var posts =
-                Posts
+                _inMemoryStorage
+                    .Posts
                     .WhereBlogKeys(blogKeys)
                     .WherePublishedAt(archiveDate)
                     .ApplyPaging(paging)
@@ -147,7 +140,8 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var posts =
-                Posts
+                _inMemoryStorage
+                    .Posts
                     .WhereBlogKeys(blogKeys)
                     .WhereTagName(tagName)
                     .ApplyPaging(paging)
@@ -168,7 +162,8 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var posts =
-                Posts
+                _inMemoryStorage
+                    .Posts
                     .WhereBlogKeys(blogKeys)
                     .WhereContentContains(searchText)
                     .ApplyPaging(paging)
@@ -177,70 +172,6 @@ namespace Blaven.Storage
                      as IReadOnlyList<BlogPostHeader>;
 
             return Task.FromResult(posts);
-        }
-
-        public Task Update(
-            BlogKey blogKey,
-            BlogMeta? meta,
-            IEnumerable<BlogPost> insertedPosts,
-            IEnumerable<BlogPost> updatedPosts,
-            IEnumerable<BlogPostBase> deletedPosts,
-            DateTimeOffset? lastUpdatedAt)
-        {
-            if (insertedPosts is null)
-                throw new ArgumentNullException(nameof(insertedPosts));
-            if (updatedPosts is null)
-                throw new ArgumentNullException(nameof(updatedPosts));
-            if (deletedPosts is null)
-                throw new ArgumentNullException(nameof(deletedPosts));
-
-            if (lastUpdatedAt == null)
-            {
-                _posts.RemoveAll(x => x.BlogKey == blogKey);
-            }
-
-            CreateOrUpdateMeta(blogKey, meta);
-
-            foreach (var post in insertedPosts)
-            {
-                CreateOrUpdatePost(blogKey, post);
-            }
-
-            foreach (var post in updatedPosts)
-            {
-                CreateOrUpdatePost(blogKey, post);
-            }
-
-            foreach (var post in deletedPosts)
-            {
-                DeletePost(blogKey, post);
-            }
-
-            return Task.CompletedTask;
-        }
-
-        private void CreateOrUpdateMeta(BlogKey blogKey, BlogMeta? meta)
-        {
-            if (meta is null)
-            {
-                return;
-            }
-
-            _metas.RemoveAll(x => x.BlogKey == blogKey);
-
-            _metas.Add(meta);
-        }
-
-        private void CreateOrUpdatePost(BlogKey blogKey, BlogPost post)
-        {
-            DeletePost(blogKey, post);
-
-            _posts.Add(post);
-        }
-
-        private void DeletePost(BlogKey blogKey, BlogPostBase post)
-        {
-            _posts.RemoveAll(x => x.BlogKey == blogKey && x.Id == post.Id);
         }
     }
 }

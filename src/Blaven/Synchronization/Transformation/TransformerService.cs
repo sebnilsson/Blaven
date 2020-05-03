@@ -1,17 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Blaven.Synchronization.Transformation
 {
     public class TransformerService : ITransformerService
     {
-        private readonly IEnumerable<IBlogPostTransformer> _transformers;
+        private readonly IReadOnlyList<IBlogPostTransformer> _transformers;
 
         public TransformerService(
             IEnumerable<IBlogPostTransformer> transformers)
         {
-            _transformers = transformers
-                ?? throw new ArgumentNullException(nameof(transformers));
+            if (transformers is null)
+                throw new ArgumentNullException(nameof(transformers));
+
+            _transformers = transformers.ToList();
         }
 
         public void TransformPost(BlogPost post)

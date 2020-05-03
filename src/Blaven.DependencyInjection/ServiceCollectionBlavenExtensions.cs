@@ -1,6 +1,7 @@
 ﻿using System;
 using Blaven.BlogSource;
 using Blaven.Storage;
+using Blaven.Storage.InMemory;
 using Blaven.Synchronization;
 using Blaven.Synchronization.Transformation;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,27 @@ namespace Blaven.DependencyInjection
 
                     return new BlogService(repository);
                 });
+
+            return services;
+        }
+
+        public static IServiceCollection AddBlavenInMemoryStorage(
+            this IServiceCollection services)
+        {
+            if (services is null)
+                throw new ArgumentNullException(nameof(services));
+
+            services.TryAddSingleton<
+                IInMemoryStorage,
+                InMemoryStorage>();
+
+            services.TryAddSingleton<
+                IStorageSyncRepository,
+                InMemoryStorageSyncRepository>();
+
+            services.TryAddSingleton<
+                IStorageQueryRepository,
+                InMemoryStorageQueryRepository>();
 
             return services;
         }

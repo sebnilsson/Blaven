@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Blaven.BlogSource;
 using Blaven.DependencyInjection;
 using Blaven.Storage;
+using Blaven.Storage.InMemory;
 using Blaven.Synchronization;
-using Blaven.Synchronization.Transformation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -17,15 +17,14 @@ namespace Blaven.Testing
     {
         private readonly Lazy<IServiceProvider> _serviceProvider;
 
-        public TestContext()
+        public TestContext(
+            Action<IServiceCollection>? config = null)
         {
             ServiceCollection = new ServiceCollection();
 
+            config?.Invoke(ServiceCollection);
+
             ServiceCollection.AddBlaven();
-
-            var transformerService = new Mock<ITransformerService>();
-
-            ServiceCollection.AddSingleton(transformerService.Object);
 
             RegisterDefaultServices();
 
@@ -36,14 +35,6 @@ namespace Blaven.Testing
         public IServiceCollection ServiceCollection { get; }
 
         public IServiceProvider Services => _serviceProvider.Value;
-
-        public void Config(Action<IServiceCollection> config)
-        {
-            if (config is null)
-                throw new ArgumentNullException(nameof(config));
-
-            config.Invoke(ServiceCollection);
-        }
 
         public void ConfigBlogSource(
             IEnumerable<BlogPost>? blogSourcePosts = null)
@@ -74,6 +65,16 @@ namespace Blaven.Testing
         public IBlogService GetBlogService()
         {
             return Services.GetRequiredService<IBlogService>();
+        }
+
+        public T GetService<T>()
+        {
+            return Services.GetService<T>();
+        }
+
+        public T GetRequiredService<T>()
+        {
+            return Services.GetRequiredService<T>();
         }
 
         public ISyncService GetSyncService()
@@ -121,6 +122,18 @@ namespace Blaven.Testing
                 }
 
                 return blogSource.Object;
+            });
+
+            ServiceCollection.AddSingleton<IInMemoryStorage>(x =>
+            {
+                var config = x.GetService<StorageSyncRepositoryConfig>();
+
+                var storagePosts =
+                    config?.StoragePosts ?? Enumerable.Empty<BlogPost>();
+
+                return new InMemoryStorage(
+                    metas: Enumerable.Empty<BlogMeta>(),
+                    posts: storagePosts);
             });
         }
     }

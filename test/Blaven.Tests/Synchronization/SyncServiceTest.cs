@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blaven.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Blaven.Synchronization.Tests
@@ -12,7 +13,31 @@ namespace Blaven.Synchronization.Tests
 
         public SyncServiceTest()
         {
-            Context = new TestContext();
+            var contextConfig = GetContextConfig();
+
+            Context = new TestContext(contextConfig);
+        }
+
+        [Fact]
+        public async Task Synchronize_ContainsInserts_BlogServiceReturnsInserts()
+        {
+            // Arrange
+            Context.ConfigBlogSource(
+                BlogPostTestFactory.CreateList(1, 2, 3, 4));
+
+            Context.ConfigStorageSyncRepo(
+                BlogPostTestFactory.CreateList(2, 3));
+
+            var blogService = Context.GetBlogService();
+            var syncService = Context.GetSyncService();
+
+            // Act
+            await syncService.Synchronize();
+
+            // Assert
+            var posts = await blogService.ListPostHeaders();
+
+            Assert.Equal(4, posts.Count);
         }
 
         [Fact]
@@ -158,6 +183,11 @@ namespace Blaven.Synchronization.Tests
                 GetChangedBlogPosts(x => { x.Title = "CHANGED_VALUE"; }),
                 0
             };
+        }
+
+        protected virtual Action<IServiceCollection>? GetContextConfig()
+        {
+            return null;
         }
 
         private static BlogPost[] GetChangedBlogPosts(
