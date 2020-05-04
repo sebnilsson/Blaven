@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blaven.Storage.Queries;
+using Blaven.Queries;
 
 namespace Blaven.Storage.InMemory
 {
@@ -18,13 +18,13 @@ namespace Blaven.Storage.InMemory
 
         public Task<BlogMeta?> GetMeta(
             BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt)
+            DateTimeOffset? updatedAfter)
         {
             var meta =
                 _inMemoryStorage
                     .Metas
                     .WhereBlogKey(blogKey)
-                    .WhereUpdatedAt(lastUpdatedAt)
+                    .WhereUpdatedAfter(updatedAfter)
                     .FirstOrDefault();
 
             return Task.FromResult<BlogMeta?>(meta);
@@ -32,13 +32,13 @@ namespace Blaven.Storage.InMemory
 
         public Task<IReadOnlyList<BlogPostBase>> GetPosts(
             BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt)
+            DateTimeOffset? updatedAfter)
         {
             var posts =
                 _inMemoryStorage
                     .Posts
                     .WhereBlogKey(blogKey)
-                    .WhereUpdatedAfter(lastUpdatedAt)
+                    .WhereUpdatedAfter(updatedAfter)
                     .OfType<BlogPostBase>()
                     .ToList()
                      as IReadOnlyList<BlogPostBase>;
@@ -52,7 +52,7 @@ namespace Blaven.Storage.InMemory
             IEnumerable<BlogPost> insertedPosts,
             IEnumerable<BlogPost> updatedPosts,
             IEnumerable<BlogPostBase> deletedPosts,
-            DateTimeOffset? lastUpdatedAt)
+            DateTimeOffset? updatedAfter)
         {
             if (insertedPosts is null)
                 throw new ArgumentNullException(nameof(insertedPosts));
@@ -61,7 +61,7 @@ namespace Blaven.Storage.InMemory
             if (deletedPosts is null)
                 throw new ArgumentNullException(nameof(deletedPosts));
 
-            if (lastUpdatedAt == null)
+            if (updatedAfter == null)
             {
                 _inMemoryStorage.RemovePosts(blogKey);
             }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Blaven.Storage.Queries
+namespace Blaven.Queries
 {
     public static class QueryableBlogMetaExtensions
     {
@@ -31,16 +31,16 @@ namespace Blaven.Storage.Queries
                 queryable.Where(x => !blogKey.HasValue || x.BlogKey == blogKey);
         }
 
-        public static IQueryable<BlogMeta> WhereUpdatedAt(
+        public static IQueryable<BlogMeta> WhereUpdatedAfter(
             this IQueryable<BlogMeta> queryable,
-            DateTimeOffset? updatedAt)
+            DateTimeOffset? updatedAfter)
         {
             if (queryable is null)
                 throw new ArgumentNullException(nameof(queryable));
 
             return
                 queryable
-                    .Where(x => updatedAt == null || x.UpdatedAt > updatedAt);
+                    .Where(x => updatedAfter == null || x.UpdatedAt > updatedAfter);
         }
     }
 }

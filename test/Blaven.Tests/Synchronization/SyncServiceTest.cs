@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Blaven.Storage.InMemory;
+using Blaven.Synchronization.Transformation;
 using Blaven.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -9,48 +12,14 @@ namespace Blaven.Synchronization.Tests
 {
     public class SyncServiceTest
     {
-        protected readonly TestContext Context;
-
-        public SyncServiceTest()
-        {
-            var contextConfig = GetContextConfig();
-
-            Context = new TestContext(contextConfig);
-        }
-
-        [Fact]
-        public async Task Synchronize_ContainsInserts_BlogServiceReturnsInserts()
-        {
-            // Arrange
-            Context.ConfigBlogSource(
-                BlogPostTestFactory.CreateList(1, 2, 3, 4));
-
-            Context.ConfigStorageSyncRepo(
-                BlogPostTestFactory.CreateList(2, 3));
-
-            var blogService = Context.GetBlogService();
-            var syncService = Context.GetSyncService();
-
-            // Act
-            await syncService.Synchronize();
-
-            // Assert
-            var posts = await blogService.ListPostHeaders();
-
-            Assert.Equal(4, posts.Count);
-        }
-
         [Fact]
         public async Task Synchronize_ContainsInserts_ReturnsInserts()
         {
             // Arrange
-            Context.ConfigBlogSource(
-                BlogPostTestFactory.CreateList(1, 2, 3, 4));
+            var blogSourcePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
+            var storagePosts = BlogPostTestFactory.CreateList(2, 3);
 
-            Context.ConfigStorageSyncRepo(
-                BlogPostTestFactory.CreateList(2, 3));
-
-            var syncService = Context.GetSyncService();
+            var syncService = GetSyncService(blogSourcePosts, storagePosts);
 
             // Act
             var result = await syncService.Synchronize();
@@ -68,12 +37,9 @@ namespace Blaven.Synchronization.Tests
             int expectedUpdateCount)
         {
             // Arrange
-            Context.ConfigBlogSource(
-                BlogPostTestFactory.CreateList(1, 2, 3, 4));
+            var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
 
-            Context.ConfigStorageSyncRepo(blogSourcePosts);
-
-            var syncService = Context.GetSyncService();
+            var syncService = GetSyncService(blogSourcePosts, storagePosts);
 
             // Act
             var result = await syncService.Synchronize();
@@ -88,13 +54,10 @@ namespace Blaven.Synchronization.Tests
         public async Task Synchronize_ContainsDeleted_ReturnsDeleted()
         {
             // Arrange
-            Context.ConfigBlogSource(
-                BlogPostTestFactory.CreateList(2, 3));
+            var blogSourcePosts = BlogPostTestFactory.CreateList(2, 3);
+            var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
 
-            Context.ConfigStorageSyncRepo(
-                BlogPostTestFactory.CreateList(1, 2, 3, 4));
-
-            var syncService = Context.GetSyncService();
+            var syncService = GetSyncService(blogSourcePosts, storagePosts);
 
             // Act
             var result = await syncService.Synchronize();
@@ -109,13 +72,10 @@ namespace Blaven.Synchronization.Tests
         public async Task Synchronize_NoChanges_ReturnsNoChanges()
         {
             // Arrange
-            Context.ConfigBlogSource(
-                BlogPostTestFactory.CreateList(1, 2, 3, 4));
+            var blogSourcePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
+            var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
 
-            Context.ConfigStorageSyncRepo(
-                BlogPostTestFactory.CreateList(1, 2, 3, 4));
-
-            var syncService = Context.GetSyncService();
+            var syncService = GetSyncService(blogSourcePosts, storagePosts);
 
             // Act
             var result = await syncService.Synchronize();
@@ -130,67 +90,62 @@ namespace Blaven.Synchronization.Tests
         {
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.Hash = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.Hash = "CHANGED_VALUE"; }),
                 2
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.Author.Name = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.Author.Name = "CHANGED_VALUE"; }),
                 0
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.Author.ImageUrl = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.Author.ImageUrl = "CHANGED_VALUE"; }),
                 0
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.Author.Name = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.Author.Name = "CHANGED_VALUE"; }),
                 0
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.Author.Url = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.Author.Url = "CHANGED_VALUE"; }),
                 0
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.Content = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.Content = "CHANGED_VALUE"; }),
                 0
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.ImageUrl = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.ImageUrl = "CHANGED_VALUE"; }),
                 0
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.Slug = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.Slug = "CHANGED_VALUE"; }),
                 0
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.SourceUrl = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.SourceUrl = "CHANGED_VALUE"; }),
                 0
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.Summary = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.Summary = "CHANGED_VALUE"; }),
                 0
             };
             yield return new object[]
             {
-                GetChangedBlogPosts(x => { x.Title = "CHANGED_VALUE"; }),
+                CreateChangedBlogPosts(x => { x.Title = "CHANGED_VALUE"; }),
                 0
             };
         }
 
-        protected virtual Action<IServiceCollection>? GetContextConfig()
-        {
-            return null;
-        }
-
-        private static BlogPost[] GetChangedBlogPosts(
+        private static BlogPost[] CreateChangedBlogPosts(
             Action<BlogPost> config)
         {
             return
@@ -201,6 +156,29 @@ namespace Blaven.Synchronization.Tests
                     BlogPostTestFactory.Create(3, config),
                     BlogPostTestFactory.Create(4)
                 };
+        }
+
+        private ISyncService GetSyncService(
+            IReadOnlyList<BlogPost>? blogSourcePosts = null,
+            IReadOnlyList<BlogPost>? storagePosts = null)
+        {
+            var blogSource = new FakeBlogSource(blogSourcePosts);
+
+            var inMemoryStorage = new InMemoryStorage(
+                Enumerable.Empty<BlogMeta>(),
+                storagePosts ?? Enumerable.Empty<BlogPost>());
+
+            var storageSyncRepo =
+                new InMemoryStorageSyncRepository(inMemoryStorage);
+
+            var transformerService =
+                new TransformerService(
+                    Enumerable.Empty<IBlogPostTransformer>());
+
+            return new SyncService(
+                blogSource,
+                storageSyncRepo,
+                transformerService);
         }
     }
 }

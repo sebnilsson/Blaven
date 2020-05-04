@@ -10,34 +10,34 @@ namespace Blaven.Synchronization
     public class SyncService : ISyncService
     {
         private readonly IBlogSource _blogSource;
-        private readonly IStorageSyncRepository _storage;
+        private readonly IStorageSyncRepository _storageSyncRepo;
         private readonly ITransformerService _transformerService;
 
         public SyncService(
             IBlogSource blogSource,
-            IStorageSyncRepository storage,
+            IStorageSyncRepository storageSyncRepo,
             ITransformerService transformerService)
         {
             _blogSource = blogSource
                 ?? throw new ArgumentNullException(nameof(blogSource));
-            _storage = storage
-                ?? throw new ArgumentNullException(nameof(storage));
+            _storageSyncRepo = storageSyncRepo
+                ?? throw new ArgumentNullException(nameof(storageSyncRepo));
             _transformerService = transformerService
                 ?? throw new ArgumentNullException(nameof(transformerService));
         }
 
         public async Task<SyncResult> Synchronize(
             BlogKey blogKey = default,
-            DateTimeOffset? lastUpdatedAt = null)
+            DateTimeOffset? updatedAfter = null)
         {
             var stopwatch = Stopwatch.StartNew();
 
             var meta =
-                await SyncMeta(blogKey, lastUpdatedAt).ConfigureAwait(false);
+                await SyncMeta(blogKey, updatedAfter).ConfigureAwait(false);
             var posts =
-                await SyncPosts(blogKey, lastUpdatedAt).ConfigureAwait(false);
+                await SyncPosts(blogKey, updatedAfter).ConfigureAwait(false);
 
-            await Update(blogKey, meta, posts, lastUpdatedAt)
+            await Update(blogKey, meta, posts, updatedAfter)
                 .ConfigureAwait(false);
 
             stopwatch.Stop();
@@ -51,12 +51,12 @@ namespace Blaven.Synchronization
 
         private async Task<BlogMeta?> SyncMeta(
             BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt)
+            DateTimeOffset? updatedAfter)
         {
             var blogSourceMeta =
                 await
                 _blogSource
-                    .GetMeta(blogKey, lastUpdatedAt)
+                    .GetMeta(blogKey, updatedAfter)
                     .ConfigureAwait(false);
 
             if (blogSourceMeta == null)
@@ -66,8 +66,8 @@ namespace Blaven.Synchronization
 
             var storageSourceMeta =
                 await
-                _storage
-                    .GetMeta(blogKey, lastUpdatedAt)
+                _storageSyncRepo
+                    .GetMeta(blogKey, updatedAfter)
                     .ConfigureAwait(false);
 
             var equals =
@@ -78,18 +78,18 @@ namespace Blaven.Synchronization
 
         private async Task<SyncBlogPosts> SyncPosts(
             BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt)
+            DateTimeOffset? updatedAfter)
         {
             var blogSourcePosts =
                 await
                 _blogSource
-                    .GetPosts(blogKey, lastUpdatedAt)
+                    .GetPosts(blogKey, updatedAfter)
                     .ConfigureAwait(false);
 
             var storagePosts =
                 await
-                _storage
-                    .GetPosts(blogKey, lastUpdatedAt)
+                _storageSyncRepo
+                    .GetPosts(blogKey, updatedAfter)
                     .ConfigureAwait(false);
 
             return BlogPostComparer.Compare(blogSourcePosts, storagePosts);
@@ -99,7 +99,7 @@ namespace Blaven.Synchronization
             BlogKey blogKey,
             BlogMeta? meta,
             SyncBlogPosts posts,
-            DateTimeOffset? lastUpdatedAt)
+            DateTimeOffset? updatedAfter)
         {
             foreach (var post in posts.Inserted)
             {
@@ -111,13 +111,13 @@ namespace Blaven.Synchronization
             }
 
             await
-                _storage.Update(
+                _storageSyncRepo.Update(
                     blogKey,
                     meta,
                     insertedPosts: posts.Inserted,
                     updatedPosts: posts.Updated,
                     deletedPosts: posts.Deleted,
-                    lastUpdatedAt)
+                    updatedAfter)
                 .ConfigureAwait(false);
         }
     }

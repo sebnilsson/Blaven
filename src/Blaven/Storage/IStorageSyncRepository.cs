@@ -8,11 +8,11 @@ namespace Blaven.Storage
     {
         Task<IReadOnlyList<BlogPostBase>> GetPosts(
             BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt);
+            DateTimeOffset? updatedAfter);
 
         Task<BlogMeta?> GetMeta(
             BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt);
+            DateTimeOffset? updatedAfter);
 
         Task Update(
             BlogKey blogKey,
@@ -20,6 +20,6 @@ namespace Blaven.Storage
             IEnumerable<BlogPost> insertedPosts,
             IEnumerable<BlogPost> updatedPosts,
             IEnumerable<BlogPostBase> deletedPosts,
-            DateTimeOffset? lastUpdatedAt);
+            DateTimeOffset? updatedAfter);
     }
 }

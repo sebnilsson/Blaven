@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Blaven.Storage.Queries
+namespace Blaven.Queries
 {
     public static class QueryableBlogPostExtensions
     {

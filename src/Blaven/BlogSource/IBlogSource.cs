@@ -8,10 +8,10 @@ namespace Blaven.BlogSource
     {
         Task<IReadOnlyList<BlogPost>> GetPosts(
             BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt = null);
+            DateTimeOffset? updatedAfter = null);
 
         Task<BlogMeta?> GetMeta(
             BlogKey blogKey,
-            DateTimeOffset? lastUpdatedAt = null);
+            DateTimeOffset? updatedAfter = null);
     }
 }

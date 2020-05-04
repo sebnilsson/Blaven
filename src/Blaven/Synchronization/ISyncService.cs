@@ -7,6 +7,6 @@ namespace Blaven.Synchronization
     {
         Task<SyncResult> Synchronize(
             BlogKey blogKey = default,
-            DateTimeOffset? lastUpdatedAt = null);
+            DateTimeOffset? updatedAfter = null);
     }
 }
