@@ -3,27 +3,27 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Blaven.BlogSource;
 using Blaven.Storage;
-using Blaven.Synchronization.Transformation;
+using Blaven.Transformation;
 
 namespace Blaven.Synchronization
 {
-    public class SyncService : ISyncService
+    public class BlogSyncService : IBlogSyncService
     {
         private readonly IBlogSource _blogSource;
         private readonly IStorageSyncRepository _storageSyncRepo;
-        private readonly ITransformerService _transformerService;
+        private readonly IBlogPostStorageTransformService _transformService;
 
-        public SyncService(
+        public BlogSyncService(
             IBlogSource blogSource,
             IStorageSyncRepository storageSyncRepo,
-            ITransformerService transformerService)
+            IBlogPostStorageTransformService transformService)
         {
             _blogSource = blogSource
                 ?? throw new ArgumentNullException(nameof(blogSource));
             _storageSyncRepo = storageSyncRepo
                 ?? throw new ArgumentNullException(nameof(storageSyncRepo));
-            _transformerService = transformerService
-                ?? throw new ArgumentNullException(nameof(transformerService));
+            _transformService = transformService
+                ?? throw new ArgumentNullException(nameof(transformService));
         }
 
         public async Task<SyncResult> Synchronize(
@@ -103,11 +103,11 @@ namespace Blaven.Synchronization
         {
             foreach (var post in posts.Inserted)
             {
-                _transformerService.TransformPost(post);
+                _transformService.TransformPost(post);
             }
             foreach (var post in posts.Updated)
             {
-                _transformerService.TransformPost(post);
+                _transformService.TransformPost(post);
             }
 
             await

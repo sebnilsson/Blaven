@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Blaven
 {
-    public interface IBlogService
+    public interface IBlogQueryService
     {
         Task<BlogMeta?> GetMeta(BlogKey blogKey = default);
 

@@ -2,17 +2,23 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Blaven.Storage;
+using Blaven.Transformation;
 
 namespace Blaven
 {
-    public class BlogService : IBlogService
+    public class BlogQueryService : IBlogQueryService
     {
         private readonly IStorageQueryRepository _repository;
+        private readonly IBlogPostQueryTransformService _transformService;
 
-        public BlogService(IStorageQueryRepository repository)
+        public BlogQueryService(
+            IStorageQueryRepository repository,
+            IBlogPostQueryTransformService transformService)
         {
             _repository = repository
                 ?? throw new ArgumentNullException(nameof(repository));
+            _transformService = transformService
+                ?? throw new ArgumentNullException(nameof(transformService));
         }
 
         public async Task<BlogMeta?> GetMeta(BlogKey blogKey = default)
@@ -27,10 +33,12 @@ namespace Blaven
             if (id is null)
                 throw new ArgumentNullException(nameof(id));
 
-            return await
+            var post = await
                 _repository
                     .GetPost(id, blogKey)
                     .ConfigureAwait(false);
+
+            return post?.TryTransformPost(_transformService);
         }
 
         public async Task<BlogPost?> GetPostBySlug(
@@ -40,10 +48,12 @@ namespace Blaven
             if (slug is null)
                 throw new ArgumentNullException(nameof(slug));
 
-            return await
+            var post = await
                 _repository
                     .GetPostBySlug(slug, blogKey)
                     .ConfigureAwait(false);
+
+            return post?.TryTransformPost(_transformService);
         }
 
         public async Task<IReadOnlyList<BlogDateItem>> ListAllDates(
@@ -85,10 +95,12 @@ namespace Blaven
             if (blogKeys is null)
                 throw new ArgumentNullException(nameof(blogKeys));
 
-            return await
+            var postHeaders = await
                 _repository
                     .ListPostHeaders(paging, blogKeys)
                     .ConfigureAwait(false);
+
+            return postHeaders.TryTransformPostHeaders(_transformService);
         }
 
         public async Task<IReadOnlyList<BlogPostHeader>> ListPostsByArchive(
@@ -99,10 +111,12 @@ namespace Blaven
             if (blogKeys is null)
                 throw new ArgumentNullException(nameof(blogKeys));
 
-            return await
+            var postHeaders = await
                 _repository
                     .ListPostsByArchive(archiveDate, paging, blogKeys)
                     .ConfigureAwait(false);
+
+            return postHeaders.TryTransformPostHeaders(_transformService);
         }
 
         public async Task<IReadOnlyList<BlogPostHeader>> ListPostsByTag(
@@ -113,10 +127,12 @@ namespace Blaven
             if (blogKeys is null)
                 throw new ArgumentNullException(nameof(blogKeys));
 
-            return await
+            var postHeaders = await
                 _repository
                     .ListPostsByTag(tagName, paging, blogKeys)
                     .ConfigureAwait(false);
+
+            return postHeaders.TryTransformPostHeaders(_transformService);
         }
 
         public async Task<IReadOnlyList<BlogPostHeader>> SearchPostHeaders(
@@ -129,10 +145,12 @@ namespace Blaven
             if (blogKeys is null)
                 throw new ArgumentNullException(nameof(blogKeys));
 
-            return await
+            var postHeaders = await
                 _repository
                     .SearchPostHeaders(searchText, paging, blogKeys)
                     .ConfigureAwait(false);
+
+            return postHeaders.TryTransformPostHeaders(_transformService);
         }
     }
 }

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Blaven.Synchronization
 {
-    public interface ISyncService
+    public interface IBlogSyncService
     {
         Task<SyncResult> Synchronize(
             BlogKey blogKey = default,

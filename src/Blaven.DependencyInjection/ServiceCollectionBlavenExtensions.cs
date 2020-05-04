@@ -3,7 +3,7 @@ using Blaven.BlogSource;
 using Blaven.Storage;
 using Blaven.Storage.InMemory;
 using Blaven.Synchronization;
-using Blaven.Synchronization.Transformation;
+using Blaven.Transformation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -18,37 +18,49 @@ namespace Blaven.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
 
             services
-                .TryAddTransient<ISyncService>(x =>
+                .TryAddTransient<IBlogSyncService>(x =>
                 {
                     var blogSource = x.GetRequiredService<IBlogSource>();
 
                     var storage = x.GetRequiredService<IStorageSyncRepository>();
 
-                    var transformerService =
-                        x.GetRequiredService<ITransformerService>();
+                    var transformService =
+                        x.GetRequiredService<IBlogPostStorageTransformService>();
 
-                    return new SyncService(
+                    return new BlogSyncService(
                         blogSource,
                         storage,
-                        transformerService);
+                        transformService);
                 });
 
             services
-                .TryAddSingleton<ITransformerService>(x =>
+                .TryAddSingleton<IBlogPostStorageTransformService>(x =>
                 {
-                    var transformers = x.GetServices<IBlogPostTransformer>();
-                    AssertService(transformers);
+                    var transforms = x.GetServices<IBlogPostStorageTransform>();
+                    AssertService(transforms);
 
-                    return new TransformerService(transformers);
+                    return new BlogPostStorageTransformService(transforms);
                 });
 
             services
-                .TryAddTransient<IBlogService>(x =>
+                .TryAddSingleton<IBlogPostQueryTransformService>(x =>
+                {
+                    var transforms = x.GetServices<IBlogPostQueryTransform>();
+                    AssertService(transforms);
+
+                    return new BlogPostQueryTransformService(transforms);
+                });
+
+            services
+                .TryAddTransient<IBlogQueryService>(x =>
                 {
                     var repository =
                         x.GetRequiredService<IStorageQueryRepository>();
 
-                    return new BlogService(repository);
+                    var transformService =
+                        x.GetRequiredService<IBlogPostQueryTransformService>();
+
+                    return new BlogQueryService(repository, transformService);
                 });
 
             return services;

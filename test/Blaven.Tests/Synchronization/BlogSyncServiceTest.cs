@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blaven.Storage.InMemory;
-using Blaven.Synchronization.Transformation;
 using Blaven.Testing;
-using Microsoft.Extensions.DependencyInjection;
+using Blaven.Transformation;
 using Xunit;
 
 namespace Blaven.Synchronization.Tests
 {
-    public class SyncServiceTest
+    public class BlogSyncServiceTest
     {
         [Fact]
         public async Task Synchronize_ContainsInserts_ReturnsInserts()
@@ -158,7 +157,7 @@ namespace Blaven.Synchronization.Tests
                 };
         }
 
-        private ISyncService GetSyncService(
+        private IBlogSyncService GetSyncService(
             IReadOnlyList<BlogPost>? blogSourcePosts = null,
             IReadOnlyList<BlogPost>? storagePosts = null)
         {
@@ -171,14 +170,14 @@ namespace Blaven.Synchronization.Tests
             var storageSyncRepo =
                 new InMemoryStorageSyncRepository(inMemoryStorage);
 
-            var transformerService =
-                new TransformerService(
-                    Enumerable.Empty<IBlogPostTransformer>());
+            var transformService =
+                new BlogPostStorageTransformService(
+                    Enumerable.Empty<IBlogPostStorageTransform>());
 
-            return new SyncService(
+            return new BlogSyncService(
                 blogSource,
                 storageSyncRepo,
-                transformerService);
+                transformService);
         }
     }
 }
