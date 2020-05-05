@@ -2,7 +2,7 @@
 
 namespace Blaven.Transformation
 {
-    internal static class BlogPostTransformExtensions
+    public static class BlogPostTransformExtensions
     {
         public static BlogPost? TryTransformPost(
             this BlogPost? post,

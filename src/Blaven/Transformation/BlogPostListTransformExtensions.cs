@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Blaven.Transformation
 {
-    internal static class BlogPostListTransformExtensions
+    public static class BlogPostListTransformExtensions
     {
         public static IReadOnlyList<BlogPost> TryTransformPosts(
             this IReadOnlyList<BlogPost> posts,
@@ -19,6 +19,7 @@ namespace Blaven.Transformation
 
             return posts;
         }
+
         public static IReadOnlyList<BlogPostHeader> TryTransformPostHeaders(
             this IReadOnlyList<BlogPostHeader> postHeaders,
             IBlogPostQueryTransformService transformService)

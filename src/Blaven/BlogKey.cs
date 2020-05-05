@@ -40,9 +40,12 @@ namespace Blaven
         {
             return x.Value == y.Value && x.Value == y.Value;
         }
+
         public static bool operator !=(BlogKey x, BlogKey y)
         {
             return !(x == y);
         }
+
+        public static implicit operator BlogKey(string str) => new BlogKey(str);
     }
 }

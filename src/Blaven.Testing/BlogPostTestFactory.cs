@@ -7,9 +7,26 @@ namespace Blaven.Testing
     public static class BlogPostTestFactory
     {
         public static BlogPost Create(
+            int index,
+            Action<BlogPost> config)
+        {
+            return Create(index, blogKey: null, config: config);
+        }
+
+        public static BlogPost Create(
+            int index,
+            string blogKey)
+        {
+            return Create(index, blogKey, config: null);
+        }
+
+        public static BlogPost Create(
             int index = 1,
+            string? blogKey = null,
             Action<BlogPost>? config = null)
         {
+            blogKey ??= $"TEST_BLOG_KEY_{index}";
+
             var blogPost = new BlogPost
             {
                 Author = new BlogAuthor
@@ -20,7 +37,7 @@ namespace Blaven.Testing
                     SourceId = $"TEST_SOURCE_ID_{index}",
                     Url = $"TEST_URL_{index}"
                 },
-                BlogKey = new BlogKey($"TEST_BLOG_KEY_{index}"),
+                BlogKey = new BlogKey(blogKey),
                 Content = $"TEST_CONTENT_{index}",
                 Hash = $"TEST_HASH_{index}",
                 Id = $"{index}",

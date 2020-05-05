@@ -18,7 +18,7 @@ namespace Blaven.Synchronization.Tests
             var blogSourcePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
             var storagePosts = BlogPostTestFactory.CreateList(2, 3);
 
-            var syncService = GetSyncService(blogSourcePosts, storagePosts);
+            var syncService = GetBlogSyncService(blogSourcePosts, storagePosts);
 
             // Act
             var result = await syncService.Synchronize();
@@ -38,7 +38,7 @@ namespace Blaven.Synchronization.Tests
             // Arrange
             var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
 
-            var syncService = GetSyncService(blogSourcePosts, storagePosts);
+            var syncService = GetBlogSyncService(blogSourcePosts, storagePosts);
 
             // Act
             var result = await syncService.Synchronize();
@@ -56,7 +56,7 @@ namespace Blaven.Synchronization.Tests
             var blogSourcePosts = BlogPostTestFactory.CreateList(2, 3);
             var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
 
-            var syncService = GetSyncService(blogSourcePosts, storagePosts);
+            var syncService = GetBlogSyncService(blogSourcePosts, storagePosts);
 
             // Act
             var result = await syncService.Synchronize();
@@ -74,7 +74,7 @@ namespace Blaven.Synchronization.Tests
             var blogSourcePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
             var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
 
-            var syncService = GetSyncService(blogSourcePosts, storagePosts);
+            var syncService = GetBlogSyncService(blogSourcePosts, storagePosts);
 
             // Act
             var result = await syncService.Synchronize();
@@ -157,7 +157,7 @@ namespace Blaven.Synchronization.Tests
                 };
         }
 
-        private IBlogSyncService GetSyncService(
+        private IBlogSyncService GetBlogSyncService(
             IReadOnlyList<BlogPost>? blogSourcePosts = null,
             IReadOnlyList<BlogPost>? storagePosts = null)
         {
