@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Blaven.BlogSource
+namespace Blaven.BlogSources
 {
     public interface IBlogSource
     {

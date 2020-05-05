@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Blaven.BlogSource;
+using Blaven.BlogSources;
 using Blaven.Storage;
 using Blaven.Transformation;
 

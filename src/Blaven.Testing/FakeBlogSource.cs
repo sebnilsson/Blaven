@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blaven.BlogSource;
+using Blaven.BlogSources;
 using Blaven.Queries;
 
 namespace Blaven.Testing

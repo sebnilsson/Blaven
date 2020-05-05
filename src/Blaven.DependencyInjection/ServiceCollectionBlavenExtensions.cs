@@ -1,5 +1,5 @@
 ﻿using System;
-using Blaven.BlogSource;
+using Blaven.BlogSources;
 using Blaven.Storage;
 using Blaven.Storage.InMemory;
 using Blaven.Synchronization;
