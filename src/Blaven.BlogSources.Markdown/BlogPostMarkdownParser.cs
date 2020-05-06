@@ -32,9 +32,6 @@ namespace Blaven.BlogSources.Markdown
                 post.SourceId ??= fileData.FileName;
                 post.SourceUrl ??= fileData.FileName;
 
-                // TODO: Consider making this into a Transform
-                post.Hash ??= BlogPostHashUtility.GetHash(post);
-
                 return post;
             }
             catch

@@ -1,17 +1,24 @@
-﻿using System;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
-namespace Blaven.BlogSources.Markdown
+namespace Blaven.Transformation
 {
-    internal static class BlogPostHashUtility
+    public class BlogPostSha256HashStorageTransform
+        : IBlogPostStorageTransform
     {
-        public static string GetHash(BlogPost post)
+        public void Transform(BlogPost post)
         {
-            if (post is null)
-                throw new ArgumentNullException(nameof(post));
+            if (post == null || post.Hash != null)
+            {
+                return;
+            }
 
+            post.Hash = GetHash(post);
+        }
+
+        private static string GetHash(BlogPost post)
+        {
             var json = JsonSerializer.Serialize(post);
 
             var jsonBytes = Encoding.UTF8.GetBytes(json);
