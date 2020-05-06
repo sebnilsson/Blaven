@@ -10,9 +10,9 @@ namespace Blaven
             Value = (value ?? string.Empty).ToLowerInvariant();
         }
 
-        public bool HasValue => !string.IsNullOrWhiteSpace(Value);
+        public readonly bool HasValue => !string.IsNullOrWhiteSpace(Value);
 
-        public string Value { get; }
+        public readonly string Value { get; }
 
         public bool Equals(BlogKey other)
         {

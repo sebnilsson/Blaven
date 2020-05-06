@@ -21,9 +21,10 @@ namespace Blaven
             _pageSize = pageSize;
         }
 
-        public int PageIndex { get; }
+        public readonly int PageIndex { get; }
 
-        public int PageSize => _pageSize > 0 ? _pageSize : DefaultPageSize;
+        public readonly int PageSize =>
+            _pageSize > 0 ? _pageSize : DefaultPageSize;
 
         public IEnumerable<T> Apply<T>(IEnumerable<T> enumerable)
         {

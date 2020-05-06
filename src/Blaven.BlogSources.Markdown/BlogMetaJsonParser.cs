@@ -4,21 +4,23 @@ namespace Blaven.BlogSources.Markdown
 {
     internal static class BlogMetaJsonParser
     {
-        public static BlogMeta? Parse(BlogKey blogKey, string json)
+        public static BlogMeta? Parse(FileData fileData)
         {
-            if (string.IsNullOrWhiteSpace(json))
+            if (string.IsNullOrWhiteSpace(fileData.Content))
             {
                 return null;
             }
 
             try
             {
-                var meta = ParseInternal(json);
+                var meta = ParseInternal(fileData.Content);
 
                 meta.BlogKey =
                     meta.BlogKey.HasValue
                     ? meta.BlogKey
-                    : blogKey;
+                    : fileData.FolderName;
+
+                meta.Id ??= fileData.FileName;
 
                 return meta;
             }

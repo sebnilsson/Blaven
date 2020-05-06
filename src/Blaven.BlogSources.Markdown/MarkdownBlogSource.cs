@@ -8,32 +8,31 @@ namespace Blaven.BlogSources.Markdown
 {
     public class MarkdownBlogSource : IBlogSource
     {
-        private readonly IReadOnlyList<BlogMeta> _blogMetas;
-        private readonly IReadOnlyList<BlogPost> _blogPosts;
+        private readonly IReadOnlyList<BlogMeta> _metas;
+        private readonly IReadOnlyList<BlogPost> _posts;
 
-        internal IQueryable<BlogMeta> BlogMetas => _blogMetas.AsQueryable();
-        internal IQueryable<BlogPost> BlogPosts => _blogPosts.AsQueryable();
+        internal IQueryable<BlogMeta> Metas => _metas.AsQueryable();
+        internal IQueryable<BlogPost> Posts => _posts.AsQueryable();
 
         public MarkdownBlogSource(
-            IEnumerable<string> metaJsons,
-            IEnumerable<string> postMarkdowns)
+            IEnumerable<string> metaJsonFiles,
+            IEnumerable<string> postMarkdownFiles)
             : this(
-                metaJsons: ToTuples(metaJsons),
-                postMarkdowns: ToTuples(postMarkdowns))
+                metaJsonFiles: ToFileData(metaJsonFiles),
+                postMarkdownFiles: ToFileData(postMarkdownFiles))
         {
         }
 
         public MarkdownBlogSource(
-            IEnumerable<(string blogKey, string json)> metaJsons,
-            IEnumerable<(string blogKey, string markdown)> postMarkdowns)
+            IEnumerable<FileData> metaJsonFiles,
+            IEnumerable<FileData> postMarkdownFiles)
         {
-            _blogMetas =
-                GetJsonMetas(metaJsons ?? Enumerable.Empty<(string, string)>())
+            _metas =
+                GetJsonMetas(metaJsonFiles ?? Enumerable.Empty<FileData>())
                 .ToList();
 
-            _blogPosts =
-                GetMarkdownPosts(
-                    postMarkdowns ?? Enumerable.Empty<(string, string)>())
+            _posts =
+                GetMarkdownPosts(postMarkdownFiles ?? Enumerable.Empty<FileData>())
                 .ToList();
         }
 
@@ -42,7 +41,7 @@ namespace Blaven.BlogSources.Markdown
             DateTimeOffset? updatedAfter = null)
         {
             var meta =
-                BlogMetas
+                Metas
                     .WhereBlogKey(blogKey)
                     .WhereUpdatedAfter(updatedAfter)
                     .FirstOrDefault();
@@ -55,7 +54,7 @@ namespace Blaven.BlogSources.Markdown
             DateTimeOffset? updatedAfter = null)
         {
             var posts =
-                BlogPosts
+                Posts
                     .WhereBlogKey(blogKey)
                     .WhereUpdatedAfter(updatedAfter)
                     .ToList()
@@ -65,13 +64,11 @@ namespace Blaven.BlogSources.Markdown
         }
 
         private IEnumerable<BlogMeta> GetJsonMetas(
-            IEnumerable<(string blogKey, string json)> metaJsons)
+            IEnumerable<FileData> metaJsonFiles)
         {
-            foreach (var (key, json) in metaJsons)
+            foreach (var file in metaJsonFiles)
             {
-                var blogKey = new BlogKey(key);
-
-                var meta = BlogMetaJsonParser.Parse(blogKey, json);
+                var meta = BlogMetaJsonParser.Parse(file);
                 if (meta != null)
                 {
                     yield return meta;
@@ -80,13 +77,11 @@ namespace Blaven.BlogSources.Markdown
         }
 
         private IEnumerable<BlogPost> GetMarkdownPosts(
-            IEnumerable<(string blogKey, string markdown)> blogPostFiles)
+            IEnumerable<FileData> postMarkdownFiles)
         {
-            foreach (var (key, markdown) in blogPostFiles)
+            foreach (var file in postMarkdownFiles)
             {
-                var blogKey = new BlogKey(key);
-
-                var post = BlogPostMarkdownParser.Parse(blogKey, markdown);
+                var post = BlogPostMarkdownParser.Parse(file);
                 if (post != null)
                 {
                     yield return post;
@@ -94,12 +89,12 @@ namespace Blaven.BlogSources.Markdown
             }
         }
 
-        private static IEnumerable<(string, string)> ToTuples(
+        private static IEnumerable<FileData> ToFileData(
             IEnumerable<string> source)
         {
             return
-                source?.Select(x => (string.Empty, x))
-                ?? Enumerable.Empty<(string, string)>();
+                source?.Select(x => new FileData(x))
+                ?? Enumerable.Empty<FileData>();
         }
     }
 }
