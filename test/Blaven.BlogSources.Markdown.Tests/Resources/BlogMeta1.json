@@ -1,0 +1,10 @@
+{
+  "BlogKey": "BLOG_KEY_1",
+  "Description": "TEST_DESCRIPTION",
+  "Id": "TEST_ID",
+  "Name": "TEST_NAME",
+  "PublishedAt": "2020-01-02",
+  "SourceId": "TEST_SOURCE_ID",
+  "UpdatedAt": "2020-02-01",
+  "Url": "TEST_URL"
+}

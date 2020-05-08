@@ -47,5 +47,7 @@ namespace Blaven
         }
 
         public static implicit operator BlogKey(string str) => new BlogKey(str);
+
+        public static BlogKey Empty => new BlogKey();
     }
 }

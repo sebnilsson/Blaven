@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+﻿using Blaven.Json;
 
 namespace Blaven.BlogSources.Markdown
 {
@@ -16,11 +16,12 @@ namespace Blaven.BlogSources.Markdown
                 var meta = ParseInternal(fileData.Content);
 
                 meta.BlogKey =
-                    meta.BlogKey.HasValue
-                    ? meta.BlogKey
-                    : fileData.FolderName;
+                    meta.BlogKey.Value.Coalesce(
+                        fileData.FolderName,
+                        fileData.FolderName);
 
-                meta.Id ??= fileData.FileName;
+                meta.Id = meta.Id.Coalesce(fileData.FileName);
+                meta.PublishedAt ??= fileData.CreatedAt;
 
                 return meta;
             }
@@ -32,7 +33,7 @@ namespace Blaven.BlogSources.Markdown
 
         private static BlogMeta ParseInternal(string json)
         {
-            return JsonSerializer.Deserialize<BlogMeta>(json);
+            return BlavenJsonSerializer.Deserialize<BlogMeta>(json);
         }
     }
 }

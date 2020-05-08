@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
-using System.Text.Json;
+using Blaven.Json;
 
 namespace Blaven.Transformation
 {
@@ -19,7 +19,7 @@ namespace Blaven.Transformation
 
         private static string GetHash(BlogPost post)
         {
-            var json = JsonSerializer.Serialize(post);
+            var json = BlavenJsonSerializer.Serialize(post);
 
             var jsonBytes = Encoding.UTF8.GetBytes(json);
 

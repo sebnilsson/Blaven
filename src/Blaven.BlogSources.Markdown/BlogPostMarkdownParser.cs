@@ -1,16 +1,7 @@
-﻿using Markdig;
-using YamlDotNet.Serialization;
-
-namespace Blaven.BlogSources.Markdown
+﻿namespace Blaven.BlogSources.Markdown
 {
     internal static class BlogPostMarkdownParser
     {
-        private static readonly MarkdownPipeline s_markdownPipeline =
-            new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
-
-        private static readonly IDeserializer s_yamlDeserializer =
-            new DeserializerBuilder().IgnoreUnmatchedProperties().Build();
-
         public static BlogPost? Parse(FileData fileData)
         {
             if (string.IsNullOrWhiteSpace(fileData.Content))
@@ -22,15 +13,11 @@ namespace Blaven.BlogSources.Markdown
             {
                 var post = ParseInternal(fileData);
 
-                post.BlogKey =
-                    post.BlogKey.HasValue
-                    ? post.BlogKey
-                    : fileData.FolderName;
+                post.BlogKey = post.BlogKey.Value.Coalesce(fileData.FolderName);
 
-                post.Id ??= fileData.FileName;
-                post.Slug ??= fileData.FileName;
-                post.SourceId ??= fileData.FileName;
-                post.SourceUrl ??= fileData.FileName;
+                post.Id = post.Id.Coalesce(fileData.FileName);
+                post.Slug = post.Slug.Coalesce(fileData.FileName);
+                post.PublishedAt ??= fileData.CreatedAt;
 
                 return post;
             }
@@ -46,8 +33,7 @@ namespace Blaven.BlogSources.Markdown
 
             var post = GetBlogPost(document);
 
-            var html =
-                Markdig.Markdown.ToHtml(document.Body, s_markdownPipeline);
+            var html = MarkdownUtility.ToHtml(document.Body);
 
             post.Content = html;
 
@@ -63,7 +49,7 @@ namespace Blaven.BlogSources.Markdown
 
             try
             {
-                return s_yamlDeserializer.Deserialize<BlogPost>(document.Yaml);
+                return YamlUtility.Deserialize<BlogPost>(document.Yaml);
             }
             catch
             {
