@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Blaven.BlogSources.FileProviders;
 using Xunit;
 
 namespace Blaven.BlogSources.Markdown.Tests
@@ -107,7 +108,7 @@ namespace Blaven.BlogSources.Markdown.Tests
             Assert.Equal(new DateTime(2020, 3, 5), post.PublishedAt);
         }
 
-        private MarkdownBlogSource GetMarkdownBlogSource()
+        private IBlogSource GetMarkdownBlogSource()
         {
             var metaJsonFiles = new[]
             {
@@ -136,7 +137,7 @@ namespace Blaven.BlogSources.Markdown.Tests
                     createdAt: new DateTime(2020, 3, 5))
             };
 
-            return new MarkdownBlogSource(metaJsonFiles, postMarkdownFiles);
+            return new MarkdownBlogSource(postMarkdownFiles, metaJsonFiles);
         }
     }
 }

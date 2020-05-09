@@ -1,0 +1,1 @@
+﻿Blog Post without YAML

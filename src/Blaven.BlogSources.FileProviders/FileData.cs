@@ -1,6 +1,7 @@
 ﻿using System;
+using System.IO;
 
-namespace Blaven.BlogSources.Markdown
+namespace Blaven.BlogSources.FileProviders
 {
     public readonly struct FileData
     {
@@ -15,11 +16,18 @@ namespace Blaven.BlogSources.Markdown
             FileName = fileName ?? string.Empty;
             FolderName = folderName ?? string.Empty;
             CreatedAt = createdAt;
+
+            FileExtension = Path.GetExtension(FileName);
+            Exists = true;
         }
 
-        public DateTimeOffset? CreatedAt { get; }
+        public readonly DateTimeOffset? CreatedAt { get; }
 
         public readonly string Content { get; }
+
+        public readonly bool Exists { get; }
+
+        public readonly string FileExtension { get; }
 
         public readonly string FileName { get; }
 

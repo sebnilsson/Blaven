@@ -6,11 +6,11 @@ namespace Blaven.BlogSources
 {
     public interface IBlogSource
     {
-        Task<IReadOnlyList<BlogPost>> GetPosts(
+        Task<BlogMeta?> GetMeta(
             BlogKey blogKey,
             DateTimeOffset? updatedAfter = null);
 
-        Task<BlogMeta?> GetMeta(
+        Task<IReadOnlyList<BlogPost>> GetPosts(
             BlogKey blogKey,
             DateTimeOffset? updatedAfter = null);
     }

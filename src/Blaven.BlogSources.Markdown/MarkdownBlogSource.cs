@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Blaven.BlogSources.FileProviders;
 using Blaven.Queries;
 
 namespace Blaven.BlogSources.Markdown
@@ -15,17 +16,17 @@ namespace Blaven.BlogSources.Markdown
         internal IQueryable<BlogPost> Posts => _posts.AsQueryable();
 
         public MarkdownBlogSource(
-            IEnumerable<string> metaJsonFiles,
-            IEnumerable<string> postMarkdownFiles)
+            IEnumerable<string> postMarkdownFiles,
+            IEnumerable<string>? metaJsonFiles = null)
             : this(
-                metaJsonFiles: ToFileData(metaJsonFiles),
-                postMarkdownFiles: ToFileData(postMarkdownFiles))
+                postMarkdownFiles: ToFileData(postMarkdownFiles),
+                metaJsonFiles: ToFileData(metaJsonFiles))
         {
         }
 
         public MarkdownBlogSource(
-            IEnumerable<FileData> metaJsonFiles,
-            IEnumerable<FileData> postMarkdownFiles)
+            IEnumerable<FileData> postMarkdownFiles,
+            IEnumerable<FileData>? metaJsonFiles = null)
         {
             _metas =
                 GetJsonMetas(metaJsonFiles ?? Enumerable.Empty<FileData>())
@@ -90,7 +91,7 @@ namespace Blaven.BlogSources.Markdown
         }
 
         private static IEnumerable<FileData> ToFileData(
-            IEnumerable<string> source)
+            IEnumerable<string>? source)
         {
             return
                 source?.Select(x => new FileData(x))

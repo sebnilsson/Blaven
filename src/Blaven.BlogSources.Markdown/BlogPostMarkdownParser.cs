@@ -1,4 +1,7 @@
-﻿namespace Blaven.BlogSources.Markdown
+﻿using System.IO;
+using Blaven.BlogSources.FileProviders;
+
+namespace Blaven.BlogSources.Markdown
 {
     internal static class BlogPostMarkdownParser
     {
@@ -15,8 +18,12 @@
 
                 post.BlogKey = post.BlogKey.Value.Coalesce(fileData.FolderName);
 
-                post.Id = post.Id.Coalesce(fileData.FileName);
-                post.Slug = post.Slug.Coalesce(fileData.FileName);
+                var fileName =
+                    Path.GetFileNameWithoutExtension(fileData.FileName);
+
+                post.Id = post.Id.Coalesce(fileName);
+                post.Slug = post.Slug.Coalesce(fileName);
+                post.SourceId ??= fileData.FileName;
                 post.PublishedAt ??= fileData.CreatedAt;
 
                 return post;

@@ -1,4 +1,6 @@
-﻿using Blaven.Json;
+﻿using System.IO;
+using Blaven.BlogSources.FileProviders;
+using Blaven.Json;
 
 namespace Blaven.BlogSources.Markdown
 {
@@ -15,13 +17,17 @@ namespace Blaven.BlogSources.Markdown
             {
                 var meta = ParseInternal(fileData.Content);
 
+                var fileName =
+                    Path.GetFileNameWithoutExtension(fileData.FileName);
+
                 meta.BlogKey =
                     meta.BlogKey.Value.Coalesce(
                         fileData.FolderName,
-                        fileData.FolderName);
+                        fileName);
 
-                meta.Id = meta.Id.Coalesce(fileData.FileName);
+                meta.Id = meta.Id.Coalesce(fileName);
                 meta.PublishedAt ??= fileData.CreatedAt;
+                meta.SourceId = meta.SourceId.Coalesce(fileData.FileName);
 
                 return meta;
             }
