@@ -4,7 +4,7 @@ using YamlDotNet.Serialization;
 
 namespace Blaven.BlogSources.Markdown
 {
-    internal static class YamlUtility
+    internal static class YamlConverter
     {
         private static readonly IDeserializer s_yamlDeserializer =
             new DeserializerBuilder()

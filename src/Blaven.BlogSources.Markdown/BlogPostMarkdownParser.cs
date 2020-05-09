@@ -33,7 +33,7 @@
 
             var post = GetBlogPost(document);
 
-            var html = MarkdownUtility.ToHtml(document.Body);
+            var html = MarkdownConverter.ToHtml(document.Body);
 
             post.Content = html;
 
@@ -49,7 +49,7 @@
 
             try
             {
-                return YamlUtility.Deserialize<BlogPost>(document.Yaml);
+                return YamlConverter.Deserialize<BlogPost>(document.Yaml);
             }
             catch
             {

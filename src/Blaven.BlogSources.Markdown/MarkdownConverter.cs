@@ -4,7 +4,7 @@ using Markdig;
 
 namespace Blaven.BlogSources.Markdown
 {
-    internal static class MarkdownUtility
+    internal static class MarkdownConverter
     {
         private static readonly HtmlSanitizer s_htmlSanitizer =
             new HtmlSanitizer();
