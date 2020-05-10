@@ -12,8 +12,6 @@ namespace Blaven.Storage.InMemory
 
         void CreateOrUpdatePost(BlogKey blogKey, BlogPost post);
 
-        void RemovePosts(BlogKey blogKey);
-
-        void RemovePosts(BlogKey blogKey, string id);
+        void RemovePosts(BlogKey blogKey, string? id = null);
     }
 }

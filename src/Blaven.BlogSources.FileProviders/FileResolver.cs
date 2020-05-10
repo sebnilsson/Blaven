@@ -44,7 +44,7 @@ namespace Blaven.BlogSources.FileProviders
                     .Select(x => GetFileDatas(x))
                     .ToList();
 
-            await Task.WhenAll(fileDataTasks);
+            await Task.WhenAll(fileDataTasks).ConfigureAwait(false);
 
             var fileDatas =
                 fileDataTasks
@@ -68,7 +68,7 @@ namespace Blaven.BlogSources.FileProviders
                     .Select(x => GetFileData(x))
                     .ToList();
 
-            await Task.WhenAll(fileDataTasks);
+            await Task.WhenAll(fileDataTasks).ConfigureAwait(false);
 
             return fileDataTasks.Select(x => x.Result).ToList();
         }
@@ -77,7 +77,10 @@ namespace Blaven.BlogSources.FileProviders
         {
             try
             {
-                return await _fileDataResolver.GetFileData(fileInfo);
+                return
+                    await _fileDataResolver
+                        .GetFileData(fileInfo)
+                        .ConfigureAwait(false);
             }
             catch
             {

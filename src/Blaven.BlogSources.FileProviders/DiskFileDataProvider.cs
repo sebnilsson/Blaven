@@ -64,7 +64,8 @@ namespace Blaven.BlogSources.FileProviders
 
             var directories = _directoryResolver.GetDirectories();
 
-            var files = await _fileResolver.GetFiles(directories);
+            var files =
+                await _fileResolver.GetFiles(directories).ConfigureAwait(false);
 
             return GetFileDataResult(files);
         }

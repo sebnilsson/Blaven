@@ -76,11 +76,11 @@ namespace Blaven.DependencyInjection
                 IInMemoryStorage,
                 InMemoryStorage>();
 
-            services.TryAddSingleton<
+            services.TryAddTransient<
                 IStorageSyncRepository,
                 InMemoryStorageSyncRepository>();
 
-            services.TryAddSingleton<
+            services.TryAddTransient<
                 IStorageQueryRepository,
                 InMemoryStorageQueryRepository>();
 

@@ -14,5 +14,13 @@ namespace Blaven
 
             return paging.Apply(enumerable);
         }
+
+        public static HashSet<T> ToHashSet<T>(this IEnumerable<T> enumerable)
+        {
+            if (enumerable is null)
+                throw new ArgumentNullException(nameof(enumerable));
+
+            return new HashSet<T>(enumerable);
+        }
     }
 }

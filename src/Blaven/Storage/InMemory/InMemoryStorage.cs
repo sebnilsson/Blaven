@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Blaven.Storage.InMemory
 {
     public class InMemoryStorage : IInMemoryStorage
     {
-        private readonly List<BlogMeta> _metas = new List<BlogMeta>();
-        private readonly List<BlogPost> _posts = new List<BlogPost>();
+        private readonly ICollection<BlogMeta> _metas = new HashSet<BlogMeta>();
+        private readonly ICollection<BlogPost> _posts = new HashSet<BlogPost>();
 
         public InMemoryStorage()
             : this(
@@ -19,8 +20,8 @@ namespace Blaven.Storage.InMemory
             IEnumerable<BlogMeta> metas,
             IEnumerable<BlogPost> posts)
         {
-            _metas = (metas ?? Enumerable.Empty<BlogMeta>()).ToList();
-            _posts = (posts ?? Enumerable.Empty<BlogPost>()).ToList();
+            _metas = (metas ?? Enumerable.Empty<BlogMeta>()).ToHashSet();
+            _posts = (posts ?? Enumerable.Empty<BlogPost>()).ToHashSet();
         }
 
         public IQueryable<BlogMeta> Metas => _metas.AsQueryable();
@@ -29,31 +30,38 @@ namespace Blaven.Storage.InMemory
 
         public void CreateOrUpdateMeta(BlogKey blogKey, BlogMeta? meta)
         {
+            var existingMetas =
+                _metas.Where(x => x.BlogKey == blogKey).ToList();
+
+            existingMetas.ForEach(x => _metas.Remove(x));
+
             if (meta is null)
             {
                 return;
             }
-
-            _metas.RemoveAll(x => x.BlogKey == blogKey);
 
             _metas.Add(meta);
         }
 
         public void CreateOrUpdatePost(BlogKey blogKey, BlogPost post)
         {
+            if (post is null)
+                throw new ArgumentNullException(nameof(post));
+
             RemovePosts(blogKey, post.Id);
 
             _posts.Add(post);
         }
 
-        public void RemovePosts(BlogKey blogKey)
+        public void RemovePosts(BlogKey blogKey, string? id = null)
         {
-            _posts.RemoveAll(x => x.BlogKey == blogKey);
-        }
+            var existingPosts =
+                _posts
+                    .Where(x => x.BlogKey == blogKey)
+                    .Where(x => string.IsNullOrWhiteSpace(id) || x.Id == id)
+                    .ToList();
 
-        public void RemovePosts(BlogKey blogKey, string id)
-        {
-            _posts.RemoveAll(x => x.BlogKey == blogKey && x.Id == id);
+            existingPosts.ForEach(x => _posts.Remove(x));
         }
     }
 }

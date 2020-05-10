@@ -24,7 +24,9 @@ namespace Blaven.BlogSources.FileProviders
             if (fileInfo is null)
                 throw new ArgumentNullException(nameof(fileInfo));
 
-            var content = await ReadTextAsync(fileInfo.FullName, _encoding);
+            var content =
+                await ReadTextAsync(fileInfo.FullName, _encoding)
+                    .ConfigureAwait(false);
 
             var fileName = fileInfo.Name;
 
@@ -35,12 +37,23 @@ namespace Blaven.BlogSources.FileProviders
                 ? fileInfo.Directory.Name
                 : null;
 
+            var trimmedContent = GetTrimmedContent(content);
+
             return
                 new FileData(
-                    content,
-                    fileName,
-                    folderName,
-                    fileInfo.CreationTimeUtc);
+                    trimmedContent,
+                    fileName: fileName,
+                    folderName: folderName,
+                    createdAt: fileInfo.CreationTimeUtc,
+                    updatedAt: fileInfo.LastWriteTimeUtc);
+        }
+
+        private string GetTrimmedContent(string content)
+        {
+            var bom =
+                _encoding.GetString(_encoding.GetPreamble()).ToCharArray();
+
+            return content.TrimStart(bom);
         }
 
         private static async Task<string> ReadTextAsync(
@@ -61,7 +74,11 @@ namespace Blaven.BlogSources.FileProviders
             var buffer = new byte[0x1000];
 
             int numRead;
-            while ((numRead = await sourceStream.ReadAsync(buffer, 0, buffer.Length)) != 0)
+            while ((numRead =
+                await sourceStream
+                    .ReadAsync(buffer, 0, buffer.Length)
+                    .ConfigureAwait(false))
+                    != 0)
             {
                 var text = encoding.GetString(buffer, 0, numRead);
                 sb.Append(text);

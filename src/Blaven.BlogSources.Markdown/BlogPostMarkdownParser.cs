@@ -16,15 +16,16 @@ namespace Blaven.BlogSources.Markdown
             {
                 var post = ParseInternal(fileData);
 
-                post.BlogKey = post.BlogKey.Value.Coalesce(fileData.FolderName);
-
                 var fileName =
                     Path.GetFileNameWithoutExtension(fileData.FileName);
+
+                post.BlogKey = post.BlogKey.Value.Coalesce(fileData.FolderName);
 
                 post.Id = post.Id.Coalesce(fileName);
                 post.Slug = post.Slug.Coalesce(fileName);
                 post.SourceId ??= fileData.FileName;
                 post.PublishedAt ??= fileData.CreatedAt;
+                post.UpdatedAt ??= fileData.UpdatedAt;
 
                 return post;
             }

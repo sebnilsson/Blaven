@@ -20,14 +20,12 @@ namespace Blaven.BlogSources.Markdown
                 var fileName =
                     Path.GetFileNameWithoutExtension(fileData.FileName);
 
-                meta.BlogKey =
-                    meta.BlogKey.Value.Coalesce(
-                        fileData.FolderName,
-                        fileName);
+                meta.BlogKey = meta.BlogKey.Value.Coalesce(fileData.FolderName);
 
                 meta.Id = meta.Id.Coalesce(fileName);
-                meta.PublishedAt ??= fileData.CreatedAt;
                 meta.SourceId = meta.SourceId.Coalesce(fileData.FileName);
+                meta.PublishedAt ??= fileData.CreatedAt;
+                meta.UpdatedAt ??= fileData.UpdatedAt;
 
                 return meta;
             }

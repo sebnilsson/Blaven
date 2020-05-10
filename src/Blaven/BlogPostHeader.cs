@@ -19,7 +19,8 @@ namespace Blaven
 
         public string Summary { get; set; } = string.Empty;
 
-        public IReadOnlyList<string> Tags { get; set; } = new List<string>();
+        public IReadOnlyCollection<string> Tags { get; set; }
+            = new HashSet<string>();
 
         public string Title { get; set; } = string.Empty;
     }

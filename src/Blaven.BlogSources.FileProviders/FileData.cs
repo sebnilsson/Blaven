@@ -9,13 +9,15 @@ namespace Blaven.BlogSources.FileProviders
             string content,
             string? fileName = null,
             string? folderName = null,
-            DateTimeOffset? createdAt = null)
+            DateTimeOffset? createdAt = null,
+            DateTimeOffset? updatedAt = null)
         {
             Content = content
                 ?? throw new ArgumentNullException(nameof(content));
             FileName = fileName ?? string.Empty;
             FolderName = folderName ?? string.Empty;
             CreatedAt = createdAt;
+            UpdatedAt = updatedAt;
 
             FileExtension = Path.GetExtension(FileName);
             Exists = true;
@@ -32,5 +34,7 @@ namespace Blaven.BlogSources.FileProviders
         public readonly string FileName { get; }
 
         public readonly string FolderName { get; }
+
+        public readonly DateTimeOffset? UpdatedAt { get; }
     }
 }

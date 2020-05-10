@@ -5,14 +5,16 @@ namespace Blaven
 {
     public readonly struct BlogKey : IEquatable<BlogKey>
     {
+        private readonly string _value;
+
         public BlogKey(string value)
         {
-            Value = (value ?? string.Empty).ToLowerInvariant();
+            _value = (value ?? string.Empty).ToLowerInvariant();
         }
 
         public readonly bool HasValue => !string.IsNullOrWhiteSpace(Value);
 
-        public readonly string Value { get; }
+        public readonly string Value => _value ?? string.Empty;
 
         public bool Equals(BlogKey other)
         {
@@ -38,7 +40,7 @@ namespace Blaven
 
         public static bool operator ==(BlogKey x, BlogKey y)
         {
-            return x.Value == y.Value && x.Value == y.Value;
+            return x.Value == y.Value;
         }
 
         public static bool operator !=(BlogKey x, BlogKey y)
