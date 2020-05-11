@@ -16,10 +16,10 @@ namespace Blaven.Storage
 
         Task Update(
             BlogKey blogKey,
+            DateTimeOffset? updatedAfter,
             BlogMeta? meta,
             IEnumerable<BlogPost> insertedPosts,
             IEnumerable<BlogPost> updatedPosts,
-            IEnumerable<BlogPostBase> deletedPosts,
-            DateTimeOffset? updatedAfter);
+            IEnumerable<BlogPostBase> deletedPosts);
     }
 }

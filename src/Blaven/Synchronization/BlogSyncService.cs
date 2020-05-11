@@ -32,10 +32,16 @@ namespace Blaven.Synchronization
         {
             var stopwatch = Stopwatch.StartNew();
 
+            var data =
+                await _blogSource.GetData(blogKey, updatedAfter)
+                    .ConfigureAwait(false);
+
             var meta =
-                await SyncMeta(blogKey, updatedAfter).ConfigureAwait(false);
+                await SyncMeta(data, blogKey, updatedAfter)
+                    .ConfigureAwait(false);
             var posts =
-                await SyncPosts(blogKey, updatedAfter).ConfigureAwait(false);
+                await SyncPosts(data, blogKey, updatedAfter)
+                    .ConfigureAwait(false);
 
             await Update(blogKey, meta, posts, updatedAfter)
                 .ConfigureAwait(false);
@@ -50,14 +56,11 @@ namespace Blaven.Synchronization
         }
 
         private async Task<BlogMeta?> SyncMeta(
+            BlogSourceData data,
             BlogKey blogKey,
             DateTimeOffset? updatedAfter)
         {
-            var blogSourceMeta =
-                await
-                _blogSource
-                    .GetMeta(blogKey, updatedAfter)
-                    .ConfigureAwait(false);
+            var blogSourceMeta = data.Meta;
 
             if (blogSourceMeta == null)
             {
@@ -77,14 +80,11 @@ namespace Blaven.Synchronization
         }
 
         private async Task<SyncBlogPosts> SyncPosts(
+            BlogSourceData data,
             BlogKey blogKey,
             DateTimeOffset? updatedAfter)
         {
-            var blogSourcePosts =
-                await
-                _blogSource
-                    .GetPosts(blogKey, updatedAfter)
-                    .ConfigureAwait(false);
+            var blogSourcePosts = data.Posts;
 
             var storagePosts =
                 await
@@ -113,11 +113,11 @@ namespace Blaven.Synchronization
             await
                 _storageSyncRepo.Update(
                     blogKey,
+                    updatedAfter,
                     meta,
                     insertedPosts: posts.Inserted,
                     updatedPosts: posts.Updated,
-                    deletedPosts: posts.Deleted,
-                    updatedAfter)
+                    deletedPosts: posts.Deleted)
                 .ConfigureAwait(false);
         }
     }

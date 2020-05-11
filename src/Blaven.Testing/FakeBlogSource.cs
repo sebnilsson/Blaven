@@ -23,7 +23,7 @@ namespace Blaven.Testing
             _metas = (metas ?? Enumerable.Empty<BlogMeta>()).ToList();
         }
 
-        public Task<BlogMeta?> GetMeta(
+        public Task<BlogSourceData> GetData(
             BlogKey blogKey,
             DateTimeOffset? updatedAfter = null)
         {
@@ -33,21 +33,14 @@ namespace Blaven.Testing
                     .WhereUpdatedAfter(updatedAfter)
                     .FirstOrDefault();
 
-            return Task.FromResult<BlogMeta?>(meta);
-        }
-
-        public Task<IReadOnlyList<BlogPost>> GetPosts(
-            BlogKey blogKey,
-            DateTimeOffset? updatedAfter = null)
-        {
             var posts =
                 Posts
                     .WhereBlogKey(blogKey)
                     .WhereUpdatedAfter(updatedAfter)
-                    .ToList()
-                    as IReadOnlyList<BlogPost>;
+                    .ToList();
 
-            return Task.FromResult(posts);
+            var data = new BlogSourceData(blogKey, meta, posts);
+            return Task.FromResult(data);
         }
     }
 }

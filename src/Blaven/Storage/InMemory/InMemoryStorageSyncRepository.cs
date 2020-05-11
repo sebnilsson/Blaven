@@ -48,11 +48,11 @@ namespace Blaven.Storage.InMemory
 
         public Task Update(
             BlogKey blogKey,
+            DateTimeOffset? updatedAfter,
             BlogMeta? meta,
             IEnumerable<BlogPost> insertedPosts,
             IEnumerable<BlogPost> updatedPosts,
-            IEnumerable<BlogPostBase> deletedPosts,
-            DateTimeOffset? updatedAfter)
+            IEnumerable<BlogPostBase> deletedPosts)
         {
             if (insertedPosts is null)
                 throw new ArgumentNullException(nameof(insertedPosts));

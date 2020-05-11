@@ -21,7 +21,8 @@ namespace Blaven.BlogSources.Markdown.Tests
             var markdownBlogSource = GetMarkdownBlogSource();
 
             // Act
-            var meta = await markdownBlogSource.GetMeta(s_blogKey1);
+            var data = await markdownBlogSource.GetData(s_blogKey1);
+            var meta = data.Meta;
 
             // Assert
             Assert.NotNull(meta);
@@ -42,7 +43,8 @@ namespace Blaven.BlogSources.Markdown.Tests
             var markdownBlogSource = GetMarkdownBlogSource();
 
             // Act
-            var meta = await markdownBlogSource.GetMeta(s_blogKey2);
+            var data = await markdownBlogSource.GetData(s_blogKey2);
+            var meta = data.Meta;
 
             // Assert
             Assert.NotNull(meta);
@@ -57,7 +59,8 @@ namespace Blaven.BlogSources.Markdown.Tests
             var markdownBlogSource = GetMarkdownBlogSource();
 
             // Act
-            var posts = await markdownBlogSource.GetPosts("test_blog_key_1");
+            var data = await markdownBlogSource.GetData("test_blog_key_1");
+            var posts = data.Posts;
             var post = posts.FirstOrDefault(x => x.Id == "TEST_ID_1");
 
             // Assert
@@ -98,7 +101,8 @@ namespace Blaven.BlogSources.Markdown.Tests
             var markdownBlogSource = GetMarkdownBlogSource();
 
             // Act
-            var posts = await markdownBlogSource.GetPosts(s_blogKey2);
+            var data = await markdownBlogSource.GetData(s_blogKey2);
+            var posts = data.Posts;
             var post = posts.FirstOrDefault();
 
             // Assert
