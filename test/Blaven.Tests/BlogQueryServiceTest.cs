@@ -14,7 +14,7 @@ namespace Blaven.Tests
         private const string BlogKey2 = "BLOG_KEY_2";
 
         [Fact]
-        public async Task ListPostHeaders_NoBlogKeyAndNoPaging_ReturnsAllPosts()
+        public async Task ListPosts_NoBlogKeyAndNoPaging_ReturnsAllPosts()
         {
             // Arrange
             var storagePosts = GetBlogPosts();
@@ -22,14 +22,14 @@ namespace Blaven.Tests
             var blogQueryService = GetBlogQueryServices(storagePosts);
 
             // Act
-            var posts = await blogQueryService.ListPostHeaders();
+            var posts = await blogQueryService.ListPosts();
 
             // Assert
             Assert.Equal(10, posts.Count);
         }
 
         [Fact]
-        public async Task ListPostHeaders_BlogKeyAndNoPaging_ReturnsPostsWithBlogKey()
+        public async Task ListPosts_BlogKeyAndNoPaging_ReturnsPostsWithBlogKey()
         {
             // Arrange
             var storagePosts = GetBlogPosts();
@@ -38,7 +38,7 @@ namespace Blaven.Tests
 
             // Act
             var posts =
-                await blogQueryService.ListPostHeaders(blogKeys: BlogKey1);
+                await blogQueryService.ListPosts(blogKeys: BlogKey1);
 
             // Assert
             var allPostsHasBlogKey =
@@ -49,7 +49,7 @@ namespace Blaven.Tests
         }
 
         [Fact]
-        public async Task ListPostHeaders_BlogKeyAndPaging_ReturnsPagedPostsWithBlogKey()
+        public async Task ListPosts_BlogKeyAndPaging_ReturnsPagedPostsWithBlogKey()
         {
             // Arrange
             var storagePosts = GetBlogPosts();
@@ -61,9 +61,9 @@ namespace Blaven.Tests
 
             // Act
             var posts1 =
-                await blogQueryService.ListPostHeaders(paging1, BlogKey1);
+                await blogQueryService.ListPosts(paging1, BlogKey1);
             var posts2 =
-                await blogQueryService.ListPostHeaders(paging2, BlogKey1);
+                await blogQueryService.ListPosts(paging2, BlogKey1);
 
             // Assert
             var allPostsHasBlogKey1 =

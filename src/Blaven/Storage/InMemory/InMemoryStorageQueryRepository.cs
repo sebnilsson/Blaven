@@ -90,7 +90,7 @@ namespace Blaven.Storage.InMemory
             return Task.FromResult(tags);
         }
 
-        public Task<IReadOnlyList<BlogPostHeader>> ListPostHeaders(
+        public Task<IReadOnlyList<BlogPostHeader>> ListPosts(
             Paging paging,
             IEnumerable<BlogKey> blogKeys)
         {

@@ -88,7 +88,7 @@ namespace Blaven
                     .ConfigureAwait(false);
         }
 
-        public async Task<IReadOnlyList<BlogPostHeader>> ListPostHeaders(
+        public async Task<IReadOnlyList<BlogPostHeader>> ListPosts(
             Paging paging = default,
             params BlogKey[] blogKeys)
         {
@@ -97,7 +97,7 @@ namespace Blaven
 
             var postHeaders = await
                 _repository
-                    .ListPostHeaders(paging, blogKeys)
+                    .ListPosts(paging, blogKeys)
                     .ConfigureAwait(false);
 
             return postHeaders.TryTransformPostHeaders(_transformService);

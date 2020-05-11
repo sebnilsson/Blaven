@@ -2,7 +2,6 @@
 Title: Second Post Title
 Summary: Second Post Summary
 Tags:
-- Test Tag 1
 - Test Tag 2
 - Test Tag 3
 - Test Tag 4

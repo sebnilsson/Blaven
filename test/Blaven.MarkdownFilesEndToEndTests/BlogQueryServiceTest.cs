@@ -92,6 +92,106 @@ namespace Blaven.MarkdownFilesEndToEndTests
             Assert.True(sequenceEquals);
         }
 
+        [Fact]
+        public async Task ListAllMetas_ExistingMetas_ReturnMetas()
+        {
+            // Arrange
+            var blogQueryService = GetBlogQueryService();
+
+            // Act
+            var metas = await blogQueryService.ListAllMetas();
+
+            // Assert
+            Assert.NotNull(metas);
+            Assert.NotEmpty(metas);
+        }
+
+        [Fact]
+        public async Task ListAllTags_ExistingTags_ReturnTags()
+        {
+            // Arrange
+            var blogQueryService = GetBlogQueryService();
+
+            // Act
+            var tags = await blogQueryService.ListAllTags();
+
+            // Assert
+            var expectedTags = new[]
+            {
+                new BlogTagItem
+                {
+                    Name = "Test Tag 1",
+                    Count = 1
+                },
+                new BlogTagItem
+                {
+                    Name = "Test Tag 2",
+                    Count = 3
+                },
+                new BlogTagItem
+                {
+                    Name = "Test Tag 3",
+                    Count = 3
+                },
+                new BlogTagItem
+                {
+                    Name = "Test Tag 4",
+                    Count = 2
+                }
+            };
+
+            var sequenceEquals =
+                expectedTags.All(x => tags.Any(y =>
+                    y.BlogKey == x.BlogKey
+                    && y.Count == x.Count
+                    && y.Name == x.Name));
+
+            Assert.True(sequenceEquals);
+        }
+
+        [Fact]
+        public async Task ListPosts_ExistingPosts_ReturnPosts()
+        {
+            // Arrange
+            var blogQueryService = GetBlogQueryService();
+
+            // Act
+            var posts = await blogQueryService.ListPosts();
+
+            // Assert
+            Assert.NotNull(posts);
+            Assert.Equal(3, posts.Count);
+        }
+
+        [Fact]
+        public async Task ListPostsByArchive_ExistingPosts_ReturnPosts()
+        {
+            // Arrange
+            var blogQueryService = GetBlogQueryService();
+
+            // Act
+            var archiveDates = new DateTime(2020, 3, 1);
+            var posts = await blogQueryService.ListPostsByArchive(archiveDates);
+
+            // Assert
+            Assert.NotNull(posts);
+            Assert.Equal(2, posts.Count);
+        }
+
+        [Fact]
+        public async Task ListPostsByTag_ExistingPosts_ReturnPosts()
+        {
+            // Arrange
+            var blogQueryService = GetBlogQueryService();
+
+            // Act
+            var posts = await blogQueryService.ListPostsByTag("Test Tag 3");
+
+            // Assert
+            Assert.NotNull(posts);
+            Assert.Equal(3, posts.Count);
+        }
+
         private IBlogQueryService GetBlogQueryService()
         {
             var services = GetServiceProvider();
@@ -112,13 +212,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
             services.AddBlaven();
             services.AddBlavenInMemoryStorage();
 
-            services.AddTransient<IBlogSource>(x =>
-            {
-                var fileDataProvider =
-                    x.GetRequiredService<IFileDataProvider>();
-
-                return new MarkdownBlogSource(fileDataProvider);
-            });
+            services.AddTransient<IBlogSource, MarkdownBlogSource>();
 
             services.AddTransient<IFileDataProvider>(x =>
             {

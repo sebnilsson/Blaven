@@ -20,7 +20,7 @@ namespace Blaven.Storage
         Task<IReadOnlyList<BlogTagItem>> ListAllTags(
             IEnumerable<BlogKey> blogKeys);
 
-        Task<IReadOnlyList<BlogPostHeader>> ListPostHeaders(
+        Task<IReadOnlyList<BlogPostHeader>> ListPosts(
             Paging paging,
             IEnumerable<BlogKey> blogKeys);
 
