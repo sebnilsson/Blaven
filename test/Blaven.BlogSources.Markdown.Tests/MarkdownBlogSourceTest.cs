@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Blaven.BlogSources.FileProviders;
+using Moq;
 using Xunit;
 
 namespace Blaven.BlogSources.Markdown.Tests
@@ -137,7 +138,20 @@ namespace Blaven.BlogSources.Markdown.Tests
                     createdAt: new DateTime(2020, 3, 5))
             };
 
-            return new MarkdownBlogSource(postMarkdownFiles, metaJsonFiles);
+            var mockFileDataProvider = new Mock<IFileDataProvider>();
+
+            mockFileDataProvider
+                .Setup(x => x.GetFileData())
+                .Returns(() =>
+                {
+                    var result = new FileDataResult(
+                    metas: metaJsonFiles,
+                    posts: postMarkdownFiles);
+
+                    return Task.FromResult(result);
+                });
+
+            return new MarkdownBlogSource(mockFileDataProvider.Object);
         }
     }
 }

@@ -9,62 +9,55 @@ namespace Blaven.BlogSources.Markdown
 {
     public class MarkdownBlogSource : IBlogSource
     {
-        private readonly IReadOnlyList<BlogMeta> _metas;
-        private readonly IReadOnlyList<BlogPost> _posts;
+        private readonly IFileDataProvider _fileDataProvider;
 
-        internal IQueryable<BlogMeta> Metas => _metas.AsQueryable();
-        internal IQueryable<BlogPost> Posts => _posts.AsQueryable();
-
-        public MarkdownBlogSource(
-            IEnumerable<string> postMarkdownFiles,
-            IEnumerable<string>? metaJsonFiles = null)
-            : this(
-                postMarkdownFiles: ToFileData(postMarkdownFiles),
-                metaJsonFiles: ToFileData(metaJsonFiles))
+        // TODO: Refactor to allow composition and single call to file-provider
+        public MarkdownBlogSource(IFileDataProvider fileDataProvider)
         {
+            _fileDataProvider = fileDataProvider
+                ?? throw new ArgumentNullException(nameof(fileDataProvider));
         }
 
-        public MarkdownBlogSource(
-            IEnumerable<FileData> postMarkdownFiles,
-            IEnumerable<FileData>? metaJsonFiles = null)
-        {
-            _metas =
-                GetJsonMetas(metaJsonFiles ?? Enumerable.Empty<FileData>())
-                .ToList();
-
-            _posts =
-                GetMarkdownPosts(postMarkdownFiles ?? Enumerable.Empty<FileData>())
-                .ToList();
-        }
-
-        public Task<BlogMeta?> GetMeta(
+        public async Task<BlogMeta?> GetMeta(
             BlogKey blogKey,
             DateTimeOffset? updatedAfter = null)
         {
-            var meta =
-                Metas
+            var fileData =
+                await _fileDataProvider.GetFileData().ConfigureAwait(false);
+
+            var metas = GetMetaQuery(fileData);
+
+            return
+                metas
                     .WhereBlogKey(blogKey)
                     .WhereUpdatedAfter(updatedAfter)
                     .FirstOrDefault();
-
-            return Task.FromResult<BlogMeta?>(meta);
         }
 
-        public Task<IReadOnlyList<BlogPost>> GetPosts(
+        public async Task<IReadOnlyList<BlogPost>> GetPosts(
             BlogKey blogKey,
             DateTimeOffset? updatedAfter = null)
         {
-            var posts =
-                Posts
+            var fileData =
+                await _fileDataProvider.GetFileData().ConfigureAwait(false);
+
+            // TODO: Fix double-fetching
+            var posts = GetPostQuery(fileData);
+
+            return
+                posts
                     .WhereBlogKey(blogKey)
                     .WhereUpdatedAfter(updatedAfter)
-                    .ToList()
-                    as IReadOnlyList<BlogPost>;
-
-            return Task.FromResult(posts);
+                    .ToList();
         }
 
-        private IEnumerable<BlogMeta> GetJsonMetas(
+        private IQueryable<BlogMeta> GetJsonMetas(
+            IEnumerable<FileData> metaJsonFiles)
+        {
+            return GetJsonMetasInternal(metaJsonFiles).ToList().AsQueryable();
+        }
+
+        private IEnumerable<BlogMeta> GetJsonMetasInternal(
             IEnumerable<FileData> metaJsonFiles)
         {
             foreach (var file in metaJsonFiles)
@@ -77,7 +70,24 @@ namespace Blaven.BlogSources.Markdown
             }
         }
 
-        private IEnumerable<BlogPost> GetMarkdownPosts(
+        private IQueryable<BlogPost> GetMarkdownPosts(
+            IEnumerable<FileData> postMarkdownFiles)
+        {
+            var markdownPosts =
+                postMarkdownFiles
+                    .Select(x => BlogPostMarkdownParser.Parse(x))
+                    .Where(x => x != null)
+                    .Select(x => x!)
+                    .ToList();
+
+            return markdownPosts.AsQueryable();
+            //return
+            //    GetMarkdownPostsInternal(postMarkdownFiles)
+            //        .ToList()
+            //        .AsQueryable();
+        }
+
+        private IEnumerable<BlogPost> GetMarkdownPostsInternal(
             IEnumerable<FileData> postMarkdownFiles)
         {
             foreach (var file in postMarkdownFiles)
@@ -90,12 +100,20 @@ namespace Blaven.BlogSources.Markdown
             }
         }
 
-        private static IEnumerable<FileData> ToFileData(
-            IEnumerable<string>? source)
+        private IQueryable<BlogMeta> GetMetaQuery(
+            FileDataResult fileData)
         {
-            return
-                source?.Select(x => new FileData(x))
-                ?? Enumerable.Empty<FileData>();
+            //var fileData = await _fileData.Value.ConfigureAwait(false);
+
+            return GetJsonMetas(fileData.Metas);
+        }
+
+        private IQueryable<BlogPost> GetPostQuery(
+            FileDataResult fileData)
+        {
+            //var fileData = await _fileData.Value.ConfigureAwait(false);
+
+            return GetMarkdownPosts(fileData.Posts);
         }
     }
 }
