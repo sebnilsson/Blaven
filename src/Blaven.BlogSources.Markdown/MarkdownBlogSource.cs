@@ -10,6 +10,8 @@ namespace Blaven.BlogSources.Markdown
     public class MarkdownBlogSource : IBlogSource
     {
         private readonly IFileDataProvider _fileDataProvider;
+        private readonly BlogPostMarkdownParser _blogPostMarkdownParser =
+            new BlogPostMarkdownParser();
 
         public MarkdownBlogSource(IFileDataProvider fileDataProvider)
         {
@@ -60,7 +62,7 @@ namespace Blaven.BlogSources.Markdown
             var markdownPosts =
                 fileDataResult
                     .Posts
-                    .Select(x => BlogPostMarkdownParser.Parse(x))
+                    .Select(x => _blogPostMarkdownParser.Parse(x))
                     .Where(x => x != null)
                     .Select(x => x!)
                     .ToList();

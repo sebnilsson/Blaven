@@ -3,9 +3,13 @@ using Blaven.BlogSources.FileProviders;
 
 namespace Blaven.BlogSources.Markdown
 {
-    internal static class BlogPostMarkdownParser
+    internal class BlogPostMarkdownParser
     {
-        public static BlogPost? Parse(FileData fileData)
+        private readonly MarkdownConverter _markdownConverter =
+            new MarkdownConverter();
+        private readonly YamlConverter _yamlConverter = new YamlConverter();
+
+        public BlogPost? Parse(FileData fileData)
         {
             if (string.IsNullOrWhiteSpace(fileData.Content))
             {
@@ -35,20 +39,20 @@ namespace Blaven.BlogSources.Markdown
             }
         }
 
-        private static BlogPost ParseInternal(FileData fileData)
+        private BlogPost ParseInternal(FileData fileData)
         {
             var document = MarkdownDocumentParser.Parse(fileData.Content);
 
             var post = GetBlogPost(document);
 
-            var html = MarkdownConverter.ToHtml(document.Body);
+            var html = _markdownConverter.ToHtml(document.Body);
 
             post.Content = html;
 
             return post;
         }
 
-        private static BlogPost GetBlogPost(MarkdownDocument document)
+        private BlogPost GetBlogPost(MarkdownDocument document)
         {
             if (string.IsNullOrWhiteSpace(document.Yaml))
             {
@@ -57,7 +61,7 @@ namespace Blaven.BlogSources.Markdown
 
             try
             {
-                return YamlConverter.Deserialize<BlogPost>(document.Yaml);
+                return _yamlConverter.Deserialize<BlogPost>(document.Yaml);
             }
             catch
             {

@@ -18,7 +18,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
         public async Task GetMeta_ExistingMeta_ReturnMeta()
         {
             // Arrange
-            var blogQueryService = GetBlogQueryService();
+            var blogQueryService = await GetBlogQueryService();
 
             // Act
             var meta = await blogQueryService.GetMeta();
@@ -34,7 +34,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
         public async Task GetPostBySlug_ExistingPost_ReturnPost()
         {
             // Arrange
-            var blogQueryService = GetBlogQueryService();
+            var blogQueryService = await GetBlogQueryService();
 
             // Act
             var post = await blogQueryService.GetPostBySlug("test-blog-post");
@@ -63,7 +63,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
         public async Task ListAllDates_ExistingPost_ReturnDates()
         {
             // Arrange
-            var blogQueryService = GetBlogQueryService();
+            var blogQueryService = await GetBlogQueryService();
 
             // Act
             var dates = await blogQueryService.ListAllDates();
@@ -96,7 +96,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
         public async Task ListAllMetas_ExistingMetas_ReturnMetas()
         {
             // Arrange
-            var blogQueryService = GetBlogQueryService();
+            var blogQueryService = await GetBlogQueryService();
 
             // Act
             var metas = await blogQueryService.ListAllMetas();
@@ -110,7 +110,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
         public async Task ListAllTags_ExistingTags_ReturnTags()
         {
             // Arrange
-            var blogQueryService = GetBlogQueryService();
+            var blogQueryService = await GetBlogQueryService();
 
             // Act
             var tags = await blogQueryService.ListAllTags();
@@ -153,7 +153,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
         public async Task ListPosts_ExistingPosts_ReturnPosts()
         {
             // Arrange
-            var blogQueryService = GetBlogQueryService();
+            var blogQueryService = await GetBlogQueryService();
 
             // Act
             var posts = await blogQueryService.ListPosts();
@@ -167,7 +167,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
         public async Task ListPostsByArchive_ExistingPosts_ReturnPosts()
         {
             // Arrange
-            var blogQueryService = GetBlogQueryService();
+            var blogQueryService = await GetBlogQueryService();
 
             // Act
             var archiveDates = new DateTime(2020, 3, 1);
@@ -182,7 +182,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
         public async Task ListPostsByTag_ExistingPosts_ReturnPosts()
         {
             // Arrange
-            var blogQueryService = GetBlogQueryService();
+            var blogQueryService = await GetBlogQueryService();
 
             // Act
             var posts = await blogQueryService.ListPostsByTag("Test Tag 3");
@@ -192,14 +192,14 @@ namespace Blaven.MarkdownFilesEndToEndTests
             Assert.Equal(3, posts.Count);
         }
 
-        private IBlogQueryService GetBlogQueryService()
+        private async Task<IBlogQueryService> GetBlogQueryService()
         {
             var services = GetServiceProvider();
 
             var blogSyncService =
                 services.GetRequiredService<IBlogSyncService>();
 
-            blogSyncService.Synchronize();
+            await blogSyncService.Synchronize();
 
             return services.GetRequiredService<IBlogQueryService>();
         }

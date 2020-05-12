@@ -4,24 +4,24 @@ using Markdig;
 
 namespace Blaven.BlogSources.Markdown
 {
-    internal static class MarkdownConverter
+    internal class MarkdownConverter
     {
-        private static readonly HtmlSanitizer s_htmlSanitizer =
+        private readonly HtmlSanitizer _htmlSanitizer =
             new HtmlSanitizer();
 
-        private static readonly MarkdownPipeline s_markdownPipeline =
+        private readonly MarkdownPipeline _markdownPipeline =
             new MarkdownPipelineBuilder()
                 .UseAdvancedExtensions()
                 .Build();
 
-        public static string ToHtml(string markdown)
+        public string ToHtml(string markdown)
         {
             if (markdown is null)
                 throw new ArgumentNullException(nameof(markdown));
 
-            var sanitized = s_htmlSanitizer.Sanitize(markdown);
+            var sanitized = _htmlSanitizer.Sanitize(markdown);
 
-            var html = Markdig.Markdown.ToHtml(sanitized, s_markdownPipeline);
+            var html = Markdig.Markdown.ToHtml(sanitized, _markdownPipeline);
             return html;
 
             //var sanitizedHtml = s_htmlSanitizer.Sanitize(html);
