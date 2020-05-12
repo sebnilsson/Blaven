@@ -29,7 +29,7 @@ namespace Blaven
             var indexOf =
                 str.IndexOf(
                     value,
-                    StringComparison.OrdinalIgnoreCase);
+                    StringComparison.InvariantCultureIgnoreCase);
 
             return indexOf >= 0;
         }

@@ -135,7 +135,7 @@ namespace Blaven
             return postHeaders.TryTransformPostHeaders(_transformService);
         }
 
-        public async Task<IReadOnlyList<BlogPostHeader>> SearchPostHeaders(
+        public async Task<IReadOnlyList<BlogPostHeader>> SearchPosts(
             string searchText,
             Paging paging = default,
             params BlogKey[] blogKeys)
@@ -147,7 +147,7 @@ namespace Blaven
 
             var postHeaders = await
                 _repository
-                    .SearchPostHeaders(searchText, paging, blogKeys)
+                    .SearchPosts(searchText, paging, blogKeys)
                     .ConfigureAwait(false);
 
             return postHeaders.TryTransformPostHeaders(_transformService);

@@ -151,7 +151,7 @@ namespace Blaven.Storage.InMemory
             return Task.FromResult(posts);
         }
 
-        public Task<IReadOnlyList<BlogPostHeader>> SearchPostHeaders(
+        public Task<IReadOnlyList<BlogPostHeader>> SearchPosts(
             string searchText,
             Paging paging,
             IEnumerable<BlogKey> blogKeys)

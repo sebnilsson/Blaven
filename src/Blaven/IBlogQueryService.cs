@@ -33,7 +33,7 @@ namespace Blaven
             Paging paging = default,
             params BlogKey[] blogKeys);
 
-        Task<IReadOnlyList<BlogPostHeader>> SearchPostHeaders(
+        Task<IReadOnlyList<BlogPostHeader>> SearchPosts(
             string searchText,
             Paging paging = default,
             params BlogKey[] blogKeys);

@@ -192,6 +192,25 @@ namespace Blaven.MarkdownFilesEndToEndTests
             Assert.Equal(3, posts.Count);
         }
 
+        [Theory]
+        [InlineData("Test Tag 3")]
+        [InlineData("another test")]
+        [InlineData("Test Post Summary")]
+        [InlineData("Third Post Title ABC")]
+        public async Task SearchPosts_ExistingPosts_ReturnPosts(
+            string searchText)
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var posts = await blogQueryService.SearchPosts(searchText);
+
+            // Assert
+            Assert.NotNull(posts);
+            Assert.NotEmpty(posts);
+        }
+
         private async Task<IBlogQueryService> GetBlogQueryService()
         {
             var services = GetServiceProvider();

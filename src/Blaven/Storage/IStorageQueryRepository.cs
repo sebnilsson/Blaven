@@ -34,7 +34,7 @@ namespace Blaven.Storage
             Paging paging,
             IEnumerable<BlogKey> blogKeys);
 
-        Task<IReadOnlyList<BlogPostHeader>> SearchPostHeaders(
+        Task<IReadOnlyList<BlogPostHeader>> SearchPosts(
             string searchText,
             Paging paging,
             IEnumerable<BlogKey> blogKeys);

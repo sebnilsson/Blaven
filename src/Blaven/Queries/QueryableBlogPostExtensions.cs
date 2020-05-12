@@ -123,7 +123,17 @@ namespace Blaven.Queries
                     .Where(x =>
                         x.Content.IndexOf(
                             searchText,
-                            StringComparison.OrdinalIgnoreCase) >= 0);
+                            StringComparison.InvariantCultureIgnoreCase) >= 0
+                        || x.Summary.IndexOf(
+                            searchText,
+                            StringComparison.InvariantCultureIgnoreCase) >= 0
+                        || x.Title.IndexOf(
+                            searchText,
+                            StringComparison.InvariantCultureIgnoreCase) >= 0
+                        || x.Tags.Any(t =>
+                            t.IndexOf(
+                                searchText,
+                                StringComparison.InvariantCultureIgnoreCase) >= 0));
         }
 
         public static IQueryable<BlogPost> WhereTagName(
@@ -138,8 +148,10 @@ namespace Blaven.Queries
             return
                 queryable
                     .Where(x =>
-                        x.Tags.Contains(
-                            tagName, StringComparer.OrdinalIgnoreCase));
+                        x.Tags.Any(t =>
+                            t.Equals(
+                                tagName,
+                                StringComparison.InvariantCultureIgnoreCase)));
         }
 
         public static IQueryable<BlogPost> WherePublishedAfter(
