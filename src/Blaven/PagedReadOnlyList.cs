@@ -16,22 +16,25 @@ namespace Blaven
 
             _list = paging.Apply(queryable).ToList();
 
+            PageIndex = paging.Index;
+            PageSize = paging.Size;
+
             HasPrevious = paging.Index > 0;
 
-            var nextItemPaging = new Paging(index: paging.Index + 1, size: 1);
-
-            var nextItemList = nextItemPaging.Apply(queryable);
-
-            HasNext = nextItemList.Any();
+            HasNext = GetHasNext(queryable, paging);
         }
+
+        public T this[int index] => _list[index];
+
+        public int Count => _list.Count;
 
         public bool HasNext { get; }
 
         public bool HasPrevious { get; }
 
-        public T this[int index] => _list[index];
+        public int PageIndex { get; }
 
-        public int Count => _list.Count;
+        public int PageSize { get; }
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -41,6 +44,15 @@ namespace Blaven
         IEnumerator IEnumerable.GetEnumerator()
         {
             return _list.GetEnumerator();
+        }
+
+        private static bool GetHasNext(IQueryable<T> queryable, Paging paging)
+        {
+            var nextItemPaging = new Paging(index: paging.Index + 1, size: 1);
+
+            var nextItemList = nextItemPaging.Apply(queryable);
+
+            return nextItemList.Any();
         }
     }
 }

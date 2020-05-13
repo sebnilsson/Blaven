@@ -110,6 +110,23 @@ namespace Blaven.Storage.InMemory
             return Task.FromResult(posts);
         }
 
+        public Task<IPagedReadOnlyList<BlogPost>> ListPostsFull(
+            Paging paging,
+            IEnumerable<BlogKey> blogKeys)
+        {
+            if (blogKeys is null)
+                throw new ArgumentNullException(nameof(blogKeys));
+
+            var posts =
+                _inMemoryStorage
+                    .Posts
+                    .WhereBlogKeys(blogKeys)
+                    .OrderByPublishedAtDescending()
+                    .ToPagedList(paging);
+
+            return Task.FromResult(posts);
+        }
+
         public Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByArchive(
             DateTimeOffset archiveDate,
             Paging paging,

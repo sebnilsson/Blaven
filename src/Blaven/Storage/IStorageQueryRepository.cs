@@ -24,6 +24,10 @@ namespace Blaven.Storage
             Paging paging,
             IEnumerable<BlogKey> blogKeys);
 
+        Task<IPagedReadOnlyList<BlogPost>> ListPostsFull(
+            Paging paging,
+            IEnumerable<BlogKey> blogKeys);
+
         Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByArchive(
             DateTimeOffset archiveDate,
             Paging paging,

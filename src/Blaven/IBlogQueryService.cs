@@ -23,6 +23,10 @@ namespace Blaven
             Paging paging = default,
             params BlogKey[] blogKeys);
 
+        Task<IPagedReadOnlyList<BlogPost>> ListPostsFull(
+            Paging paging = default,
+            params BlogKey[] blogKeys);
+
         Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByArchive(
             DateTimeOffset archiveDate,
             Paging paging = default,

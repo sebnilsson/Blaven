@@ -103,6 +103,21 @@ namespace Blaven
             return postHeaders.TryTransformPostHeaders(_transformService);
         }
 
+        public async Task<IPagedReadOnlyList<BlogPost>> ListPostsFull(
+            Paging paging = default,
+            params BlogKey[] blogKeys)
+        {
+            if (blogKeys is null)
+                throw new ArgumentNullException(nameof(blogKeys));
+
+            var postHeaders = await
+                _repository
+                    .ListPostsFull(paging, blogKeys)
+                    .ConfigureAwait(false);
+
+            return postHeaders.TryTransformPostHeaders(_transformService);
+        }
+
         public async Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByArchive(
             DateTimeOffset archiveDate,
             Paging paging = default,

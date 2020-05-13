@@ -7,5 +7,9 @@ namespace Blaven
         bool HasNext { get; }
 
         bool HasPrevious { get; }
+
+        int PageIndex { get; }
+
+        int PageSize { get; }
     }
 }
