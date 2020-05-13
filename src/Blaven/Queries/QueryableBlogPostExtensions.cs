@@ -30,6 +30,24 @@ namespace Blaven.Queries
             return queryable.Where(x => x.Slug == slug).FirstOrDefault();
         }
 
+        public static IOrderedQueryable<BlogPost> OrderByPublishedAt(
+            this IQueryable<BlogPost> queryable)
+        {
+            if (queryable is null)
+                throw new ArgumentNullException(nameof(queryable));
+
+            return queryable.OrderBy(x => x.PublishedAt);
+        }
+
+        public static IOrderedQueryable<BlogPost> OrderByPublishedAtDescending(
+            this IQueryable<BlogPost> queryable)
+        {
+            if (queryable is null)
+                throw new ArgumentNullException(nameof(queryable));
+
+            return queryable.OrderByDescending(x => x.PublishedAt);
+        }
+
         public static List<BlogDateItem> ToDateList(
             this IQueryable<BlogPost> queryable,
             IEnumerable<BlogKey> blogKeys)

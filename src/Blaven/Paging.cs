@@ -10,20 +10,20 @@ namespace Blaven
 
         private readonly int _pageSize;
 
-        public Paging(int pageIndex = 0, int pageSize = DefaultPageSize)
+        public Paging(int index = 0, int size = DefaultPageSize)
         {
-            if (pageIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(pageIndex));
-            if (pageSize < 0)
-                throw new ArgumentOutOfRangeException(nameof(pageSize));
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (size < 0)
+                throw new ArgumentOutOfRangeException(nameof(size));
 
-            PageIndex = pageIndex;
-            _pageSize = pageSize;
+            Index = index;
+            _pageSize = size;
         }
 
-        public readonly int PageIndex { get; }
+        public readonly int Index { get; }
 
-        public readonly int PageSize =>
+        public readonly int Size =>
             _pageSize > 0 ? _pageSize : DefaultPageSize;
 
         public IEnumerable<T> Apply<T>(IEnumerable<T> enumerable)
@@ -31,8 +31,8 @@ namespace Blaven
             if (enumerable is null)
                 throw new ArgumentNullException(nameof(enumerable));
 
-            var skipCount = PageIndex * PageSize;
-            var takeCount = PageSize;
+            var skipCount = Index * Size;
+            var takeCount = Size;
 
             return
                 enumerable
@@ -45,8 +45,8 @@ namespace Blaven
             if (queryable is null)
                 throw new ArgumentNullException(nameof(queryable));
 
-            var skipCount = PageIndex * PageSize;
-            var takeCount = PageSize;
+            var skipCount = Index * Size;
+            var takeCount = Size;
 
             return
                 queryable

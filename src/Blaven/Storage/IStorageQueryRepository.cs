@@ -20,21 +20,21 @@ namespace Blaven.Storage
         Task<IReadOnlyList<BlogTagItem>> ListAllTags(
             IEnumerable<BlogKey> blogKeys);
 
-        Task<IReadOnlyList<BlogPostHeader>> ListPosts(
+        Task<IPagedReadOnlyList<BlogPostHeader>> ListPosts(
             Paging paging,
             IEnumerable<BlogKey> blogKeys);
 
-        Task<IReadOnlyList<BlogPost>> ListPostsByArchive(
+        Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByArchive(
             DateTimeOffset archiveDate,
             Paging paging,
             IEnumerable<BlogKey> blogKeys);
 
-        Task<IReadOnlyList<BlogPost>> ListPostsByTag(
+        Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByTag(
             string tagName,
             Paging paging,
             IEnumerable<BlogKey> blogKeys);
 
-        Task<IReadOnlyList<BlogPostHeader>> SearchPosts(
+        Task<IPagedReadOnlyList<BlogPostHeader>> SearchPosts(
             string searchText,
             Paging paging,
             IEnumerable<BlogKey> blogKeys);

@@ -19,21 +19,21 @@ namespace Blaven
 
         Task<IReadOnlyList<BlogTagItem>> ListAllTags(params BlogKey[] blogKeys);
 
-        Task<IReadOnlyList<BlogPostHeader>> ListPosts(
+        Task<IPagedReadOnlyList<BlogPostHeader>> ListPosts(
             Paging paging = default,
             params BlogKey[] blogKeys);
 
-        Task<IReadOnlyList<BlogPostHeader>> ListPostsByArchive(
+        Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByArchive(
             DateTimeOffset archiveDate,
             Paging paging = default,
             params BlogKey[] blogKeys);
 
-        Task<IReadOnlyList<BlogPostHeader>> ListPostsByTag(
+        Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByTag(
             string tagName,
             Paging paging = default,
             params BlogKey[] blogKeys);
 
-        Task<IReadOnlyList<BlogPostHeader>> SearchPosts(
+        Task<IPagedReadOnlyList<BlogPostHeader>> SearchPosts(
             string searchText,
             Paging paging = default,
             params BlogKey[] blogKeys);

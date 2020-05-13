@@ -56,8 +56,8 @@ namespace Blaven.Tests
 
             var blogQueryService = GetBlogQueryServices(storagePosts);
 
-            var paging1 = new Paging(pageIndex: 0, pageSize: 2);
-            var paging2 = new Paging(pageIndex: 1, pageSize: 2);
+            var paging1 = new Paging(index: 0, size: 2);
+            var paging2 = new Paging(index: 1, size: 2);
 
             // Act
             var posts1 =

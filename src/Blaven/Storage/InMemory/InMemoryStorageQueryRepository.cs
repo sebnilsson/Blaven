@@ -36,6 +36,7 @@ namespace Blaven.Storage.InMemory
                 _inMemoryStorage
                     .Posts
                     .WhereBlogKey(blogKey)
+                    .OrderByPublishedAt()
                     .FirstOrDefaultById(id);
 
             return Task.FromResult(post);
@@ -50,6 +51,7 @@ namespace Blaven.Storage.InMemory
                 _inMemoryStorage
                     .Posts
                     .WhereBlogKey(blogKey)
+                    .OrderByPublishedAt()
                     .FirstOrDefaultBySlug(slug);
 
             return Task.FromResult(post);
@@ -71,7 +73,7 @@ namespace Blaven.Storage.InMemory
         public Task<IReadOnlyList<BlogMeta>> ListAllMetas()
         {
             var metas =
-                _inMemoryStorage.Metas.ToList()
+                _inMemoryStorage.Metas.OrderBy(x => x.Name).ToList()
                 as IReadOnlyList<BlogMeta>;
 
             return Task.FromResult(metas);
@@ -90,7 +92,7 @@ namespace Blaven.Storage.InMemory
             return Task.FromResult(tags);
         }
 
-        public Task<IReadOnlyList<BlogPostHeader>> ListPosts(
+        public Task<IPagedReadOnlyList<BlogPostHeader>> ListPosts(
             Paging paging,
             IEnumerable<BlogKey> blogKeys)
         {
@@ -101,15 +103,14 @@ namespace Blaven.Storage.InMemory
                 _inMemoryStorage
                     .Posts
                     .WhereBlogKeys(blogKeys)
+                    .OrderByPublishedAtDescending()
                     .OfType<BlogPostHeader>()
-                    .ApplyPaging(paging)
-                    .ToList()
-                     as IReadOnlyList<BlogPostHeader>;
+                    .ToPagedList(paging);
 
             return Task.FromResult(posts);
         }
 
-        public Task<IReadOnlyList<BlogPost>> ListPostsByArchive(
+        public Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByArchive(
             DateTimeOffset archiveDate,
             Paging paging,
             IEnumerable<BlogKey> blogKeys)
@@ -122,14 +123,14 @@ namespace Blaven.Storage.InMemory
                     .Posts
                     .WhereBlogKeys(blogKeys)
                     .WherePublishedAt(archiveDate)
-                    .ApplyPaging(paging)
-                    .ToList()
-                     as IReadOnlyList<BlogPost>;
+                    .OrderByPublishedAtDescending()
+                    .OfType<BlogPostHeader>()
+                    .ToPagedList(paging);
 
             return Task.FromResult(posts);
         }
 
-        public Task<IReadOnlyList<BlogPost>> ListPostsByTag(
+        public Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByTag(
             string tagName,
             Paging paging,
             IEnumerable<BlogKey> blogKeys)
@@ -144,14 +145,14 @@ namespace Blaven.Storage.InMemory
                     .Posts
                     .WhereBlogKeys(blogKeys)
                     .WhereTagName(tagName)
-                    .ApplyPaging(paging)
-                    .ToList()
-                     as IReadOnlyList<BlogPost>;
+                    .OrderByPublishedAtDescending()
+                    .OfType<BlogPostHeader>()
+                    .ToPagedList(paging);
 
             return Task.FromResult(posts);
         }
 
-        public Task<IReadOnlyList<BlogPostHeader>> SearchPosts(
+        public Task<IPagedReadOnlyList<BlogPostHeader>> SearchPosts(
             string searchText,
             Paging paging,
             IEnumerable<BlogKey> blogKeys)
@@ -166,10 +167,9 @@ namespace Blaven.Storage.InMemory
                     .Posts
                     .WhereBlogKeys(blogKeys)
                     .WhereContentContains(searchText)
-                    .ApplyPaging(paging)
+                    .OrderByPublishedAtDescending()
                     .OfType<BlogPostHeader>()
-                    .ToList()
-                     as IReadOnlyList<BlogPostHeader>;
+                    .ToPagedList(paging);
 
             return Task.FromResult(posts);
         }

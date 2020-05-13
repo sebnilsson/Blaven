@@ -88,7 +88,7 @@ namespace Blaven
                     .ConfigureAwait(false);
         }
 
-        public async Task<IReadOnlyList<BlogPostHeader>> ListPosts(
+        public async Task<IPagedReadOnlyList<BlogPostHeader>> ListPosts(
             Paging paging = default,
             params BlogKey[] blogKeys)
         {
@@ -103,7 +103,7 @@ namespace Blaven
             return postHeaders.TryTransformPostHeaders(_transformService);
         }
 
-        public async Task<IReadOnlyList<BlogPostHeader>> ListPostsByArchive(
+        public async Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByArchive(
             DateTimeOffset archiveDate,
             Paging paging = default,
             params BlogKey[] blogKeys)
@@ -119,7 +119,7 @@ namespace Blaven
             return postHeaders.TryTransformPostHeaders(_transformService);
         }
 
-        public async Task<IReadOnlyList<BlogPostHeader>> ListPostsByTag(
+        public async Task<IPagedReadOnlyList<BlogPostHeader>> ListPostsByTag(
             string tagName,
             Paging paging = default,
             params BlogKey[] blogKeys)
@@ -135,7 +135,7 @@ namespace Blaven
             return postHeaders.TryTransformPostHeaders(_transformService);
         }
 
-        public async Task<IReadOnlyList<BlogPostHeader>> SearchPosts(
+        public async Task<IPagedReadOnlyList<BlogPostHeader>> SearchPosts(
             string searchText,
             Paging paging = default,
             params BlogKey[] blogKeys)
