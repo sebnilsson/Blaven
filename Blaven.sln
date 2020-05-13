@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.BlogSources.FileProv
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.MarkdownFilesEndToEndTests", "test\Blaven.MarkdownFilesEndToEndTests\Blaven.MarkdownFilesEndToEndTests.csproj", "{F62190AF-6431-472F-8979-0CB87582790F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Transformation.Extensions", "src\Blaven.Transformation.Extensions\Blaven.Transformation.Extensions.csproj", "{8E2BF483-BDE4-439E-9307-CCE9060A8E65}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{F62190AF-6431-472F-8979-0CB87582790F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F62190AF-6431-472F-8979-0CB87582790F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F62190AF-6431-472F-8979-0CB87582790F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E2BF483-BDE4-439E-9307-CCE9060A8E65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E2BF483-BDE4-439E-9307-CCE9060A8E65}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E2BF483-BDE4-439E-9307-CCE9060A8E65}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E2BF483-BDE4-439E-9307-CCE9060A8E65}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -89,6 +95,7 @@ Global
 		{D65BE5C6-064A-453B-91CB-83314D26449A} = {E4B54C7C-7C6A-4422-AC35-E24F547BBBEC}
 		{F14BD26F-38DE-4A9E-9B63-2AE1F2F5DACA} = {F45746FC-FD40-4B63-BE5D-EAC399D55B78}
 		{F62190AF-6431-472F-8979-0CB87582790F} = {F45746FC-FD40-4B63-BE5D-EAC399D55B78}
+		{8E2BF483-BDE4-439E-9307-CCE9060A8E65} = {E4B54C7C-7C6A-4422-AC35-E24F547BBBEC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FF8A751E-8CED-46E6-8E56-E78FB74B40ED}

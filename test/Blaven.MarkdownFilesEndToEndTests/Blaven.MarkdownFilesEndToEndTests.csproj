@@ -26,6 +26,7 @@
     <ProjectReference Include="..\..\src\Blaven.BlogSources.FileProviders\Blaven.BlogSources.FileProviders.csproj" />
     <ProjectReference Include="..\..\src\Blaven.BlogSources.Markdown\Blaven.BlogSources.Markdown.csproj" />
     <ProjectReference Include="..\..\src\Blaven.DependencyInjection\Blaven.DependencyInjection.csproj" />
+    <ProjectReference Include="..\..\src\Blaven.Transformation.Extensions\Blaven.Transformation.Extensions.csproj" />
     <ProjectReference Include="..\..\src\Blaven\Blaven.csproj" />
   </ItemGroup>
 

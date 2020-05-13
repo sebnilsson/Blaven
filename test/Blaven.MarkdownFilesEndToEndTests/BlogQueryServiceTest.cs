@@ -7,6 +7,8 @@ using Blaven.BlogSources.FileProviders;
 using Blaven.BlogSources.Markdown;
 using Blaven.DependencyInjection;
 using Blaven.Synchronization;
+using Blaven.Transformation;
+using Blaven.Transformation.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -28,6 +30,51 @@ namespace Blaven.MarkdownFilesEndToEndTests
             Assert.Equal("Single Blog Description", meta?.Description);
             Assert.Equal("Single Blog", meta?.Name);
             Assert.Equal("https://single-blog.com", meta?.Url);
+        }
+
+        [Fact]
+        public async Task GetPost_ExistingPost_ReturnPost()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var post = await blogQueryService.GetPost("test-blog-post");
+
+            // Assert
+            var expectedTags =
+                Enumerable.Range(1, 3).Select(x => $"Test Tag {x}").ToList();
+
+            Assert.NotNull(post);
+            Assert.Equal("Test Post Title", post?.Title);
+            Assert.Equal("Test Post Summary", post?.Summary);
+            Assert.Equal("test-blog-post", post?.Slug);
+            Assert.Equal("Test Author Name", post?.Author?.Name);
+            Assert.Equal("https://test.com/author/image.png", post?.Author?.ImageUrl);
+            Assert.Equal("https://test.com/author", post?.Author?.Url);
+            Assert.Equal(new DateTime(2020, 1, 2, 3, 4, 5), post?.PublishedAt);
+            Assert.Equal(new DateTime(2020, 2, 3, 4, 5, 6), post?.UpdatedAt);
+
+            var tagsSequenceEquals =
+                expectedTags.SequenceEqual(post?.Tags);
+
+            Assert.True(tagsSequenceEquals);
+        }
+
+        [Fact]
+        public async Task GetPost_ExistingPost_ReturnPostWithImageUrl()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var post = await blogQueryService.GetPost("test-blog-post");
+
+            // Assert
+            Assert.NotNull(post);
+            Assert.Equal(
+                "https://i.picsum.photos/id/637/150/150.jpg",
+                post?.ImageUrl);
         }
 
         [Fact]
@@ -57,6 +104,22 @@ namespace Blaven.MarkdownFilesEndToEndTests
                 expectedTags.SequenceEqual(post?.Tags);
 
             Assert.True(tagsSequenceEquals);
+        }
+
+        [Fact]
+        public async Task GetPostBySlug_ExistingPost_ReturnPostWithImageUrl()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var post = await blogQueryService.GetPostBySlug("test-blog-post");
+
+            // Assert
+            Assert.NotNull(post);
+            Assert.Equal(
+                "https://i.picsum.photos/id/637/150/150.jpg",
+                post?.ImageUrl);
         }
 
         [Fact]
@@ -164,6 +227,23 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         [Fact]
+        public async Task ListPosts_ExistingPosts_ReturnPostWithImageUrl()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var posts = await blogQueryService.ListPosts();
+            var post = posts.FirstOrDefault(x => x.Slug == "test-blog-post");
+
+            // Assert
+            Assert.NotNull(post);
+            Assert.Equal(
+                "https://i.picsum.photos/id/637/150/150.jpg",
+                post?.ImageUrl);
+        }
+
+        [Fact]
         public async Task ListPostsByArchive_ExistingPosts_ReturnPosts()
         {
             // Arrange
@@ -247,6 +327,16 @@ namespace Blaven.MarkdownFilesEndToEndTests
                         metaExtensions: new[] { ".json" },
                         postExtensions: new[] { ".md" });
             });
+
+            services
+                .AddSingleton<
+                    IBlogPostQueryTransform,
+                    BlogPostImageUrlTransform>();
+
+            services
+                .AddSingleton<
+                    IBlogPostStorageTransform,
+                    BlogPostImageUrlTransform>();
 
             return services.BuildServiceProvider();
         }

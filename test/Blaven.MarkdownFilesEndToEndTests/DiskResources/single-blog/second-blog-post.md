@@ -1,6 +1,7 @@
 ﻿---
 Title: Second Post Title
 Summary: Second Post Summary
+ImageUrl: https://test.com/image.png
 Tags:
 - Test Tag 2
 - Test Tag 3
