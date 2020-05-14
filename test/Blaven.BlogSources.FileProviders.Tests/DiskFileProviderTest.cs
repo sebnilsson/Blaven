@@ -19,17 +19,17 @@ namespace Blaven.BlogSources.FileProviders.Tests
 
             // Assert
             var meta1 =
-                result.Metas.FirstOrDefault(x => x.FolderName == "BlogKey1");
+                result.Metas.FirstOrDefault(x => x.KeyFolderName == "BlogKey1");
             var meta2 =
-                result.Metas.FirstOrDefault(x => x.FolderName == "BlogKey2");
+                result.Metas.FirstOrDefault(x => x.KeyFolderName == "BlogKey2");
             var nonExistingMeta =
                 result.Metas.FirstOrDefault(x =>
-                    x.FolderName == "NON_EXISTING_BLOG_KEY");
+                    x.KeyFolderName == "NON_EXISTING_BLOG_KEY");
             var post =
-                result.Posts.FirstOrDefault(x => x.FolderName == "BlogKey1");
+                result.Posts.FirstOrDefault(x => x.KeyFolderName == "BlogKey1");
             var nonExistingPost =
                 result.Posts.FirstOrDefault(x =>
-                    x.FolderName == "NON_EXISTING_BLOG_KEY");
+                    x.KeyFolderName == "NON_EXISTING_BLOG_KEY");
 
             Assert.True(meta1.Exists);
             Assert.True(meta2.Exists);
@@ -43,20 +43,23 @@ namespace Blaven.BlogSources.FileProviders.Tests
             // Arrange
             var fileDataProvider =
                 GetDiskFileDataProvider(
-                    "DiskResources/SubFolder/BlogKey2",
+                    "DiskResources/SubFolder/.BlogKey2",
                     recursive: false);
 
             // Act
             var result = await fileDataProvider.GetFileData();
 
             var meta1 =
-                result.Metas.FirstOrDefault(x => x.FolderName == "BlogKey1");
+                result.Metas.FirstOrDefault(x =>
+                    x.RelativeFolderPath == "BlogKey1");
             var meta2 =
                 result.Metas.FirstOrDefault(x => x.FileName == ".meta.json");
             var post1 =
-                result.Posts.FirstOrDefault(x => x.FolderName == "BlogKey1");
+                result.Posts.FirstOrDefault(x =>
+                    x.RelativeFolderPath == "BlogKey1");
             var post2 =
-                result.Posts.FirstOrDefault(x => x.FolderName == "BlogKey2");
+                result.Posts.FirstOrDefault(x =>
+                    x.RelativeFolderPath == "BlogKey2");
 
             // Assert
             Assert.False(meta1.Exists);

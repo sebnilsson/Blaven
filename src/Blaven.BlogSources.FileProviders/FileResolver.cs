@@ -10,6 +10,7 @@ namespace Blaven.BlogSources.FileProviders
     internal class FileResolver
     {
         private readonly FileDataResolver _fileDataResolver;
+        private readonly DirectoryInfo _baseDirectory;
         private readonly IReadOnlyList<string> _extensions;
 
         public FileResolver(
@@ -24,6 +25,7 @@ namespace Blaven.BlogSources.FileProviders
             if (encoding is null)
                 throw new ArgumentNullException(nameof(encoding));
 
+            _baseDirectory = baseDirectory;
             _fileDataResolver = new FileDataResolver(baseDirectory, encoding);
             _extensions = extensions;
         }
@@ -79,7 +81,7 @@ namespace Blaven.BlogSources.FileProviders
             {
                 return
                     await _fileDataResolver
-                        .GetFileData(fileInfo)
+                        .GetFileData(_baseDirectory, fileInfo)
                         .ConfigureAwait(false);
             }
             catch

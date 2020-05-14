@@ -23,7 +23,8 @@ namespace Blaven.BlogSources.Markdown
                 var fileName =
                     Path.GetFileNameWithoutExtension(fileData.FileName);
 
-                post.BlogKey = post.BlogKey.Value.Coalesce(fileData.FolderName);
+                post.BlogKey =
+                    post.BlogKey.Value.Coalesce(fileData.KeyFolderName);
 
                 post.Id = post.Id.Coalesce(fileName);
                 post.Slug = post.Slug.Coalesce(fileName);

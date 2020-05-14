@@ -19,31 +19,36 @@ namespace Blaven.BlogSources.FileProviders
         }
 
         public async Task<FileData> GetFileData(
+            DirectoryInfo baseDirectory,
             FileInfo fileInfo)
         {
+            if (baseDirectory is null)
+                throw new ArgumentNullException(nameof(baseDirectory));
             if (fileInfo is null)
                 throw new ArgumentNullException(nameof(fileInfo));
 
             var content =
-                await ReadTextAsync(fileInfo.FullName, _encoding)
-                    .ConfigureAwait(false);
+                await ReadTextAsync(fileInfo.FullName).ConfigureAwait(false);
 
             var fileName = fileInfo.Name;
 
-            var baseDirectoryName = _baseDirectory?.Name;
-
-            var folderName =
-                fileInfo.Directory.Name != baseDirectoryName
-                ? fileInfo.Directory.Name
+            var relativeFolderPath =
+                fileInfo.DirectoryName.StartsWith(baseDirectory.FullName)
+                ? fileInfo.DirectoryName.Substring(baseDirectory.FullName.Length)
                 : null;
 
-            var trimmedContent = GetTrimmedContent(content);
+            //var baseDirectoryName = _baseDirectory?.Name;
+
+            //var folderName =
+            //    fileInfo.Directory.Name != baseDirectoryName
+            //    ? fileInfo.Directory.Name
+            //    : null;
 
             return
                 new FileData(
-                    trimmedContent,
+                    content,
                     fileName: fileName,
-                    folderName: folderName,
+                    relativeFolderPath: relativeFolderPath,
                     createdAt: fileInfo.CreationTimeUtc,
                     updatedAt: fileInfo.LastWriteTimeUtc);
         }
@@ -56,9 +61,7 @@ namespace Blaven.BlogSources.FileProviders
             return content.TrimStart(bom);
         }
 
-        private static async Task<string> ReadTextAsync(
-            string filePath,
-            Encoding encoding)
+        private async Task<string> ReadTextAsync(string filePath)
         {
             using var sourceStream =
                 new FileStream(
@@ -80,11 +83,11 @@ namespace Blaven.BlogSources.FileProviders
                     .ConfigureAwait(false))
                     != 0)
             {
-                var text = encoding.GetString(buffer, 0, numRead);
+                var text = _encoding.GetString(buffer, 0, numRead);
                 sb.Append(text);
             }
 
-            return sb.ToString();
+            return GetTrimmedContent(sb.ToString());
         }
 
     }

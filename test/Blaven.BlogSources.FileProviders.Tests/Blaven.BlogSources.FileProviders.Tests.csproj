@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="DiskResources\.BlogKey1\.meta.json" />
+    <None Include="DiskResources\.BlogKey1\test-blog-post.md" />
+    <None Include="DiskResources\SubFolder\.BlogKey2\.meta.json" />
+    <None Include="DiskResources\SubFolder\.BlogKey2\SubFolder\test-blog-post.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
     <PackageReference Include="xunit" Version="2.4.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">

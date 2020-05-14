@@ -120,12 +120,12 @@ namespace Blaven.BlogSources.Markdown.Tests
                 new FileData(
                     Resources.BlogMeta1,
                     fileName: "TEST_FILE_NAME1",
-                    folderName: "FOLDER_NAME1",
+                    relativeFolderPath: "FOLDER_NAME1",
                     createdAt: new DateTime(2020, 3, 2)),
                 new FileData(
                     Resources.BlogMeta2,
                     fileName: "TEST_FILE_NAME2",
-                    folderName: s_blogKey2.Value,
+                    relativeFolderPath: "/TEST/.BLOG_KEY_2/meta/",
                     createdAt: new DateTime(2020, 3, 3))
             };
             var postMarkdownFiles = new[]
@@ -133,12 +133,12 @@ namespace Blaven.BlogSources.Markdown.Tests
                 new FileData(
                     Resources.BlogPost1,
                     fileName: "TEST_FILE_NAME1",
-                    folderName: "FOLDER_NAME1",
+                    relativeFolderPath: "FOLDER_NAME1",
                     createdAt: new DateTime(2020, 3, 4)),
                 new FileData(
                     Resources.BlogPost2,
                     fileName: TestFileName2,
-                    folderName: s_blogKey2.Value,
+                    relativeFolderPath: "/TEST/.BLOG_KEY_2/posts/",
                     createdAt: new DateTime(2020, 3, 5))
             };
 
