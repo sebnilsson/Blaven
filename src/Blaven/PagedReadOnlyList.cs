@@ -48,7 +48,8 @@ namespace Blaven
 
         private static bool GetHasNext(IQueryable<T> queryable, Paging paging)
         {
-            var nextItemPaging = new Paging(index: paging.Index + 1, size: 1);
+            var nextItemPaging =
+                new Paging(index: paging.Index + 1, size: paging.Size);
 
             var nextItemList = nextItemPaging.Apply(queryable);
 

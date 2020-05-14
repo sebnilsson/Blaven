@@ -281,6 +281,34 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         [Fact]
+        public async Task ListPosts_WithPaging_ReturnResultWithNextAndPrevious()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            var page1 = new Paging(index: 0, size: 1);
+            var page2 = new Paging(index: 1, size: 1);
+            var page3 = new Paging(index: 2, size: 1);
+            var page4 = new Paging(index: 0, size: 10);
+
+            // Act
+            var posts1 = await blogQueryService.ListPosts(page1);
+            var posts2 = await blogQueryService.ListPosts(page2);
+            var posts3 = await blogQueryService.ListPosts(page3);
+            var posts4 = await blogQueryService.ListPosts(page4);
+
+            // Assert
+            Assert.False(posts1.HasPrevious);
+            Assert.True(posts1.HasNext);
+            Assert.True(posts2.HasPrevious);
+            Assert.True(posts2.HasNext);
+            Assert.True(posts3.HasPrevious);
+            Assert.False(posts3.HasNext);
+            Assert.False(posts4.HasPrevious);
+            Assert.False(posts4.HasNext);
+        }
+
+        [Fact]
         public async Task ListPostsByArchive_ExistingPosts_ReturnPosts()
         {
             // Arrange
