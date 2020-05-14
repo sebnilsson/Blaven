@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Blaven
 {
+    [DebuggerDisplay("Index={Index}, Size={Size}")]
     public readonly struct Paging
     {
         public const int DefaultPageSize = 10;

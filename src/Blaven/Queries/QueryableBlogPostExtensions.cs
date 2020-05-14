@@ -57,9 +57,7 @@ namespace Blaven.Queries
             if (blogKeys is null)
                 throw new ArgumentNullException(nameof(blogKeys));
 
-            var posts =
-                queryable
-                    .WhereBlogKeys(blogKeys);
+            var posts = queryable.WhereBlogKeys(blogKeys);
 
             return
                 (from post in posts
@@ -67,14 +65,14 @@ namespace Blaven.Queries
                  where publishedAt != null
                  let postMonth =
                     new DateTime(publishedAt.Value.Year, publishedAt.Value.Month, 1)
-                 group post by new { post.BlogKey, Date = postMonth } into g
-                 orderby g.Key.Date descending
+                 group post by postMonth into g
                  select new BlogDateItem
                  {
-                     BlogKey = g.Key.BlogKey,
                      Count = g.Count(),
-                     Date = g.Key.Date
-                 }).ToList();
+                     Date = g.Key
+                 })
+                 .OrderByDescending(x => x.Date)
+                 .ToList();
         }
 
         public static List<BlogTagItem> ToTagList(
@@ -91,14 +89,14 @@ namespace Blaven.Queries
             return
                 (from post in posts
                  from tag in post.Tags
-                 group post by new { post.BlogKey, Tag = tag } into g
-                 orderby g.Key.Tag ascending
+                 group post by tag into g
                  select new BlogTagItem
                  {
-                     BlogKey = g.Key.BlogKey,
                      Count = g.Count(),
-                     Name = g.Key.Tag
-                 }).ToList();
+                     Name = g.Key
+                 })
+                 .OrderBy(x => x.Name)
+                 .ToList();
         }
 
         public static IQueryable<BlogPost> WhereBlogKey(

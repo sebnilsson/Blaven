@@ -185,8 +185,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
 
             var sequenceEquals =
                 expectedDates.All(x => dates.Any(y =>
-                    y.BlogKey == x.BlogKey
-                    && y.Count == x.Count
+                    y.Count == x.Count
                     && y.Date == x.Date));
 
             Assert.True(sequenceEquals);
@@ -242,8 +241,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
 
             var sequenceEquals =
                 expectedTags.All(x => tags.Any(y =>
-                    y.BlogKey == x.BlogKey
-                    && y.Count == x.Count
+                    y.Count == x.Count
                     && y.Name == x.Name));
 
             Assert.True(sequenceEquals);
