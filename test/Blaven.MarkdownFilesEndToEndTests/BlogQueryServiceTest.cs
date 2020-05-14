@@ -78,6 +78,23 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         [Fact]
+        public async Task GetPost_ExistingPost_ReturnPostWithHeaderIncreased()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var post = await blogQueryService.GetPost("test-blog-post");
+
+            // Assert
+            Assert.NotNull(post);
+
+            var containsHeaderIncreased =
+                post?.Content.Contains("<h2 class=\"h1\">Test Post Title</h2>");
+            Assert.True(containsHeaderIncreased);
+        }
+
+        [Fact]
         public async Task GetPost_ExistingPost_ReturnPostWithEncodedPreTag()
         {
             // Arrange
@@ -395,6 +412,11 @@ namespace Blaven.MarkdownFilesEndToEndTests
                 .AddSingleton<
                     IBlogPostStorageTransform,
                     BlogPostImageUrlTransform>();
+
+            services
+                .AddSingleton<
+                    IBlogPostStorageTransform,
+                    BlogPostHeaderIncreaseTransform>();
 
             return services.BuildServiceProvider();
         }
