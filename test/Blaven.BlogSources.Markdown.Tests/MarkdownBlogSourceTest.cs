@@ -67,7 +67,7 @@ namespace Blaven.BlogSources.Markdown.Tests
             var expectTag =
                 Enumerable.Range(1, 3).Select(x => $"TEST_TAG_{x}").ToList();
             var expectedContent =
-                @"<p><strong>Bold</strong> <em>Italic</em></p>
+                @"<p><strong>Bold</strong> <em>Italic</em> </p>
 <div>TEST_DIV</div>".Replace(Environment.NewLine, "\n");
 
             Assert.NotNull(post);

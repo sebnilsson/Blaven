@@ -19,13 +19,10 @@ namespace Blaven.BlogSources.Markdown
             if (markdown is null)
                 throw new ArgumentNullException(nameof(markdown));
 
-            var sanitized = _htmlSanitizer.Sanitize(markdown);
+            var html = Markdig.Markdown.ToHtml(markdown, _markdownPipeline);
 
-            var html = Markdig.Markdown.ToHtml(sanitized, _markdownPipeline);
-            return html;
-
-            //var sanitizedHtml = s_htmlSanitizer.Sanitize(html);
-            //return sanitizedHtml;
+            var sanitizedHtml = _htmlSanitizer.Sanitize(html);
+            return sanitizedHtml;
         }
     }
 }

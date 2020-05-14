@@ -78,6 +78,27 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         [Fact]
+        public async Task GetPost_ExistingPost_ReturnPostWithEncodedPreTag()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var post = await blogQueryService.GetPost("test-blog-post");
+
+            // Assert
+            Assert.NotNull(post);
+
+            var containsPreCodeEncodedTag =
+                post?.Content.Contains("x =&gt; x &amp;&amp; !x");
+            var containsCodeEncodedTag =
+                post?.Content.Contains("code &gt; test");
+
+            Assert.True(containsPreCodeEncodedTag);
+            Assert.True(containsCodeEncodedTag);
+        }
+
+        [Fact]
         public async Task GetPostBySlug_ExistingPost_ReturnPost()
         {
             // Arrange
@@ -120,6 +141,22 @@ namespace Blaven.MarkdownFilesEndToEndTests
             Assert.Equal(
                 "https://i.picsum.photos/id/637/150/150.jpg",
                 post?.ImageUrl);
+        }
+
+        [Fact]
+        public async Task GetPostBySlug_ExistingPost_ReturnPostWithoutScriptTag()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var post = await blogQueryService.GetPostBySlug("test-blog-post");
+
+            // Assert
+            Assert.NotNull(post);
+
+            var containsScriptTag = post?.Content.Contains("<script");
+            Assert.False(containsScriptTag);
         }
 
         [Fact]
@@ -327,11 +364,6 @@ namespace Blaven.MarkdownFilesEndToEndTests
                         metaExtensions: new[] { ".json" },
                         postExtensions: new[] { ".md" });
             });
-
-            services
-                .AddSingleton<
-                    IBlogPostQueryTransform,
-                    BlogPostImageUrlTransform>();
 
             services
                 .AddSingleton<

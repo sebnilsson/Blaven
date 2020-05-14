@@ -53,5 +53,7 @@ namespace Blaven
                     .Skip(skipCount)
                     .Take(takeCount);
         }
+
+        public static Paging Max => new Paging(index: 0, size: int.MaxValue);
     }
 }

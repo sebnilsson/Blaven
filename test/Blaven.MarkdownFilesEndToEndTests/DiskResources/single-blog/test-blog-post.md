@@ -1,5 +1,5 @@
 ﻿---
-Title: Test Post Title
+Title: 'Test Post Title'
 Summary: Test Post Summary
 Tags:
 - Test Tag 1
@@ -19,6 +19,18 @@ This is a test-post.
 
 **Multiple lines**.
 
+Inline `code > test`
+
+<script>var a = 'abc';</script>
+
 ![First image](https://i.picsum.photos/id/637/150/150.jpg "Logo Title Text 1")
 
 ![First image](https://i.picsum.photos/id/953/200/200.jpg "Logo Title Text 1")
+
+```
+var result =
+    items.Where(x => x && !x);
+```
+
+    var tabbedCode =
+        items.Where(x => x && !x);
