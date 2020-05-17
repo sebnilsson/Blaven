@@ -21,7 +21,11 @@ namespace Blaven.BlogSources.FileProviders
 
         public IReadOnlyList<DirectoryInfo> GetDirectories()
         {
-            return GetDirectoriesInternal().ToList();
+            return
+                GetDirectoriesInternal()
+                    .GroupBy(x => x.FullName)
+                    .Select(x => x.First())
+                    .ToList();
         }
 
         private IEnumerable<DirectoryInfo> GetDirectoriesInternal()

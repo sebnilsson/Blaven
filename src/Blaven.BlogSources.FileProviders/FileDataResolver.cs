@@ -7,13 +7,10 @@ namespace Blaven.BlogSources.FileProviders
 {
     internal class FileDataResolver
     {
-        private readonly DirectoryInfo _baseDirectory;
         private readonly Encoding _encoding;
 
-        public FileDataResolver(DirectoryInfo baseDirectory, Encoding encoding)
+        public FileDataResolver(Encoding encoding)
         {
-            _baseDirectory = baseDirectory
-                ?? throw new ArgumentNullException(nameof(baseDirectory));
             _encoding = encoding
                 ?? throw new ArgumentNullException(nameof(encoding));
         }
@@ -36,13 +33,6 @@ namespace Blaven.BlogSources.FileProviders
                 fileInfo.DirectoryName.StartsWith(baseDirectory.FullName)
                 ? fileInfo.DirectoryName.Substring(baseDirectory.FullName.Length)
                 : null;
-
-            //var baseDirectoryName = _baseDirectory?.Name;
-
-            //var folderName =
-            //    fileInfo.Directory.Name != baseDirectoryName
-            //    ? fileInfo.Directory.Name
-            //    : null;
 
             return
                 new FileData(

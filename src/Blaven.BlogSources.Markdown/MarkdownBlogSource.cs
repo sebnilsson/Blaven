@@ -62,6 +62,7 @@ namespace Blaven.BlogSources.Markdown
             var markdownPosts =
                 fileDataResult
                     .Posts
+                    .AsParallel()
                     .Select(x => _blogPostMarkdownParser.Parse(x))
                     .Where(x => x != null)
                     .Select(x => x!)

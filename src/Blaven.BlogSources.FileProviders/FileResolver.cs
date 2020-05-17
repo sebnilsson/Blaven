@@ -26,7 +26,7 @@ namespace Blaven.BlogSources.FileProviders
                 throw new ArgumentNullException(nameof(encoding));
 
             _baseDirectory = baseDirectory;
-            _fileDataResolver = new FileDataResolver(baseDirectory, encoding);
+            _fileDataResolver = new FileDataResolver(encoding);
             _extensions = extensions;
         }
 
@@ -36,13 +36,8 @@ namespace Blaven.BlogSources.FileProviders
             if (directories is null)
                 throw new ArgumentNullException(nameof(directories));
 
-            var distinctDirectories =
-                directories
-                    .GroupBy(x => x.FullName)
-                    .Select(x => x.First());
-
             var fileDataTasks =
-                distinctDirectories
+                directories
                     .Select(x => GetFileDatas(x))
                     .ToList();
 
