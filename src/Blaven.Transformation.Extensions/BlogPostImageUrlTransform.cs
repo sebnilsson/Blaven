@@ -42,7 +42,9 @@ namespace Blaven.Transformation.Extensions
 
             var document = htmlParser.ParseDocument(post.Content);
 
-            return document.QuerySelector("img")?.GetAttribute("src");
+            return
+                document.QuerySelector("img")?.GetAttribute("src")
+                ?? string.Empty;
         }
     }
 }

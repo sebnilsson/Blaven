@@ -2,18 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <LangVersion>8.0</LangVersion>
-    <Nullable>Enable</Nullable>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="DiskResources\.BlogKey1\.meta.json" />
-    <None Include="DiskResources\.BlogKey1\test-blog-post.md" />
-    <None Include="DiskResources\SubFolder\.BlogKey2\.meta.json" />
-    <None Include="DiskResources\SubFolder\.BlogKey2\SubFolder\test-blog-post.md" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
@@ -30,6 +21,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Blaven.BlogSources.FileProviders\Blaven.BlogSources.FileProviders.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="DiskResources\**\*.json" />
+    <None Include="DiskResources\**\*.md" />
   </ItemGroup>
 
   <ItemGroup>

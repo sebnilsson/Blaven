@@ -116,6 +116,22 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         [Fact]
+        public async Task GetPost_ExistingPostWithoutSummary_ReturnPostWithSummary()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var post = await blogQueryService.GetPost("third-blog-post");
+
+            // Assert
+            Assert.NotNull(post);
+            Assert.Equal(
+                "This is third test-post intro. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis semper neque lobortis mi aliquet, quis eleifend lectus tempus.",
+                post?.Summary);
+        }
+
+        [Fact]
         public async Task GetPostBySlug_ExistingPost_ReturnPost()
         {
             // Arrange
@@ -412,6 +428,11 @@ namespace Blaven.MarkdownFilesEndToEndTests
                 .AddSingleton<
                     IBlogPostStorageTransform,
                     BlogPostImageUrlTransform>();
+
+            services
+                .AddSingleton<
+                    IBlogPostStorageTransform,
+                    BlogPostSummaryTransform>();
 
             services
                 .AddSingleton<

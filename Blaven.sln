@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E4B54C7C-7C6A-4422-AC35-E24F547BBBEC}"
+	ProjectSection(SolutionItems) = preProject
+		src\Directory.Build.props = src\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F45746FC-FD40-4B63-BE5D-EAC399D55B78}"
 EndProject
@@ -20,19 +23,23 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{90C0340D-DFA5-4213-ABAC-5065EE89181F}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		README = README
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.BlogSources.Markdown", "src\Blaven.BlogSources.Markdown\Blaven.BlogSources.Markdown.csproj", "{96867C5E-2006-4C12-B79B-A80E1F7D706B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.BlogSources.Markdown", "src\Blaven.BlogSources.Markdown\Blaven.BlogSources.Markdown.csproj", "{96867C5E-2006-4C12-B79B-A80E1F7D706B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.BlogSources.Markdown.Tests", "test\Blaven.BlogSources.Markdown.Tests\Blaven.BlogSources.Markdown.Tests.csproj", "{6DD283B1-1497-4B62-AF2C-1B554E7D9BFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.BlogSources.Markdown.Tests", "test\Blaven.BlogSources.Markdown.Tests\Blaven.BlogSources.Markdown.Tests.csproj", "{6DD283B1-1497-4B62-AF2C-1B554E7D9BFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.BlogSources.FileProviders", "src\Blaven.BlogSources.FileProviders\Blaven.BlogSources.FileProviders.csproj", "{D65BE5C6-064A-453B-91CB-83314D26449A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.BlogSources.FileProviders", "src\Blaven.BlogSources.FileProviders\Blaven.BlogSources.FileProviders.csproj", "{D65BE5C6-064A-453B-91CB-83314D26449A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.BlogSources.FileProviders.Tests", "test\Blaven.BlogSources.FileProviders.Tests\Blaven.BlogSources.FileProviders.Tests.csproj", "{F14BD26F-38DE-4A9E-9B63-2AE1F2F5DACA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.BlogSources.FileProviders.Tests", "test\Blaven.BlogSources.FileProviders.Tests\Blaven.BlogSources.FileProviders.Tests.csproj", "{F14BD26F-38DE-4A9E-9B63-2AE1F2F5DACA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.MarkdownFilesEndToEndTests", "test\Blaven.MarkdownFilesEndToEndTests\Blaven.MarkdownFilesEndToEndTests.csproj", "{F62190AF-6431-472F-8979-0CB87582790F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.MarkdownFilesEndToEndTests", "test\Blaven.MarkdownFilesEndToEndTests\Blaven.MarkdownFilesEndToEndTests.csproj", "{F62190AF-6431-472F-8979-0CB87582790F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blaven.Transformation.Extensions", "src\Blaven.Transformation.Extensions\Blaven.Transformation.Extensions.csproj", "{8E2BF483-BDE4-439E-9307-CCE9060A8E65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.Transformation.Extensions", "src\Blaven.Transformation.Extensions\Blaven.Transformation.Extensions.csproj", "{8E2BF483-BDE4-439E-9307-CCE9060A8E65}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
