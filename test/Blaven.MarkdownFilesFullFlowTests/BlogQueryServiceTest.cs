@@ -62,6 +62,36 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         [Fact]
+        public async Task GetPost_ExistingPostOptionsIsDraftTrue_ReturnPost()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService(
+                blogQueryOptionsConfig:
+                    options => options.IncludeDrafts = true);
+
+            // Act
+            var post = await blogQueryService.GetPost("draft-blog-post");
+
+            // Assert
+            Assert.NotNull(post);
+        }
+
+        [Fact]
+        public async Task GetPost_ExistingPostOptionsIsDraftFalse_ReturnNull()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService(
+                blogQueryOptionsConfig:
+                    options => options.IncludeDrafts = false);
+
+            // Act
+            var post = await blogQueryService.GetPost("draft-blog-post");
+
+            // Assert
+            Assert.Null(post);
+        }
+
+        [Fact]
         public async Task GetPost_ExistingPost_ReturnPostWithImageUrl()
         {
             // Arrange
@@ -387,9 +417,11 @@ namespace Blaven.MarkdownFilesEndToEndTests
             Assert.NotEmpty(posts);
         }
 
-        private async Task<IBlogQueryService> GetBlogQueryService()
+        private async Task<IBlogQueryService> GetBlogQueryService(
+            Action<BlogQueryOptions>? blogQueryOptionsConfig = null)
         {
-            var services = GetServiceProvider();
+            var services = GetServiceProvider(
+                blogQueryOptionsConfig: blogQueryOptionsConfig);
 
             var blogSyncService =
                 services.GetRequiredService<IBlogSyncService>();
@@ -400,11 +432,12 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         private static IServiceProvider GetServiceProvider(
-            string filePath = "DiskResources/single-blog")
+            string filePath = "DiskResources/single-blog",
+            Action<BlogQueryOptions>? blogQueryOptionsConfig = null)
         {
             var services = new ServiceCollection();
 
-            services.AddBlaven();
+            services.AddBlaven(blogQueryOptionsConfig);
             services.AddBlavenInMemoryStorage();
 
             services.AddTransient<IBlogSource, MarkdownBlogSource>();

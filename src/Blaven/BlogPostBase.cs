@@ -12,6 +12,8 @@ namespace Blaven
 
         public string Id { get; set; } = string.Empty;
 
+        public bool IsDraft { get; set; }
+
         public string SourceId { get; set; } = string.Empty;
 
         public DateTimeOffset? UpdatedAt { get; set; }

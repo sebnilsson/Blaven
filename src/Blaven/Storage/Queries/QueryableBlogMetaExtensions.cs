@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Blaven.Queries
+namespace Blaven.Storage.Queries
 {
     public static class QueryableBlogMetaExtensions
     {

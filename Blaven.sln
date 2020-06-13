@@ -37,9 +37,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.BlogSources.FileProv
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.BlogSources.FileProviders.Tests", "test\Blaven.BlogSources.FileProviders.Tests\Blaven.BlogSources.FileProviders.Tests.csproj", "{F14BD26F-38DE-4A9E-9B63-2AE1F2F5DACA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.MarkdownFilesEndToEndTests", "test\Blaven.MarkdownFilesEndToEndTests\Blaven.MarkdownFilesEndToEndTests.csproj", "{F62190AF-6431-472F-8979-0CB87582790F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.Transformation.Extensions", "src\Blaven.Transformation.Extensions\Blaven.Transformation.Extensions.csproj", "{8E2BF483-BDE4-439E-9307-CCE9060A8E65}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Blaven.MarkdownFilesFullFlowTests", "test\Blaven.MarkdownFilesFullFlowTests\Blaven.MarkdownFilesFullFlowTests.csproj", "{101BF197-F7B6-4619-9E4F-1D579156833B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,14 +79,14 @@ Global
 		{F14BD26F-38DE-4A9E-9B63-2AE1F2F5DACA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F14BD26F-38DE-4A9E-9B63-2AE1F2F5DACA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F14BD26F-38DE-4A9E-9B63-2AE1F2F5DACA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F62190AF-6431-472F-8979-0CB87582790F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F62190AF-6431-472F-8979-0CB87582790F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F62190AF-6431-472F-8979-0CB87582790F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F62190AF-6431-472F-8979-0CB87582790F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8E2BF483-BDE4-439E-9307-CCE9060A8E65}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E2BF483-BDE4-439E-9307-CCE9060A8E65}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E2BF483-BDE4-439E-9307-CCE9060A8E65}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E2BF483-BDE4-439E-9307-CCE9060A8E65}.Release|Any CPU.Build.0 = Release|Any CPU
+		{101BF197-F7B6-4619-9E4F-1D579156833B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{101BF197-F7B6-4619-9E4F-1D579156833B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{101BF197-F7B6-4619-9E4F-1D579156833B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{101BF197-F7B6-4619-9E4F-1D579156833B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -101,8 +101,8 @@ Global
 		{6DD283B1-1497-4B62-AF2C-1B554E7D9BFC} = {F45746FC-FD40-4B63-BE5D-EAC399D55B78}
 		{D65BE5C6-064A-453B-91CB-83314D26449A} = {E4B54C7C-7C6A-4422-AC35-E24F547BBBEC}
 		{F14BD26F-38DE-4A9E-9B63-2AE1F2F5DACA} = {F45746FC-FD40-4B63-BE5D-EAC399D55B78}
-		{F62190AF-6431-472F-8979-0CB87582790F} = {F45746FC-FD40-4B63-BE5D-EAC399D55B78}
 		{8E2BF483-BDE4-439E-9307-CCE9060A8E65} = {E4B54C7C-7C6A-4422-AC35-E24F547BBBEC}
+		{101BF197-F7B6-4619-9E4F-1D579156833B} = {F45746FC-FD40-4B63-BE5D-EAC399D55B78}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {FF8A751E-8CED-46E6-8E56-E78FB74B40ED}

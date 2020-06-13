@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blaven.Queries;
+using Blaven.Storage.Queries;
 
 namespace Blaven.Storage.InMemory
 {

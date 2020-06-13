@@ -11,7 +11,8 @@ namespace Blaven.DependencyInjection
     public static class ServiceCollectionBlavenExtensions
     {
         public static IServiceCollection AddBlaven(
-            this IServiceCollection services)
+            this IServiceCollection services,
+            Action<BlogQueryOptions>? blogQueryOptionsConfig = null)
         {
             if (services is null)
                 throw new ArgumentNullException(nameof(services));
@@ -35,6 +36,10 @@ namespace Blaven.DependencyInjection
                 .TryAddTransient<
                     IBlogQueryService,
                     BlogQueryService>();
+
+            services
+                .AddOptions<BlogQueryOptions>()
+                .Configure(blogQueryOptionsConfig ?? (_ => { }));
 
             return services;
         }

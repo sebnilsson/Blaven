@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Blaven.Storage.InMemory;
 using Blaven.Testing;
 using Blaven.Transformation;
+using Microsoft.Extensions.Options;
+using Moq;
 using Xunit;
 
 namespace Blaven.Tests
@@ -130,14 +132,17 @@ namespace Blaven.Tests
         }
 
         private IBlogQueryService GetBlogQueryServices(
-            IReadOnlyList<BlogPost>? storagePosts = null)
+            IReadOnlyList<BlogPost>? storagePosts = null,
+            BlogQueryOptions? blogQueryOptions = null)
         {
             var inMemoryStorage = new InMemoryStorage(
                 Enumerable.Empty<BlogMeta>(),
                 storagePosts ?? Enumerable.Empty<BlogPost>());
 
+            var options = GetBlogQueryOptions(blogQueryOptions);
+
             var storageQueryRepo =
-                new InMemoryStorageQueryRepository(inMemoryStorage);
+                new InMemoryStorageQueryRepository(inMemoryStorage, options);
 
             var queryTransformService =
                 new BlogPostQueryTransformService(
@@ -147,6 +152,18 @@ namespace Blaven.Tests
                 new BlogQueryService(
                     storageQueryRepo,
                     queryTransformService);
+        }
+
+        private static IOptionsMonitor<BlogQueryOptions> GetBlogQueryOptions(
+            BlogQueryOptions? blogQueryOptions = null)
+        {
+            var options = blogQueryOptions ?? new BlogQueryOptions();
+
+            var mock = new Mock<IOptionsMonitor<BlogQueryOptions>>();
+
+            mock.Setup(x => x.CurrentValue).Returns(options);
+
+            return mock.Object;
         }
     }
 }
