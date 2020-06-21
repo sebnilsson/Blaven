@@ -36,9 +36,13 @@ namespace Blaven.Storage
         {
             var query = blogPostsQueryable;
 
-            if (!_options.IncludeDrafts)
+            if (!_options.IncludeDraftPosts)
             {
                 query = query.Where(x => !x.IsDraft);
+            }
+            if (!_options.IncludeFuturePosts)
+            {
+                query = query.Where(x => x.PublishedAt < DateTimeOffset.UtcNow);
             }
 
             return query;

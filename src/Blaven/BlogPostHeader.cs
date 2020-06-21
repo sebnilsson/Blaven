@@ -13,6 +13,8 @@ namespace Blaven
 
         public DateTimeOffset? PublishedAt { get; set; }
 
+        public string Series { get; set; } = string.Empty;
+
         public string Slug { get; set; } = string.Empty;
 
         public string SourceUrl { get; set; } = string.Empty;

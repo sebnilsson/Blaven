@@ -2,6 +2,8 @@
 {
     public class BlogQueryOptions
     {
-        public bool IncludeDrafts { get; set; }
+        public bool IncludeDraftPosts { get; set; }
+
+        public bool IncludeFuturePosts { get; set; }
     }
 }

@@ -62,12 +62,12 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         [Fact]
-        public async Task GetPost_ExistingPostOptionsIsDraftTrue_ReturnPost()
+        public async Task GetPost_ExistingPostOptionsIncludeDraftPostsTrue_ReturnPost()
         {
             // Arrange
             var blogQueryService = await GetBlogQueryService(
                 blogQueryOptionsConfig:
-                    options => options.IncludeDrafts = true);
+                    options => options.IncludeDraftPosts = true);
 
             // Act
             var post = await blogQueryService.GetPost("draft-blog-post");
@@ -77,15 +77,45 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         [Fact]
-        public async Task GetPost_ExistingPostOptionsIsDraftFalse_ReturnNull()
+        public async Task GetPost_ExistingPostOptionsIncludeDraftPostsFalse_ReturnNull()
         {
             // Arrange
             var blogQueryService = await GetBlogQueryService(
                 blogQueryOptionsConfig:
-                    options => options.IncludeDrafts = false);
+                    options => options.IncludeDraftPosts = false);
 
             // Act
             var post = await blogQueryService.GetPost("draft-blog-post");
+
+            // Assert
+            Assert.Null(post);
+        }
+
+        [Fact]
+        public async Task GetPost_ExistingPostOptionsIncludeFuturePostsTrue_ReturnPost()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService(
+                blogQueryOptionsConfig:
+                    options => options.IncludeFuturePosts = true);
+
+            // Act
+            var post = await blogQueryService.GetPost("future-blog-post");
+
+            // Assert
+            Assert.NotNull(post);
+        }
+
+        [Fact]
+        public async Task GetPost_ExistingPostOptionsIncludeFuturePostsFalse_ReturnNull()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService(
+                blogQueryOptionsConfig:
+                    options => options.IncludeFuturePosts = false);
+
+            // Act
+            var post = await blogQueryService.GetPost("future-blog-post");
 
             // Assert
             Assert.Null(post);
