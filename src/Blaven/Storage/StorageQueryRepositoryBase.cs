@@ -200,6 +200,22 @@ namespace Blaven.Storage
             return Task.FromResult(posts);
         }
 
+        public Task<IReadOnlyList<BlogSeriesEpisode>> ListSeriesEpisodes(
+            string seriesName,
+            IEnumerable<BlogKey> blogKeys)
+        {
+            if (seriesName is null)
+                throw new ArgumentNullException(nameof(seriesName));
+            if (blogKeys is null)
+                throw new ArgumentNullException(nameof(blogKeys));
+
+            var series =
+                _blogPostsQueryable.ToSeriesList(seriesName, blogKeys)
+                as IReadOnlyList<BlogSeriesEpisode>;
+
+            return Task.FromResult(series);
+        }
+
         public Task<IPagedReadOnlyList<BlogPostHeader>> SearchPosts(
             string searchText,
             Paging paging,

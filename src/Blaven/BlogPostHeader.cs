@@ -11,6 +11,12 @@ namespace Blaven
 
         public string ImageUrl { get; set; } = string.Empty;
 
+        public bool IsPublished
+            => !IsDraft && PublishedAt <= DateTime.UtcNow;
+
+        public bool IsScheduled
+            => IsDraft && PublishedAt > DateTime.UtcNow;
+
         public DateTimeOffset? PublishedAt { get; set; }
 
         public string Series { get; set; } = string.Empty;

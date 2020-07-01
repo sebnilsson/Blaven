@@ -68,6 +68,21 @@ namespace Blaven
                     .ConfigureAwait(false);
         }
 
+        public async Task<IReadOnlyList<BlogSeriesEpisode>> ListSeriesEpisodes(
+            string seriesName,
+            params BlogKey[] blogKeys)
+        {
+            if (seriesName is null)
+                throw new ArgumentNullException(nameof(seriesName));
+            if (blogKeys is null)
+                throw new ArgumentNullException(nameof(blogKeys));
+
+            return await
+                _repository
+                    .ListSeriesEpisodes(seriesName, blogKeys)
+                    .ConfigureAwait(false);
+        }
+
         public async Task<IReadOnlyList<BlogTagItem>> ListAllTags(
             params BlogKey[] blogKeys)
         {

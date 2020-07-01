@@ -12,6 +12,7 @@ Author:
   Url: https://test.com/author
 PublishedAt: 2020-03-04T05:06:07
 UpdatedAt: 2020-04-05T06:07:08
+Series: "Test series"
 ---
 
 # Second Post Title

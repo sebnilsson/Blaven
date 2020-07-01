@@ -33,5 +33,21 @@ namespace Blaven
 
             return indexOf >= 0;
         }
+
+        public static bool EqualsIgnoreCase(this string str, string value)
+        {
+            if (value is null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (str == null)
+            {
+                return false;
+            }
+
+            return
+                str.Equals(
+                    value,
+                    StringComparison.InvariantCultureIgnoreCase);
+        }
     }
 }

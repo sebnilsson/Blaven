@@ -299,6 +299,28 @@ namespace Blaven.MarkdownFilesEndToEndTests
         }
 
         [Fact]
+        public async Task ListAllSeries_QueuedAndNonQueuedPosts_ReturnQueuedAndNonQueuedPosts()
+        {
+            // Arrange
+            var blogQueryService = await GetBlogQueryService();
+
+            // Act
+            var seriesEpisodes =
+                await blogQueryService.ListSeriesEpisodes("test series");
+
+            // Assert
+            Assert.NotNull(seriesEpisodes);
+            Assert.Equal(2, seriesEpisodes.Count);
+
+            var first = seriesEpisodes.First();
+            var second = seriesEpisodes.ElementAt(1);
+
+            Assert.True(first.IsPublished);
+            Assert.False(second.IsPublished);
+            Assert.True(first.PublishedAt < second.PublishedAt);
+        }
+
+        [Fact]
         public async Task ListAllTags_ExistingTags_ReturnTags()
         {
             // Arrange

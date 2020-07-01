@@ -75,6 +75,39 @@ namespace Blaven.Storage.Queries
                  .ToList();
         }
 
+        public static List<BlogSeriesEpisode> ToSeriesList(
+            this IQueryable<BlogPost> queryable,
+            string seriesName,
+            IEnumerable<BlogKey> blogKeys)
+        {
+            if (queryable is null)
+                throw new ArgumentNullException(nameof(queryable));
+            if (seriesName is null)
+                throw new ArgumentNullException(nameof(seriesName));
+            if (blogKeys is null)
+                throw new ArgumentNullException(nameof(blogKeys));
+
+            var posts = queryable.WhereBlogKeys(blogKeys);
+
+            return
+                posts
+                    .Where(x =>
+                        x.Series != null
+                        && x.Series.EqualsIgnoreCase(seriesName))
+                    .OrderBy(x => x.PublishedAt)
+                    .Select((x, i) =>
+                        new BlogSeriesEpisode
+                        {
+                            Id = x.Id,
+                            Episode = i + 1,
+                            IsPublished = x.IsPublished,
+                            PublishedAt = x.PublishedAt,
+                            Slug = x.Slug,
+                            Title = x.Title
+                        })
+                    .ToList();
+        }
+
         public static List<BlogTagItem> ToTagList(
             this IQueryable<BlogPost> queryable,
             IEnumerable<BlogKey> blogKeys)

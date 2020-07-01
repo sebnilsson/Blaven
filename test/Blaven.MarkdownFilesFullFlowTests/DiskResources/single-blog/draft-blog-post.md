@@ -10,6 +10,7 @@ Author:
   Url: https://test.com/author
 PublishedAt: 2020-05-06T07:08:09
 IsDraft: true
+Series: "test series"
 ---
 
 This is the draft test-post
