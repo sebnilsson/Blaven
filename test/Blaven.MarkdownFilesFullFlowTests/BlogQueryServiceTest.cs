@@ -302,7 +302,10 @@ namespace Blaven.MarkdownFilesEndToEndTests
         public async Task ListAllSeries_QueuedAndNonQueuedPosts_ReturnQueuedAndNonQueuedPosts()
         {
             // Arrange
-            var blogQueryService = await GetBlogQueryService();
+            var blogQueryService = await GetBlogQueryService(config =>
+            {
+                config.IncludeDraftPosts = true;
+            });
 
             // Act
             var seriesEpisodes =

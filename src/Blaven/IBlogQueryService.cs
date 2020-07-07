@@ -37,7 +37,7 @@ namespace Blaven
             Paging paging = default,
             params BlogKey[] blogKeys);
 
-        Task<IReadOnlyList<BlogSeriesEpisode>> ListSeriesEpisodes(
+        Task<IReadOnlyList<BlogPostSeriesEpisode>> ListSeriesEpisodes(
             string seriesName,
             params BlogKey[] blogKeys);
 

@@ -7,6 +7,34 @@ namespace Blaven
     [DebuggerDisplay("BlogKey={BlogKey}, Id={Id}, Hash={Hash}, Title={Title}")]
     public class BlogPostHeader : BlogPostBase
     {
+        public BlogPostHeader()
+        {
+        }
+
+        public BlogPostHeader(BlogPostHeader blogPost)
+        {
+            if (blogPost == null)
+            {
+                return;
+            }
+
+            Author = blogPost.Author;
+            BlogKey = blogPost.BlogKey;
+            Hash = blogPost.Hash;
+            Id = blogPost.Id;
+            ImageUrl = blogPost.ImageUrl;
+            IsDraft = blogPost.IsDraft;
+            PublishedAt = blogPost.PublishedAt;
+            Series = blogPost.Series;
+            Slug = blogPost.Slug;
+            SourceId = blogPost.SourceId;
+            SourceUrl = blogPost.SourceUrl;
+            Summary = blogPost.Summary;
+            Tags = blogPost.Tags;
+            Title = blogPost.Title;
+            UpdatedAt = blogPost.UpdatedAt;
+        }
+
         public BlogAuthor Author { get; set; } = new BlogAuthor();
 
         public string ImageUrl { get; set; } = string.Empty;
@@ -15,7 +43,7 @@ namespace Blaven
             => !IsDraft && PublishedAt <= DateTime.UtcNow;
 
         public bool IsScheduled
-            => IsDraft && PublishedAt > DateTime.UtcNow;
+            => !IsDraft && PublishedAt > DateTime.UtcNow;
 
         public DateTimeOffset? PublishedAt { get; set; }
 

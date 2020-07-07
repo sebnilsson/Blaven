@@ -5,6 +5,20 @@ namespace Blaven.Storage.Queries
 {
     public static class QueryableBlogMetaExtensions
     {
+        public static IQueryable<BlogMeta> ApplyOptions(
+            this IQueryable<BlogMeta> queryable,
+            BlogQueryOptions options)
+        {
+            var query = queryable;
+
+            if (!options.IncludeFuturePosts)
+            {
+                query = query.Where(x => x.PublishedAt < DateTimeOffset.UtcNow);
+            }
+
+            return query;
+        }
+
         public static BlogMeta? FirstOrDefaultById(
             this IQueryable<BlogMeta> queryable,
             string id)

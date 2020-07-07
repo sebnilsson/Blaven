@@ -6,6 +6,24 @@ namespace Blaven.Storage.Queries
 {
     public static class QueryableBlogPostExtensions
     {
+        public static IQueryable<BlogPost> ApplyOptions(
+            this IQueryable<BlogPost> queryable,
+            BlogQueryOptions options)
+        {
+            var query = queryable;
+
+            if (!options.IncludeDraftPosts)
+            {
+                query = query.Where(x => !x.IsDraft);
+            }
+            if (!options.IncludeFuturePosts)
+            {
+                query = query.Where(x => x.PublishedAt < DateTimeOffset.UtcNow);
+            }
+
+            return query;
+        }
+
         public static BlogPost? FirstOrDefaultById(
             this IQueryable<BlogPost> queryable,
             string id)
@@ -75,7 +93,7 @@ namespace Blaven.Storage.Queries
                  .ToList();
         }
 
-        public static List<BlogSeriesEpisode> ToSeriesList(
+        public static List<BlogPostSeriesEpisode> ToSeriesList(
             this IQueryable<BlogPost> queryable,
             string seriesName,
             IEnumerable<BlogKey> blogKeys)
@@ -96,15 +114,7 @@ namespace Blaven.Storage.Queries
                         && x.Series.EqualsIgnoreCase(seriesName))
                     .OrderBy(x => x.PublishedAt)
                     .Select((x, i) =>
-                        new BlogSeriesEpisode
-                        {
-                            Id = x.Id,
-                            Episode = i + 1,
-                            IsPublished = x.IsPublished,
-                            PublishedAt = x.PublishedAt,
-                            Slug = x.Slug,
-                            Title = x.Title
-                        })
+                        new BlogPostSeriesEpisode(x, i + 1))
                     .ToList();
         }
 

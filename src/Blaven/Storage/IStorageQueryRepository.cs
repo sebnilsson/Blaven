@@ -38,7 +38,7 @@ namespace Blaven.Storage
             Paging paging,
             IEnumerable<BlogKey> blogKeys);
 
-        Task<IReadOnlyList<BlogSeriesEpisode>> ListSeriesEpisodes(
+        Task<IReadOnlyList<BlogPostSeriesEpisode>> ListSeriesEpisodes(
             string seriesName,
             IEnumerable<BlogKey> blogKeys);
 

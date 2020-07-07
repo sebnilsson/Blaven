@@ -10,54 +10,27 @@ namespace Blaven.Storage
     public abstract class StorageQueryRepositoryBase : IStorageQueryRepository
     {
         private readonly BlogQueryOptions _options;
-        private readonly IQueryable<BlogMeta> _blogMetasQueryable;
-        private readonly IQueryable<BlogPost> _blogPostsQueryable;
+        private readonly IStorageQueryData _storageQueryData;
 
         public StorageQueryRepositoryBase(
-            IQueryable<BlogMeta> blogMetasQueryable,
-            IQueryable<BlogPost> blogPostsQueryable,
+            IStorageQueryData storageQueryData,
             IOptionsMonitor<BlogQueryOptions> options)
         {
-            if (blogMetasQueryable is null)
-                throw new ArgumentNullException(nameof(blogMetasQueryable));
-            if (blogPostsQueryable is null)
-                throw new ArgumentNullException(nameof(blogPostsQueryable));
+            _storageQueryData = storageQueryData
+                ?? throw new ArgumentNullException(nameof(storageQueryData));
+
             if (options is null)
                 throw new ArgumentNullException(nameof(options));
 
             _options = options.CurrentValue;
-
-            _blogMetasQueryable = GetBlogMetasQueryable(blogMetasQueryable);
-            _blogPostsQueryable = GetBlogPostsQueryable(blogPostsQueryable);
-        }
-
-        private IQueryable<BlogPost> GetBlogPostsQueryable(
-            IQueryable<BlogPost> blogPostsQueryable)
-        {
-            var query = blogPostsQueryable;
-
-            if (!_options.IncludeDraftPosts)
-            {
-                query = query.Where(x => !x.IsDraft);
-            }
-            if (!_options.IncludeFuturePosts)
-            {
-                query = query.Where(x => x.PublishedAt < DateTimeOffset.UtcNow);
-            }
-
-            return query;
-        }
-
-        private IQueryable<BlogMeta> GetBlogMetasQueryable(
-            IQueryable<BlogMeta> blogMetasQueryable)
-        {
-            return blogMetasQueryable;
         }
 
         public Task<BlogMeta?> GetMeta(BlogKey blogKey)
         {
             var meta =
-                _blogMetasQueryable
+                _storageQueryData
+                    .Metas
+                    .ApplyOptions(_options)
                     .WhereBlogKey(blogKey)
                     .FirstOrDefault();
 
@@ -70,7 +43,9 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(id));
 
             var post =
-                _blogPostsQueryable
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
                     .WhereBlogKey(blogKey)
                     .OrderByPublishedAt()
                     .FirstOrDefaultById(id);
@@ -84,7 +59,9 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(slug));
 
             var post =
-                _blogPostsQueryable
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
                     .WhereBlogKey(blogKey)
                     .OrderByPublishedAt()
                     .FirstOrDefaultBySlug(slug);
@@ -99,7 +76,10 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var dates =
-                _blogPostsQueryable.ToDateList(blogKeys)
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
+                    .ToDateList(blogKeys)
                 as IReadOnlyList<BlogDateItem>;
 
             return Task.FromResult(dates);
@@ -108,7 +88,11 @@ namespace Blaven.Storage
         public Task<IReadOnlyList<BlogMeta>> ListAllMetas()
         {
             var metas =
-                _blogMetasQueryable.OrderBy(x => x.Name).ToList()
+                _storageQueryData
+                    .Metas
+                    .ApplyOptions(_options)
+                    .OrderBy(x => x.Name)
+                    .ToList()
                 as IReadOnlyList<BlogMeta>;
 
             return Task.FromResult(metas);
@@ -121,7 +105,10 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var tags =
-                _blogPostsQueryable.ToTagList(blogKeys)
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
+                    .ToTagList(blogKeys)
                 as IReadOnlyList<BlogTagItem>;
 
             return Task.FromResult(tags);
@@ -135,7 +122,9 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var posts =
-                _blogPostsQueryable
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
                     .WhereBlogKeys(blogKeys)
                     .OrderByPublishedAtDescending()
                     .OfType<BlogPostHeader>()
@@ -152,7 +141,9 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var posts =
-                _blogPostsQueryable
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
                     .WhereBlogKeys(blogKeys)
                     .OrderByPublishedAtDescending()
                     .ToPagedList(paging);
@@ -169,7 +160,9 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var posts =
-                _blogPostsQueryable
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
                     .WhereBlogKeys(blogKeys)
                     .WherePublishedAt(archiveDate)
                     .OrderByPublishedAtDescending()
@@ -190,7 +183,9 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var posts =
-                _blogPostsQueryable
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
                     .WhereBlogKeys(blogKeys)
                     .WhereTagName(tagName)
                     .OrderByPublishedAtDescending()
@@ -200,7 +195,7 @@ namespace Blaven.Storage
             return Task.FromResult(posts);
         }
 
-        public Task<IReadOnlyList<BlogSeriesEpisode>> ListSeriesEpisodes(
+        public Task<IReadOnlyList<BlogPostSeriesEpisode>> ListSeriesEpisodes(
             string seriesName,
             IEnumerable<BlogKey> blogKeys)
         {
@@ -210,8 +205,11 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var series =
-                _blogPostsQueryable.ToSeriesList(seriesName, blogKeys)
-                as IReadOnlyList<BlogSeriesEpisode>;
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
+                    .ToSeriesList(seriesName, blogKeys)
+                as IReadOnlyList<BlogPostSeriesEpisode>;
 
             return Task.FromResult(series);
         }
@@ -227,7 +225,9 @@ namespace Blaven.Storage
                 throw new ArgumentNullException(nameof(blogKeys));
 
             var posts =
-                _blogPostsQueryable
+                _storageQueryData
+                    .Posts
+                    .ApplyOptions(_options)
                     .WhereBlogKeys(blogKeys)
                     .WhereContentContains(searchText)
                     .OrderByPublishedAtDescending()

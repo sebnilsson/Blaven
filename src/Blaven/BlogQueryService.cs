@@ -68,7 +68,7 @@ namespace Blaven
                     .ConfigureAwait(false);
         }
 
-        public async Task<IReadOnlyList<BlogSeriesEpisode>> ListSeriesEpisodes(
+        public async Task<IReadOnlyList<BlogPostSeriesEpisode>> ListSeriesEpisodes(
             string seriesName,
             params BlogKey[] blogKeys)
         {
