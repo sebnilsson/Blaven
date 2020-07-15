@@ -168,7 +168,7 @@ namespace Blaven.Storage.Queries
                         || blogKeys.Contains(x.BlogKey));
         }
 
-        public static IQueryable<BlogPost> WhereContentContains(
+        public static IQueryable<BlogPost> WhereSearchMatch(
             this IQueryable<BlogPost> queryable,
             string searchText)
         {
@@ -177,22 +177,7 @@ namespace Blaven.Storage.Queries
             if (searchText is null)
                 throw new ArgumentNullException(nameof(searchText));
 
-            return
-                queryable
-                    .Where(x =>
-                        x.Content.IndexOf(
-                            searchText,
-                            StringComparison.InvariantCultureIgnoreCase) >= 0
-                        || x.Summary.IndexOf(
-                            searchText,
-                            StringComparison.InvariantCultureIgnoreCase) >= 0
-                        || x.Title.IndexOf(
-                            searchText,
-                            StringComparison.InvariantCultureIgnoreCase) >= 0
-                        || x.Tags.Any(t =>
-                            t.IndexOf(
-                                searchText,
-                                StringComparison.InvariantCultureIgnoreCase) >= 0));
+            return queryable.Where(x => SearchHelper.HasMatch(x, searchText));
         }
 
         public static IQueryable<BlogPost> WhereTagName(

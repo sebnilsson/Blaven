@@ -229,7 +229,7 @@ namespace Blaven.Storage
                     .Posts
                     .ApplyOptions(_options)
                     .WhereBlogKeys(blogKeys)
-                    .WhereContentContains(searchText)
+                    .WhereSearchMatch(searchText)
                     .OrderByPublishedAtDescending()
                     .OfType<BlogPostHeader>()
                     .ToPagedList(paging);
