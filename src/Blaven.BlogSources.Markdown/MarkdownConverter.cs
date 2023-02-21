@@ -1,5 +1,5 @@
 ﻿using System;
-using Ganss.XSS;
+using Ganss.Xss;
 using Markdig;
 
 namespace Blaven.BlogSources.Markdown
