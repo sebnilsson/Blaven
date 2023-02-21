@@ -103,7 +103,7 @@ namespace Blaven.Synchronization.Testing
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Empty(result.BlogPostsChanges.DeletedBlogPosts);
             Assert.Equal(2, result.BlogPostsChanges.InsertedBlogPosts.Count);
             Assert.Equal(2, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
@@ -192,9 +192,9 @@ namespace Blaven.Synchronization.Testing
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey2);
 
-            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
-            Assert.Equal(0, result.BlogPostsChanges.InsertedBlogPosts.Count);
-            Assert.Equal(0, result.BlogPostsChanges.UpdatedBlogPosts.Count);
+            Assert.Empty(result.BlogPostsChanges.DeletedBlogPosts);
+            Assert.Empty(result.BlogPostsChanges.InsertedBlogPosts);
+            Assert.Empty(result.BlogPostsChanges.UpdatedBlogPosts);
         }
 
         [Theory]
@@ -219,8 +219,8 @@ namespace Blaven.Synchronization.Testing
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
             Assert.Equal(expectedDeletedBlogPosts, result.BlogPostsChanges.DeletedBlogPosts.Count);
-            Assert.Equal(0, result.BlogPostsChanges.InsertedBlogPosts.Count);
-            Assert.Equal(0, result.BlogPostsChanges.UpdatedBlogPosts.Count);
+            Assert.Empty(result.BlogPostsChanges.InsertedBlogPosts);
+            Assert.Empty(result.BlogPostsChanges.UpdatedBlogPosts);
         }
 
         [Fact]
@@ -289,9 +289,9 @@ namespace Blaven.Synchronization.Testing
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
+            Assert.Empty(result.BlogPostsChanges.DeletedBlogPosts);
             Assert.Equal(expectedInsertedBlogPosts, result.BlogPostsChanges.InsertedBlogPosts.Count);
-            Assert.Equal(0, result.BlogPostsChanges.UpdatedBlogPosts.Count);
+            Assert.Empty(result.BlogPostsChanges.UpdatedBlogPosts   );
         }
 
         [Theory]
@@ -319,8 +319,8 @@ namespace Blaven.Synchronization.Testing
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
-            Assert.Equal(0, result.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Empty(result.BlogPostsChanges.DeletedBlogPosts);
+            Assert.Empty(result.BlogPostsChanges.InsertedBlogPosts);
             Assert.Equal(expectedUpdatedBlogPosts, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
 
@@ -376,8 +376,8 @@ namespace Blaven.Synchronization.Testing
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
-            Assert.Equal(0, result.BlogPostsChanges.InsertedBlogPosts.Count);
+            Assert.Empty(result.BlogPostsChanges.DeletedBlogPosts);
+            Assert.Empty(result.BlogPostsChanges.InsertedBlogPosts);
             Assert.Equal(expectedUpdatedBlogPosts, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
     }
