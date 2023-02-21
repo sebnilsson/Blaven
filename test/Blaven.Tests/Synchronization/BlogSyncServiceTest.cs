@@ -2,92 +2,141 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Blaven.Storage.InMemory;
+using Blaven.BlogSources;
 using Blaven.Testing;
-using Blaven.Transformation;
+using Moq;
 using Xunit;
 
-namespace Blaven.Synchronization.Tests
+namespace Blaven.Synchronization.Testing
 {
     public class BlogSyncServiceTest
     {
         [Fact]
-        public async Task Synchronize_ContainsInserts_ReturnsInserts()
+        public async Task Update_BlogKeyNotExisting_ShouldThrow()
         {
             // Arrange
-            var blogSourcePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
-            var storagePosts = BlogPostTestFactory.CreateList(2, 3);
+            var service = BlogSyncServiceTestFactory.Create();
 
-            var syncService = GetBlogSyncService(blogSourcePosts, storagePosts);
-
-            // Act
-            var result = await syncService.Synchronize();
-
-            // Assert
-            Assert.Equal(2, result.Posts.Inserted.Count);
-            Assert.Empty(result.Posts.Updated);
-            Assert.Empty(result.Posts.Deleted);
-        }
-
-        [Theory]
-        [MemberData(nameof(GetChangedBlogPostData))]
-        public async Task Synchronize_ContainsHashUpdates_ReturnsUpdates(
-            BlogPost[] blogSourcePosts,
-            int expectedUpdateCount)
-        {
-            // Arrange
-            var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
-
-            var syncService = GetBlogSyncService(blogSourcePosts, storagePosts);
-
-            // Act
-            var result = await syncService.Synchronize();
-
-            // Assert
-            Assert.Equal(expectedUpdateCount, result.Posts.Updated.Count);
-            Assert.Empty(result.Posts.Inserted);
-            Assert.Empty(result.Posts.Deleted);
+            // Act & Assert
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await service.Update("NON_EXISTING_BLOGKEY"));
         }
 
         [Fact]
-        public async Task Synchronize_ContainsDeleted_ReturnsDeleted()
+        public async Task Update_BlogSourceGetBlogPostsThrows_ShouldThrow()
         {
             // Arrange
-            var blogSourcePosts = BlogPostTestFactory.CreateList(2, 3);
-            var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
+            var blogSource = new Mock<IBlogSource>();
+            blogSource.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .Throws(new Exception("TEST_ERROR"));
 
-            var syncService = GetBlogSyncService(blogSourcePosts, storagePosts);
+            var service = BlogSyncServiceTestFactory.Create(blogSource.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<BlogSyncBlogSourceException>(async () => await service.Update());
+        }
+
+        [Fact]
+        public async Task Update_BlogSourceGetMetaAndGetBlogPostsReturnsNull_ShouldNotThrow()
+        {
+            // Arrange
+            var blogSource = new Mock<IBlogSource>();
+            blogSource.Setup(x => x.GetMeta(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .ReturnsAsync((BlogMeta)null);
+            blogSource.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .ReturnsAsync((IReadOnlyList<BlogPost>)null);
+
+            var service = BlogSyncServiceTestFactory.Create(blogSource.Object);
+
+            // Act & Assert
+            await service.Update();
+        }
+
+        [Fact]
+        public async Task Update_BlogSourceGetMetaThrows_ShouldThrow()
+        {
+            // Arrange
+            var blogSource = new Mock<IBlogSource>();
+            blogSource.Setup(x => x.GetMeta(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .Throws(new Exception("TEST_ERROR"));
+
+            var service = BlogSyncServiceTestFactory.Create(blogSource.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<BlogSyncBlogSourceException>(async () => await service.Update());
+        }
+
+        [Fact]
+        public async Task Update_DataStorageContainsPosts_ShouldUpdateNewAndNotFlagOldAsDeleted()
+        {
+            // Arrange
+            var dataStoragePosts = new[]
+                                   {
+                                       BlogPostTestData.Create(0, updatedAt: new DateTime(2016, 1, 1)),
+                                       BlogPostTestData.Create(1, updatedAt: new DateTime(2016, 2, 2)),
+                                       BlogPostTestData.Create(2, updatedAt: new DateTime(2016, 3, 3)),
+                                       BlogPostTestData.Create(3, updatedAt: new DateTime(2016, 4, 4))
+                                   };
+            var blogSourcePosts = new[]
+                                  {
+                                      BlogPostTestData.Create(
+                                          0,
+                                          updatedAt: new DateTime(2016, 1, 1),
+                                          hashPrefix: "CHANGED_"),
+                                      BlogPostTestData.Create(
+                                          1,
+                                          updatedAt: new DateTime(2016, 2, 2),
+                                          hashPrefix: "CHANGED_"),
+                                      BlogPostTestData.Create(2, updatedAt: new DateTime(2016, 3, 3)),
+                                      BlogPostTestData.Create(3, updatedAt: new DateTime(2016, 4, 4)),
+                                      BlogPostTestData.Create(4, updatedAt: new DateTime(2016, 5, 5)),
+                                      BlogPostTestData.Create(5, updatedAt: new DateTime(2016, 6, 6))
+                                  };
+
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
 
             // Act
-            var result = await syncService.Synchronize();
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
 
             // Assert
             var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
-            Assert.Empty(result.BlogPostsChanges.DeletedBlogPosts);
+            Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
             Assert.Equal(2, result.BlogPostsChanges.InsertedBlogPosts.Count);
             Assert.Equal(2, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
 
         [Fact]
-        public async Task Synchronize_NoChanges_ReturnsNoChanges()
+        public async Task Update_DataStorageGetBlogPostsReturnsNull_ShouldThrow()
         {
             // Arrange
-            var blogSourcePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
-            var storagePosts = BlogPostTestFactory.CreateList(1, 2, 3, 4);
+            var dataStorage = new Mock<IDataStorage>();
+            dataStorage.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .ReturnsAsync((IReadOnlyList<BlogPostBase>)null);
 
-            var syncService = GetBlogSyncService(blogSourcePosts, storagePosts);
+            var service = BlogSyncServiceTestFactory.Create(dataStorage: dataStorage.Object);
 
-            // Act
-            var result = await syncService.Synchronize();
-
-            // Assert
-            Assert.Empty(result.Posts.Inserted);
-            Assert.Empty(result.Posts.Updated);
-            Assert.Empty(result.Posts.Deleted);
+            // Act & Assert
+            await Assert.ThrowsAsync<BlogSyncDataStorageResultException>(async () => await service.Update());
         }
 
-        public static IEnumerable<object[]> GetChangedBlogPostData()
+        [Fact]
+        public async Task Update_DataStorageGetBlogPostsThrows_ShouldThrow()
+        {
+            // Arrange
+            var dataStorage = new Mock<IDataStorage>();
+            dataStorage.Setup(x => x.GetBlogPosts(It.IsAny<BlogSetting>(), It.IsAny<DateTime?>()))
+                .Throws(new Exception("TEST_ERROR"));
+
+            var service = BlogSyncServiceTestFactory.Create(dataStorage: dataStorage.Object);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<BlogSyncDataStorageException>(async () => await service.Update());
+        }
+
+        [Fact]
+        public async Task UpdateAll_BlogKeyNotExisting_ShouldThrow()
         {
             // Arrange
             var service = BlogSyncServiceTestFactory.Create();
@@ -274,35 +323,57 @@ namespace Blaven.Synchronization.Tests
             Assert.Equal(expectedUpdatedBlogPosts, result.BlogPostsChanges.UpdatedBlogPosts.Count);
         }
 
-        private static BlogPost[] CreateChangedBlogPosts(
-            Action<BlogPost> config)
+        [Fact]
+        public async Task UpdateAll_BlogSourceUpdatedPostTags_ReturnsUpdatedPostWithUpdatedTags()
         {
-            return
-                new BlogPost[]
-                {
-                    BlogPostTestFactory.Create(1),
-                    BlogPostTestFactory.Create(2, config),
-                    BlogPostTestFactory.Create(3, config),
-                    BlogPostTestFactory.Create(4)
-                };
+            // Arrange
+            const int updatedTagCount = BlogPostTestData.DefaultTagCount + 2;
+
+            var dataStoragePost = BlogPostTestData.Create(0);
+
+            var dataStoragePosts = new[] { dataStoragePost };
+            var blogSourcePosts =
+                new[] { BlogPostTestData.Create(0, hashPrefix: "_CHANGED", tagCount: updatedTagCount) };
+
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
+
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
+
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
+            var updatedPost = result.BlogPostsChanges.UpdatedBlogPosts.First();
+
+            Assert.Equal(BlogPostTestData.DefaultTagCount, dataStoragePost.BlogPostTags.Count);
+            Assert.Equal(updatedTagCount, updatedPost.BlogPostTags.Count);
         }
 
-        private IBlogSyncService GetBlogSyncService(
-            IReadOnlyList<BlogPost>? blogSourcePosts = null,
-            IReadOnlyList<BlogPost>? storagePosts = null)
+        [Theory]
+        [InlineData(BlogMetaTestData.BlogKey, 2)]
+        [InlineData(BlogMetaTestData.BlogKey2, 0)]
+        public async Task UpdateAll_BlogSourceUpdatedPostUpdatedAts_ReturnsUpdatedPosts(
+            string blogKey,
+            int expectedUpdatedBlogPosts)
         {
-            var blogSource = new FakeBlogSource(blogSourcePosts);
+            // Arrange
+            var dataStoragePosts = BlogPostTestData.CreateCollection(0, 2, blogKey);
+            var blogSourcePosts = new[]
+                                  {
+                                      BlogPostTestData.Create(0, blogKey, updatedAtAddedDays: 1),
+                                      BlogPostTestData.Create(1, blogKey, updatedAtAddedDays: 2)
+                                  };
 
-            var inMemoryStorage = new InMemoryStorage(
-                Enumerable.Empty<BlogMeta>(),
-                storagePosts ?? Enumerable.Empty<BlogPost>());
+            var service = BlogSyncServiceTestFactory.CreateWithData(
+                blogSourcePosts,
+                dataStoragePosts: dataStoragePosts);
 
-            var storageSyncRepo =
-                new InMemoryStorageSyncRepository(inMemoryStorage);
+            // Act
+            var results = await service.UpdateAll(BlogMetaTestData.BlogKey);
 
-            var transformService =
-                new BlogPostStorageTransformService(
-                    Enumerable.Empty<IBlogPostStorageTransform>());
+            // Assert
+            var result = results.First(x => x.BlogKey == BlogMetaTestData.BlogKey);
 
             Assert.Equal(0, result.BlogPostsChanges.DeletedBlogPosts.Count);
             Assert.Equal(0, result.BlogPostsChanges.InsertedBlogPosts.Count);

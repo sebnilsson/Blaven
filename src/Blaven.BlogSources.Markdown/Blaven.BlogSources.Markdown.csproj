@@ -1,13 +1,14 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>Test</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlSanitizer" Version="5.0.331" />
+    <PackageReference Include="HtmlSanitizer" Version="5.0.372" />
     <PackageReference Include="Markdig" Version="0.20.0" />
-    <PackageReference Include="System.Text.Json" Version="4.7.2" />
+    <PackageReference Include="System.Text.Json" Version="4.6.0" />
     <PackageReference Include="YamlDotNet" Version="8.1.2" />
   </ItemGroup>
 

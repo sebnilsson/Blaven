@@ -2,7 +2,8 @@
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
   
   <PropertyGroup>    
-    <Version>0.8.0</Version>
+    <Version>0.8.1</Version>
+
     <RepositoryUrl>https://github.com/sebnilsson/Blaven</RepositoryUrl>
   </PropertyGroup>
 </Project>
