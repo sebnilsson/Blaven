@@ -15,7 +15,7 @@ namespace Blaven.Json
             return options;
         }
 
-        public static T Deserialize<T>(string json)
+        public static T? Deserialize<T>(string json)
         {
             return JsonSerializer.Deserialize<T>(json, s_serializeOptions);
         }

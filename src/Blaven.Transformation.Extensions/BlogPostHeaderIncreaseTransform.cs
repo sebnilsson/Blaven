@@ -4,20 +4,15 @@ using AngleSharp.Html.Parser;
 
 namespace Blaven.Transformation.Extensions
 {
-    public class BlogPostHeaderIncreaseTransform
-        : IBlogPostQueryTransform, IBlogPostStorageTransform
+    public class BlogPostHeaderIncreaseTransform(bool addClassName)
+                : IBlogPostQueryTransform, IBlogPostStorageTransform
     {
-        private readonly bool _addClassName;
+        private readonly bool _addClassName = addClassName;
 
         public BlogPostHeaderIncreaseTransform()
             : this(addClassName: true)
         {
 
-        }
-
-        public BlogPostHeaderIncreaseTransform(bool addClassName)
-        {
-            _addClassName = addClassName;
         }
 
         public void Transform(BlogPost post)

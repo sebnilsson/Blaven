@@ -8,7 +8,7 @@ namespace Blaven.Transformation.Extensions
     public class BlogPostSummaryTransform
         : IBlogPostQueryTransform, IBlogPostStorageTransform
     {
-        private static readonly HtmlParser s_htmlParser = new HtmlParser();
+        private static readonly HtmlParser s_htmlParser = new();
 
         private readonly int _maxLength;
         private readonly string _suffix;

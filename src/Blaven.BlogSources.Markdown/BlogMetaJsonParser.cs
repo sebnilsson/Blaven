@@ -16,6 +16,10 @@ namespace Blaven.BlogSources.Markdown
             try
             {
                 var meta = ParseInternal(fileData.Content);
+                if (meta is null)
+                {
+                    return null;
+                }
 
                 var fileName =
                     Path.GetFileNameWithoutExtension(fileData.FileName);
@@ -36,7 +40,7 @@ namespace Blaven.BlogSources.Markdown
             }
         }
 
-        private static BlogMeta ParseInternal(string json)
+        private static BlogMeta? ParseInternal(string json)
         {
             return BlavenJsonSerializer.Deserialize<BlogMeta>(json);
         }

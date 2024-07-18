@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HtmlSanitizer" Version="8.0.645" />
+    <PackageReference Include="HtmlSanitizer" Version="8.0.865" />
     <PackageReference Include="Markdig" Version="0.30.4" />
-    <PackageReference Include="System.Text.Json" Version="4.6.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.4" />
     <PackageReference Include="YamlDotNet" Version="13.0.1" />
   </ItemGroup>
 

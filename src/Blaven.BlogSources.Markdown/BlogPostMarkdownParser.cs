@@ -5,9 +5,8 @@ namespace Blaven.BlogSources.Markdown
 {
     internal class BlogPostMarkdownParser
     {
-        private readonly MarkdownConverter _markdownConverter =
-            new MarkdownConverter();
-        private readonly YamlConverter _yamlConverter = new YamlConverter();
+        private readonly MarkdownConverter _markdownConverter = new();
+        private readonly YamlConverter _yamlConverter = new();
 
         public BlogPost? Parse(FileData fileData)
         {

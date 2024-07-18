@@ -6,8 +6,7 @@ namespace Blaven.BlogSources.Markdown
 {
     internal class MarkdownConverter
     {
-        private readonly HtmlSanitizer _htmlSanitizer =
-            new HtmlSanitizer();
+        private readonly HtmlSanitizer _htmlSanitizer = new();
 
         private readonly MarkdownPipeline _markdownPipeline =
             new MarkdownPipelineBuilder()

@@ -10,9 +10,7 @@ namespace Blaven.BlogSources.FileProviders
         public const string KeyFolderString = ".";
 
         private static readonly char[] s_directorySeparatorChars =
-            new[] {
-                Path.DirectorySeparatorChar,
-                Path.AltDirectorySeparatorChar };
+            [Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar];
 
         public FileData(
             string content,

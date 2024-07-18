@@ -10,8 +10,7 @@ namespace Blaven.BlogSources.Markdown
     public class MarkdownBlogSource : IBlogSource
     {
         private readonly IFileDataProvider _fileDataProvider;
-        private readonly BlogPostMarkdownParser _blogPostMarkdownParser =
-            new BlogPostMarkdownParser();
+        private readonly BlogPostMarkdownParser _blogPostMarkdownParser = new();
 
         public MarkdownBlogSource(IFileDataProvider fileDataProvider)
         {

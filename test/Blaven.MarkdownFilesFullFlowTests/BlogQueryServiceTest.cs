@@ -56,7 +56,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
             Assert.Equal(new DateTime(2020, 2, 3, 4, 5, 6), post?.UpdatedAt);
 
             var tagsSequenceEquals =
-                expectedTags.SequenceEqual(post?.Tags);
+                expectedTags.SequenceEqual(post?.Tags ?? []);
 
             Assert.True(tagsSequenceEquals);
         }
@@ -215,7 +215,7 @@ namespace Blaven.MarkdownFilesEndToEndTests
             Assert.Equal(new DateTime(2020, 2, 3, 4, 5, 6), post?.UpdatedAt);
 
             var tagsSequenceEquals =
-                expectedTags.SequenceEqual(post?.Tags);
+                expectedTags.SequenceEqual(post?.Tags ?? []);
 
             Assert.True(tagsSequenceEquals);
         }

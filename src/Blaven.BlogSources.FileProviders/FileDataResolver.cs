@@ -5,15 +5,10 @@ using System.Threading.Tasks;
 
 namespace Blaven.BlogSources.FileProviders
 {
-    internal class FileDataResolver
+    internal class FileDataResolver(Encoding encoding)
     {
-        private readonly Encoding _encoding;
-
-        public FileDataResolver(Encoding encoding)
-        {
-            _encoding = encoding
+        private readonly Encoding _encoding = encoding
                 ?? throw new ArgumentNullException(nameof(encoding));
-        }
 
         public async Task<FileData> GetFileData(
             DirectoryInfo baseDirectory,

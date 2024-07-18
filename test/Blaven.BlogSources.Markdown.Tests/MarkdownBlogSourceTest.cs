@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Blaven.BlogSources.FileProviders;
@@ -64,8 +65,11 @@ namespace Blaven.BlogSources.Markdown.Tests
             var post = posts.FirstOrDefault(x => x.Id == "TEST_ID_1");
 
             // Assert
-            var expectTag =
-                Enumerable.Range(1, 3).Select(x => $"TEST_TAG_{x}").ToList();
+            IReadOnlyList<string> expectTags =
+                [
+                    .. Enumerable.Range(1, 3).Select(x => $"TEST_TAG_{x}"),
+                    "Test Tag with .NET in it",
+                ];
             var expectedContent =
                 @"<p><strong>Bold</strong> <em>Italic</em> </p>
 <div>TEST_DIV</div>".Replace(Environment.NewLine, "\n");
@@ -85,12 +89,12 @@ namespace Blaven.BlogSources.Markdown.Tests
             Assert.Equal("TEST_SOURCE_ID_1", post.SourceId);
             Assert.Equal("TEST_SOURCE_URL_1", post.SourceUrl);
             Assert.Equal("TEST_SUMMARY_1", post.Summary);
-            Assert.Equal("TEST_TITLE_1", post.Title);
-            Assert.Equal(new DateTime(2020, 2, 4, 4, 5, 6), post.UpdatedAt);
+            Assert.Equal("TEST TITLE WITH . IN IT", post.Title);
+            Assert.Equal(new DateTime(2020, 2, 4, 16, 17, 0, DateTimeKind.Utc), post.UpdatedAt);
 
             Assert.Equal(expectedContent, post.Content.Trim());
 
-            var tagsSequenceEquals = expectTag.SequenceEqual(post.Tags);
+            var tagsSequenceEquals = expectTags.OrderBy(x => x).SequenceEqual(post.Tags.OrderBy(x => x));
             Assert.True(tagsSequenceEquals);
         }
 

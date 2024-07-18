@@ -14,12 +14,13 @@ Tags:
 - TEST_TAG_1
 - TEST_TAG_2
 - TEST_TAG_3
-Title: TEST_TITLE_1
+- "Test Tag with .NET in it"
+Title: "TEST TITLE WITH . IN IT"
 BlogKey: test_blog_key_1
 Hash: TEST_HASH_1
 Id: TEST_ID_1
 SourceId: TEST_SOURCE_ID_1
-UpdatedAt: 2020-02-04T04:05:06
+UpdatedAt: 2020-02-04T16:17:00Z
 ---
 
 **Bold** *Italic* <script>alert('should not show')</script>

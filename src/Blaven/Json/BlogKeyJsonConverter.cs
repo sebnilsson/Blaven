@@ -11,7 +11,7 @@ namespace Blaven.Json
             Type typeToConvert,
             JsonSerializerOptions options)
         {
-            var value = reader.GetString();
+            var value = reader.GetString() ?? string.Empty;
 
             return new BlogKey(value);
         }
